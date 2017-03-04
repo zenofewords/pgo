@@ -70,6 +70,7 @@ class Move(DefaultModelMixin, NameMixin):
     )
     move_category = models.CharField(max_length=2, choices=MOVE_CATEGORY)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True)
+    legacy = models.BooleanField(default=False)
 
     power = models.IntegerField(blank=True, default=0)
     energy_delta = models.IntegerField(blank=True, default=0)

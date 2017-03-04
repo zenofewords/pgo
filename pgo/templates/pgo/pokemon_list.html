@@ -1,0 +1,9 @@
+{% extends 'pgo/pokemon_base.html' %}
+
+
+{% block content %}
+    {% for obj in object_list %}
+        <a href="{% url 'pgo:pokemon-detail' obj.slug %}">{{ obj }}</a>
+        <br>
+    {% endfor %}
+{% endblock content %}

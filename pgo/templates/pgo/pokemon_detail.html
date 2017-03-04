@@ -1,0 +1,25 @@
+{% extends 'pgo/pokemon_base.html' %}
+
+
+{% block content %}
+    <table>
+        <thead>
+            <th>Number</th>
+            <th>Pokemon name</th>
+            <th>Primary type</th>
+            <th>Secondary type</th>
+            <th>Attack</th>
+            <th>Defense</th>
+            <th>Stamina</th>
+        </thead>
+        <tr>
+            <td>{{ object.number }}</td>
+            <td>{{ object.name }}</td>
+            <td>{{ object.primary_type }}</td>
+            <td>{{ object.secondary_type|default:'' }}</td>
+            <td>{{ object.pgo_atk }}</td>
+            <td>{{ object.pgo_def }}</td>
+            <td>{{ object.pgo_sta }}</td>
+        </tr>
+    </table>
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% load zenofewords_tags %}
+<!DOCTYPE html>
+<html>
+    <body>
+        {% block header %}
+            {% navigation_tag 'default' %}
+            <hr>
+        {% endblock header %}
+
+        {% block content %}
+        {% endblock content %}
+
+        {% block footer %}
+            <hr>
+            zenofewords {% now 'Y' %}
+        {% endblock footer %}
+    </body>
+</html>

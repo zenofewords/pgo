@@ -1,0 +1,9 @@
+<ul>
+    {% for menu_item in menu_items.navigationitem_set.all %}
+        <li>
+            <a href="/{{ menu_item.slug }}">
+                {{ menu_item }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>

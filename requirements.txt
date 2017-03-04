@@ -1,0 +1,13 @@
+blessings==1.6
+bpython==0.16
+curtsies==0.2.11
+Django==1.10.3
+django-debug-toolbar==1.6
+djangorestframework==3.5.4
+greenlet==0.4.10
+psycopg2==2.6.2
+Pygments==2.1.3
+requests==2.12.1
+six==1.10.0
+sqlparse==0.2.2
+wcwidth==0.1.7

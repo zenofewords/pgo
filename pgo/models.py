@@ -15,6 +15,11 @@ class Pokemon(DefaultModelMixin, NameMixin):
         related_name='primary_types', blank=True, null=True)
     secondary_type = models.ForeignKey('pgo.Type',
         related_name='secondary_types', blank=True, null=True)
+    quick_moves = models.ManyToManyField('pgo.Move', blank=True,
+        related_name='quick')
+    cinematic_moves = models.ManyToManyField('pgo.Move', blank=True,
+        related_name='cinematic')
+
     pgo_attack = models.IntegerField(verbose_name='PGO Attack',
         blank=True, null=True)
     pgo_defense = models.IntegerField(verbose_name='PGO Defense',

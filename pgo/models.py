@@ -15,9 +15,14 @@ class Pokemon(DefaultModelMixin, NameMixin):
         related_name='primary_types', blank=True, null=True)
     secondary_type = models.ForeignKey('pgo.Type',
         related_name='secondary_types', blank=True, null=True)
-    pgo_attack = models.IntegerField(verbose_name='ATK', blank=True, null=True)
-    pgo_defense = models.IntegerField(verbose_name='DEF', blank=True, null=True)
-    pgo_stamina = models.IntegerField(verbose_name='STA', blank=True, null=True)
+    pgo_attack = models.IntegerField(verbose_name='PGO Attack',
+        blank=True, null=True)
+    pgo_defense = models.IntegerField(verbose_name='PGO Defense',
+        blank=True, null=True)
+    pgo_stamina = models.IntegerField(verbose_name='PGO Stamina',
+        blank=True, null=True)
+    maximum_cp = models.DecimalField(verbose_name='Combat Power',
+        max_digits=7, decimal_places=2, blank=True, null=True)
 
     attack = models.IntegerField(blank=True, null=True)
     special_attack = models.IntegerField(blank=True, null=True)

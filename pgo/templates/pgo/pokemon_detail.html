@@ -1,4 +1,5 @@
 {% extends 'pgo/pokemon_base.html' %}
+{% load zenofewords_tags %}
 
 
 {% block content %}
@@ -8,18 +9,38 @@
             <th>Pokemon name</th>
             <th>Primary type</th>
             <th>Secondary type</th>
+            <th>Stamina</th>
             <th>Attack</th>
             <th>Defense</th>
-            <th>Stamina</th>
+            <th>Max CP</th>
         </thead>
         <tr>
             <td>{{ object.number }}</td>
             <td>{{ object.name }}</td>
             <td>{{ object.primary_type }}</td>
-            <td>{{ object.secondary_type|default:'' }}</td>
-            <td>{{ object.pgo_atk }}</td>
-            <td>{{ object.pgo_def }}</td>
-            <td>{{ object.pgo_sta }}</td>
+            <td>{{ object.secondary_type|default:'-' }}</td>
+            <td>{{ object.pgo_stamina }}</td>
+            <td>{{ object.pgo_attack }}</td>
+            <td>{{ object.pgo_defense }}</td>
+            <td>{{ object.maximum_cp|floor }}</td>
+        </tr>
+
+        <th>Quick Moves</th>
+        <tr>
+            {% for move in object.quick_moves.all %}
+                <td>
+                    {{ move }}
+                </td>
+            {% endfor %}
+        </tr>
+
+        <th>Cinematic Moves</th>
+        <tr>
+            {% for move in object.cinematic_moves.all %}
+                <td>
+                    {{ move }}
+                </td>
+            {% endfor %}
         </tr>
     </table>
 {% endblock content %}

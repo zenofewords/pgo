@@ -1,9 +1,50 @@
 {% extends 'pgo/pokemon_base.html' %}
+{% load zenofewords_tags %}
 
 
 {% block content %}
-    {% for obj in object_list %}
-        <a href="{% url 'pgo:pokemon-detail' obj.slug %}">{{ obj }}</a>
-        <br>
-    {% endfor %}
+    <table>
+        <thead>
+            <th>Number</th>
+            <th>Name</th>
+            <th>Primary Type</th>
+            <th>Secondary Type</th>
+            <th>Stamina</th>
+            <th>Attack</th>
+            <th>Defense</th>
+            <th>Max CP</th>
+        </thead>
+        {% for obj in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'pgo:pokemon-detail' obj.slug %}">
+                        {{ obj.number }}
+                    </a>
+                </td>
+                <td>
+                    {{ obj.name }}
+                </td>
+                <td>
+                    {{ obj.primary_type }}
+                </td>
+                <td>
+                    {{ obj.secondary_type|default:"-" }}
+                </td>
+                <td>
+                    {{ obj.pgo_stamina }}
+                </td>
+                <td>
+                    {{ obj.pgo_attack }}
+                </td>
+                <td>
+                    {{ obj.pgo_defense }}
+                </td>
+                <td>
+                    {{ obj.maximum_cp|floor }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {{ block.super }}
 {% endblock content %}

@@ -1,0 +1,49 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block content %}
+    <table>
+        <thead>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>Power</th>
+            <th>Energy Delta</th>
+            <th>Duration</th>
+            <th>Damage Window Start</th>
+            <th>DPS</th>
+        </thead>
+        {% for obj in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'pgo:move-detail' obj.slug %}">
+                        {{ obj.name }} {{ obj.legacy|yesno:"Legacy Move," }}
+                    </a>
+                </td>
+                <td>
+                    {{ obj.get_move_category_display }}
+                </td>
+                <td>
+                    {{ obj.move_type }}
+                </td>
+                <td>
+                    {{ obj.power }}
+                </td>
+                <td>
+                    {{ obj.energy_delta }}
+                </td>
+                <td>
+                    {{ obj.duration }}
+                </td>
+                <td>
+                    {{ obj.damage_window_start }}
+                </td>
+                <td>
+                    {{ obj.dps }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {{ block.super }}
+{% endblock content %}

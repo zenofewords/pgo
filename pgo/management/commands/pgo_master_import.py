@@ -46,7 +46,7 @@ TYPE_IMPORT_ORDER = (
 
 class Command(BaseCommand):
     help = '''
-        Build the CPM, Pokemon, Moves and Types models, parsed from the .csv source file.
+        Build the CPM, Pokemon, Move and Type models, parsed from the .csv source file.
     '''
 
     def get_or_create_cpm(self, value, level):

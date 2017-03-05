@@ -158,12 +158,12 @@ class Command(BaseCommand):
 
                 if 'moves' in detail:
                     for move_name in detail['moves']['quick']:
-                        pokemon_moves.append(self.get_or_create_move(
+                        pokemon.quick_moves.add(self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'QK'
                         ))
 
                     for move_name in detail['moves']['cinematic']:
-                        pokemon_moves.append(self.get_or_create_move(
+                        pokemon.cinematic_moves.add(self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'CC'
                         ))
             pokemon.save()

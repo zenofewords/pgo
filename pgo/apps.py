@@ -3,5 +3,5 @@ from __future__ import unicode_literals
 from django.apps import AppConfig
 
 
-class PGOConfig(AppConfig):
-    name = 'PGO'
+class PGoConfig(AppConfig):
+    name = 'PGo'

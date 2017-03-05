@@ -20,11 +20,11 @@ class Pokemon(DefaultModelMixin, NameMixin):
     cinematic_moves = models.ManyToManyField('pgo.Move', blank=True,
         related_name='cinematic')
 
-    pgo_attack = models.IntegerField(verbose_name='PGO Attack',
+    pgo_attack = models.IntegerField(verbose_name='PGo Attack',
         blank=True, null=True)
-    pgo_defense = models.IntegerField(verbose_name='PGO Defense',
+    pgo_defense = models.IntegerField(verbose_name='PGo Defense',
         blank=True, null=True)
-    pgo_stamina = models.IntegerField(verbose_name='PGO Stamina',
+    pgo_stamina = models.IntegerField(verbose_name='PGo Stamina',
         blank=True, null=True)
     maximum_cp = models.DecimalField(verbose_name='Combat Power',
         max_digits=7, decimal_places=2, blank=True, null=True)
@@ -91,6 +91,9 @@ class Move(DefaultModelMixin, NameMixin):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('-move_category', 'name',)
 
 
 class CPM(models.Model):

@@ -12,9 +12,16 @@ from pgo.models import (
 )
 
 
+class PokemonAdmin(admin.ModelAdmin):
+    list_display = (
+        'number', 'name', 'primary_type', 'secondary_type', 'pgo_stamina',
+        'pgo_attack', 'pgo_defense', 'maximum_cp',
+    )
+
+
 admin.site.register(CPM)
 admin.site.register(Move)
-admin.site.register(Pokemon)
+admin.site.register(Pokemon, PokemonAdmin)
 admin.site.register(Type)
 admin.site.register(TypeAdvantage)
 admin.site.register(TypeEffectivness)

@@ -5,7 +5,7 @@ from django.views.generic import (
 )
 
 from pgo.models import (
-    Pokemon, Move,
+    Pokemon, Move, Type,
 )
 
 
@@ -38,3 +38,11 @@ class MoveListView(ListView):
 
 class MoveDetailView(DetailView):
     model = Move
+
+
+class TypeListView(ListView):
+    model = Type
+
+
+class TypeDetailView(DetailView):
+    model = Type

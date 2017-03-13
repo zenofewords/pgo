@@ -4,16 +4,19 @@ from django.conf.urls import url
 
 from pgo.views import (
     PGoHomeView, PokemonDetailView, PokemonListView, MoveDetailView,
-    MoveListView,
+    MoveListView, TypeDetailView, TypeListView,
 )
 
 
 urlpatterns = (
-    url(r'^moves/(?P<slug>[\w|\W]+)$',
+    url(r'^move/(?P<slug>[\w|\W]+)$',
         MoveDetailView.as_view(), name='move-detail'),
     url(r'^moves/$', MoveListView.as_view(), name='move-list'),
     url(r'^pokemon/(?P<slug>[\w|\W]+)$',
         PokemonDetailView.as_view(), name='pokemon-detail'),
     url(r'^pokemon/$', PokemonListView.as_view(), name='pokemon-list'),
+    url(r'^type/(?P<slug>[\w]+)$',
+        TypeDetailView.as_view(), name='type-detail'),
+    url(r'^types/$', TypeListView.as_view(), name='type-list'),
     url(r'^$', PGoHomeView.as_view(), name='pgo-home'),
 )

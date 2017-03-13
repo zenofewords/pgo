@@ -7,8 +7,8 @@ from pgo.models import (
     Move,
     Pokemon,
     Type,
-    TypeAdvantage,
     TypeEffectivness,
+    TypeEffectivnessScalar,
 )
 
 
@@ -23,5 +23,5 @@ admin.site.register(CPM)
 admin.site.register(Move)
 admin.site.register(Pokemon, PokemonAdmin)
 admin.site.register(Type)
-admin.site.register(TypeAdvantage)
 admin.site.register(TypeEffectivness)
+admin.site.register(TypeEffectivnessScalar)

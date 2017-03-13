@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from zenofewords.mixins import (
@@ -46,6 +47,10 @@ class Pokemon(DefaultModelMixin, NameMixin):
 
 
 class Type(DefaultModelMixin, NameMixin, OrderMixin):
+    strong = JSONField(blank=True, null=True)
+    feeble = JSONField(blank=True, null=True)
+    resistant = JSONField(blank=True, null=True)
+    weak = JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ('slug',)
@@ -54,17 +59,17 @@ class Type(DefaultModelMixin, NameMixin, OrderMixin):
         return self.name
 
 
-class TypeAdvantage(models.Model):
-    first_type = models.ForeignKey('pgo.Type', related_name='first')
-    second_type = models.ForeignKey('pgo.Type', related_name='second')
+class TypeEffectivness(models.Model):
+    type_offense = models.ForeignKey('pgo.Type', related_name='type_offense')
+    type_defense = models.ForeignKey('pgo.Type', related_name='type_defense')
     relation = models.CharField(max_length=30, blank=True)
-    effectivness = models.ForeignKey('pgo.TypeEffectivness')
+    effectivness = models.ForeignKey('pgo.TypeEffectivnessScalar')
 
     def __str__(self):
         return '{0}: {1}'.format(self.relation, self.effectivness)
 
 
-class TypeEffectivness(NameMixin):
+class TypeEffectivnessScalar(NameMixin):
     scalar = models.DecimalField(max_digits=4, decimal_places=2)
 
     def __str__(self):
@@ -78,7 +83,7 @@ class Move(DefaultModelMixin, NameMixin):
         (QK, 'Quick'),
         (CC, 'Cinematic'),
     )
-    move_category = models.CharField(max_length=2, choices=MOVE_CATEGORY)
+    category = models.CharField(max_length=2, choices=MOVE_CATEGORY)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True)
     legacy = models.BooleanField(default=False)
 
@@ -89,11 +94,16 @@ class Move(DefaultModelMixin, NameMixin):
     damage_window_start = models.IntegerField(blank=True, null=True)
     damage_window_end = models.IntegerField(blank=True, null=True)
 
+    DPS = models.DecimalField(max_digits=3, decimal_places=1,
+        blank=True, null=True)
+    EPS = models.DecimalField(max_digits=3, decimal_places=1,
+        blank=True, null=True)
+
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ('-move_category', 'name',)
+        ordering = ('-category', 'name',)
 
 
 class CPM(models.Model):

@@ -1,0 +1,50 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block content %}
+    <table>
+        <thead>
+            <th rowspan="2">Type</th>
+            <th colspan="2">Offense</th>
+            <th colspan="2">Defense</th>
+        </thead>
+        <thead>
+            <th>&nbsp;</th>
+            <th>Strong</th>
+            <th>Feeble</th>
+            <th>Resistant</th>
+            <th>Weak</th>
+        </thead>
+        {% for obj in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'pgo:type-detail' obj.slug %}">
+                        {{ obj }}
+                    </a>
+                </td>
+                <td>
+                    {% for strong in obj.strong %}
+                        {{ strong.0 }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for feeble in obj.feeble %}
+                        {{ feeble.0 }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for resistant in obj.resistant %}
+                        {{ resistant.0 }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for weak in obj.weak %}
+                        {{ weak.0 }}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {{ block.super }}
+{% endblock content %}

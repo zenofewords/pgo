@@ -12,6 +12,7 @@
             <th>Duration</th>
             <th>Damage Window Start</th>
             <th>DPS</th>
+            <th>EPS</th>
         </thead>
         {% for obj in object_list %}
             <tr>
@@ -21,7 +22,7 @@
                     </a>
                 </td>
                 <td>
-                    {{ obj.get_move_category_display }}
+                    {{ obj.get_category_display }}
                 </td>
                 <td>
                     {{ obj.move_type }}
@@ -33,13 +34,16 @@
                     {{ obj.energy_delta }}
                 </td>
                 <td>
-                    {{ obj.duration }}
+                    {{ obj.duration }}ms
                 </td>
                 <td>
-                    {{ obj.damage_window_start }}
+                    {{ obj.damage_window_start }}ms
                 </td>
                 <td>
-                    {{ obj.dps }}
+                    {{ obj.DPS }}
+                </td>
+                <td>
+                    {{ obj.EPS }}
                 </td>
             </tr>
         {% endfor %}

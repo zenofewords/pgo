@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-from decimal import Decimal
-
 from django.core.management.base import BaseCommand
 
 from pgo.models import (

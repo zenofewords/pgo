@@ -94,10 +94,10 @@ class Move(DefaultModelMixin, NameMixin):
     damage_window_start = models.IntegerField(blank=True, null=True)
     damage_window_end = models.IntegerField(blank=True, null=True)
 
-    DPS = models.DecimalField(max_digits=3, decimal_places=1,
-        blank=True, null=True)
-    EPS = models.DecimalField(max_digits=3, decimal_places=1,
-        blank=True, null=True)
+    dps = models.DecimalField(verbose_name='DPS',
+        max_digits=3, decimal_places=1, blank=True, null=True)
+    eps = models.DecimalField(verbose_name='EPS',
+        max_digits=3, decimal_places=1, blank=True, null=True)
 
     def __str__(self):
         return self.name

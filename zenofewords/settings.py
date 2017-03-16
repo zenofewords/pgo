@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'debug_toolbar',
+    'django_extensions',
+
+    'rest_framework',
 
     'zenofewords',
     'pgo',
@@ -136,3 +139,10 @@ STATIC_FILES_DIR = [
     os.path.join(BASE_DIR, 'static')
 ]
 # STATIC_ROOT = "/var/www/example.com/static/"
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAdminUser',
+    ],
+    'PAGE_SIZE': 251
+}

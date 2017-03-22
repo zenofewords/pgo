@@ -13,6 +13,7 @@ from pgo.models import (
     CPM,
     Pokemon,
     Move,
+    MoveSet,
     Type,
     TypeEffectivness,
     TypeEffectivnessScalar,
@@ -82,7 +83,7 @@ class Command(BaseCommand):
 
     def get_or_create_pokemon(self, number):
         obj, created = Pokemon.objects.get_or_create(number=number)
-        return obj
+        return obj, created
 
     def get_or_create_move(self, slug, category):
         obj, created = Move.objects.get_or_create(
@@ -92,7 +93,7 @@ class Command(BaseCommand):
                 'category': category
             }
         )
-        return obj
+        return obj, created
 
     def _process_cpm(self, cpm):
         previous_value = None
@@ -120,8 +121,13 @@ class Command(BaseCommand):
                         TypeEffectivnessScalar.objects.get(scalar=scalar))
 
     def _process_pokemon(self, pokemon_data):
+        existing_movesets = MoveSet.objects.all()
+        new_movesets = []
+
         for pokemon_number, data in pokemon_data.items():
-            pokemon = self.get_or_create_pokemon(pokemon_number)
+            quick_moves = []
+            cinematic_moves = []
+            pokemon, created = self.get_or_create_pokemon(pokemon_number)
 
             pokemon_types = []
             for detail in data:
@@ -157,22 +163,42 @@ class Command(BaseCommand):
 
                 if 'moves' in detail:
                     for move_name in detail['moves']['quick']:
-                        pokemon.quick_moves.add(self.get_or_create_move(
+                        quick_move = self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'QK'
-                        ))
+                        )[0]
+                        pokemon.quick_moves.add(quick_move)
+                        quick_moves.append(quick_move)
 
                     for move_name in detail['moves']['cinematic']:
-                        pokemon.cinematic_moves.add(self.get_or_create_move(
+                        cinematic_move = self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'CC'
-                        ))
+                        )[0]
+                        pokemon.cinematic_moves.add(cinematic_move)
+                        cinematic_moves.append(cinematic_move)
+
+                if 'legendary' in detail:
+                    pokemon.legendary = True
+
+            for quick_move in quick_moves:
+                for cinematic_move in cinematic_moves:
+                    new_movesets.append(MoveSet.objects.get_or_create(
+                        pokemon=pokemon,
+                        key='{} - {}'.format(quick_move, cinematic_move)
+                    ))
             pokemon.save()
+
+        legacy_movesets = existing_movesets.exclude(
+            id__in=[x[0].pk for x in new_movesets])
+        for legacy_moveset in legacy_movesets:
+            legacy_moveset.legacy = True
+            legacy_moveset.save()
 
     def _process_moves(self, move_data):
         for move_slug, data in move_data.items():
             move = None
             for detail in data:
                 if 'category' in detail:
-                    move = self.get_or_create_move(
+                    move, _ = self.get_or_create_move(
                         move_slug, detail['category'])
                 if 'move_type' in detail:
                     move.move_type_id = \
@@ -310,6 +336,12 @@ class Command(BaseCommand):
                             'cinematic': cinematic
                         }
                         data.append({'moves': moves})
+
+                        while 'animation_time' in self._next(csv_object):
+                            pass
+
+                        if 'rarity' in self._next(csv_object):
+                            data.append({'legendary': True})
                         pokemon_data[template_id] = data
                     else:
                         data = []

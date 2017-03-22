@@ -17,9 +17,9 @@ class Pokemon(DefaultModelMixin, NameMixin):
     secondary_type = models.ForeignKey('pgo.Type',
         related_name='secondary_types', blank=True, null=True)
     quick_moves = models.ManyToManyField('pgo.Move', blank=True,
-        related_name='quick')
+        related_name='quick_moves')
     cinematic_moves = models.ManyToManyField('pgo.Move', blank=True,
-        related_name='cinematic')
+        related_name='cinematic_moves')
 
     pgo_attack = models.IntegerField(verbose_name='PGo Attack',
         blank=True, null=True)
@@ -29,6 +29,8 @@ class Pokemon(DefaultModelMixin, NameMixin):
         blank=True, null=True)
     maximum_cp = models.DecimalField(verbose_name='Combat Power',
         max_digits=7, decimal_places=2, blank=True, null=True)
+
+    legendary = models.BooleanField(default=False)
 
     attack = models.IntegerField(blank=True, null=True)
     special_attack = models.IntegerField(blank=True, null=True)
@@ -85,7 +87,6 @@ class Move(DefaultModelMixin, NameMixin):
     )
     category = models.CharField(max_length=2, choices=MOVE_CATEGORY)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True)
-    legacy = models.BooleanField(default=False)
 
     power = models.IntegerField(blank=True, default=0)
     energy_delta = models.IntegerField(blank=True, default=0)
@@ -104,6 +105,20 @@ class Move(DefaultModelMixin, NameMixin):
 
     class Meta:
         ordering = ('-category', 'name',)
+
+
+class MoveSet(DefaultModelMixin):
+    pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True)
+    key = models.CharField(max_length=50, blank=True)
+    legacy = models.BooleanField(default=False)
+    weave_damage = JSONField(blank=True, null=True)
+
+    def __str__(self):
+        return '{} {}'.format(self.pokemon.name, self.key)
+
+    class Meta:
+        ordering = ('pokemon__number', 'weave_damage',)
+        unique_together = ('pokemon', 'key',)
 
 
 class CPM(models.Model):

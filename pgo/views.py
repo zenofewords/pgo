@@ -5,7 +5,7 @@ from django.views.generic import (
 )
 
 from pgo.models import (
-    Pokemon, Move, Type,
+    Pokemon, Move, MoveSet, Type,
 )
 
 
@@ -28,6 +28,12 @@ class PokemonDetailView(DetailView):
             'primary_type', 'secondary_type').prefetch_related(
             'quick_moves', 'cinematic_moves')
 
+    def get_context_data(self, **kwargs):
+        context = super(PokemonDetailView, self).get_context_data(**kwargs)
+
+        context['movesets'] = MoveSet.objects.filter(pokemon=self.object)
+        return context
+
 
 class MoveListView(ListView):
     model = Move
@@ -46,3 +52,11 @@ class TypeListView(ListView):
 
 class TypeDetailView(DetailView):
     model = Type
+
+
+class MoveSetListView(ListView):
+    model = MoveSet
+
+
+class MoveSetDetailView(DetailView):
+    model = DetailView

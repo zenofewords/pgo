@@ -25,22 +25,69 @@
             <td>{{ object.maximum_cp|floor }}</td>
         </tr>
 
-        <th>Quick Moves</th>
-        <tr>
-            {% for move in object.quick_moves.all %}
+        <th>Quick moves</th>
+        {% for move in object.quick_moves.all %}
+            <tr>
                 <td>
                     {{ move }}
+                    {{ move.duration }}ms
+                    {{ move.power }}
+                    {{ move.dps }}
+                    {{ move.eps }}
                 </td>
-            {% endfor %}
-        </tr>
+            </tr>
+        {% endfor %}
 
-        <th>Cinematic Moves</th>
-        <tr>
-            {% for move in object.cinematic_moves.all %}
+        <th>Cinematic moves</th>
+        {% for move in object.cinematic_moves.all %}
+            <tr>
                 <td>
                     {{ move }}
+                    {{ move.duration }}ms
+                    {{ move.power }}
+                    {{ move.dps }}
+                    {{ move.energy_delta }}
                 </td>
-            {% endfor %}
+            </tr>
+        {% endfor %}
+
+        <tr>
+            <th>
+                Moveset weave damage
+            </th>
         </tr>
+        {% for moveset in movesets %}
+            {% if forloop.first %}
+                <tr>
+                    <th>
+                        Pokemon level
+                    </th>
+                    <th>
+                        {% for moveset_data in moveset.weave_damage %}
+                            &nbsp;{{ moveset_data.0|floatformat:"0" }}&nbsp;
+                        {% endfor %}
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Moveset
+                    </th>
+                    <th>
+                        Damage / 99s
+                    </th>
+                </tr>
+            {% endif %}
+            <tr>
+                <td>
+                    {{ moveset.key }} {{ moveset.legacy|yesno:"Legacy," }}
+                </td>
+
+                <td>
+                    {% for moveset_data in moveset.weave_damage %}
+                        {{ moveset_data.1|floatformat:"0" }}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock content %}

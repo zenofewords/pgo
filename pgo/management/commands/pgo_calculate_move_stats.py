@@ -11,10 +11,10 @@ class Command(BaseCommand):
     help = 'Calculate and store DPS/EPS for all currently listed moves.'
 
     def _calculate_move_dps(self, move):
-        move.DPS = move.power / (move.duration / 1000.0)
+        move.dps = move.power / (move.duration / 1000.0)
 
     def _calculate_move_eps(self, move):
-        move.EPS = move.energy_delta / (move.duration / 1000.0)
+        move.eps = move.energy_delta / (move.duration / 1000.0)
 
     def handle(self, *args, **options):
         for move in Move.objects.all():

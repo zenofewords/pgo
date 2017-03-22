@@ -1,0 +1,15 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block content %}
+    {% for moveset in object_list %}
+        {{ moveset.key }}
+        <br>
+        {% for moveset_data in moveset.weave_damage %}
+            {{ moveset_data }}
+            <br>
+        {% endfor %}
+    {% endfor %}
+
+    {{ block.super }}
+{% endblock content %}

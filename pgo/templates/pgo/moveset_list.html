@@ -2,14 +2,37 @@
 
 
 {% block content %}
-    {% for moveset in object_list %}
-        {{ moveset.key }}
-        <br>
-        {% for moveset_data in moveset.weave_damage %}
-            {{ moveset_data }}
-            <br>
+    <table>
+        <tr>
+            <th>Pokemon</th>
+            <th>Moveset</th>
+            <th colspan="5">Damage over 99s</th>
+        </tr>
+        <tr>
+            <th colspan="2">&nbsp;</th>
+            <th>L20</th>
+            <th>L25</th>
+            <th>L30</th>
+            <th>L35</th>
+            <th>L40</th>
+        </tr>
+
+        {% for moveset in object_list %}
+            <tr>
+                <td>
+                    {{ moveset.pokemon.name }}
+                </td>
+                <td>
+                    {{ moveset.key }}
+                </td>
+                {% for moveset_data in moveset.weave_damage %}
+                    <td>
+                        {{ moveset_data.1|floatformat:"0" }}
+                    </td>
+                {% endfor %}
+            </tr>
         {% endfor %}
-    {% endfor %}
+    </table>
 
     {{ block.super }}
 {% endblock content %}

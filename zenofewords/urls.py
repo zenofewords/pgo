@@ -11,15 +11,15 @@ from zenofewords.views import HomeView
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^api-pgo/', include(pgo_router.urls)),
+    url(r'^api-pgo/', include(pgo_router.urls, namespace='api-pgo')),
     url(r'^api-auth/', include(
         'rest_framework.urls', namespace='rest_framework')),
 
-    url(r'^$', HomeView.as_view(), name='home'),
     url(r'^blog/', include('blog.urls', namespace='blog')),
     url(r'^pgo/', include('pgo.urls', namespace='pgo')),
     url(r'^book/', include('book.urls', namespace='book')),
     url(r'^tcg/', include('tcg.urls', namespace='tcg')),
+    url(r'^$', HomeView.as_view(), name='home'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

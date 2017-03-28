@@ -9,7 +9,7 @@ class TypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Type
         fields = (
-            'name', 'strong', 'feeble', 'resistant', 'weak',
+            'id', 'name', 'strong', 'feeble', 'resistant', 'weak',
         )
 
 
@@ -19,8 +19,16 @@ class MoveSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Move
         fields = (
-            'category', 'move_type', 'power', 'energy_delta', 'duration',
-            'dps', 'eps',
+            'id', 'name', 'category', 'move_type', 'power', 'energy_delta',
+            'duration', 'dps', 'eps',
+        )
+
+
+class SimpleMoveSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Move
+        fields = (
+            'id', 'name', 'category',
         )
 
 
@@ -31,6 +39,6 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Pokemon
         fields = (
-            'number', 'name', 'primary_type', 'secondary_type',
+            'id', 'number', 'name', 'primary_type', 'secondary_type',
             'pgo_attack', 'pgo_defense', 'pgo_stamina', 'maximum_cp',
         )

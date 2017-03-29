@@ -1,0 +1,207 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block content %}
+    <form id="aProForm">
+        <select id="attacker" class="a-pro-select">
+            <option value="0" selected>Select attacker</option>
+            {% for data in pokemon_data %}
+                <option value="{{ data.0 }}">{{ data.1 }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <select id="quick_move" class="a-pro-select" disabled>
+            <option value="0" selected>Quick move</option>
+        </select>
+        <br>
+
+        <select id="cinematic_move" class="a-pro-select" disabled>
+            <option value="0" selected>Cinematic move</option>
+        </select>
+        <br>
+
+        <input type="number" id="level" class="a-pro-input" name="level" placeholder="Level" min="1" max="40" step="0.5">
+
+        <input type="number" id="attack" class="a-pro-input" name="attack" placeholder="ATK IV" min="0" max="15" step="1">
+        <br>
+
+        <select id="defender" class="a-pro-select">
+            <option value="0" selected>Select defender</option>
+            {% for data in pokemon_data %}
+                <option value="{{ data.0 }}">{{ data.1 }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <input type="submit" id="submit" name="submit" class="a-pro-button" disabled>
+    </form>
+{% endblock content %}
+
+{% block scripts %}
+    {{ block.super }}
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.a-pro-select').select2()
+            $('select').on(
+                'select2:select',(
+                    function(){
+                        $(this).focus()
+                    }
+                )
+            )
+
+            var quickMoveSelect = $('#quick_move')
+            var cinematicMoveSelect = $('#cinematic_move')
+            var submitButton = $('#submit')
+
+            var attackerChoice = undefined
+            var quickMoveChoice = undefined
+            var cinematicMoveChoice = undefined
+            var levelChoice = undefined
+            var attackChoice = undefined
+            var defenderChoice = undefined
+
+            $('#attacker').change(function() {
+                filterQueryset(this.value)
+                attackerChoice = this.value
+            })
+            quickMoveSelect.change(function() {
+                quickMoveChoice = this.value
+            })
+            cinematicMoveSelect.change(function() {
+                cinematicMoveChoice = this.value
+            })
+            $('#level').on('change', function() {
+                var choice = validateLevel(this)
+
+                if (!isNaN(choice)) {
+                    this.value = choice
+                    levelChoice = choice
+                }
+            })
+            $('#attack').on('change keyup', function() {
+                var choice = validateAttack(this)
+
+                if (!isNaN(choice)) {
+                    this.value = choice
+                    attackChoice = choice
+                }
+            })
+            $('#defender').change(function() {
+                defenderChoice = this.value
+            })
+            $('#aProForm').on('submit', function(event) {
+                event.preventDefault()
+                submitForm()
+            })
+
+            $('.a-pro-select, .a-pro-input').on('change keyup paste', function() {
+
+                if (attackerChoice && quickMoveChoice && cinematicMoveChoice && levelChoice && attackChoice && defenderChoice) {
+                    submitButton.prop('disabled', false)
+                }
+                else {
+                    submitButton.prop('disabled', true)
+                }
+            })
+
+            function filterQueryset(value){
+                if (value !== '0') {
+                    $.ajax({
+                        url: "{% url 'api-pgo:move-list' %}",
+                        type: 'GET',
+                        data: {
+                            'pokemon-id': value
+                        },
+                        success: function(json){
+                            clearMoveInputs()
+                            $.each(json.results, function(i, move) {
+                                if (move.category === 'QK') {
+                                    quickMoveSelect.prop('disabled', false)
+                                    quickMoveSelect.append(
+                                        '<option value=' + move.id + '>' + move.name + '</option>'
+                                    )
+                                }
+                                else {
+                                    cinematicMoveSelect.prop('disabled', false)
+                                    cinematicMoveSelect.append(
+                                        '<option value=' + move.id + '>' + move.name + '</option>'
+                                    )
+                                }
+                            })
+                        },
+                        error: function(xhr, errmsg, err){
+                            console.log(xhr)
+                        }
+                    })
+                }
+                else {
+                    quickMoveSelect.prop('disabled', true)
+                    cinematicMoveSelect.prop('disabled', true)
+                    clearMoveInputs()
+                }
+            }
+
+            function submitForm() {
+                console.log('submitting form')
+            }
+
+            function clearMoveInputs() {
+                quickMoveSelect.empty()
+                quickMoveSelect.append(
+                    '<option>Select quick move</option>'
+                )
+                cinematicMoveSelect.empty()
+                cinematicMoveSelect.append(
+                    '<option>Select cinematic move</option>'
+                )
+            }
+
+            function validateLevel(input) {
+                var level = parseFloat(input.value)
+
+                if (level < 0) {
+                    level *= - 1
+                }
+                if (level < 1) {
+                    level = 1
+                }
+                if (level > 40) {
+                    level = 40
+                }
+                if ((level * 10) % 5 !== 0) {
+                    level = parseInt(level)
+                }
+                return level
+            }
+
+            function validateAttack(input) {
+                var attack = parseInt(input.value)
+
+                if (attack < 0) {
+                    attack = 0
+                }
+                if (attack > 15) {
+                    attack = 15
+                }
+                return attack
+            }
+        })
+    </script>
+
+    <style type="text/css">
+        .a-pro-select {
+            width: 200px;
+        }
+        .a-pro-input {
+            width: 92px;
+            height: 20px;
+        }
+        .a-pro-button {
+            width: 200px;
+            height: 25px;
+        }
+    </style>
+{% endblock scripts %}

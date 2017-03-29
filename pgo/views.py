@@ -57,6 +57,19 @@ class TypeDetailView(DetailView):
 class MoveSetListView(ListView):
     model = MoveSet
 
+    def get_queryset(self):
+        return self.model.objects.select_related('pokemon')
+
 
 class MoveSetDetailView(DetailView):
     model = DetailView
+
+
+class AttackProficiencyView(TemplateView):
+    template_name = 'pgo/attack_proficiency.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AttackProficiencyView, self).get_context_data(**kwargs)
+
+        context['pokemon_data'] = Pokemon.objects.values_list('id', 'name')
+        return context

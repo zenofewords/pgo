@@ -5,7 +5,7 @@ from django.conf.urls import url
 from pgo.views import (
     PGoHomeView, PokemonDetailView, PokemonListView, MoveDetailView,
     MoveListView, MoveSetDetailView, MoveSetListView, TypeDetailView,
-    TypeListView,
+    TypeListView, AttackProficiencyView,
 )
 
 
@@ -22,5 +22,6 @@ urlpatterns = (
     url(r'^moveset(?P<pk>[\d]+)/$',
         MoveSetDetailView.as_view(), name='moveset-detail'),
     url(r'^movesets/$', MoveSetListView.as_view(), name='moveset-list'),
+    url(r'^a-pro/$', AttackProficiencyView.as_view(), name='attack-proficiency'),
     url(r'^$', PGoHomeView.as_view(), name='pgo-home'),
 )

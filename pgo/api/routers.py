@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from rest_framework import routers
 
 from pgo.api.views import (

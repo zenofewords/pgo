@@ -217,8 +217,8 @@ class Command(BaseCommand):
 
     def _map_type_effectivness(self):
         types = Type.objects.all()
-        se = TypeEffectivnessScalar.objects.get(slug='super-effective')
-        nve = TypeEffectivnessScalar.objects.get(slug='not-very-effective')
+        se = TypeEffectivnessScalar.objects.get(slug='super-effective').scalar
+        nve = TypeEffectivnessScalar.objects.get(slug='not-very-effective').scalar
 
         for _type in types:
             type_offense_strong = []
@@ -227,18 +227,17 @@ class Command(BaseCommand):
             type_defense_weak = []
 
             for type_e in _type.type_offense.all():
-                scalar = str(type_e.effectivness.scalar)
-                # todo: fix decimal stored as 0.80 (trailing zero)
-                if scalar == '1.25':
+                scalar = type_e.effectivness.scalar
+                if scalar == se:
                     type_offense_strong.append((type_e.type_defense, scalar))
-                if scalar == '0.80':
+                if scalar == nve:
                     type_offense_feeble.append((type_e.type_defense, scalar))
             for type_e in _type.type_defense.all():
-                scalar = str(type_e.effectivness.scalar)
-                if scalar == '0.80':
+                scalar = type_e.effectivness.scalar
+                if scalar == nve:
                     type_defense_resistant.append(
                         (type_e.type_offense, scalar))
-                if scalar == '1.25':
+                if scalar == se:
                     type_defense_weak.append(
                         (type_e.type_offense, scalar))
 
@@ -263,6 +262,8 @@ class Command(BaseCommand):
         path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/resources/master.csv')
         file_path = options.get('path') if options.get('path') else path
 
+        # yolo
+        Type.objects.get_or_create(slug='dark')
         for name, scalar in TYPE_EFFECTIVNESS.items():
             self.get_or_create_type_effectivness_scalar(name, scalar)
 

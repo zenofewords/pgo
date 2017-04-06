@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 
-from pgo.api.routers import pgo_router
+from pgo.api.urls import pgo_api_urls
 
 from zenofewords.views import HomeView
 
@@ -11,9 +11,9 @@ from zenofewords.views import HomeView
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^api-pgo/', include(pgo_router.urls, namespace='api-pgo')),
     url(r'^api-auth/', include(
         'rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-pgo/', include(pgo_api_urls, namespace='api-pgo')),
 
     url(r'^blog/', include('blog.urls', namespace='blog')),
     url(r'^pgo/', include('pgo.urls', namespace='pgo')),

@@ -2,32 +2,40 @@
 
 
 {% block content %}
-    <form id="aProForm">
-        <select id="attacker" class="a-pro-select">
-            <option value="0" selected>Select attacker</option>
+    <form id="attack-pro-form">
+        {% csrf_token %}
+
+        <span id="attacker_error" class="form-error"></span>
+        <select id="attacker" class="attack-pro-select">
+            <option value="-1" selected>Select attacker</option>
             {% for data in pokemon_data %}
                 <option value="{{ data.0 }}">{{ data.1 }}</option>
             {% endfor %}
         </select>
         <br>
 
-        <select id="quick_move" class="a-pro-select" disabled>
-            <option value="0" selected>Quick move</option>
+        <span id="quick_move_error" class="form-error"></span>
+        <select id="quick_move" class="attack-pro-select" disabled>
+            <option value="-1" selected>Quick move</option>
         </select>
         <br>
 
-        <select id="cinematic_move" class="a-pro-select" disabled>
-            <option value="0" selected>Cinematic move</option>
+        <span id="cinematic_move_error" class="form-error"></span>
+        <select id="cinematic_move" class="attack-pro-select" disabled>
+            <option value="-1" selected>Cinematic move</option>
         </select>
         <br>
 
-        <input type="number" id="level" class="a-pro-input" name="level" placeholder="Level" min="1" max="40" step="0.5">
+        <span id="attacker_level_error" class="form-error"></span>
+        <input type="number" id="attacker_level" class="attack-pro-input" name="attacker_level" placeholder="Attacker level" min="1" max="40" step="0.5">
 
-        <input type="number" id="attack" class="a-pro-input" name="attack" placeholder="ATK IV" min="0" max="15" step="1">
+        <span id="attack_iv_error" class="form-error"></span>
+        <input type="number" id="attack_iv" class="attack-pro-input" name="attack_iv" placeholder="ATK IV" min="0" max="15" step="1">
         <br>
 
-        <select id="defender" class="a-pro-select">
-            <option value="0" selected>Select defender</option>
+        <span id="defender_error" class="form-error"></span>
+        <select id="defender" class="attack-pro-select">
+            <option value="-1" selected>Select defender</option>
             {% for data in pokemon_data %}
                 <option value="{{ data.0 }}">{{ data.1 }}</option>
             {% endfor %}
@@ -36,6 +44,23 @@
 
         <input type="submit" id="submit" name="submit" class="a-pro-button" disabled>
     </form>
+
+    <div class="attack-proficiency-info">
+        <h3>
+            Your <span id="attacker_name"></span>'s attack proficiency against a 15 DEF IV, l{{ max_pokemon_level|floatformat }}
+            <span id="defender_name"></span>:
+        </h3>
+        <p>
+            <span id="attacker_quick_move"></span> will do
+            <span id="quick_attack_damage"></span> damage per hit
+            (<span id="quick_attack_dps"></span> DPS)
+        </p>
+        <p>
+            <span id="attacker_cinematic_move"></span> will do
+            <span id="cinematic_attack_damage"></span> damage per hit
+            (<span id="cinematic_attack_dps"></span> DPS)
+        </p>
+    </div>
 {% endblock content %}
 
 {% block scripts %}
@@ -43,7 +68,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            $('.a-pro-select').select2()
+            $('.attack-pro-select').select2()
             $('select').on(
                 'select2:select',(
                     function(){
@@ -55,56 +80,61 @@
             var quickMoveSelect = $('#quick_move')
             var cinematicMoveSelect = $('#cinematic_move')
             var submitButton = $('#submit')
-
-            var attackerChoice = undefined
-            var quickMoveChoice = undefined
-            var cinematicMoveChoice = undefined
-            var levelChoice = undefined
-            var attackChoice = undefined
-            var defenderChoice = undefined
+            var formData = {}
 
             $('#attacker').change(function() {
                 filterQueryset(this.value)
-                attackerChoice = this.value
+                formData.attacker = this.value
             })
             quickMoveSelect.change(function() {
-                quickMoveChoice = this.value
+                formData.quickMove = this.value
             })
             cinematicMoveSelect.change(function() {
-                cinematicMoveChoice = this.value
+                formData.cinematicMove = this.value
             })
-            $('#level').on('change', function() {
+            $('#attacker_level').on('change', function() {
                 var choice = validateLevel(this)
 
                 if (!isNaN(choice)) {
                     this.value = choice
-                    levelChoice = choice
+                    formData.attackerLevel = this.value
+                }
+                else {
+                    formData.attackerLevel = "-1"
                 }
             })
-            $('#attack').on('change keyup', function() {
+            $('#attack_iv').on('change keyup', function() {
                 var choice = validateAttack(this)
 
                 if (!isNaN(choice)) {
                     this.value = choice
-                    attackChoice = choice
+                    formData.attackIV = this.value
+                }
+                else {
+                    formData.attackIV = "-1"
                 }
             })
             $('#defender').change(function() {
-                defenderChoice = this.value
+                formData.defender = this.value
             })
-            $('#aProForm').on('submit', function(event) {
+
+            $('#attack-pro-form').on('submit', function(event) {
                 event.preventDefault()
-                submitForm()
+                submitForm(formData)
             })
 
-            $('.a-pro-select, .a-pro-input').on('change keyup paste', function() {
+            $('.attack-pro-select, .attack-pro-input').on('change keyup paste', function() {
+                var disabled = true
 
-                if (attackerChoice && quickMoveChoice && cinematicMoveChoice && levelChoice && attackChoice && defenderChoice) {
-                    submitButton.prop('disabled', false)
+                if (Object.keys(formData).length === 6) {
+                    disabled = false
+                    for (prop in formData) {
+                        if (formData[prop] < 0) {
+                            disabled = true
+                        }
+                    }
                 }
-                else {
-                    submitButton.prop('disabled', true)
-                }
+                submitButton.prop('disabled', disabled)
             })
 
             function filterQueryset(value){
@@ -144,9 +174,55 @@
                 }
             }
 
-            function submitForm() {
-                console.log('submitting form')
+            function submitForm(formData) {
+                $.ajax({
+                    url: "{% url 'api-pgo:attack-proficiency' %}",
+                    type: "POST",
+                    data: {
+                        'attacker': formData.attacker,
+                        'quick_move': formData.quickMove,
+                        'cinematic_move': formData.cinematicMove,
+                        'attacker_level': formData.attackerLevel,
+                        'attack_iv': formData.attackIV,
+                        'defender': formData.defender,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(json){
+                        displayAttackProficiency(json)
+                        generateAttackProficiencyStats(json)
+                    },
+                    error: function(xhr, errmsg, err){
+                        displayFieldErrors(xhr.responseJSON)
+                    }
+                })
             }
+
+            function generateAttackProficiencyStats(json) {
+                console.log('ensue magic')
+            }
+
+            function displayAttackProficiency(json) {
+                $('.attack-proficiency-info').show()
+
+                $('#attacker_name').html(json.attacker.name)
+
+                $('#attacker_quick_move').html(json.quick_move.name)
+                $('#quick_attack_damage').html(json.quick_move.damage_per_hit)
+                $('#quick_attack_dps').html(json.quick_move.dps)
+
+                $('#attacker_cinematic_move').html(json.cinematic_move.name)
+                $('#cinematic_attack_damage').html(json.cinematic_move.damage_per_hit)
+                $('#cinematic_attack_dps').html(json.cinematic_move.dps)
+
+                $('#defender_name').html(json.defender.name)
+            }
+
+            function displayFieldErrors(errorObject) {
+                for (error in errorObject) {
+                    var selector = '#' + error + '_error'
+                    $(selector).html(errorObject[error])
+                }
+             }
 
             function clearMoveInputs() {
                 quickMoveSelect.empty()
@@ -192,16 +268,22 @@
     </script>
 
     <style type="text/css">
-        .a-pro-select {
+        .attack-pro-select {
             width: 200px;
         }
-        .a-pro-input {
+        .attack-pro-input {
             width: 92px;
             height: 20px;
         }
         .a-pro-button {
             width: 200px;
             height: 25px;
+        }
+        .form-error {
+            color: red;
+        }
+        .attack-proficiency-info {
+            display: none;
         }
     </style>
 {% endblock scripts %}

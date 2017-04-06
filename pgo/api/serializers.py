@@ -42,3 +42,12 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
             'id', 'number', 'name', 'primary_type', 'secondary_type',
             'pgo_attack', 'pgo_defense', 'pgo_stamina', 'maximum_cp',
         )
+
+
+class AttackProficiencySerializer(serializers.Serializer):
+    attacker = serializers.IntegerField()
+    quick_move = serializers.IntegerField()
+    cinematic_move = serializers.IntegerField()
+    attacker_level = serializers.FloatField()
+    attack_iv = serializers.IntegerField()
+    defender = serializers.IntegerField()

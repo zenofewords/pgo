@@ -7,7 +7,7 @@
 
         <span id="attacker_error" class="form-error"></span>
         <select id="attacker" class="attack-pro-select">
-            <option value="-1" selected>Select attacker</option>
+            <option value="-1" disabled selected>Select attacker</option>
             {% for data in pokemon_data %}
                 <option value="{{ data.0 }}">{{ data.1 }}</option>
             {% endfor %}
@@ -16,13 +16,13 @@
 
         <span id="quick_move_error" class="form-error"></span>
         <select id="quick_move" class="attack-pro-select" disabled>
-            <option value="-1" selected>Quick move</option>
+            <option value="-1" disabled selected>Quick move</option>
         </select>
         <br>
 
         <span id="cinematic_move_error" class="form-error"></span>
         <select id="cinematic_move" class="attack-pro-select" disabled>
-            <option value="-1" selected>Cinematic move</option>
+            <option value="-1" disabled selected>Cinematic move</option>
         </select>
         <br>
 
@@ -35,11 +35,18 @@
 
         <span id="defender_error" class="form-error"></span>
         <select id="defender" class="attack-pro-select">
-            <option value="-1" selected>Select defender</option>
+            <option value="-1" disabled selected>Select defender</option>
             {% for data in pokemon_data %}
                 <option value="{{ data.0 }}">{{ data.1 }}</option>
             {% endfor %}
         </select>
+        <br>
+
+        <span id="defender_level_error" class="form-error"></span>
+        <input type="number" id="defender_level" class="attack-pro-input" name="defender_level" placeholder="Defender level" min="1" max="40" step="0.5" value="40">
+
+        <span id="defense_iv_error" class="form-error"></span>
+        <input type="number" id="defense_iv" class="attack-pro-input" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
         <br>
 
         <input type="submit" id="submit" name="submit" class="a-pro-button" disabled>
@@ -47,7 +54,9 @@
 
     <div class="attack-proficiency-info">
         <h3>
-            Your <span id="attacker_name"></span>'s attack proficiency against a 15 DEF IV, l{{ max_pokemon_level|floatformat }}
+            Your <span id="attacker_name"></span>'s attack proficiency against a
+            <span id="dfns_iv"></span> DEF IV, lvl
+            <span id="dfndr_level"></span>
             <span id="defender_name"></span>:
         </h3>
         <p>
@@ -79,8 +88,13 @@
 
             var quickMoveSelect = $('#quick_move')
             var cinematicMoveSelect = $('#cinematic_move')
+            var defenderLevelInput = $('#defender_level')
+            var defenseIVInput = $('#defense_iv')
             var submitButton = $('#submit')
-            var formData = {}
+            var formData = {
+                defenderLevel: defenderLevelInput.val(),
+                defenseIV: defenseIVInput.val(),
+            }
 
             $('#attacker').change(function() {
                 filterQueryset(this.value)
@@ -93,27 +107,18 @@
                 formData.cinematicMove = this.value
             })
             $('#attacker_level').on('change', function() {
-                var choice = validateLevel(this)
-
-                if (!isNaN(choice)) {
-                    this.value = choice
-                    formData.attackerLevel = this.value
-                }
-                else {
-                    formData.attackerLevel = "-1"
-                }
+                setValidLevel(this, 'attackerLevel')
             })
             $('#attack_iv').on('change keyup', function() {
-                var choice = validateAttack(this)
-
-                if (!isNaN(choice)) {
-                    this.value = choice
-                    formData.attackIV = this.value
-                }
-                else {
-                    formData.attackIV = "-1"
-                }
+                setValidIV(this, 'attackIV')
             })
+            defenderLevelInput.on('change', function() {
+                setValidLevel(this, 'defenderLevel')
+            })
+            defenseIVInput.on('change keyup', function() {
+                setValidIV(this, 'defenseIV')
+            })
+
             $('#defender').change(function() {
                 formData.defender = this.value
             })
@@ -123,10 +128,11 @@
                 submitForm(formData)
             })
 
-            $('.attack-pro-select, .attack-pro-input').on('change keyup paste', function() {
+            var formInputs = $('.attack-pro-select, .attack-pro-input')
+            formInputs.on('change keyup paste', function() {
                 var disabled = true
 
-                if (Object.keys(formData).length === 6) {
+                if (Object.keys(formData).length === formInputs.length) {
                     disabled = false
                     for (prop in formData) {
                         if (formData[prop] < 0) {
@@ -137,8 +143,32 @@
                 submitButton.prop('disabled', disabled)
             })
 
+            function setValidLevel(input, inputName) {
+                var choice = validateLevel(input)
+
+                if (!isNaN(choice)) {
+                    input.value = choice
+                    formData[inputName] = input.value
+                }
+                else {
+                    formData[inputName] = "-1"
+                }
+            }
+
+            function setValidIV(input, inputName) {
+                var choice = validateIV(input)
+
+                if (!isNaN(choice)) {
+                    input.value = choice
+                    formData[inputName] = input.value
+                }
+                else {
+                    formData[inputName] = "-1"
+                }
+            }
+
             function filterQueryset(value){
-                if (value !== '0') {
+                if (parseInt(value) > 0) {
                     $.ajax({
                         url: "{% url 'api-pgo:move-list' %}",
                         type: 'GET',
@@ -185,6 +215,8 @@
                         'attacker_level': formData.attackerLevel,
                         'attack_iv': formData.attackIV,
                         'defender': formData.defender,
+                        'defender_level': formData.defenderLevel,
+                        'defense_iv': formData.defenseIV,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
                     success: function(json){
@@ -198,13 +230,11 @@
             }
 
             function generateAttackProficiencyStats(json) {
-                console.log('ensue magic')
+                console.log(json)
             }
 
             function displayAttackProficiency(json) {
                 $('.attack-proficiency-info').show()
-
-                $('#attacker_name').html(json.attacker.name)
 
                 $('#attacker_quick_move').html(json.quick_move.name)
                 $('#quick_attack_damage').html(json.quick_move.damage_per_hit)
@@ -214,7 +244,10 @@
                 $('#cinematic_attack_damage').html(json.cinematic_move.damage_per_hit)
                 $('#cinematic_attack_dps').html(json.cinematic_move.dps)
 
+                $('#attacker_name').html(json.attacker.name)
                 $('#defender_name').html(json.defender.name)
+                $('#dfndr_level').html(json.defender_level)
+                $('#dfns_iv').html(json.defendse_iv)
             }
 
             function displayFieldErrors(errorObject) {
@@ -222,17 +255,19 @@
                     var selector = '#' + error + '_error'
                     $(selector).html(errorObject[error])
                 }
-             }
+            }
 
             function clearMoveInputs() {
                 quickMoveSelect.empty()
                 quickMoveSelect.append(
-                    '<option>Select quick move</option>'
+                    '<option value="-1" disabled selected>Select quick move</option>'
                 )
                 cinematicMoveSelect.empty()
                 cinematicMoveSelect.append(
-                    '<option>Select cinematic move</option>'
+                    '<option value="-1" disabled selected>Select cinematic move</option>'
                 )
+                formData['quickMove'] = -1
+                formData['cinematicMove'] = -1
             }
 
             function validateLevel(input) {
@@ -253,7 +288,7 @@
                 return level
             }
 
-            function validateAttack(input) {
+            function validateIV(input) {
                 var attack = parseInt(input.value)
 
                 if (attack < 0) {

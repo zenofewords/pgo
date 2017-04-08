@@ -68,13 +68,15 @@ class AttackProficiencyAPIView(GenericAPIView):
         defender = self._get_pokemon(data.get('defender'))
         qk_move = self._get_move(data.get('quick_move'))
         cc_move = self._get_move(data.get('cinematic_move'))
+        defender_level = data.get('defender_level')
 
         attacker_cpm = CPM.objects.get(level=data.get('attacker_level')).value
-        defender_cpm = CPM.objects.latest('level').value
+        defender_cpm = CPM.objects.get(level=defender_level).value
         atk_iv = data.get('attack_iv')
+        def_iv = data.get('defense_iv')
         attack_multiplier = (
             (attacker.pgo_attack + atk_iv) * attacker_cpm) / (
-            (defender.pgo_defense + 15) * defender_cpm)
+            (defender.pgo_defense + def_iv) * defender_cpm)
 
         qk_move.damage_per_hit, qk_move.dps = self._calculate_damage(
             attack_multiplier, qk_move, self._is_stab(attacker, qk_move),
@@ -90,6 +92,8 @@ class AttackProficiencyAPIView(GenericAPIView):
             'cinematic_move': self._serialize(cc_move),
             'attacker': self._serialize(attacker),
             'defender': self._serialize(defender),
+            'defender_level': defender_level,
+            'defendse_iv': def_iv,
         }
 
     def _serialize(self, obj):

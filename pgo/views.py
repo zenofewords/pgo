@@ -72,5 +72,4 @@ class AttackProficiencyView(TemplateView):
         context = super(AttackProficiencyView, self).get_context_data(**kwargs)
 
         context['pokemon_data'] = Pokemon.objects.values_list('id', 'name')
-        context['max_pokemon_level'] = CPM.objects.latest('level').level
         return context

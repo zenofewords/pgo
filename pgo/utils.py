@@ -39,9 +39,5 @@ def calculate_dph(power, attack_multiplier, stab, effectivness=1.0):
     def _get_stab(stab):
         return 1.25 if stab else 1.0
 
-    print attack_multiplier
-    print _get_stab(stab)
-    print effectivness
-
     return floor(
         0.5 * power * float(attack_multiplier) * _get_stab(stab) * float(effectivness)) + 1

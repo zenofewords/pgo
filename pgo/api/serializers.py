@@ -51,3 +51,5 @@ class AttackProficiencySerializer(serializers.Serializer):
     attacker_level = serializers.FloatField()
     attack_iv = serializers.IntegerField()
     defender = serializers.IntegerField()
+    defender_level = serializers.FloatField()
+    defense_iv = serializers.IntegerField()

@@ -2,6 +2,7 @@
 
 
 {% block content %}
+<div class="main-wrapper">
     <form id="attack-pro-form">
         {% csrf_token %}
 
@@ -53,12 +54,6 @@
     </form>
 
     <div class="attack-proficiency-info">
-        <h3>
-            Your <span id="attacker_name"></span>'s attack proficiency against a
-            <span id="dfns_iv"></span> DEF IV, lvl
-            <span id="dfndr_level"></span>
-            <span id="defender_name"></span>:
-        </h3>
         <p>
             <span id="attacker_quick_move"></span> will do
             <span id="quick_attack_damage"></span> damage per hit
@@ -69,7 +64,22 @@
             <span id="cinematic_attack_damage"></span> damage per hit
             (<span id="cinematic_attack_dps"></span> DPS)
         </p>
+        <p>
+            <span id="summary"></span>
+        </p>
     </div>
+
+    <div class="attack-proficiency-stats-wrapper">
+        <h4>Use the table below to help your <span class="attacker_name"></span> realise its full offensive potential</h4>
+        <p>This is how much damage its attacks will do, depending on <span class="defender_name"></span>'s level and defense IV</p>
+        <p>Click on a cell for details</p>
+
+        <p class="attack-proficiency-summary"></p>
+        <table id="attack-proficiency-stats">
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
 {% endblock content %}
 
 {% block scripts %}
@@ -78,13 +88,10 @@
     <script type="text/javascript">
         $(document).ready(function(){
             $('.attack-pro-select').select2()
-            $('select').on(
-                'select2:select',(
-                    function(){
-                        $(this).focus()
-                    }
-                )
-            )
+            // maintain tab index order
+            $('select').on('select2:close', function() {
+                $(this).focus()
+            })
 
             var quickMoveSelect = $('#quick_move')
             var cinematicMoveSelect = $('#cinematic_move')
@@ -95,6 +102,8 @@
                 defenderLevel: defenderLevelInput.val(),
                 defenseIV: defenseIVInput.val(),
             }
+            var tableBody = $('#attack-proficiency-stats').find('tbody')
+
 
             $('#attacker').change(function() {
                 filterQueryset(this.value)
@@ -141,6 +150,19 @@
                     }
                 }
                 submitButton.prop('disabled', disabled)
+            })
+
+            tableBody.on('click', 'td.attack-proficiency-detail', function(e){
+                e.preventDefault()
+                tableBody.find('#detail-summary').remove()
+
+                var level = tableBody.find('tr').eq(
+                    $(e.currentTarget).parent().index()).find('td').eq(0)[0].textContent
+                var defenseIV = tableBody.find('tr').eq(
+                    0).find('td').eq($(e.currentTarget).index())[0].textContent
+
+                var element = $(e.currentTarget)
+                getAttackProficiencyDetail(level, defenseIV, formData, element.parent())
             })
 
             function setValidLevel(input, inputName) {
@@ -193,7 +215,7 @@
                             })
                         },
                         error: function(xhr, errmsg, err){
-                            console.log(xhr)
+                            console.log('filter error', xhr)
                         }
                     })
                 }
@@ -207,7 +229,7 @@
             function submitForm(formData) {
                 $.ajax({
                     url: "{% url 'api-pgo:attack-proficiency' %}",
-                    type: "POST",
+                    type: 'POST',
                     data: {
                         'attacker': formData.attacker,
                         'quick_move': formData.quickMove,
@@ -230,11 +252,58 @@
             }
 
             function generateAttackProficiencyStats(json) {
-                console.log(json)
+                $.ajax({
+                    url: "{% url 'api-pgo:attack-proficiency-stats' %}",
+                    type: 'POST',
+                    data: {
+                        'attacker': JSON.stringify(json.attacker),
+                        'quick_move': JSON.stringify(json.quick_move),
+                        'cinematic_move': JSON.stringify(json.cinematic_move),
+                        'defender': JSON.stringify(json.defender),
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(json){
+                        tableBody.empty()
+
+                        for (var i = 0; i < json.length; i++) {
+                            var tr = $('<tr>')
+                            for (value in json[i]) {
+                                tr.append($('<td>').append(value))
+
+                                var td = $('<td>')
+                                for (var j = 0; j < json[i][value].length; j++) {
+                                    td.append(json[i][value][j])
+
+                                    if (i > 0) {
+                                        td.append($('<br>'))
+                                    }
+                                    if (j % 2 === 1) {
+                                        var text = td[0].textContent
+                                        if (text.length > 2) {
+                                            td.addClass('attack-proficiency-detail')
+                                        }
+                                        if (text.indexOf('*') !== - 1) {
+                                            td.addClass('significant-increase')
+                                        }
+                                        td[0].innerHTML = td[0].innerHTML.replace(/\*/g, '')
+                                        tr.append(td)
+                                        td = $('<td>')
+                                    }
+                                }
+                            }
+                            tableBody.append(tr)
+                        }
+                        $('.attack-proficiency-stats-wrapper').show()
+                    },
+                    error: function(xhr, errmsg, err){
+                        console.log('stats error', xhr)
+                    }
+                })
             }
 
             function displayAttackProficiency(json) {
                 $('.attack-proficiency-info').show()
+                $('#summary').html(json.summary)
 
                 $('#attacker_quick_move').html(json.quick_move.name)
                 $('#quick_attack_damage').html(json.quick_move.damage_per_hit)
@@ -244,10 +313,38 @@
                 $('#cinematic_attack_damage').html(json.cinematic_move.damage_per_hit)
                 $('#cinematic_attack_dps').html(json.cinematic_move.dps)
 
-                $('#attacker_name').html(json.attacker.name)
-                $('#defender_name').html(json.defender.name)
-                $('#dfndr_level').html(json.defender_level)
-                $('#dfns_iv').html(json.defendse_iv)
+                $('.attacker_name').html(json.attacker.name)
+                $('.defender_name').html(json.defender.name)
+            }
+
+            function getAttackProficiencyDetail(level, defenseIV, formData, rowToAppend) {
+                $.ajax({
+                    url: "{% url 'api-pgo:attack-proficiency-detail' %}",
+                    type: 'POST',
+                    data: {
+                        'attacker': formData.attacker,
+                        'quick_move': formData.quickMove,
+                        'cinematic_move': formData.cinematicMove,
+                        'attacker_level': formData.attackerLevel,
+                        'attack_iv': formData.attackIV,
+                        'defender': formData.defender,
+                        'defender_level': level,
+                        'defense_iv': defenseIV,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(json){
+                        var deduceMargins = rowToAppend.children().length * 4
+                        var details = $(
+                            '<tr id="detail-summary"><td width='
+                            + (rowToAppend.outerWidth(true) - deduceMargins)
+                            + ' colspan="7">' + json + '</td></tr>').hide()
+                        rowToAppend.after(details)
+                        details.show('normal')
+                    },
+                    error: function(xhr, errmsg, err){
+                        console.log('detail error', xhr)
+                    }
+                })
             }
 
             function displayFieldErrors(errorObject) {
@@ -317,8 +414,22 @@
         .form-error {
             color: red;
         }
-        .attack-proficiency-info {
+/*        .attack-proficiency-info {
             display: none;
+        }
+        .attack-proficiency-stats-wrapper {
+            display: none;
+        }*/
+        #attack-proficiency-stats td {
+            text-align: center;
+            border: 1px solid black;
+            padding: 10px;
+        }
+        .attack-proficiency-detail {
+            cursor: pointer;
+        }
+        .significant-increase {
+            background-color: #01FFA9;
         }
     </style>
 {% endblock scripts %}

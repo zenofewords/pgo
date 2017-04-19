@@ -1,3 +1,7 @@
+from __future__ import division
+
+from decimal import Decimal
+
 from rest_framework import response, status, viewsets
 from rest_framework.permissions import (
     AllowAny,
@@ -8,7 +12,8 @@ from rest_framework.generics import GenericAPIView
 from django.db.models import Q
 
 from pgo.api.serializers import (
-    AttackProficiencySerializer, SimpleMoveSerializer, MoveSerializer,
+    AttackProficiencySerializer, AttackProficiencyStatsSerializer,
+    AttackProficiencyDetailSerializer, SimpleMoveSerializer, MoveSerializer,
     PokemonSerializer, TypeSerializer,
 )
 from pgo.models import (
@@ -16,6 +21,9 @@ from pgo.models import (
 )
 from pgo.utils import (
     calculate_dph,
+    simulate_weave_damage,
+    calculate_defender_health,
+    calculate_defense,
 )
 
 
@@ -59,42 +67,77 @@ class AttackProficiencyAPIView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = self._process_data(serializer.data)
 
+        self._fetch_data(serializer.data)
+        data = self._process_data(serializer.data)
         return response.Response(data, status=status.HTTP_200_OK)
 
+    def _fetch_data(self, data):
+        self.attacker = self._get_pokemon(data.get('attacker'))
+        self.attacker.cpm_list = CPM.objects.filter(level__gte=data.get(
+            'attacker_level')).values_list('value', flat=True)
+        self.attacker.atk_iv = data.get('attack_iv')
+        self.qk_move = self._get_move(data.get('quick_move'))
+        self.cc_move = self._get_move(data.get('cinematic_move'))
+
+        self.defender = self._get_pokemon(data.get('defender'))
+        self.defender.level = data.get('defender_level')
+        self.defender.cpm = self._get_cpm(self.defender.level)
+        self.defender.defense_iv = data.get('defense_iv')
+
     def _process_data(self, data):
-        attacker = self._get_pokemon(data.get('attacker'))
-        defender = self._get_pokemon(data.get('defender'))
-        qk_move = self._get_move(data.get('quick_move'))
-        cc_move = self._get_move(data.get('cinematic_move'))
         defender_level = data.get('defender_level')
+        defense_iv = data.get('defense_iv')
+        self.attacker.atk_iv = data.get('attack_iv')
 
-        attacker_cpm = CPM.objects.get(level=data.get('attacker_level')).value
-        defender_cpm = CPM.objects.get(level=defender_level).value
-        atk_iv = data.get('attack_iv')
-        def_iv = data.get('defense_iv')
-        attack_multiplier = (
-            (attacker.pgo_attack + atk_iv) * attacker_cpm) / (
-            (defender.pgo_defense + def_iv) * defender_cpm)
-
-        qk_move.damage_per_hit, qk_move.dps = self._calculate_damage(
-            attack_multiplier, qk_move, self._is_stab(attacker, qk_move),
-            self._get_effectivness(qk_move, defender)
-        )
-        cc_move.damage_per_hit, cc_move.dps = self._calculate_damage(
-            attack_multiplier, cc_move, self._is_stab(attacker, cc_move),
-            self._get_effectivness(cc_move, defender)
-        )
+        attack_multiplier = self._calculate_attack_multiplier(
+            self.attacker.cpm_list[0], defense_iv, self._get_cpm(defender_level))
+        self._set_move_stats(attack_multiplier, self.qk_move)
+        self._set_move_stats(attack_multiplier, self.cc_move)
 
         return {
-            'quick_move': self._serialize(qk_move),
-            'cinematic_move': self._serialize(cc_move),
-            'attacker': self._serialize(attacker),
-            'defender': self._serialize(defender),
-            'defender_level': defender_level,
-            'defendse_iv': def_iv,
+            'quick_move': self._serialize(self.qk_move),
+            'cinematic_move': self._serialize(self.cc_move),
+            'attacker': self._serialize(self.attacker),
+            'defender': self._serialize(self.defender),
+            'summary': self._rename_this()
         }
+
+    def _rename_this(self):
+        attack_multiplier = self._calculate_attack_multiplier(
+            self.attacker.cpm_list[0], self.defender.defense_iv, self.defender.cpm)
+        self._set_move_stats(attack_multiplier, self.qk_move)
+        self._set_move_stats(attack_multiplier, self.cc_move)
+
+        health = calculate_defender_health(
+            self.defender.pgo_stamina + 15, self.defender.cpm)
+        defense = calculate_defense(
+            self.defender.pgo_defense + self.defender.defense_iv, self.defender.cpm)
+        damage, time = simulate_weave_damage(self.qk_move, self.cc_move, health)
+
+        output = ''
+        if damage < health:
+            output = 'Your {} would do {} damage to {} (level {:g}, {} defense, {} health), before timing out. *'.format(
+                self.attacker.name, damage, self.defender.name, self.defender.level, defense, health)
+        else:
+            output = 'Your {} would do {} damage to {} (level {:g}, {} defense, {} health) and finish the battle in {} seconds. *'.format(
+                self.attacker.name, damage, self.defender.name, self.defender.level, defense, health, time / 1000)
+        return output
+
+    def _get_cpm(self, level):
+        return CPM.objects.get(level=level).value
+
+    def _calculate_attack_multiplier(self, attacker_cpm, defense_iv, defender_cpm):
+        return (
+            (self.attacker.pgo_attack + self.attacker.atk_iv) * attacker_cpm) / (
+            (self.defender.pgo_defense + defense_iv) * defender_cpm)
+
+    def _set_move_stats(self, attack_multiplier, move):
+        move.effectivness = self._get_effectivness(move, self.defender)
+        move.stab = self._is_stab(self.attacker, move)
+        move.damage_per_hit, move.dps = self._calculate_damage(
+            attack_multiplier, move, move.stab, move.effectivness
+        )
 
     def _serialize(self, obj):
         data = {}
@@ -104,8 +147,8 @@ class AttackProficiencyAPIView(GenericAPIView):
         return data
 
     def _get_pokemon(self, id):
-        return Pokemon.objects.only('name', 'pgo_attack', 'primary_type_id',
-            'secondary_type_id').get(pk=id)
+        return Pokemon.objects.only('name', 'pgo_attack', 'pgo_stamina',
+            'primary_type_id', 'secondary_type_id').get(pk=id)
 
     def _get_move(self, id):
         return Move.objects.only(
@@ -118,17 +161,112 @@ class AttackProficiencyAPIView(GenericAPIView):
         )
 
     def _get_effectivness(self, move, pokemon):
-        secondary_type_effectivness = 1.0
+        secondary_type_effectivness = Decimal('1.0')
         if pokemon.secondary_type_id:
-            secondary_type_effectivness = float(TypeEffectivness.objects.get(
+            secondary_type_effectivness = TypeEffectivness.objects.get(
                 type_offense__id=move.move_type_id,
-                type_defense__id=pokemon.secondary_type_id).effectivness.scalar)
-        primary_type_effectivness = float(TypeEffectivness.objects.get(
+                type_defense__id=pokemon.secondary_type_id).effectivness.scalar
+        primary_type_effectivness = TypeEffectivness.objects.get(
             type_offense__id=move.move_type_id,
-            type_defense__id=pokemon.primary_type_id).effectivness.scalar)
+            type_defense__id=pokemon.primary_type_id).effectivness.scalar
         return secondary_type_effectivness * primary_type_effectivness
 
     def _calculate_damage(self, attack_multiplier, move, stab, move_multiplier):
         dph = calculate_dph(move.power, attack_multiplier, stab, move_multiplier)
         dps = '{0:.2f}'.format(dph / (move.duration / 1000.0))
         return dph, dps
+
+
+class AttackProficiencyStatsAPIView(GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = AttackProficiencyStatsSerializer
+    levels = CPM.objects.filter(level__gte=30)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = self._process_data(serializer.data)
+        return response.Response(data, status=status.HTTP_200_OK)
+
+    def _process_data(self, data):
+        self.defense_iv_range = range(10, 16)
+        defender_cpm_list = list(CPM.objects.filter(level__gte=37))
+
+        total_attack = data['attacker']['pgo_attack'] + data['attacker']['atk_iv']
+        self.attack_multiplier = total_attack * data['attacker']['cpm_list'][0]
+        self.max_attack_multiplier = total_attack * float(defender_cpm_list[-1].value)
+
+        def_ivs = []
+        for defense_iv in self.defense_iv_range:
+            def_ivs.append(defense_iv)
+            def_ivs.append('')
+        stats = [{'L/IV': def_ivs}]
+
+        for cpm in defender_cpm_list:
+            stats.append({
+                '{0:g}'.format(float(cpm.level)):
+                self._calculate_moves_dph(
+                    cpm.value,
+                    data['defender']['pgo_defense'],
+                    data['quick_move'],
+                    data['cinematic_move']
+                )
+            })
+        return stats
+
+    def _calculate_moves_dph(self, cpm_value, defense, qk_move, cc_move):
+        attack_modifiers = self._calculate_attack_modifiers(
+            self.attack_multiplier, defense, cpm_value)
+        max_attack_modifiers = self._calculate_attack_modifiers(
+            self.max_attack_multiplier, defense, cpm_value)
+
+        dph_list = []
+        for attack_modifiers in zip(attack_modifiers, max_attack_modifiers):
+            dph_list.append(self._calc_move_stats(attack_modifiers, qk_move))
+            dph_list.append(self._calc_move_stats(attack_modifiers, cc_move))
+        return dph_list
+
+    def _calculate_attack_modifiers(self, attack_multiplier, defense, cpm_value):
+        return (
+            attack_multiplier / float((defense + defense_iv) * cpm_value)
+            for defense_iv in self.defense_iv_range
+        )
+
+    def _calc_move_stats(self, attack_modifiers, move):
+        current_dph = calculate_dph(
+            move['power'], attack_modifiers[0],
+            move['stab'], move['effectivness'])
+        max_dph = calculate_dph(
+            move['power'], attack_modifiers[1],
+            move['stab'], move['effectivness'])
+
+        if current_dph / max_dph * 100 < 93:
+            return '{} ({}) *'.format(current_dph, max_dph)
+        if current_dph == max_dph:
+            return '{}'.format(current_dph)
+        return '{} ({})'.format(current_dph, max_dph)
+
+
+class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = AttackProficiencyDetailSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        data = self._process_data(serializer.data)
+        return response.Response(data, status=status.HTTP_200_OK)
+
+    def _process_data(self, data):
+        self._fetch_data(data)
+
+        current_attack_stats = self._rename_this()
+        # repeat for ascending attacker level
+        # find damage breakpoints by comparison with the last highest value
+        # output the data with the new values
+        for cpm_value in self.attacker.cpm_list:
+            print cpm_value
+
+        return current_attack_stats

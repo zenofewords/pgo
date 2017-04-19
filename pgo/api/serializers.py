@@ -44,7 +44,26 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
+# todo rework and extract attacker and defender serializer (needs js rework)
 class AttackProficiencySerializer(serializers.Serializer):
+    attacker = serializers.IntegerField()
+    quick_move = serializers.IntegerField()
+    cinematic_move = serializers.IntegerField()
+    attacker_level = serializers.FloatField()
+    attack_iv = serializers.IntegerField()
+    defender = serializers.IntegerField()
+    defender_level = serializers.FloatField()
+    defense_iv = serializers.IntegerField()
+
+
+class AttackProficiencyStatsSerializer(serializers.Serializer):
+    attacker = serializers.JSONField()
+    quick_move = serializers.JSONField()
+    cinematic_move = serializers.JSONField()
+    defender = serializers.JSONField()
+
+
+class AttackProficiencyDetailSerializer(serializers.Serializer):
     attacker = serializers.IntegerField()
     quick_move = serializers.IntegerField()
     cinematic_move = serializers.IntegerField()

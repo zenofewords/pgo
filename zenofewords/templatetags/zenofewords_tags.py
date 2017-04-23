@@ -10,3 +10,8 @@ def navigation_tag(navigation_slug):
     return {
         'menu_items': Navigation.objects.get(slug=navigation_slug)
     }
+
+
+@register.filter
+def floor(value):
+    return int(value)

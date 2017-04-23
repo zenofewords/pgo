@@ -13,9 +13,10 @@ from pgo.models import (
     CPM,
     Pokemon,
     Move,
+    MoveSet,
     Type,
-    TypeAdvantage,
     TypeEffectivness,
+    TypeEffectivnessScalar,
 )
 TYPE_EFFECTIVNESS = {
     'Super effective': 1.25,
@@ -46,7 +47,7 @@ TYPE_IMPORT_ORDER = (
 
 class Command(BaseCommand):
     help = '''
-        Build the CPM, Pokemon, Moves and Types models, parsed from the .csv source file.
+        Build the CPM, Pokemon, Move and Type models, parsed from the .csv source file.
     '''
 
     def get_or_create_cpm(self, value, level):
@@ -63,36 +64,36 @@ class Command(BaseCommand):
             )
             return obj
 
-    def get_or_create_type_effectivness(self, name, scalar):
-        obj, created = TypeEffectivness.objects.get_or_create(
+    def get_or_create_type_effectivness_scalar(self, name, scalar):
+        obj, created = TypeEffectivnessScalar.objects.get_or_create(
             slug=slugify(name),
             defaults={'scalar': Decimal(scalar), 'name': name}
         )
 
     def get_or_create_type_advantage(self, first_type, second_type, effectivness):
         relation = '{0}:{1}'.format(first_type.slug, second_type.slug)
-        obj, created = TypeAdvantage.objects.get_or_create(
+        obj, created = TypeEffectivness.objects.get_or_create(
             relation=relation,
             defaults={
-                'first_type': first_type,
-                'second_type': second_type,
+                'type_offense': first_type,
+                'type_defense': second_type,
                 'effectivness': effectivness,
             }
         )
 
     def get_or_create_pokemon(self, number):
         obj, created = Pokemon.objects.get_or_create(number=number)
-        return obj
+        return obj, created
 
-    def get_or_create_move(self, slug, move_category):
+    def get_or_create_move(self, slug, category):
         obj, created = Move.objects.get_or_create(
             slug=slug,
             defaults={
                 'name': slug.replace('-', ' ').title(),
-                'move_category': move_category
+                'category': category
             }
         )
-        return obj
+        return obj, created
 
     def _process_cpm(self, cpm):
         previous_value = None
@@ -117,14 +118,18 @@ class Command(BaseCommand):
                 for second_type_slug, scalar in data.items():
                     second_type = Type.objects.get(slug=second_type_slug)
                     self.get_or_create_type_advantage(first_type, second_type,
-                        TypeEffectivness.objects.get(scalar=scalar))
+                        TypeEffectivnessScalar.objects.get(scalar=scalar))
 
     def _process_pokemon(self, pokemon_data):
+        existing_movesets = MoveSet.objects.all()
+        new_movesets = []
+
         for pokemon_number, data in pokemon_data.items():
-            pokemon = self.get_or_create_pokemon(pokemon_number)
+            quick_moves = []
+            cinematic_moves = []
+            pokemon, created = self.get_or_create_pokemon(pokemon_number)
 
             pokemon_types = []
-            pokemon_moves = []
             for detail in data:
                 if 'slug' in detail:
                     slug = detail['slug']
@@ -158,23 +163,43 @@ class Command(BaseCommand):
 
                 if 'moves' in detail:
                     for move_name in detail['moves']['quick']:
-                        pokemon_moves.append(self.get_or_create_move(
+                        quick_move = self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'QK'
-                        ))
+                        )[0]
+                        pokemon.quick_moves.add(quick_move)
+                        quick_moves.append(quick_move)
 
                     for move_name in detail['moves']['cinematic']:
-                        pokemon_moves.append(self.get_or_create_move(
+                        cinematic_move = self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'CC'
-                        ))
+                        )[0]
+                        pokemon.cinematic_moves.add(cinematic_move)
+                        cinematic_moves.append(cinematic_move)
+
+                if 'legendary' in detail:
+                    pokemon.legendary = True
+
+            for quick_move in quick_moves:
+                for cinematic_move in cinematic_moves:
+                    new_movesets.append(MoveSet.objects.get_or_create(
+                        pokemon=pokemon,
+                        key='{} - {}'.format(quick_move, cinematic_move)
+                    ))
             pokemon.save()
+
+        legacy_movesets = existing_movesets.exclude(
+            id__in=[x[0].pk for x in new_movesets])
+        for legacy_moveset in legacy_movesets:
+            legacy_moveset.legacy = True
+            legacy_moveset.save()
 
     def _process_moves(self, move_data):
         for move_slug, data in move_data.items():
             move = None
             for detail in data:
-                if 'move_category' in detail:
-                    move = self.get_or_create_move(
-                        move_slug, detail['move_category'])
+                if 'category' in detail:
+                    move, _ = self.get_or_create_move(
+                        move_slug, detail['category'])
                 if 'move_type' in detail:
                     move.move_type_id = \
                         self.get_or_create_type(detail['move_type']).id
@@ -190,6 +215,43 @@ class Command(BaseCommand):
                     move.energy_delta = detail['energy_delta']
             move.save()
 
+    def _map_type_effectivness(self):
+        types = Type.objects.all()
+        se = TypeEffectivnessScalar.objects.get(slug='super-effective').scalar
+        nve = TypeEffectivnessScalar.objects.get(slug='not-very-effective').scalar
+
+        for _type in types:
+            type_offense_strong = []
+            type_offense_feeble = []
+            type_defense_resistant = []
+            type_defense_weak = []
+
+            for type_e in _type.type_offense.all():
+                scalar = type_e.effectivness.scalar
+                if scalar == se:
+                    type_offense_strong.append((type_e.type_defense, scalar))
+                if scalar == nve:
+                    type_offense_feeble.append((type_e.type_defense, scalar))
+            for type_e in _type.type_defense.all():
+                scalar = type_e.effectivness.scalar
+                if scalar == nve:
+                    type_defense_resistant.append(
+                        (type_e.type_offense, scalar))
+                if scalar == se:
+                    type_defense_weak.append(
+                        (type_e.type_offense, scalar))
+
+            type_offense_strong.sort(key=lambda x: x[0].name)
+            type_offense_feeble.sort(key=lambda x: x[0].name)
+            type_defense_resistant.sort(key=lambda x: x[0].name)
+            type_defense_weak.sort(key=lambda x: x[0].name)
+
+            _type.strong = [(x[0].name, x[1]) for x in type_offense_strong]
+            _type.feeble = [(x[0].name, x[1]) for x in type_offense_feeble]
+            _type.resistant = [(x[0].name, x[1]) for x in type_defense_resistant]
+            _type.weak = [(x[0].name, x[1]) for x in type_defense_weak]
+            _type.save()
+
     def _next(self, csv_object, slice_start=None, slice_end=None):
         return csv_object.next()[0][slice_start:slice_end].strip()
 
@@ -200,8 +262,10 @@ class Command(BaseCommand):
         path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/resources/master.csv')
         file_path = options.get('path') if options.get('path') else path
 
+        # yolo
+        Type.objects.get_or_create(slug='dark')
         for name, scalar in TYPE_EFFECTIVNESS.items():
-            self.get_or_create_type_effectivness(name, scalar)
+            self.get_or_create_type_effectivness_scalar(name, scalar)
 
         cpm_data = []
         type_data = {}
@@ -273,22 +337,28 @@ class Command(BaseCommand):
                             'cinematic': cinematic
                         }
                         data.append({'moves': moves})
+
+                        while 'animation_time' in self._next(csv_object):
+                            pass
+
+                        if 'rarity' in self._next(csv_object):
+                            data.append({'legendary': True})
                         pokemon_data[template_id] = data
                     else:
                         data = []
                         move_slug = slugify(
                             self._next(csv_object, 17).replace('_', '-'))
-                        move_category = 'CC'
+                        category = 'CC'
                         if 'blastoise' in move_slug:
                             continue
 
                         if 'fast' in move_slug:
-                            move_category = 'QK'
+                            category = 'QK'
                             move_slug = move_slug[:-5]
                         self._next(csv_object)
 
                         # name & category
-                        data.append({'move_category': move_category})
+                        data.append({'category': category})
                         # move type
                         data.append(
                             {'move_type': slugify(self._next(csv_object, 31))})
@@ -317,3 +387,4 @@ class Command(BaseCommand):
         self._process_type_advantages(type_data)
         self._process_cpm(cpm_data)
         self._process_moves(move_data)
+        self._map_type_effectivness()

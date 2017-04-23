@@ -14,7 +14,7 @@ class DefaultModelMixin(models.Model):
 
 
 class SlugMixin(models.Model):
-    slug = models.SlugField(max_length=200, blank=False)
+    slug = models.SlugField(max_length=200, blank=True)
 
     class Meta:
         abstract = True

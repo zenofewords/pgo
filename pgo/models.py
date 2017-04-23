@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 
 from zenofewords.mixins import (
@@ -15,9 +16,21 @@ class Pokemon(DefaultModelMixin, NameMixin):
         related_name='primary_types', blank=True, null=True)
     secondary_type = models.ForeignKey('pgo.Type',
         related_name='secondary_types', blank=True, null=True)
-    pgo_attack = models.IntegerField(verbose_name='ATK', blank=True, null=True)
-    pgo_defense = models.IntegerField(verbose_name='DEF', blank=True, null=True)
-    pgo_stamina = models.IntegerField(verbose_name='STA', blank=True, null=True)
+    quick_moves = models.ManyToManyField('pgo.Move', blank=True,
+        related_name='quick_moves_pokemon')
+    cinematic_moves = models.ManyToManyField('pgo.Move', blank=True,
+        related_name='cinematic_moves_pokemon')
+
+    pgo_attack = models.IntegerField(verbose_name='PGo Attack',
+        blank=True, null=True)
+    pgo_defense = models.IntegerField(verbose_name='PGo Defense',
+        blank=True, null=True)
+    pgo_stamina = models.IntegerField(verbose_name='PGo Stamina',
+        blank=True, null=True)
+    maximum_cp = models.DecimalField(verbose_name='Combat Power',
+        max_digits=7, decimal_places=2, blank=True, null=True)
+
+    legendary = models.BooleanField(default=False)
 
     attack = models.IntegerField(blank=True, null=True)
     special_attack = models.IntegerField(blank=True, null=True)
@@ -36,6 +49,10 @@ class Pokemon(DefaultModelMixin, NameMixin):
 
 
 class Type(DefaultModelMixin, NameMixin, OrderMixin):
+    strong = JSONField(blank=True, null=True)
+    feeble = JSONField(blank=True, null=True)
+    resistant = JSONField(blank=True, null=True)
+    weak = JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ('slug',)
@@ -44,17 +61,17 @@ class Type(DefaultModelMixin, NameMixin, OrderMixin):
         return self.name
 
 
-class TypeAdvantage(models.Model):
-    first_type = models.ForeignKey('pgo.Type', related_name='first')
-    second_type = models.ForeignKey('pgo.Type', related_name='second')
+class TypeEffectivness(models.Model):
+    type_offense = models.ForeignKey('pgo.Type', related_name='type_offense')
+    type_defense = models.ForeignKey('pgo.Type', related_name='type_defense')
     relation = models.CharField(max_length=30, blank=True)
-    effectivness = models.ForeignKey('pgo.TypeEffectivness')
+    effectivness = models.ForeignKey('pgo.TypeEffectivnessScalar')
 
     def __str__(self):
         return '{0}: {1}'.format(self.relation, self.effectivness)
 
 
-class TypeEffectivness(NameMixin):
+class TypeEffectivnessScalar(NameMixin):
     scalar = models.DecimalField(max_digits=4, decimal_places=2)
 
     def __str__(self):
@@ -68,7 +85,7 @@ class Move(DefaultModelMixin, NameMixin):
         (QK, 'Quick'),
         (CC, 'Cinematic'),
     )
-    move_category = models.CharField(max_length=2, choices=MOVE_CATEGORY)
+    category = models.CharField(max_length=2, choices=MOVE_CATEGORY)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True)
 
     power = models.IntegerField(blank=True, default=0)
@@ -78,8 +95,30 @@ class Move(DefaultModelMixin, NameMixin):
     damage_window_start = models.IntegerField(blank=True, null=True)
     damage_window_end = models.IntegerField(blank=True, null=True)
 
+    dps = models.DecimalField(verbose_name='DPS',
+        max_digits=3, decimal_places=1, blank=True, null=True)
+    eps = models.DecimalField(verbose_name='EPS',
+        max_digits=3, decimal_places=1, blank=True, null=True)
+
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('-category', 'name',)
+
+
+class MoveSet(DefaultModelMixin):
+    pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True)
+    key = models.CharField(max_length=50, blank=True)
+    legacy = models.BooleanField(default=False)
+    weave_damage = JSONField(blank=True, null=True)
+
+    def __str__(self):
+        return '{} {}'.format(self.pokemon.name, self.key)
+
+    class Meta:
+        ordering = ('pokemon__number', 'weave_damage',)
+        unique_together = ('pokemon', 'key',)
 
 
 class CPM(models.Model):

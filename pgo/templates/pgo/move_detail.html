@@ -1,0 +1,22 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block content %}
+    {{ object }}
+    <br>
+    {{ object.move_type }}
+    <br>
+
+    {% for strong in object.move_type.strong %}
+        {{ strong.0 }}
+        {{ strong.1 }}
+        <br>
+    {% endfor %}
+    {% for feeble in object.move_type.feeble %}
+        {{ feeble.0 }}
+        {{ feeble.1 }}
+        <br>
+    {% endfor %}
+
+    {{ block.super }}
+{% endblock content %}

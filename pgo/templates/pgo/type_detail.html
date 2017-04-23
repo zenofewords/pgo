@@ -1,0 +1,45 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block content %}
+    <table>
+        <h4>
+            {{ object }}
+        </h4>
+        <thead>
+            <th>Strong</th>
+            <th>Feeble</th>
+            <th>Resistant</th>
+            <th>Weak</th>
+        </thead>
+        <td>
+            {% for strong in object.strong %}
+                {{ strong.0 }}
+                {{ strong.1 }}
+                <br>
+            {% endfor %}
+        </td>
+        <td>
+            {% for feeble in object.feeble %}
+                {{ feeble.0 }}
+                {{ feeble.1 }}
+                <br>
+            {% endfor %}
+        </td>
+        <td>
+            {% for resistant in object.resistant %}
+                {{ resistant.0 }}
+                {{ resistant.1 }}
+                <br>
+            {% endfor %}
+        </td>
+        <td>
+            {% for weak in object.weak %}
+                {{ weak.0 }}
+                {{ weak.1 }}
+                <br>
+            {% endfor %}
+        </td>
+    </table>
+    {{ block.super }}
+{% endblock content %}

@@ -1,7 +1,7 @@
 <ul>
     {% for menu_item in menu_items.navigationitem_set.all %}
         <li>
-            <a href="/{{ menu_item.slug }}">
+            <a href="/{{ menu_item.slug }}{% if menu_item.slug %}/{% endif %}">
                 {{ menu_item }}
             </a>
         </li>

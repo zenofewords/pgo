@@ -1,18 +1,68 @@
 {% load zenofewords_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html>
-    <body>
-        {% block header %}
-            {% navigation_tag 'default' %}
-            <hr>
-        {% endblock header %}
+    {% block body %}
+        <body>
+            {% block header %}
+                {% navigation_tag 'default' %}
+                <hr>
+            {% endblock header %}
 
-        {% block content %}
-        {% endblock content %}
+            {% block content %}
 
-        {% block footer %}
-            <hr>
-            zenofewords {% now 'Y' %}
-        {% endblock footer %}
-    </body>
+                {% block pagination %}
+                    {% if is_paginated %}
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li>
+                                    <a href="?page={{ page_obj.previous_page_number }}">
+                                        Previous
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled">
+                                    <span>Previous</span>
+                                </li>
+                            {% endif %}
+
+                            {% for page_number in paginator.page_range %}
+                                {% if page_obj.number == page_number %}
+                                    <li class="active">
+                                        <span>[{{ page_number }}]</span>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <a href="?page={{ page_number }}">{{ page_number }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li>
+                                    <a href="?page={{ page_obj.next_page_number }}">    Next
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled">
+                                    <span>Next</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                {% endblock pagination %}
+            {% endblock content %}
+
+            {% block footer %}
+                <hr>
+                &copy; zenofewords {% now 'Y' %}
+            {% endblock footer %}
+
+            {% block scripts %}
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+            {% endblock scripts %}
+        </body>
+    {% endblock body %}
 </html>

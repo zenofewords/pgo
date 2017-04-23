@@ -1,3 +1,5 @@
+from __future__ import division
+
 from math import floor
 
 TIMEOUT = 99000
@@ -18,24 +20,24 @@ def simulate_weave_damage(quick_move, cinematic_move, health):
     while step < TIMEOUT:
         if not _timeout(step, cinematic_move.duration):
             if energy >= cinematic_move.energy_delta * - 1:
-
                 damage += cinematic_move.damage_per_hit
                 step += (cinematic_move.duration + 1000)
 
                 if _knockout(damage, health):
-                    return damage, step
+                    return damage, step / 1000
                 energy += cinematic_move.energy_delta
 
         if _timeout(step, quick_move.duration):
+            step = 99000
             break
 
         damage += quick_move.damage_per_hit
         step += quick_move.duration
 
         if _knockout(damage, health):
-            return damage, step
+            return damage, step / 1000
         energy += quick_move.energy_delta
-    return damage, step
+    return damage, step / 1000
 
 
 def calculate_dph(power, attack_multiplier, stab, effectivness=1.0):

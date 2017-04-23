@@ -55,24 +55,22 @@
 
     <div class="attack-proficiency-info">
         <p>
-            <span id="attacker_quick_move"></span> will do
+            <span id="summary"></span>
+        </p>
+        <p>
+            <span id="attacker_quick_move"></span> does
             <span id="quick_attack_damage"></span> damage per hit
             (<span id="quick_attack_dps"></span> DPS)
         </p>
         <p>
-            <span id="attacker_cinematic_move"></span> will do
+            <span id="attacker_cinematic_move"></span> does
             <span id="cinematic_attack_damage"></span> damage per hit
             (<span id="cinematic_attack_dps"></span> DPS)
-        </p>
-        <p>
-            <span id="summary"></span>
         </p>
     </div>
 
     <div class="attack-proficiency-stats-wrapper">
-        <h4>Use the table below to help your <span class="attacker_name"></span> realise its full offensive potential</h4>
-        <p>This is how much damage its attacks will do, depending on <span class="defender_name"></span>'s level and defense IV</p>
-        <p>Click on a cell for details</p>
+        <span>Click a cell for details</span>
 
         <p class="attack-proficiency-summary"></p>
         <table id="attack-proficiency-stats">
@@ -332,14 +330,39 @@
                         'defense_iv': defenseIV,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
-                    success: function(json){
-                        var deduceMargins = rowToAppend.children().length * 4
-                        var details = $(
-                            '<tr id="detail-summary"><td width='
-                            + (rowToAppend.outerWidth(true) - deduceMargins)
-                            + ' colspan="7">' + json + '</td></tr>').hide()
-                        rowToAppend.after(details)
-                        details.show('normal')
+                    success: function(json) {
+                        var marginLength = rowToAppend.children().length * 4
+                        var totalWidth = rowToAppend.outerWidth(true) - marginLength
+                        var wrapper = $('<tr id="detail-summary"><td width="'
+                            + totalWidth + '" colspan="7"></td></tr>').hide()
+                        var summary = $('<p>' + json.summary + '</p>')
+                        var wrapperTd = wrapper.find('td')
+                        wrapperTd.append(summary)
+
+                        var details = json.details
+                        if (details.length > 1) {
+                            wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
+                            var detailsTable = $('<table width="' + totalWidth + '"></table>')
+                            detailsTable.append($('<tr id="detail-summary"><td width="10%">' +
+                                details[0][0] + '</td><td width="30%">' + details[0][1] +
+                                '</td><td width="30%">' + details[0][2] + '</td><td width="30%">'
+                                + details[0][3] + '</td></tr>'))
+
+                            for (row in details) {
+                                if (row > 0) {
+                                    detailsTable.append($(
+                                        '<tr><td>' + details[row][0] +
+                                        '</td><td>' + details[row][1] +
+                                        '</td><td>' + details[row][2] +
+                                        '</td><td>' + details[row][3] +
+                                        '</td></tr>'
+                                    ))
+                                }
+                            }
+                            wrapperTd.append(detailsTable)
+                        }
+                        rowToAppend.after(wrapper)
+                        wrapper.show('fast')
                     },
                     error: function(xhr, errmsg, err){
                         console.log('detail error', xhr)
@@ -414,12 +437,12 @@
         .form-error {
             color: red;
         }
-/*        .attack-proficiency-info {
+        .attack-proficiency-info {
             display: none;
         }
         .attack-proficiency-stats-wrapper {
             display: none;
-        }*/
+        }
         #attack-proficiency-stats td {
             text-align: center;
             border: 1px solid black;

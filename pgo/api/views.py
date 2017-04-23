@@ -74,8 +74,8 @@ class AttackProficiencyAPIView(GenericAPIView):
 
     def _fetch_data(self, data):
         self.attacker = self._get_pokemon(data.get('attacker'))
-        self.attacker.cpm_list = CPM.objects.filter(level__gte=data.get(
-            'attacker_level')).values_list('value', flat=True)
+        self.attacker.cpm_list = tuple(CPM.objects.filter(level__gte=data.get(
+            'attacker_level')).values_list('value', 'level'))
         self.attacker.atk_iv = data.get('attack_iv')
         self.qk_move = self._get_move(data.get('quick_move'))
         self.cc_move = self._get_move(data.get('cinematic_move'))
@@ -86,57 +86,63 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.defender.defense_iv = data.get('defense_iv')
 
     def _process_data(self, data):
-        defender_level = data.get('defender_level')
-        defense_iv = data.get('defense_iv')
-        self.attacker.atk_iv = data.get('attack_iv')
-
-        attack_multiplier = self._calculate_attack_multiplier(
-            self.attacker.cpm_list[0], defense_iv, self._get_cpm(defender_level))
-        self._set_move_stats(attack_multiplier, self.qk_move)
-        self._set_move_stats(attack_multiplier, self.cc_move)
+        self._calculate_move_stats()
+        battle_time = self._simulate_battle()
 
         return {
             'quick_move': self._serialize(self.qk_move),
             'cinematic_move': self._serialize(self.cc_move),
             'attacker': self._serialize(self.attacker),
             'defender': self._serialize(self.defender),
-            'summary': self._rename_this()
+            'summary': self._get_summary(battle_time)
         }
 
-    def _rename_this(self):
-        attack_multiplier = self._calculate_attack_multiplier(
-            self.attacker.cpm_list[0], self.defender.defense_iv, self.defender.cpm)
-        self._set_move_stats(attack_multiplier, self.qk_move)
-        self._set_move_stats(attack_multiplier, self.cc_move)
-
-        health = calculate_defender_health(
+    def _simulate_battle(self):
+        self.defender.health = calculate_defender_health(
             self.defender.pgo_stamina + 15, self.defender.cpm)
-        defense = calculate_defense(
+        self.defender.defense = calculate_defense(
             self.defender.pgo_defense + self.defender.defense_iv, self.defender.cpm)
-        damage, time = simulate_weave_damage(self.qk_move, self.cc_move, health)
+        self.weave_damage, battle_time = simulate_weave_damage(
+            self.qk_move, self.cc_move, self.defender.health)
 
-        output = ''
-        if damage < health:
-            output = 'Your {} would do {} damage to {} (level {:g}, {} defense, {} health), before timing out. *'.format(
-                self.attacker.name, damage, self.defender.name, self.defender.level, defense, health)
+        return battle_time
+
+    def _get_summary(self, battle_time):
+        if battle_time >= 99:
+            return '''
+                Your {} would do {} damage to a level {:g} {} with {} defense
+                and {} health, before timing out.'''.format(
+                self.attacker.name, self.weave_damage, self.defender.level,
+                self.defender.name, self.defender.defense, self.defender.health)
         else:
-            output = 'Your {} would do {} damage to {} (level {:g}, {} defense, {} health) and finish the battle in {} seconds. *'.format(
-                self.attacker.name, damage, self.defender.name, self.defender.level, defense, health, time / 1000)
-        return output
+            return '''
+                Your {} would do {} damage to a level {:g} {} with {} defense
+                and {} health, finishing the battle in {} seconds.'''.format(
+                self.attacker.name, self.weave_damage, self.defender.level,
+                self.defender.name, self.defender.defense, self.defender.health,
+                battle_time)
 
     def _get_cpm(self, level):
         return CPM.objects.get(level=level).value
 
-    def _calculate_attack_multiplier(self, attacker_cpm, defense_iv, defender_cpm):
-        return (
-            (self.attacker.pgo_attack + self.attacker.atk_iv) * attacker_cpm) / (
-            (self.defender.pgo_defense + defense_iv) * defender_cpm)
+    def _calculate_move_stats(self, attacker_cpm=None):
+        if not attacker_cpm:
+            attacker_cpm = self.attacker.cpm_list[0][0]
 
-    def _set_move_stats(self, attack_multiplier, move):
+        self._calculate_attack_multiplier(attacker_cpm)
+        self._set_move_damage(self.qk_move)
+        self._set_move_damage(self.cc_move)
+
+    def _calculate_attack_multiplier(self, attacker_cpm):
+        self.attack_multiplier = (
+            (self.attacker.pgo_attack + self.attacker.atk_iv) * attacker_cpm) / (
+            (self.defender.pgo_defense + self.defender.defense_iv) * self.defender.cpm)
+
+    def _set_move_damage(self, move):
         move.effectivness = self._get_effectivness(move, self.defender)
         move.stab = self._is_stab(self.attacker, move)
         move.damage_per_hit, move.dps = self._calculate_damage(
-            attack_multiplier, move, move.stab, move.effectivness
+            move, move.stab, move.effectivness
         )
 
     def _serialize(self, obj):
@@ -171,8 +177,8 @@ class AttackProficiencyAPIView(GenericAPIView):
             type_defense__id=pokemon.primary_type_id).effectivness.scalar
         return secondary_type_effectivness * primary_type_effectivness
 
-    def _calculate_damage(self, attack_multiplier, move, stab, move_multiplier):
-        dph = calculate_dph(move.power, attack_multiplier, stab, move_multiplier)
+    def _calculate_damage(self, move, stab, effectivness):
+        dph = calculate_dph(move.power, self.attack_multiplier, stab, effectivness)
         dps = '{0:.2f}'.format(dph / (move.duration / 1000.0))
         return dph, dps
 
@@ -194,7 +200,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
         defender_cpm_list = list(CPM.objects.filter(level__gte=37))
 
         total_attack = data['attacker']['pgo_attack'] + data['attacker']['atk_iv']
-        self.attack_multiplier = total_attack * data['attacker']['cpm_list'][0]
+        self.attack_multiplier = total_attack * data['attacker']['cpm_list'][0][0]
         self.max_attack_multiplier = total_attack * float(defender_cpm_list[-1].value)
 
         def_ivs = []
@@ -261,12 +267,73 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
     def _process_data(self, data):
         self._fetch_data(data)
+        self._calculate_move_stats()
+        starting_qk_dph = self.qk_move.damage_per_hit
+        starting_cc_dph = self.cc_move.damage_per_hit
 
-        current_attack_stats = self._rename_this()
-        # repeat for ascending attacker level
-        # find damage breakpoints by comparison with the last highest value
-        # output the data with the new values
+        summary = self._get_summary(self._simulate_battle())
+        self.qk_move_proficiency = []
+        self.cc_move_proficiency = []
+        self._set_qk_move_proficiency(starting_qk_dph)
+        self._set_cc_move_proficiency(starting_cc_dph, self._get_max_cc_move_dph())
+
+        info = {
+            'summary': summary,
+            'details': self._get_details(starting_qk_dph),
+        }
+        return info
+
+    def _get_max_cc_move_dph(self):
+        self._calculate_attack_multiplier(self.attacker.cpm_list[-1][0])
+        self._set_move_damage(self.cc_move)
+        return self.cc_move.damage_per_hit
+
+    def _set_qk_move_proficiency(self, starting_qk_dph):
+        current_qk_dph = starting_qk_dph
+
         for cpm_value in self.attacker.cpm_list:
-            print cpm_value
+            self._calculate_attack_multiplier(cpm_value[0])
+            self._set_move_damage(self.qk_move)
 
-        return current_attack_stats
+            if current_qk_dph < self.qk_move.damage_per_hit:
+                self.qk_move_proficiency.append(
+                    (self.qk_move.damage_per_hit, cpm_value[1], cpm_value[0],))
+                current_qk_dph = self.qk_move.damage_per_hit
+
+    def _set_cc_move_proficiency(self, starting_cc_dph, max_cc_dph):
+        current_cc_dph = starting_cc_dph
+
+        if starting_cc_dph == max_cc_dph:
+            return
+
+        for index, cpm_value in enumerate(self.attacker.cpm_list):
+            self._calculate_attack_multiplier(cpm_value[0])
+            self._set_move_damage(self.cc_move)
+
+            if self.cc_move.damage_per_hit == max_cc_dph:
+                self.cc_move_proficiency.append(
+                    (self.cc_move.damage_per_hit, cpm_value[1], cpm_value[0],))
+                break
+
+            if ([x for x in self.qk_move_proficiency if cpm_value[0] == x[2]] or
+                    current_cc_dph < self.cc_move.damage_per_hit and
+                    current_cc_dph / self.cc_move.damage_per_hit * 100 < 93):
+                self.cc_move_proficiency.append(
+                    (self.cc_move.damage_per_hit, cpm_value[1], cpm_value[0],))
+                current_cc_dph = self.cc_move.damage_per_hit
+
+    def _get_details(self, starting_qk_dph):
+        details = [('Lvl', self.qk_move.name, self.cc_move.name, 'Battle Time',)]
+
+        for c in sorted(self.cc_move_proficiency):
+            for q in sorted(self.qk_move_proficiency):
+                if q[1] == c[1]:
+                    starting_qk_dph = q[0]
+
+            self.qk_move.damage_per_hit = starting_qk_dph
+            self.cc_move.damage_per_hit = c[0]
+            battle_time = self._simulate_battle()
+
+            details.append((c[1], starting_qk_dph, c[0],
+                '{}s'.format(battle_time) if battle_time < 99 else 'Timed Out'))
+        return details

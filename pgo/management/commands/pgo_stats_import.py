@@ -21,12 +21,12 @@ class Command(BaseCommand):
         with open(file_path, 'rb') as csvfile:
             csv_rows = csv.reader(csvfile, delimiter=b',', quotechar=b'|')
 
-            for row in list(csv_rows)[1:252]:
+            for row in list(csv_rows)[:251]:
                 p = Pokemon.objects.get(number=row[0].strip())
-                p.stamina = row[1].strip()
-                p.attack = row[2].strip()
-                p.defense = row[3].strip()
-                p.special_attack = row[3].strip()
-                p.special_defense = row[4].strip()
-                p.speed = row[5].strip()
+                p.stamina = row[4].strip()
+                p.attack = row[5].strip()
+                p.defense = row[6].strip()
+                p.special_attack = row[7].strip()
+                p.special_defense = row[8].strip()
+                p.speed = row[9].strip()
                 p.save()

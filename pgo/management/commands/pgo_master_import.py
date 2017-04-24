@@ -246,10 +246,10 @@ class Command(BaseCommand):
             type_defense_resistant.sort(key=lambda x: x[0].name)
             type_defense_weak.sort(key=lambda x: x[0].name)
 
-            _type.strong = [(x[0].name, x[1]) for x in type_offense_strong]
-            _type.feeble = [(x[0].name, x[1]) for x in type_offense_feeble]
-            _type.resistant = [(x[0].name, x[1]) for x in type_defense_resistant]
-            _type.weak = [(x[0].name, x[1]) for x in type_defense_weak]
+            _type.strong = [(x[0].name, float(x[1])) for x in type_offense_strong]
+            _type.feeble = [(x[0].name, float(x[1])) for x in type_offense_feeble]
+            _type.resistant = [(x[0].name, float(x[1])) for x in type_defense_resistant]
+            _type.weak = [(x[0].name, float(x[1])) for x in type_defense_weak]
             _type.save()
 
     def _next(self, csv_object, slice_start=None, slice_end=None):
@@ -262,8 +262,7 @@ class Command(BaseCommand):
         path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/resources/master.csv')
         file_path = options.get('path') if options.get('path') else path
 
-        # yolo
-        Type.objects.get_or_create(slug='dark')
+        Type.objects.get_or_create(slug='dark', defaults={'name': 'Dark'})
         for name, scalar in TYPE_EFFECTIVNESS.items():
             self.get_or_create_type_effectivness_scalar(name, scalar)
 

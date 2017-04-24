@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,10 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5(fi%b%a=18z_-3)7dhv#jfkj&j21293npua%e)setzypedlz1'
+SECRET_KEY = os.getenv(
+    'SECRET_KEY', '5(fi%b%a=18z_-3)7dhv#jfkj&j21293npua%e)setzypedlz1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.getenv('DEBUG', False))
 
 ALLOWED_HOSTS = []
 INTERNAL_IPS = ['127.0.0.1', ]
@@ -86,17 +87,9 @@ WSGI_APPLICATION = 'zenofewords.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'zenofewords',
-        'USER': 'zen',
-        'PASSWORD': 'zenofewords',
-        'HOST': 'localhost',
-    }
+    'default': dj_database_url.config()
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

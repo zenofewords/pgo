@@ -13,3 +13,4 @@ six==1.10.0
 sqlparse==0.2.2
 Unidecode==0.4.20
 wcwidth==0.1.7
+dj-database-url==0.4.2

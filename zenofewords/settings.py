@@ -130,7 +130,7 @@ STATIC_URL = '/static/'
 STATIC_FILES_DIR = [
     os.path.join(BASE_DIR, 'static')
 ]
-# STATIC_ROOT = "/var/www/example.com/static/"
+STATIC_ROOT = 'staticfiles'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

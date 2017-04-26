@@ -1,0 +1,31 @@
+.attack-pro-select {
+    width: 200px;
+}
+.attack-pro-input {
+    width: 92px;
+    height: 20px;
+}
+.a-pro-button {
+    width: 200px;
+    height: 25px;
+}
+.form-error {
+    color: red;
+}
+.attack-proficiency-info {
+    display: none;
+}
+.attack-proficiency-stats-wrapper {
+    display: none;
+}
+#attack-proficiency-stats td {
+    text-align: center;
+    border: 1px solid black;
+    padding: 10px;
+}
+.attack-proficiency-detail {
+    cursor: pointer;
+}
+.significant-increase {
+    background-color: #01FFA9;
+}

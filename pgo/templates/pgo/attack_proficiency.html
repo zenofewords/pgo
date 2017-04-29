@@ -1,5 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
-
+{% load render_bundle from webpack_loader %}
 {% load static %}
 
 
@@ -95,8 +95,5 @@
             'attack-proficiency-detail': "{% url 'api-pgo:attack-proficiency-detail' %}",
         }
     </script>
-    <link href="{% static 'pgo/attack_proficiency.css' %}" type="text/css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" type="text/css" rel="stylesheet" />
-    <script src="{% static 'pgo/attack_proficiency.js' %}" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js" type="text/javascript"></script>
+    {% render_bundle 'main' %}
 {% endblock scripts %}

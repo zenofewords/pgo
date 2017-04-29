@@ -27,7 +27,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
 
-ALLOWED_HOSTS = [hostname.strip() for hostname in os.getenv('ALLOWED_HOSTS').split(',')]
+ALLOWED_HOSTS = [
+    hostname.strip() for hostname in os.getenv('ALLOWED_HOSTS').split(',')
+]
 INTERNAL_IPS = ['127.0.0.1', ]
 
 # Application definition
@@ -40,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'debug_toolbar',
+    'webpack_loader',
     'django_extensions',
 
     'rest_framework',
@@ -53,7 +55,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,6 +63,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if not DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware',)
 
 ROOT_URLCONF = 'zenofewords.urls'
 
@@ -127,10 +132,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_FILES_DIR = [
-    os.path.join(BASE_DIR, 'static')
-]
 STATIC_ROOT = 'staticfiles'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'assets'),
+)
+if not DEBUG:
+    WEBPACK_CONF = {
+        'BUNDLE_DIR_NAME': 'prod/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack/webpack-stats-prod.json')
+    }
+else:
+    WEBPACK_CONF = {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack/webpack-stats.json'),
+    }
+WEBPACK_LOADER = {
+    'DEFAULT': WEBPACK_CONF
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

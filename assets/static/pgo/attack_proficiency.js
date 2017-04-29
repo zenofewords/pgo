@@ -1,9 +1,5 @@
 $(document).ready(function(){
-    $('.attack-pro-select').select2()
-    // maintain tab index order
-    $('select').on('select2:close', function() {
-        $(this).focus()
-    })
+    setUp()
 
     var quickMoveSelect = $('#quick_move')
     var cinematicMoveSelect = $('#cinematic_move')
@@ -104,7 +100,7 @@ $(document).ready(function(){
     function filterQueryset(value){
         if (parseInt(value) > 0) {
             $.ajax({
-                url: "{% url 'api-pgo:move-list' %}",
+                url: window.pgoAPIURLs['move-list'],
                 type: 'GET',
                 data: {
                     'pokemon-id': value
@@ -140,7 +136,7 @@ $(document).ready(function(){
 
     function submitForm(formData) {
         $.ajax({
-            url: "{% url 'api-pgo:attack-proficiency' %}",
+            url: window.pgoAPIURLs['attack-proficiency'],
             type: 'POST',
             data: {
                 'attacker': formData.attacker,
@@ -151,7 +147,6 @@ $(document).ready(function(){
                 'defender': formData.defender,
                 'defender_level': formData.defenderLevel,
                 'defense_iv': formData.defenseIV,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
             success: function(json){
                 displayAttackProficiency(json)
@@ -165,14 +160,13 @@ $(document).ready(function(){
 
     function generateAttackProficiencyStats(json) {
         $.ajax({
-            url: "{% url 'api-pgo:attack-proficiency-stats' %}",
+            url: window.pgoAPIURLs['attack-proficiency-stats'],
             type: 'POST',
             data: {
                 'attacker': JSON.stringify(json.attacker),
                 'quick_move': JSON.stringify(json.quick_move),
                 'cinematic_move': JSON.stringify(json.cinematic_move),
                 'defender': JSON.stringify(json.defender),
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
             success: function(json){
                 tableBody.empty()
@@ -231,7 +225,7 @@ $(document).ready(function(){
 
     function getAttackProficiencyDetail(level, defenseIV, formData, rowToAppend) {
         $.ajax({
-            url: "{% url 'api-pgo:attack-proficiency-detail' %}",
+            url: window.pgoAPIURLs['attack-proficiency-detail'],
             type: 'POST',
             data: {
                 'attacker': formData.attacker,
@@ -242,7 +236,6 @@ $(document).ready(function(){
                 'defender': formData.defender,
                 'defender_level': level,
                 'defense_iv': defenseIV,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
             success: function(json) {
                 var marginLength = rowToAppend.children().length * 4
@@ -332,5 +325,43 @@ $(document).ready(function(){
             attack = 15
         }
         return attack
+    }
+
+    function setUp() {
+        // using jQuery
+        function getCookie(name) {
+            var cookieValue = null
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';')
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i])
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+                        break
+                    }
+                }
+            }
+            return cookieValue
+        }
+        var csrftoken = getCookie('csrftoken')
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken)
+                }
+            }
+        })
+
+        $('.attack-pro-select').select2()
+        // maintain tab index order
+        $('select').on('select2:close', function() {
+            $(this).focus()
+        })
     }
 })

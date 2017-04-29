@@ -90,5 +90,11 @@ ENV/
 
 # Project
 init.json
-/pgo/resources/*
-/staticfiles/*
+/pgo/resources/
+/staticfiles/
+
+# Webpack
+node_modules/
+bundles/
+webpack/
+server.js

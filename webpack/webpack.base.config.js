@@ -18,10 +18,6 @@ module.exports = {
   plugins: [
     new ExtractTextPlugin("styles.css"),
     new OptimizeCssAssetsPlugin(),
-    new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-    })
   ],
   module: {
     loaders: [{

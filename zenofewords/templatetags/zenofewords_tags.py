@@ -6,9 +6,10 @@ register = template.Library()
 
 
 @register.inclusion_tag('zenofewords/tags/navigation.html')
-def navigation_tag(navigation_slug):
+def navigation_tag(navigation_slug, subnav=False):
     return {
-        'menu_items': Navigation.objects.get(slug=navigation_slug)
+        'subnav': subnav,
+        'navigation': Navigation.objects.filter(slug=navigation_slug).first()
     }
 
 

@@ -27,8 +27,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
 DEBUG_TOOLBAR = False
+CACHE = not DEBUG
 
-ADMINS = [('Zen', 'zen.dominik@gmail.com')]
+ADMINS = [('zenofewords', 'zen.dominik@gmail.com')]
 ALLOWED_HOSTS = [
     hostname.strip() for hostname in os.getenv('ALLOWED_HOSTS').split(',')
 ]
@@ -68,7 +69,19 @@ MIDDLEWARE = [
 
 if DEBUG and DEBUG_TOOLBAR:
     INSTALLED_APPS.append('debug_toolbar')
-    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware',)
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+
+if CACHE:
+    MIDDLEWARE.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
+    MIDDLEWARE.append('django.middleware.cache.FetchFromCacheMiddleware')
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+        }
+    }
+    CACHE_MIDDLEWARE_KEY_PREFIX = 'zenofewords_'
 
 ROOT_URLCONF = 'zenofewords.urls'
 

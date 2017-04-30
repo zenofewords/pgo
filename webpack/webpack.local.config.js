@@ -8,8 +8,8 @@ config.entry = [
   'webpack/hot/only-dev-server',
   '../assets/static/index'
 ]
-
 config.output.path = require('path').resolve('./assets/bundles')
+config.output.publicPath = 'http://localhost:3000/assets/bundles/'
 
 config.plugins = config.plugins.concat([
   new webpack.HotModuleReplacementPlugin(),

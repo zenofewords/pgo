@@ -1,31 +1,38 @@
 .attack-pro-select {
-    width: 200px;
+    width: 21rem;
 }
-.attack-pro-input {
-    width: 92px;
-    height: 20px;
+.level-input {
+    width: 12.3rem;
+    height: 2.7rem;
 }
-.a-pro-button {
-    width: 200px;
-    height: 25px;
+.iv-input {
+    width: 8.4rem;
+    height: 2.7rem;
+}
+.attack-pro-button {
+    width: 21rem;
+    height: 2.7rem;
+}
+.attack-pro-form-wrapper {
+    margin: 0.2rem 0 1rem 0;
 }
 .form-error {
     color: red;
 }
 .attack-proficiency-info {
+    font-size: 1.6rem;
+    margin: 0.2rem 0 1rem 0;
     display: none;
 }
 .attack-proficiency-stats-wrapper {
     display: none;
 }
 #attack-proficiency-stats td {
+    font-size: 1.7rem;
     text-align: center;
-    border: 1px solid black;
-    padding: 10px;
+    vertical-align: middle;
+    padding: 0.4rem;
 }
 .attack-proficiency-detail {
     cursor: pointer;
-}
-.significant-increase {
-    background-color: #01FFA9;
 }

@@ -1,8 +1,8 @@
-<ul>
-    {% for menu_item in menu_items.navigationitem_set.all %}
+<ul class="nav nav-pills">
+    {% for menu_item in navigation.navigationitem_set.all %}
         {% if menu_item.active %}
             <li>
-                <a href="/{{ menu_item.slug }}{% if menu_item.slug %}/{% endif %}">
+                <a href="{% if subnav %}/{{ navigation.slug }}{% endif %}/{{ menu_item.slug }}{% if menu_item.slug %}/{% endif %}">
                     {{ menu_item }}
                 </a>
             </li>

@@ -8,78 +8,78 @@
 {% endblock head %}
 
 {% block content %}
-<div class="main-wrapper">
-    <form id="attack-pro-form">
-        {% csrf_token %}
+<div class="attack-pro-wrapper row">
+    <div class="attack-pro-form-wrapper col-sm-4">
+        <form id="attack-pro-form">
+            {% csrf_token %}
 
-        <span id="attacker_error" class="form-error"></span>
-        <select id="attacker" class="attack-pro-select">
-            <option value="-1" disabled selected>Select attacker</option>
-            {% for data in pokemon_data %}
-                <option value="{{ data.0 }}">{{ data.1 }}</option>
-            {% endfor %}
-        </select>
-        <br>
+            <span id="attacker_error" class="form-error"></span>
+            <select id="attacker" class="attack-pro-select">
+                <option value="-1" disabled selected>Select attacker *</option>
+                {% for data in pokemon_data %}
+                    <option value="{{ data.0 }}">{{ data.1 }}</option>
+                {% endfor %}
+            </select>
+            <br>
 
-        <span id="quick_move_error" class="form-error"></span>
-        <select id="quick_move" class="attack-pro-select" disabled>
-            <option value="-1" disabled selected>Quick move</option>
-        </select>
-        <br>
+            <span id="quick_move_error" class="form-error"></span>
+            <select id="quick_move" class="attack-pro-select" disabled>
+                <option value="-1" disabled selected>Quick move *</option>
+            </select>
+            <br>
 
-        <span id="cinematic_move_error" class="form-error"></span>
-        <select id="cinematic_move" class="attack-pro-select" disabled>
-            <option value="-1" disabled selected>Cinematic move</option>
-        </select>
-        <br>
+            <span id="cinematic_move_error" class="form-error"></span>
+            <select id="cinematic_move" class="attack-pro-select" disabled>
+                <option value="-1" disabled selected>Cinematic move *</option>
+            </select>
+            <br>
 
-        <span id="attacker_level_error" class="form-error"></span>
-        <input type="number" id="attacker_level" class="attack-pro-input" name="attacker_level" placeholder="Attacker level" min="1" max="40" step="0.5">
+            <input type="number" id="attacker_level" class="attack-pro-input level-input" name="attacker_level" placeholder="Attacker level *" min="1" max="40" step="0.5">
 
-        <span id="attack_iv_error" class="form-error"></span>
-        <input type="number" id="attack_iv" class="attack-pro-input" name="attack_iv" placeholder="ATK IV" min="0" max="15" step="1">
-        <br>
+            <input type="number" id="attack_iv" class="attack-pro-input iv-input" name="attack_iv" placeholder="ATK IV *" min="0" max="15" step="1">
+            <br>
 
-        <span id="defender_error" class="form-error"></span>
-        <select id="defender" class="attack-pro-select">
-            <option value="-1" disabled selected>Select defender</option>
-            {% for data in pokemon_data %}
-                <option value="{{ data.0 }}">{{ data.1 }}</option>
-            {% endfor %}
-        </select>
-        <br>
+            <span id="defender_error" class="form-error"></span>
+            <select id="defender" class="attack-pro-select">
+                <option value="-1" disabled selected>Select defender *</option>
+                {% for data in pokemon_data %}
+                    <option value="{{ data.0 }}">{{ data.1 }}</option>
+                {% endfor %}
+            </select>
+            <br>
 
-        <span id="defender_level_error" class="form-error"></span>
-        <input type="number" id="defender_level" class="attack-pro-input" name="defender_level" placeholder="Defender level" min="1" max="40" step="0.5" value="40">
+            <span id="defender_level_error" class="form-error"></span>
+            <input type="number" id="defender_level" class="attack-pro-input level-input" name="defender_level" placeholder="Defender level *" min="1" max="40" step="0.5" value="40">
 
-        <span id="defense_iv_error" class="form-error"></span>
-        <input type="number" id="defense_iv" class="attack-pro-input" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
-        <br>
+            <span id="defense_iv_error" class="form-error"></span>
+            <input type="number" id="defense_iv" class="attack-pro-input iv-input" name="defense_iv" placeholder="DEF IV *" min="0" max="15" step="1" value="15">
+            <br>
 
-        <input type="submit" id="submit" name="submit" class="a-pro-button" disabled>
-    </form>
-
-    <div class="attack-proficiency-info">
+            <input type="submit" id="submit" name="submit" class="attack-pro-button" disabled>
+        </form>
+    </div>
+    <div class="attack-proficiency-info col-sm-8">
         <p>
             <span id="summary"></span>
         </p>
         <p>
-            <span id="attacker_quick_move"></span> does
+            <span id="attacker_quick_move"></span> will do
             <span id="quick_attack_damage"></span> damage per hit
             (<span id="quick_attack_dps"></span> DPS)
         </p>
         <p>
-            <span id="attacker_cinematic_move"></span> does
+            <span id="attacker_cinematic_move"></span> will do
             <span id="cinematic_attack_damage"></span> damage per hit
             (<span id="cinematic_attack_dps"></span> DPS)
         </p>
     </div>
-
-    <div class="attack-proficiency-stats-wrapper">
+</div>
+<div class="attack-proficiency-stats-wrapper row">
+    <div class="col-sm-12">
         <span>Click a cell for details</span>
 
         <p class="attack-proficiency-summary"></p>
-        <table id="attack-proficiency-stats">
+        <table id="attack-proficiency-stats" class="table table-striped table-bordered">
             <tbody></tbody>
         </table>
     </div>

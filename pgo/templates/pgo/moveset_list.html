@@ -2,25 +2,30 @@
 
 
 {% block content %}
-    <table>
-        <tr>
+    <table class="table table-striped">
+        <thead>
             <th>Pokemon</th>
             <th>Moveset</th>
-            <th colspan="5">Damage over 99s</th>
-        </tr>
-        <tr>
-            <th colspan="2">&nbsp;</th>
-            <th>L20</th>
-            <th>L25</th>
-            <th>L30</th>
-            <th>L35</th>
-            <th>L40</th>
-        </tr>
+            <th colspan="5" class="text-center">Weave damage over 99s by level</th>
 
         {% for moveset in object_list %}
+            {% if forloop.first %}
+                <tr>
+                    <th colspan="2"></th>
+                    {% for moveset_data in moveset.weave_damage %}
+                        <th>
+                            {{ moveset_data.0|floatformat:"0" }}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            {% endif %}
+
             <tr>
                 <td>
-                    {{ moveset.pokemon.name }}
+                    <a href="{% url 'pgo:pokemon-detail' moveset.pokemon.slug %}">
+                        {{ moveset.pokemon.name }}
+                    </a>
                 </td>
                 <td>
                     {{ moveset.key }}

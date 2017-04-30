@@ -2,14 +2,14 @@
 
 
 {% block content %}
-    <table>
+    <table class="table table-striped">
         <thead>
-            <th rowspan="2">Type</th>
-            <th colspan="2">Offense</th>
-            <th colspan="2">Defense</th>
+            <th rowspan="2">&nbsp;</th>
+            <th colspan="2" class="text-center">Offense</th>
+            <th colspan="2" class="text-center">Defense</th>
         </thead>
         <thead>
-            <th>&nbsp;</th>
+            <th>Type</th>
             <th>Strong</th>
             <th>Feeble</th>
             <th>Resistant</th>
@@ -17,27 +17,27 @@
         </thead>
         {% for obj in object_list %}
             <tr>
-                <td>
+                <td width="8%">
                     <a href="{% url 'pgo:type-detail' obj.slug %}">
                         {{ obj }}
                     </a>
                 </td>
-                <td>
+                <td width="23%">
                     {% for strong in obj.strong %}
                         {{ strong.0 }}
                     {% endfor %}
                 </td>
-                <td>
+                <td width="23%">
                     {% for feeble in obj.feeble %}
                         {{ feeble.0 }}
                     {% endfor %}
                 </td>
-                <td>
+                <td width="23%">
                     {% for resistant in obj.resistant %}
                         {{ resistant.0 }}
                     {% endfor %}
                 </td>
-                <td>
+                <td width="23%">
                     {% for weak in obj.weak %}
                         {{ weak.0 }}
                     {% endfor %}

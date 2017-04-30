@@ -13,6 +13,8 @@ class NavigationAdmin(admin.ModelAdmin):
 
 class NavigationItemAdmin(admin.ModelAdmin):
     fields = ('user', 'navigation', 'name', 'slug', 'order', 'active',)
+    list_display = ('name', 'slug', 'order', 'active',)
+    list_editable = ('order', 'active',)
     prepopulated_fields = {'slug': ('name',)}
 
 

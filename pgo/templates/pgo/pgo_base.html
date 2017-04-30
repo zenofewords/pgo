@@ -1,1 +1,8 @@
 {% extends 'zenofewords/base.html' %}
+{% load zenofewords_tags %}
+
+
+{% block header %}
+    {{ block.super }}
+    {% navigation_tag 'pgo' True %}
+{% endblock header %}

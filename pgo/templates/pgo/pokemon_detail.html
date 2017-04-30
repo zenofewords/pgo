@@ -3,7 +3,7 @@
 
 
 {% block content %}
-    <table>
+    <table class="table table-striped">
         <thead>
             <th>Number</th>
             <th>Pokemon name</th>
@@ -17,76 +17,150 @@
         <tr>
             <td>{{ object.number }}</td>
             <td>{{ object.name }}</td>
-            <td>{{ object.primary_type }}</td>
-            <td>{{ object.secondary_type|default:'-' }}</td>
+            <td>
+                <a href="{% url 'pgo:type-detail' object.primary_type.slug %}">
+                    {{ object.primary_type }}
+                </a>
+            </td>
+            <td>
+                {% if object.secondary_type %}
+                    <a href="{% url 'pgo:type-detail' object.secondary_type.slug %}">
+                        {{ object.secondary_type|default:'-' }}
+                    </a>
+                {% else %}
+                    {{ object.secondary_type|default:'-' }}
+                {% endif %}
+            </td>
             <td>{{ object.pgo_stamina }}</td>
             <td>{{ object.pgo_attack }}</td>
             <td>{{ object.pgo_defense }}</td>
             <td>{{ object.maximum_cp|floor }}</td>
         </tr>
-
-        <th>Quick moves</th>
+    </table>
+    <table class="table table-striped">
+        <thead>
+            <th>
+                Moves
+            </th>
+            <tr>
+                <th>Category</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Power</th>
+                <th>Energy delta</th>
+                <th>Duration</th>
+                <th>Damage start</th>
+                <th>DPS</th>
+                <th>EPS</th>
+            </tr>
+        </thead>
         {% for move in object.quick_moves.all %}
             <tr>
                 <td>
-                    {{ move }}
-                    {{ move.duration }}ms
+                    {{ move.get_category_display }}
+                </td>
+                <td>
+                    <a href="{% url 'pgo:move-detail' move.slug %}">
+                        {{ move.name }} {{ move.legacy|yesno:"Legacy Move," }}
+                    </a>
+                </td>
+                <td>
+                    {{ move.move_type }}
+                </td>
+                <td>
                     {{ move.power }}
+                </td>
+                <td>
+                    {{ move.energy_delta }}
+                </td>
+                <td>
+                    {{ move.duration }}ms
+                </td>
+                <td>
+                    {{ move.damage_window_start }}ms
+                </td>
+                <td>
                     {{ move.dps }}
+                </td>
+                <td>
                     {{ move.eps }}
                 </td>
             </tr>
         {% endfor %}
 
-        <th>Cinematic moves</th>
         {% for move in object.cinematic_moves.all %}
             <tr>
                 <td>
-                    {{ move }}
-                    {{ move.duration }}ms
+                    {{ move.get_category_display }}
+                </td>
+                <td>
+                    <a href="{% url 'pgo:move-detail' move.slug %}">
+                        {{ move.name }} {{ move.legacy|yesno:"Legacy Move," }}
+                    </a>
+                </td>
+                <td>
+                    {{ move.move_type }}
+                </td>
+                <td>
                     {{ move.power }}
-                    {{ move.dps }}
+                </td>
+                <td>
                     {{ move.energy_delta }}
+                </td>
+                <td>
+                    {{ move.duration }}ms
+                </td>
+                <td>
+                    {{ move.damage_window_start }}ms
+                </td>
+                <td>
+                    {{ move.dps }}
+                </td>
+                <td>
+                    {{ move.eps }}
                 </td>
             </tr>
         {% endfor %}
+    </table>
 
-        <tr>
-            <th>
-                Moveset weave damage
+    <table class="table table-striped">
+        <thead>
+            <th colspan="2">
+                Movesets
             </th>
-        </tr>
+            <th colspan="5" class="text-center">
+                Weave damage over 99s by level
+            </th>
+            <tr>
+                <th>
+                    Moveset
+                </th>
+                <th>
+                    Legacy
+                </th>
         {% for moveset in movesets %}
             {% if forloop.first %}
-                <tr>
+                {% for moveset_data in moveset.weave_damage %}
                     <th>
-                        Pokemon level
+                        {{ moveset_data.0|floatformat:"0" }}
                     </th>
-                    <th>
-                        {% for moveset_data in moveset.weave_damage %}
-                            &nbsp;{{ moveset_data.0|floatformat:"0" }}&nbsp;
-                        {% endfor %}
-                    </th>
+                {% endfor %}
                 </tr>
-                <tr>
-                    <th>
-                        Moveset
-                    </th>
-                    <th>
-                        Damage / 99s
-                    </th>
-                </tr>
+            </thead>
             {% endif %}
             <tr>
                 <td>
-                    {{ moveset.key }} {{ moveset.legacy|yesno:"Legacy," }}
+                    {{ moveset.key }}
+                </td>
+                <td>
+                    {{ moveset.legacy|yesno:"Yes," }}
                 </td>
 
-                <td>
-                    {% for moveset_data in moveset.weave_damage %}
+                {% for moveset_data in moveset.weave_damage %}
+                    <td>
                         {{ moveset_data.1|floatformat:"0" }}
-                    {% endfor %}
-                </td>
+                    </td>
+                {% endfor %}
             </tr>
         {% endfor %}
     </table>

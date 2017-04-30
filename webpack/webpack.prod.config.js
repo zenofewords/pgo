@@ -3,6 +3,7 @@ var BundleTracker = require('webpack-bundle-tracker')
 var config = require('./webpack.base.config.js')
 
 
+config.output.filename = '[name].min.js',
 config.output.path = require('path').resolve('./assets/prod')
 
 config.plugins = config.plugins.concat([

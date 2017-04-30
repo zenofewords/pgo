@@ -5,14 +5,12 @@ var config = require('./webpack.base.config.js')
 
 config.entry = [
   'webpack-dev-server/client?http://localhost:3000',
-  'webpack/hot/only-dev-server',
   '../assets/static/index'
 ]
-
 config.output.path = require('path').resolve('./assets/bundles')
+config.output.publicPath = 'http://localhost:3000/assets/bundles/'
 
 config.plugins = config.plugins.concat([
-  new webpack.HotModuleReplacementPlugin(),
   new webpack.NoErrorsPlugin(),
   new BundleTracker({filename: 'webpack/webpack-stats.json'}),
 ])

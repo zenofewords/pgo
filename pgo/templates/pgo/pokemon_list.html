@@ -3,7 +3,7 @@
 
 
 {% block content %}
-    <table>
+    <table class="table table-striped">
         <thead>
             <th>Number</th>
             <th>Name</th>
@@ -14,33 +14,33 @@
             <th>Defense</th>
             <th>Max CP</th>
         </thead>
-        {% for obj in object_list %}
+        {% for object in object_list %}
             <tr>
                 <td>
-                    <a href="{% url 'pgo:pokemon-detail' obj.slug %}">
-                        {{ obj.number }}
+                    <a href="{% url 'pgo:pokemon-detail' object.slug %}">
+                        {{ object.number }}
                     </a>
                 </td>
                 <td>
-                    {{ obj.name }}
+                    {{ object.name }}
                 </td>
                 <td>
-                    {{ obj.primary_type }}
+                    {{ object.primary_type }}
                 </td>
                 <td>
-                    {{ obj.secondary_type|default:"-" }}
+                    {{ object.secondary_type|default:"-" }}
                 </td>
                 <td>
-                    {{ obj.pgo_stamina }}
+                    {{ object.pgo_stamina }}
                 </td>
                 <td>
-                    {{ obj.pgo_attack }}
+                    {{ object.pgo_attack }}
                 </td>
                 <td>
-                    {{ obj.pgo_defense }}
+                    {{ object.pgo_defense }}
                 </td>
                 <td>
-                    {{ obj.maximum_cp|floor }}
+                    {{ object.maximum_cp|floor }}
                 </td>
             </tr>
         {% endfor %}

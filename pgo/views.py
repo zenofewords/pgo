@@ -5,7 +5,7 @@ from django.views.generic import (
 )
 
 from pgo.models import (
-    CPM, Pokemon, Move, MoveSet, Type,
+    Pokemon, Move, MoveSet, Type,
 )
 
 

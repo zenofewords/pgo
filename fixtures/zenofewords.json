@@ -7,7 +7,18 @@
     "created": "2016-12-09T23:26:42.122Z",
     "active": true,
     "slug": "default",
-    "name": null
+    "name": "Default"
+  }
+},
+{
+  "model": "zenofewords.navigation",
+  "pk": 2,
+  "fields": {
+    "user": 1,
+    "created": "2017-04-30T17:00:43.779Z",
+    "active": true,
+    "slug": "pgo",
+    "name": "PGO"
   }
 },
 {
@@ -19,7 +30,7 @@
     "active": true,
     "slug": "",
     "name": "Home",
-    "order": 1,
+    "order": 10,
     "navigation": 1
   }
 },
@@ -32,7 +43,7 @@
     "active": true,
     "slug": "pgo",
     "name": "PGo",
-    "order": 2,
+    "order": 11,
     "navigation": 1
   }
 },
@@ -42,10 +53,10 @@
   "fields": {
     "user": 1,
     "created": "2016-12-10T16:23:36.069Z",
-    "active": true,
+    "active": false,
     "slug": "blog",
     "name": "Blog",
-    "order": 3,
+    "order": 12,
     "navigation": 1
   }
 },
@@ -55,10 +66,10 @@
   "fields": {
     "user": 1,
     "created": "2016-12-10T16:23:53.525Z",
-    "active": true,
+    "active": false,
     "slug": "book",
     "name": "Book",
-    "order": 4,
+    "order": 13,
     "navigation": 1
   }
 },
@@ -68,11 +79,76 @@
   "fields": {
     "user": 1,
     "created": "2016-12-10T17:36:21.983Z",
-    "active": true,
+    "active": false,
     "slug": "tcg",
     "name": "TCG",
-    "order": 5,
+    "order": 14,
     "navigation": 1
+  }
+},
+{
+  "model": "zenofewords.navigationitem",
+  "pk": 6,
+  "fields": {
+    "user": 1,
+    "created": "2017-04-30T17:01:13.529Z",
+    "active": true,
+    "slug": "pokemon",
+    "name": "Pokemon",
+    "order": 21,
+    "navigation": 2
+  }
+},
+{
+  "model": "zenofewords.navigationitem",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "created": "2017-04-30T17:01:21.021Z",
+    "active": true,
+    "slug": "moves",
+    "name": "Moves",
+    "order": 22,
+    "navigation": 2
+  }
+},
+{
+  "model": "zenofewords.navigationitem",
+  "pk": 8,
+  "fields": {
+    "user": 1,
+    "created": "2017-04-30T17:01:31.778Z",
+    "active": true,
+    "slug": "movesets",
+    "name": "Movesets",
+    "order": 23,
+    "navigation": 2
+  }
+},
+{
+  "model": "zenofewords.navigationitem",
+  "pk": 9,
+  "fields": {
+    "user": 1,
+    "created": "2017-04-30T17:01:39.689Z",
+    "active": true,
+    "slug": "types",
+    "name": "Types",
+    "order": 24,
+    "navigation": 2
+  }
+},
+{
+  "model": "zenofewords.navigationitem",
+  "pk": 10,
+  "fields": {
+    "user": 1,
+    "created": "2017-04-30T17:01:53.624Z",
+    "active": true,
+    "slug": "",
+    "name": "Attack Proficiency",
+    "order": 20,
+    "navigation": 2
   }
 }
 ]

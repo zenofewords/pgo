@@ -180,18 +180,10 @@ $(document).ready(function(){
                         for (var j = 0; j < json[i][value].length; j++) {
                             td.append(json[i][value][j])
 
-                            if (i > 0) {
-                                td.append($('<br>'))
-                            }
                             if (j % 2 === 1) {
-                                var text = td[0].textContent
-                                if (text.length > 2) {
+                                if (td[0].textContent.length > 2) {
                                     td.addClass('attack-proficiency-detail')
                                 }
-                                if (text.indexOf('*') !== - 1) {
-                                    td.addClass('significant-increase')
-                                }
-                                td[0].innerHTML = td[0].innerHTML.replace(/\*/g, '')
                                 tr.append(td)
                                 td = $('<td>')
                             }
@@ -249,7 +241,8 @@ $(document).ready(function(){
                 var details = json.details
                 if (details.length > 1) {
                     wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
-                    var detailsTable = $('<table width="' + totalWidth + '"></table>')
+                    var detailsTable = $('<table class="table table-striped" width="'
+                        + totalWidth + '"></table>')
                     detailsTable.append($('<tr id="detail-summary"><td width="10%">' +
                         details[0][0] + '</td><td width="30%">' + details[0][1] +
                         '</td><td width="30%">' + details[0][2] + '</td><td width="30%">'

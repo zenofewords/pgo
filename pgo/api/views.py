@@ -186,7 +186,6 @@ class AttackProficiencyAPIView(GenericAPIView):
 class AttackProficiencyStatsAPIView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = AttackProficiencyStatsSerializer
-    levels = CPM.objects.filter(level__gte=30)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -197,7 +196,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
     def _process_data(self, data):
         self.defense_iv_range = range(10, 16)
-        defender_cpm_list = list(CPM.objects.filter(level__gte=37))
+        defender_cpm_list = list(CPM.objects.filter(level__gte=35))
 
         total_attack = data['attacker']['pgo_attack'] + data['attacker']['atk_iv']
         self.attack_multiplier = total_attack * data['attacker']['cpm_list'][0][0]
@@ -248,10 +247,10 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
             move['stab'], move['effectivness'])
 
         if current_dph / max_dph * 100 < 93:
-            return '{} ({}) *'.format(current_dph, max_dph)
+            return '<b>{} ({})</b><br>'.format(current_dph, max_dph)
         if current_dph == max_dph:
-            return '{}'.format(current_dph)
-        return '{} ({})'.format(current_dph, max_dph)
+            return '{}<br>'.format(current_dph)
+        return '{} ({})<br>'.format(current_dph, max_dph)
 
 
 class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):

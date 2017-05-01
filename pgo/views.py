@@ -70,5 +70,6 @@ class AttackProficiencyView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AttackProficiencyView, self).get_context_data(**kwargs)
 
-        context['pokemon_data'] = Pokemon.objects.values_list('id', 'name')
+        context['pokemon_data'] = Pokemon.objects.values_list(
+            'id', 'name', 'pgo_attack', 'pgo_defense')
         return context

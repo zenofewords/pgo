@@ -247,7 +247,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
             move['stab'], move['effectivness'])
 
         if current_dph / max_dph * 100 < 93:
-            return '<b>{} ({})</b><br>'.format(current_dph, max_dph)
+            return '{} <b>({})</b><br>'.format(current_dph, max_dph)
         if current_dph == max_dph:
             return '{}<br>'.format(current_dph)
         return '{} ({})<br>'.format(current_dph, max_dph)

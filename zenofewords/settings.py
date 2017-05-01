@@ -26,10 +26,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
-DEBUG_TOOLBAR = False
+DEBUG_TOOLBAR = bool(os.getenv('DEBUG_TOOLBAR', False))
 CACHE = not DEBUG
 
-ADMINS = [('zenofewords', 'zen.dominik@gmail.com')]
 ALLOWED_HOSTS = [
     hostname.strip() for hostname in os.getenv('ALLOWED_HOSTS').split(',')
 ]
@@ -186,11 +185,6 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
         'django': {
             'handlers': ['logfile'],
             'level': 'ERROR',

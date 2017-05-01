@@ -28,7 +28,7 @@ class SimpleMoveSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Move
         fields = (
-            'id', 'name', 'category',
+            'id', 'name', 'category', 'power',
         )
 
 

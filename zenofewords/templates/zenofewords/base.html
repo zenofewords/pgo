@@ -6,6 +6,7 @@
     {% block head %}
         <head>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
     {% endblock head %}
 
@@ -17,46 +18,7 @@
                 {% endblock header %}
                 <hr>
                 {% block content %}
-                    {% block pagination %}
-                        {% if is_paginated %}
-                            <ul class="pagination">
-                                {% if page_obj.has_previous %}
-                                    <li>
-                                        <a href="?page={{ page_obj.previous_page_number }}">
-                                            Previous
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="disabled">
-                                        <span>Previous</span>
-                                    </li>
-                                {% endif %}
-
-                                {% for page_number in paginator.page_range %}
-                                    {% if page_obj.number == page_number %}
-                                        <li class="active">
-                                            <span>[{{ page_number }}]</span>
-                                        </li>
-                                    {% else %}
-                                        <li>
-                                            <a href="?page={{ page_number }}">{{ page_number }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if page_obj.has_next %}
-                                    <li>
-                                        <a href="?page={{ page_obj.next_page_number }}">    Next
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="disabled">
-                                        <span>Next</span>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        {% endif %}
-                    {% endblock pagination %}
+                    {% include 'zenofewords/includes/pagination.html' %}
                 {% endblock content %}
 
                 {% block footer %}
@@ -69,7 +31,6 @@
 
             {% block scripts %}
                 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-                <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
             {% endblock scripts %}
         </body>
     {% endblock body %}

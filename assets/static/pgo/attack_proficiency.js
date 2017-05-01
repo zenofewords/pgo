@@ -1,5 +1,12 @@
 $(document).ready(function(){
-    setUp()
+    $('.attack-pro-select').select2({
+        'dropdownAutoWidth': false,
+        'width': 210
+    })
+    // maintain tab index order
+    $('select').on('select2:close', function() {
+        $(this).focus()
+    })
 
     var quickMoveSelect = $('#quick_move')
     var cinematicMoveSelect = $('#cinematic_move')
@@ -320,38 +327,30 @@ $(document).ready(function(){
         return attack
     }
 
-    function setUp() {
-        function getCookie(name) {
-            var cookieValue = null
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';')
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i])
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-                        break
-                    }
+    function getCookie(name) {
+        var cookieValue = null
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';')
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i])
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+                    break
                 }
             }
-            return cookieValue
         }
-        var csrftoken = getCookie('csrftoken')
-
-        function csrfSafeMethod(method) {
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
-        }
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken)
-                }
-            }
-        })
-
-        $('.attack-pro-select').select2()
-        // maintain tab index order
-        $('select').on('select2:close', function() {
-            $(this).focus()
-        })
+        return cookieValue
     }
+    var csrftoken = getCookie('csrftoken')
+
+    function csrfSafeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken)
+            }
+        }
+    })
 })

@@ -1,7 +1,7 @@
 $(document).ready(function(){
     $('.attack-pro-select').select2({
         'dropdownAutoWidth': false,
-        'width': 210
+        'width': 250
     })
     // maintain tab index order
     $('select').on('select2:close', function() {
@@ -118,13 +118,13 @@ $(document).ready(function(){
                         if (move.category === 'QK') {
                             quickMoveSelect.prop('disabled', false)
                             quickMoveSelect.append(
-                                '<option value=' + move.id + '>' + move.name + '</option>'
+                                '<option value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
                             )
                         }
                         else {
                             cinematicMoveSelect.prop('disabled', false)
                             cinematicMoveSelect.append(
-                                '<option value=' + move.id + '>' + move.name + '</option>'
+                                '<option value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
                             )
                         }
                     })
@@ -198,7 +198,7 @@ $(document).ready(function(){
                     }
                     tableBody.append(tr)
                 }
-                $('.attack-proficiency-stats-wrapper').show()
+                $('.attack-proficiency-stats-wrapper').show('fast')
             },
             error: function(xhr, errmsg, err){
                 console.log('stats error', xhr)
@@ -207,7 +207,8 @@ $(document).ready(function(){
     }
 
     function displayAttackProficiency(json) {
-        $('.attack-proficiency-info').show()
+        $('.attack-proficiency-intro').hide()
+        $('.attack-proficiency-current').show()
         $('#summary').html(json.summary)
 
         $('#attacker_quick_move').html(json.quick_move.name)

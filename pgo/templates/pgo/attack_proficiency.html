@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="attack-pro-wrapper row">
-    <div class="attack-pro-form-wrapper col-sm-4">
+    <div class="attack-pro-form-wrapper col-md-4">
         <form id="attack-pro-form">
             {% csrf_token %}
 
@@ -17,7 +17,7 @@
             <select id="attacker" class="attack-pro-select">
                 <option value="-1" disabled selected>Select attacker *</option>
                 {% for data in pokemon_data %}
-                    <option value="{{ data.0 }}">{{ data.1 }}</option>
+                    <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
                 {% endfor %}
             </select>
             <br>
@@ -34,55 +34,89 @@
             </select>
             <br>
 
-            <input type="number" id="attacker_level" class="attack-pro-input level-input" name="attacker_level" placeholder="Attacker level *" min="1" max="40" step="0.5">
-
-            <input type="number" id="attack_iv" class="attack-pro-input iv-input" name="attack_iv" placeholder="ATK IV *" min="0" max="15" step="1">
-            <br>
+            <div class="row attack-pro-input-wrapper">
+                <div class="col-xs-8">
+                  <input type="number" id="attacker_level" class="attack-pro-input level-input form-control" name="attacker_level" placeholder="Attacker level *" min="1" max="40" step="0.5">
+                </div>
+                <div class="col-xs-4">
+                    <input type="number" id="attack_iv" class="attack-pro-input iv-input form-control" name="attack_iv" placeholder="ATK IV *" min="0" max="15" step="1">
+                </div>
+                <br>
+            </div>
 
             <span id="defender_error" class="form-error"></span>
             <select id="defender" class="attack-pro-select">
                 <option value="-1" disabled selected>Select defender *</option>
                 {% for data in pokemon_data %}
-                    <option value="{{ data.0 }}">{{ data.1 }}</option>
+                    <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
                 {% endfor %}
             </select>
             <br>
 
-            <span id="defender_level_error" class="form-error"></span>
-            <input type="number" id="defender_level" class="attack-pro-input level-input" name="defender_level" placeholder="Defender level *" min="1" max="40" step="0.5" value="40">
+            <div class="row attack-pro-input-wrapper hidden">
+                <div class="col-xs-8">
+                    <span id="defender_level_error" class="form-error"></span>
+                    <input type="number" id="defender_level" class="attack-pro-input level-input form-control" name="defender_level" placeholder="Defender level *" min="1" max="40" step="0.5" value="40">
+                </div>
+                <div class="col-xs-4">
+                    <span id="defense_iv_error" class="form-error"></span>
+                    <input type="number" id="defense_iv" class="attack-pro-input iv-input form-control" name="defense_iv" placeholder="DEF IV *" min="0" max="15" step="1" value="15">
+                </div>
+                <br>
+            </div>
 
-            <span id="defense_iv_error" class="form-error"></span>
-            <input type="number" id="defense_iv" class="attack-pro-input iv-input" name="defense_iv" placeholder="DEF IV *" min="0" max="15" step="1" value="15">
-            <br>
-
-            <input type="submit" id="submit" name="submit" class="attack-pro-button" disabled>
+            <input type="submit" id="submit" name="submit" class="attack-pro-button btn btn-primary" disabled>
         </form>
     </div>
-    <div class="attack-proficiency-info col-sm-8">
-        <p>
-            <span id="summary"></span>
-        </p>
-        <p>
-            <span id="attacker_quick_move"></span> will do
-            <span id="quick_attack_damage"></span> damage per hit
-            (<span id="quick_attack_dps"></span> DPS)
-        </p>
-        <p>
-            <span id="attacker_cinematic_move"></span> will do
-            <span id="cinematic_attack_damage"></span> damage per hit
-            (<span id="cinematic_attack_dps"></span> DPS)
-        </p>
+    <div class="attack-proficiency-info col-md-8">
+        <div class="attack-proficiency-intro">
+            <p>
+               The attack proficiency calculator was built to help find damage "breakpoints". Due to rounding in PGo's damage formula, the impact of these breakpoints can be significant.
+            </p>
+            <p>
+                To begin, select your attacker and choose its attacks. If you don't know its level and attack IV you can look it on <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
+            </p>
+            <p>
+                When you're done entering stats, choose what you'll be attacking and hit submit.
+            </p>
+        </div>
+        <div class="attack-proficiency-current">
+            <p>
+                <span id="summary"></span>
+            </p>
+            <p>
+                <span id="attacker_quick_move"></span> will do
+                <span id="quick_attack_damage"></span> damage per hit
+                (<span id="quick_attack_dps"></span> DPS)
+            </p>
+            <p>
+                <span id="attacker_cinematic_move"></span> will do
+                <span id="cinematic_attack_damage"></span> damage per hit
+                (<span id="cinematic_attack_dps"></span> DPS)
+            </p>
+        </div>
     </div>
 </div>
+
 <div class="attack-proficiency-stats-wrapper row">
     <div class="col-sm-12">
-        <span>Click a cell for details</span>
+        <p>
+            Each cell represents a match-up for the defender's level and DEF IV combination. The numbers inside are your pokemon's moves damage per hit, those in brackets (if any) indicate a possibility of improvement through power-ups.
+            <br>
+            Click on a cell to find out more.
+        </p>
 
         <p class="attack-proficiency-summary"></p>
         <table id="attack-proficiency-stats" class="table table-striped table-bordered">
             <tbody></tbody>
         </table>
     </div>
+</div>
+
+<div class="row">
+    <p class="col-sm-12">
+      <b>*DISCLAMER* This is not a battle simulator. It does not take into account dodging, defender's damage or energy gain from taking hits. The battle times listed are only relative and portray a possible speed improvement through power-ups.</b>
+    </p>
 </div>
 {% endblock content %}
 

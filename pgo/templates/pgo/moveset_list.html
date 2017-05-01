@@ -8,34 +8,36 @@
             <th>Moveset</th>
             <th colspan="5" class="text-center">Weave damage over 99s by level</th>
 
-        {% for moveset in object_list %}
-            {% if forloop.first %}
+        {% for pokemon in object_list %}
+            {% for moveset in pokemon.moveset_set.all %}
+                {% if forloop.first %}
+                    <tr>
+                        <th colspan="2"></th>
+                        {% for moveset_data in moveset.weave_damage %}
+                            <th>
+                                {{ moveset_data.0|floatformat:"0" }}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                {% endif %}
+
                 <tr>
-                    <th colspan="2"></th>
+                    <td>
+                        <a href="{% url 'pgo:pokemon-detail' moveset.pokemon.slug %}">
+                            {{ moveset.pokemon.name }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ moveset.key }}
+                    </td>
                     {% for moveset_data in moveset.weave_damage %}
-                        <th>
-                            {{ moveset_data.0|floatformat:"0" }}
-                        </th>
+                        <td>
+                            {{ moveset_data.1|floatformat:"0" }}
+                        </td>
                     {% endfor %}
                 </tr>
-            </thead>
-            {% endif %}
-
-            <tr>
-                <td>
-                    <a href="{% url 'pgo:pokemon-detail' moveset.pokemon.slug %}">
-                        {{ moveset.pokemon.name }}
-                    </a>
-                </td>
-                <td>
-                    {{ moveset.key }}
-                </td>
-                {% for moveset_data in moveset.weave_damage %}
-                    <td>
-                        {{ moveset_data.1|floatformat:"0" }}
-                    </td>
-                {% endfor %}
-            </tr>
+            {% endfor %}
         {% endfor %}
     </table>
 

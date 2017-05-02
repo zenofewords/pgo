@@ -309,10 +309,11 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
             self._calculate_attack_multiplier(cpm_value[0])
             self._set_move_damage(self.cc_move)
 
+            # ensure to get the max cinematic move damage row, which might
+            # otherwise get filtered out
             if self.cc_move.damage_per_hit == max_cc_dph:
                 self.cc_move_proficiency.append(
                     (self.cc_move.damage_per_hit, cpm_value[1], cpm_value[0],))
-                break
 
             if ([x for x in self.qk_move_proficiency if cpm_value[0] == x[2]] or
                     current_cc_dph < self.cc_move.damage_per_hit and
@@ -329,10 +330,24 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 if q[1] == c[1]:
                     starting_qk_dph = q[0]
 
+            # remove redundant rows
+            if (starting_qk_dph, c[0]) in [(x[1], x[2]) for x in details[1:]]:
+                continue
+
             self.qk_move.damage_per_hit = starting_qk_dph
             self.cc_move.damage_per_hit = c[0]
-            battle_time = self._simulate_battle()
 
+            battle_time = self._simulate_battle()
             details.append((c[1], starting_qk_dph, c[0],
                 '{}s'.format(battle_time) if battle_time < 99 else 'Timed Out'))
+
+        # edge case when there's improvement for quick moves, but not for cinematic
+        if len(self.cc_move_proficiency) == 0 and len(self.qk_move_proficiency) > 0:
+            for q in sorted(self.qk_move_proficiency):
+                self.qk_move.damage_per_hit = q[0]
+
+                battle_time = self._simulate_battle()
+                details.append(
+                    (q[1], self.qk_move.damage_per_hit, self.cc_move.damage_per_hit,
+                    '{}s'.format(battle_time) if battle_time < 99 else 'Timed Out'))
         return details

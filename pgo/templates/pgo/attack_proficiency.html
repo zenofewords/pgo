@@ -15,7 +15,7 @@
 
             <span id="attacker_error" class="form-error"></span>
             <select id="attacker" class="attack-pro-select">
-                <option value="-1" disabled selected>Select attacker *</option>
+                <option value="-1" disabled selected>Select attacker</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
                 {% endfor %}
@@ -24,29 +24,29 @@
 
             <span id="quick_move_error" class="form-error"></span>
             <select id="quick_move" class="attack-pro-select" disabled>
-                <option value="-1" disabled selected>Quick move *</option>
+                <option value="-1" disabled selected>Quick move</option>
             </select>
             <br>
 
             <span id="cinematic_move_error" class="form-error"></span>
             <select id="cinematic_move" class="attack-pro-select" disabled>
-                <option value="-1" disabled selected>Cinematic move *</option>
+                <option value="-1" disabled selected>Cinematic move</option>
             </select>
             <br>
 
             <div class="row attack-pro-input-wrapper">
                 <div class="col-xs-8">
-                  <input type="number" id="attacker_level" class="attack-pro-input level-input form-control" name="attacker_level" placeholder="Attacker level *" min="1" max="40" step="0.5">
+                  <input type="number" id="attacker_level" class="attack-pro-input level-input form-control" name="attacker_level" placeholder="Attacker level" min="1" max="40" step="0.5">
                 </div>
                 <div class="col-xs-4">
-                    <input type="number" id="attack_iv" class="attack-pro-input iv-input form-control" name="attack_iv" placeholder="ATK IV *" min="0" max="15" step="1">
+                    <input type="number" id="attack_iv" class="attack-pro-input iv-input form-control" name="attack_iv" placeholder="ATK IV" min="0" max="15" step="1">
                 </div>
                 <br>
             </div>
 
             <span id="defender_error" class="form-error"></span>
             <select id="defender" class="attack-pro-select">
-                <option value="-1" disabled selected>Select defender *</option>
+                <option value="-1" disabled selected>Select defender</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
                 {% endfor %}
@@ -56,11 +56,11 @@
             <div class="row attack-pro-input-wrapper hidden">
                 <div class="col-xs-8">
                     <span id="defender_level_error" class="form-error"></span>
-                    <input type="number" id="defender_level" class="attack-pro-input level-input form-control" name="defender_level" placeholder="Defender level *" min="1" max="40" step="0.5" value="40">
+                    <input type="number" id="defender_level" class="attack-pro-input level-input form-control" name="defender_level" placeholder="Defender level" min="1" max="40" step="0.5" value="40">
                 </div>
                 <div class="col-xs-4">
                     <span id="defense_iv_error" class="form-error"></span>
-                    <input type="number" id="defense_iv" class="attack-pro-input iv-input form-control" name="defense_iv" placeholder="DEF IV *" min="0" max="15" step="1" value="15">
+                    <input type="number" id="defense_iv" class="attack-pro-input iv-input form-control" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
                 </div>
                 <br>
             </div>
@@ -105,13 +105,13 @@
         </p>
 
         <p class="attack-proficiency-summary"></p>
-        <table id="attack-proficiency-stats" class="table table-striped table-bordered">
+        <table id="attack-proficiency-stats" class="table table-striped">
             <tbody></tbody>
         </table>
     </div>
 </div>
 
-<div class="row">
+<div class="disclaimer row">
     <p class="col-sm-12">
       <b>*DISCLAMER* This is not a battle simulator. It does not take into account dodging, defender's damage or energy gain from taking hits. The battle times listed are only relative and portray a possible speed improvement through power-ups.</b>
     </p>

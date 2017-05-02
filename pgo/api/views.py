@@ -110,16 +110,16 @@ class AttackProficiencyAPIView(GenericAPIView):
     def _get_summary(self, battle_time):
         if battle_time >= 99:
             return '''
-                Your {} would do {} damage to a level {:g} {} with {} defense
+                Your {} would do {} damage to a level {:g} {} with {} DEF IV
                 and {} health, before timing out.'''.format(
                 self.attacker.name, self.weave_damage, self.defender.level,
-                self.defender.name, self.defender.defense, self.defender.health)
+                self.defender.name, self.defender.defense_iv, self.defender.health)
         else:
             return '''
-                Your {} would do {} damage to a level {:g} {} with {} defense
+                Your {} would do {} damage to a level {:g} {} with {} DEF IV
                 and {} health, finishing the battle in {} seconds.'''.format(
                 self.attacker.name, self.weave_damage, self.defender.level,
-                self.defender.name, self.defender.defense, self.defender.health,
+                self.defender.name, self.defender.defense_iv, self.defender.health,
                 battle_time)
 
     def _get_cpm(self, level):
@@ -195,8 +195,8 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
         return response.Response(data, status=status.HTTP_200_OK)
 
     def _process_data(self, data):
-        self.defense_iv_range = range(10, 16)
-        defender_cpm_list = list(CPM.objects.filter(level__gte=35))
+        self.defense_iv_range = range(11, 16)
+        defender_cpm_list = list(CPM.objects.filter(level__gte=37))
 
         total_attack = data['attacker']['pgo_attack'] + data['attacker']['atk_iv']
         self.attack_multiplier = total_attack * data['attacker']['cpm_list'][0][0]

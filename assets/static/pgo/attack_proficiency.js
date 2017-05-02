@@ -69,15 +69,26 @@ $(document).ready(function(){
 
     tableBody.on('click', 'td.attack-proficiency-detail', function(e){
         e.preventDefault()
-        tableBody.find('#detail-summary').remove()
+        var clickedCell = tableBody.find('#clicked-cell')
 
-        var level = tableBody.find('tr').eq(
-            $(e.currentTarget).parent().index()).find('td').eq(0)[0].textContent
-        var defenseIV = tableBody.find('tr').eq(
-            0).find('td').eq($(e.currentTarget).index())[0].textContent
+        if (clickedCell.length === 1) {
+            clickedCell.removeAttr('id')
+            tableBody.find('#detail-summary').remove()
+        }
+        else {
+            clickedCell.removeAttr('id')
+            tableBody.find('#detail-summary').remove()
 
-        var element = $(e.currentTarget)
-        getAttackProficiencyDetail(level, defenseIV, formData, element.parent())
+            $(this).attr('id', 'clicked-cell')
+
+            var level = tableBody.find('tr').eq(
+                $(e.currentTarget).parent().index()).find('td').eq(0)[0].textContent
+            var defenseIV = tableBody.find('tr').eq(
+                0).find('td').eq($(e.currentTarget).index())[0].textContent
+
+            var element = $(e.currentTarget)
+            getAttackProficiencyDetail(level, defenseIV, formData, element.parent())
+        }
     })
 
     function setValidLevel(input, inputName) {
@@ -238,44 +249,48 @@ $(document).ready(function(){
                 'defense_iv': defenseIV,
             },
             success: function(json) {
-                var marginLength = rowToAppend.children().length * 4
-                var totalWidth = rowToAppend.outerWidth(true) - marginLength
-                var wrapper = $('<tr id="detail-summary"><td width="'
-                    + totalWidth + '" colspan="7"></td></tr>').hide()
-                var summary = $('<p>' + json.summary + '</p>')
-                var wrapperTd = wrapper.find('td')
-                wrapperTd.append(summary)
-
-                var details = json.details
-                if (details.length > 1) {
-                    wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
-                    var detailsTable = $('<table class="table table-striped" width="'
-                        + totalWidth + '"></table>')
-                    detailsTable.append($('<tr id="detail-summary"><td width="10%">' +
-                        details[0][0] + '</td><td width="30%">' + details[0][1] +
-                        '</td><td width="30%">' + details[0][2] + '</td><td width="30%">'
-                        + details[0][3] + '</td></tr>'))
-
-                    for (row in details) {
-                        if (row > 0) {
-                            detailsTable.append($(
-                                '<tr><td>' + details[row][0] +
-                                '</td><td>' + details[row][1] +
-                                '</td><td>' + details[row][2] +
-                                '</td><td>' + details[row][3] +
-                                '</td></tr>'
-                            ))
-                        }
-                    }
-                    wrapperTd.append(detailsTable)
-                }
-                rowToAppend.after(wrapper)
-                wrapper.show('fast')
+                displayAttackProficiencyDetail(json, rowToAppend)
             },
             error: function(xhr, errmsg, err){
                 console.log('detail error', xhr)
             }
         })
+    }
+
+    function displayAttackProficiencyDetail(json, rowToAppend) {
+        var marginLength = rowToAppend.children().length * 4
+        var totalWidth = rowToAppend.outerWidth(true) - marginLength
+        var wrapper = $('<tr id="detail-summary"><td id="detail-summary-cell" width="'
+            + totalWidth + '" colspan="7"></td></tr>').hide()
+        var summary = $('<p>' + json.summary + '</p>')
+        var wrapperTd = wrapper.find('td')
+        wrapperTd.append(summary)
+
+        var details = json.details
+        if (details.length > 1) {
+            wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
+            var detailsTable = $('<table class="table table-striped" width="'
+                + totalWidth + '"></table>')
+            detailsTable.append($('<tr id="detail-summary"><td width="10%">' +
+                details[0][0] + '</td><td width="30%">' + details[0][1] +
+                '</td><td width="30%">' + details[0][2] + '</td><td width="30%">'
+                + details[0][3] + '</td></tr>'))
+
+            for (row in details) {
+                if (row > 0) {
+                    detailsTable.append($(
+                        '<tr><td>' + details[row][0] +
+                        '</td><td>' + details[row][1] +
+                        '</td><td>' + details[row][2] +
+                        '</td><td>' + details[row][3] +
+                        '</td></tr>'
+                    ))
+                }
+            }
+            wrapperTd.append(detailsTable)
+        }
+        rowToAppend.after(wrapper)
+        wrapper.show('fast')
     }
 
     function displayFieldErrors(errorObject) {

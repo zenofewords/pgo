@@ -1,6 +1,9 @@
 .select2-container {
     margin: 0.3rem;
 }
+.attack-pro-wrapper {
+    max-width: 900px;
+}
 .attack-pro-input-wrapper {
     max-width: 23.5rem;
 }
@@ -33,7 +36,11 @@
     display: none;
 }
 .attack-proficiency-stats-wrapper {
+    max-width: 900px;
     display: none;
+}
+.disclaimer {
+    max-width: 900px;
 }
 #attack-proficiency-stats td {
     font-size: 1.6rem;
@@ -43,4 +50,13 @@
 }
 .attack-proficiency-detail {
     cursor: pointer;
+}
+#clicked-cell {
+    border-top: 0.1rem solid #2e6da4;
+    border-left: 0.1rem solid #2e6da4;
+    border-bottom: 0.1rem solid white;
+    border-right: 0.1rem solid #2e6da4;
+}
+#detail-summary-cell {
+    border: 0.1rem solid #2e6da4;
 }

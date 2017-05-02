@@ -97,3 +97,4 @@ init.json
 node_modules/
 bundles/
 server.js
+webpack-stats.json

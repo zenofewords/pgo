@@ -2,7 +2,7 @@
     margin: 0.3rem;
 }
 .attack-pro-wrapper {
-    max-width: 900px;
+    max-width: 85rem;
 }
 .attack-pro-input-wrapper {
     max-width: 23.5rem;
@@ -36,12 +36,16 @@
     display: none;
 }
 .attack-proficiency-stats-wrapper {
-    max-width: 900px;
+    max-width: 85rem;
     display: none;
 }
 .disclaimer {
-    max-width: 900px;
+    max-width: 85rem;
 }
+.detail-summary-text {
+    padding: 1rem;
+}
+
 #attack-proficiency-stats td {
     font-size: 1.6rem;
     text-align: center;

@@ -67,13 +67,17 @@ $(document).ready(function(){
         submitButton.prop('disabled', disabled)
     })
 
-    tableBody.on('click', 'td.attack-proficiency-detail', function(e){
-        e.preventDefault()
+    tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+
+    function handleAttackProficiencyDetail(event) {
+        event.preventDefault()
+        var currentTarget = $(event.currentTarget)
         var clickedCell = tableBody.find('#clicked-cell')
 
-        if (clickedCell.length === 1) {
+        if (clickedCell.length === 1 && clickedCell[0] === currentTarget[0]) {
             clickedCell.removeAttr('id')
             tableBody.find('#detail-summary').remove()
+            tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
         }
         else {
             clickedCell.removeAttr('id')
@@ -82,14 +86,14 @@ $(document).ready(function(){
             $(this).attr('id', 'clicked-cell')
 
             var level = tableBody.find('tr').eq(
-                $(e.currentTarget).parent().index()).find('td').eq(0)[0].textContent
+                currentTarget.parent().index()).find('td').eq(0)[0].textContent
             var defenseIV = tableBody.find('tr').eq(
-                0).find('td').eq($(e.currentTarget).index())[0].textContent
+                0).find('td').eq(currentTarget.index())[0].textContent
 
-            var element = $(e.currentTarget)
+            var element = currentTarget
             getAttackProficiencyDetail(level, defenseIV, formData, element.parent())
         }
-    })
+    }
 
     function setValidLevel(input, inputName) {
         var choice = validateLevel(input)
@@ -250,6 +254,8 @@ $(document).ready(function(){
             },
             success: function(json) {
                 displayAttackProficiencyDetail(json, rowToAppend)
+                rowToAppend.parent().one(
+                    'click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
             },
             error: function(xhr, errmsg, err){
                 console.log('detail error', xhr)
@@ -262,7 +268,7 @@ $(document).ready(function(){
         var totalWidth = rowToAppend.outerWidth(true) - marginLength
         var wrapper = $('<tr id="detail-summary"><td id="detail-summary-cell" width="'
             + totalWidth + '" colspan="7"></td></tr>').hide()
-        var summary = $('<p>' + json.summary + '</p>')
+        var summary = $('<p class="detail-summary-text">' + json.summary + '</p>')
         var wrapperTd = wrapper.find('td')
         wrapperTd.append(summary)
 

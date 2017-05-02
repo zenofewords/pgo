@@ -10,6 +10,8 @@ from pgo.views import (
 
 
 urlpatterns = (
+    url(r'^attack-pro/$',
+        AttackProficiencyView.as_view(), name='attack-proficiency'),
     url(r'^move/(?P<slug>[\w|\W]+)$',
         MoveDetailView.as_view(), name='move-detail'),
     url(r'^moves/$', MoveListView.as_view(), name='move-list'),
@@ -22,5 +24,4 @@ urlpatterns = (
     url(r'^moveset(?P<pk>[\d]+)/$',
         MoveSetDetailView.as_view(), name='moveset-detail'),
     url(r'^movesets/$', MoveSetListView.as_view(), name='moveset-list'),
-    url(r'^$', AttackProficiencyView.as_view(), name='attack-proficiency'),
 )

@@ -57,7 +57,7 @@ class TypeDetailView(DetailView):
 class MoveSetListView(ListView):
     model = Pokemon
     template_name = 'pgo/moveset_list.html'
-    paginate_by = 30
+    paginate_by = 75
 
 
 class MoveSetDetailView(DetailView):

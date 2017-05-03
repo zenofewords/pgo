@@ -110,14 +110,14 @@ class AttackProficiencyAPIView(GenericAPIView):
     def _get_summary(self, battle_time):
         if battle_time >= 99:
             return '''
-                Your {} would do {} damage to a level {:g} {} with {} DEF IV
-                and {} health, before timing out.'''.format(
+                Your {} would do {} damage to a l{:g} {} with {} DEF IV ({} health),
+                before timing out.'''.format(
                 self.attacker.name, self.weave_damage, self.defender.level,
                 self.defender.name, self.defender.defense_iv, self.defender.health)
         else:
             return '''
-                Your {} would do {} damage to a level {:g} {} with {} DEF IV
-                and {} health, finishing the battle in {} seconds.'''.format(
+                Your {} would do {} damage to a l{:g} {} with {} DEF IV ({} health),
+                finishing the battle in {} seconds.'''.format(
                 self.attacker.name, self.weave_damage, self.defender.level,
                 self.defender.name, self.defender.defense_iv, self.defender.health,
                 battle_time)

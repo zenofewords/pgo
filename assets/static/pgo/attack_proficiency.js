@@ -13,6 +13,7 @@ $(document).ready(function(){
     var defenderLevelInput = $('#defender_level')
     var defenseIVInput = $('#defense_iv')
     var submitButton = $('#submit')
+    var helpButton = $('#help_button')
     var formData = {
         defenderLevel: defenderLevelInput.val(),
         defenseIV: defenseIVInput.val(),
@@ -52,6 +53,11 @@ $(document).ready(function(){
         submitForm(formData)
     })
 
+    helpButton.on('click', function(event) {
+        event.preventDefault()
+        $('.help-text').toggle()
+    })
+
     var formInputs = $('.attack-pro-select, .attack-pro-input')
     formInputs.on('change keyup paste', function() {
         var disabled = true
@@ -68,6 +74,7 @@ $(document).ready(function(){
     })
 
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+
 
     function handleAttackProficiencyDetail(event) {
         event.preventDefault()

@@ -14,7 +14,7 @@
             {% csrf_token %}
 
             <span id="attacker_error" class="form-error"></span>
-            <select id="attacker" class="attack-pro-select">
+            <select id="attacker" class="attack-pro-select" tabindex="1">
                 <option value="-1" disabled selected>Select attacker</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
@@ -23,35 +23,41 @@
             <br>
 
             <span id="quick_move_error" class="form-error"></span>
-            <select id="quick_move" class="attack-pro-select" disabled>
+            <select id="quick_move" class="attack-pro-select" tabindex="2" disabled>
                 <option value="-1" disabled selected>Quick move</option>
             </select>
             <br>
 
             <span id="cinematic_move_error" class="form-error"></span>
-            <select id="cinematic_move" class="attack-pro-select" disabled>
+            <select id="cinematic_move" class="attack-pro-select" tabindex="3" disabled>
                 <option value="-1" disabled selected>Cinematic move</option>
             </select>
-            <br>
 
             <div class="row attack-pro-input-wrapper">
-                <div class="col-xs-8">
-                  <input type="number" id="attacker_level" class="attack-pro-input level-input form-control" name="attacker_level" placeholder="Attacker level" min="1" max="40" step="0.5">
+                <div class="col-xs-6">
+                  <input type="number" id="attacker_level" class="attack-pro-input level-input form-control" name="attacker_level" placeholder="Attacker level" min="1" max="40" step="0.5" tabindex="4">
                 </div>
                 <div class="col-xs-4">
-                    <input type="number" id="attack_iv" class="attack-pro-input iv-input form-control" name="attack_iv" placeholder="ATK IV" min="0" max="15" step="1">
+                    <input type="number" id="attack_iv" class="attack-pro-input iv-input form-control" name="attack_iv" placeholder="ATK IV" min="0" max="15" step="1" tabindex="5">
                 </div>
-                <br>
+                <div class="col-xs-2">
+                    <a href="#" id="help_button" class="btn btn-info help-button" tabindex="-1">?</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="help-text col-xs-12">
+                    Don't know the level and ATK IV? You can look those up on <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
+                </div>
             </div>
 
             <span id="defender_error" class="form-error"></span>
-            <select id="defender" class="attack-pro-select">
+            <select id="defender" class="attack-pro-select" tabindex="6">
                 <option value="-1" disabled selected>Select defender</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
                 {% endfor %}
             </select>
-            <br>
 
             <div class="row attack-pro-input-wrapper hidden">
                 <div class="col-xs-8">
@@ -62,22 +68,19 @@
                     <span id="defense_iv_error" class="form-error"></span>
                     <input type="number" id="defense_iv" class="attack-pro-input iv-input form-control" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
                 </div>
-                <br>
             </div>
+            <br>
 
-            <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" disabled>
+            <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" tabindex="7" disabled>
         </form>
     </div>
     <div class="attack-proficiency-info col-md-8">
         <div class="attack-proficiency-intro">
             <p>
-               The attack proficiency calculator was built to help find damage "breakpoints". Due to rounding in PGo's damage formula, the impact of these breakpoints can be significant.
+               The attack proficiency calculator was built to help find damage "breakpoints". Due to rounding in PGO's damage formula, the impact of these breakpoints can be significant.
             </p>
             <p>
-                To begin, select your attacker and choose its attacks. If you don't know its level and ATK IV you can look it up on <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress' IV calculator</a>.
-            </p>
-            <p>
-                When you're done entering stats, choose what you'll be attacking and hit submit.
+                To begin, select your attacker and its attacks, enter its level and ATK IV, then choose what you'll be attacking and hit submit.
             </p>
         </div>
         <div class="attack-proficiency-current">
@@ -93,6 +96,9 @@
                 <span id="attacker_cinematic_move"></span> will do
                 <span id="cinematic_attack_damage"></span> damage per hit
                 (<span id="cinematic_attack_dps"></span> DPS)
+            </p>
+            <p>
+                <i>Comparison with a maxed-out 15 ATK attacker placeholder.</i>
             </p>
         </div>
     </div>

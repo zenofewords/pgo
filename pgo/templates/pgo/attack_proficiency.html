@@ -2,6 +2,10 @@
 {% load render_bundle from webpack_loader %}
 
 
+{% block title %}
+    {{ block.super }} - Attack Proficiency Calculator
+{% endblock title %}
+
 {% block head %}
     {{ block.super }}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />

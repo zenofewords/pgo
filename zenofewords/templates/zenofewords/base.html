@@ -3,12 +3,17 @@
 
 <!DOCTYPE html>
 <html>
-    {% block head %}
-        <head>
+    <head>
+        {% block head %}
+            <title>
+                {% block title %}
+                    Zen's Repository
+                {% endblock title %}
+            </title>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-        </head>
-    {% endblock head %}
+        {% endblock head %}
+    </head>
 
     {% block body %}
         <body>

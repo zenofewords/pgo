@@ -19,11 +19,13 @@ $(document).ready(function(){
         defenseIV: defenseIVInput.val(),
     }
     var tableBody = $('#attack-proficiency-stats').find('tbody')
-
+    var autoSubmit = false
 
     $('#attacker').change(function() {
         filterQueryset(this.value)
         formData.attacker = this.value
+        formData.quickMove = - 1
+        formData.cinematicMove = - 1
     })
     quickMoveSelect.change(function() {
         formData.quickMove = this.value
@@ -55,7 +57,7 @@ $(document).ready(function(){
 
     helpButton.on('click', function(event) {
         event.preventDefault()
-        $('.help-text').toggle()
+        $('.help-text').toggle('fast')
     })
 
     var formInputs = $('.attack-pro-select, .attack-pro-input')
@@ -71,6 +73,10 @@ $(document).ready(function(){
             }
         }
         submitButton.prop('disabled', disabled)
+
+        if (disabled === false && autoSubmit === true) {
+            submitForm(formData)
+        }
     })
 
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
@@ -78,6 +84,7 @@ $(document).ready(function(){
 
     function handleAttackProficiencyDetail(event) {
         event.preventDefault()
+        $('.table-explanation-text').hide('fast')
         var currentTarget = $(event.currentTarget)
         var clickedCell = tableBody.find('#clicked-cell')
 
@@ -180,6 +187,7 @@ $(document).ready(function(){
             success: function(json){
                 displayAttackProficiency(json)
                 generateAttackProficiencyStats(json)
+                autoSubmit = true
             },
             error: function(xhr, errmsg, err){
                 displayFieldErrors(xhr.responseJSON)
@@ -229,8 +237,8 @@ $(document).ready(function(){
     }
 
     function displayAttackProficiency(json) {
-        $('.attack-proficiency-intro').hide()
-        $('.attack-proficiency-current').show()
+        $('.attack-proficiency-intro').hide('fast')
+        $('.attack-proficiency-current').show('fast')
         $('#summary').html(json.summary)
 
         $('#attacker_quick_move').html(json.quick_move.name)

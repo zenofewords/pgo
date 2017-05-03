@@ -8,15 +8,17 @@
 {% block content %}
     <table class="table table-striped">
         <thead>
-            <th>Category</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Power</th>
-            <th>Energy delta</th>
-            <th>Duration</th>
-            <th>Damage start</th>
-            <th>DPS</th>
-            <th>EPS</th>
+            <tr>
+                <th>Category</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Power</th>
+                <th>Energy delta</th>
+                <th>Duration</th>
+                <th>Damage start</th>
+                <th>DPS</th>
+                <th>EPS</th>
+            </tr>
         </thead>
         <tbody>
             {% for obj in object_list %}

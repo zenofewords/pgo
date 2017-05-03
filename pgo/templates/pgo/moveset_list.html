@@ -10,26 +10,28 @@
 
     <table class="table table-striped">
         <thead>
-            <th>Pokemon</th>
-            <th>Moveset</th>
-            <th colspan="5" class="text-center">Moveset damage over 99s for level</th>
+            <tr>
+                <th>Pokemon</th>
+                <th>Moveset</th>
+                <th colspan="5" class="text-center">Moveset damage over 99s for level</th>
 
-        {% for pokemon in object_list %}
-            {% for moveset in pokemon.moveset_set.all %}
-                {% if forloop.first %}
-                    <tr>
-                        <th colspan="2"></th>
-                        {% if forloop.parentloop.first %}
-                            {% for moveset_data in moveset.weave_damage %}
-                                <th>
-                                    {{ moveset_data.0|floatformat:"0" }}
-                                </th>
-                            {% endfor %}
-                        {% else %}
-                            <th colspan="5"></th>
-                        {% endif %}
-                    </tr>
-                </thead>
+            {% for pokemon in object_list %}
+                {% for moveset in pokemon.moveset_set.all %}
+                    {% if forloop.first %}
+                        <tr>
+                            <th colspan="2"></th>
+                            {% if forloop.parentloop.first %}
+                                {% for moveset_data in moveset.weave_damage %}
+                                    <th>
+                                        {{ moveset_data.0|floatformat:"0" }}
+                                    </th>
+                                {% endfor %}
+                            {% else %}
+                                <th colspan="5"></th>
+                            {% endif %}
+                        </tr>
+            </tr>
+        </thead>
                 {% endif %}
 
                 <tr>

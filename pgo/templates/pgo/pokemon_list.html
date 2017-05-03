@@ -9,14 +9,16 @@
 {% block content %}
     <table class="table table-striped">
         <thead>
-            <th>Number</th>
-            <th>Name</th>
-            <th>Primary Type</th>
-            <th>Secondary Type</th>
-            <th>Stamina</th>
-            <th>Attack</th>
-            <th>Defense</th>
-            <th>Max CP</th>
+            <tr>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Primary Type</th>
+                <th>Secondary Type</th>
+                <th>Stamina</th>
+                <th>Attack</th>
+                <th>Defense</th>
+                <th>Max CP</th>
+            </tr>
         </thead>
         {% for object in object_list %}
             <tr>

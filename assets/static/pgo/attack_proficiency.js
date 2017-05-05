@@ -240,6 +240,7 @@ $(document).ready(function(){
         $('.attack-proficiency-intro').hide('fast')
         $('.attack-proficiency-current').show('fast')
         $('#summary').html(json.summary)
+        $('#attack_iv_assessment').html(json.attack_iv_assessment)
 
         $('#attacker_quick_move').html(json.quick_move.name)
         $('#quick_attack_damage').html(json.quick_move.damage_per_hit)

@@ -51,7 +51,7 @@
 
             <div class="row">
                 <div class="help-text col-xs-12">
-                    Don't know the level and ATK IV? You can look those up on <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
+                    Don't know the level and ATK IV? You can look them up on <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
                 </div>
             </div>
 
@@ -81,24 +81,22 @@
     <div class="attack-proficiency-info col-md-8">
         <div class="attack-proficiency-intro">
             <p>
-               The attack proficiency calculator was built to help find damage "breakpoints". Due to rounding in PGO's damage formula, the impact of these breakpoints can be significant.
+               The attack proficiency calculator was built to help find damage "breakpoints".
             </p>
             <p>
-                To begin, select your attacker and its attacks, enter its level and ATK IV, then choose what you'll be attacking and hit submit.
+                To begin, select your attacker and its attacks, enter its level and ATK IV and choose what you'll be attacking, then hit submit.
             </p>
         </div>
         <div class="attack-proficiency-current">
             <p>
+                <span id="attack_iv_assessment"></span>
                 <span id="summary"></span>
             </p>
             <p>
-                <span id="attacker_quick_move"></span> will do
-                <span id="quick_attack_damage"></span> and
-                <span id="attacker_cinematic_move"></span> will do
-                <span id="cinematic_attack_damage"></span> damage per hit.
-            </p>
-            <p>
-                <span id="attack_iv_assessment"></span>
+                <span id="attacker_quick_move"></span> would do
+                <span id="quick_attack_damage"></span>, and
+                <span id="attacker_cinematic_move"></span>
+                <span id="cinematic_attack_damage"></span>, damage per hit.
             </p>
         </div>
     </div>
@@ -119,7 +117,7 @@
 
 <div class="disclaimer row">
     <p class="col-sm-12">
-      <b>*DISCLAMER* This is not a battle simulator. It does not take into account dodging, defender's damage or energy gain from taking hits. The battle times listed are only relative and portray a possible speed improvement through power-ups.</b>
+      <b>*DISCLAMER* This is not a battle simulator. It does not take into account defender's damage, energy gain from taking hits, or time-outs. The battle times listed are only relative and portray a possible speed improvement through power-ups.</b>
     </p>
 </div>
 {% endblock content %}

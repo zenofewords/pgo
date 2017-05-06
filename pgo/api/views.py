@@ -69,7 +69,7 @@ class AttackProficiencyAPIView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         self._fetch_data(serializer.data)
-        data = self._process_data(serializer.data)
+        data = self._process_data()
         return response.Response(data, status=status.HTTP_200_OK)
 
     def _fetch_data(self, data):
@@ -85,17 +85,42 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.defender.cpm = self._get_cpm(self.defender.level)
         self.defender.defense_iv = data.get('defense_iv')
 
-    def _process_data(self, data):
+    def _process_data(self):
         self._calculate_move_stats()
         battle_time = self._simulate_battle()
 
-        return {
+        data = {
             'quick_move': self._serialize(self.qk_move),
             'cinematic_move': self._serialize(self.cc_move),
             'attacker': self._serialize(self.attacker),
             'defender': self._serialize(self.defender),
             'summary': self._get_summary(battle_time)
         }
+        return self._assess_attack_iv(data)
+
+    def _assess_attack_iv(self, data):
+        max_cpm_value = self.attacker.cpm_list[-1][0]
+        self._calculate_move_stats(max_cpm_value)
+        current_qk_dph = self.qk_move.damage_per_hit
+        current_cc_dph = self.cc_move.damage_per_hit
+
+        self.attacker.atk_iv = 15
+        self._calculate_move_stats(max_cpm_value)
+
+        if (current_qk_dph == self.qk_move.damage_per_hit and
+                current_cc_dph / self.cc_move.damage_per_hit * 100 > 93):
+            attack_iv_assessment = '''
+                Your {}\'s ATK IV is high enough for it to realise its
+                maximum potential against {}!'''.format(
+                self.attacker.name, self.defender.name)
+        else:
+            attack_iv_assessment = '''
+                Unfortunately, your {}\'s ATK IV is not high enough for it to
+                realise its maximum potential against {}.'''.format(
+                self.attacker.name, self.defender.name)
+
+        data.update({'attack_iv_assessment': attack_iv_assessment})
+        return data
 
     def _simulate_battle(self):
         self.defender.health = calculate_defender_health(

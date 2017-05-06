@@ -75,9 +75,9 @@ $(document).ready(function(){
         }
         submitButton.prop('disabled', disabled)
 
-        if (disabled === false && autoSubmit === true) {
-            submitForm(formData)
-        }
+        // if (disabled === false && autoSubmit === true) {
+        //     submitForm(formData)
+        // }
     })
 
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)

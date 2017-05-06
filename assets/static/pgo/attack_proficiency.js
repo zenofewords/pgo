@@ -19,6 +19,7 @@ $(document).ready(function(){
         defenseIV: defenseIVInput.val(),
     }
     var tableBody = $('#attack-proficiency-stats').find('tbody')
+    var dirty = false
 
     $('#attacker').change(function() {
         filterQueryset(this.value)
@@ -65,6 +66,7 @@ $(document).ready(function(){
     var formInputs = $('.attack-pro-select, .attack-pro-input')
     formInputs.on('change keyup paste blur', function() {
         var disabled = true
+        dirty = true
 
         if (Object.keys(formData).length === formInputs.length) {
             disabled = false
@@ -80,6 +82,11 @@ $(document).ready(function(){
 
 
     function handleAttackProficiencyDetail(event) {
+        if (dirty) {
+            submitForm(formData)
+            return
+        }
+
         event.preventDefault()
         $('.table-explanation-text').hide()
         var currentTarget = $(event.currentTarget)
@@ -101,8 +108,7 @@ $(document).ready(function(){
             var defenseIV = tableBody.find('tr').eq(
                 0).find('td').eq(currentTarget.index())[0].textContent
 
-            var element = currentTarget
-            getAttackProficiencyDetail(level, defenseIV, formData, element.parent())
+            getAttackProficiencyDetail(level, defenseIV, formData, currentTarget.parent())
         }
     }
 
@@ -226,6 +232,7 @@ $(document).ready(function(){
                 }
                 $('.attack-proficiency-stats-wrapper').show()
                 tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+                dirty = false
             },
             error: function(xhr, errmsg, err){
                 console.log('stats error', xhr)

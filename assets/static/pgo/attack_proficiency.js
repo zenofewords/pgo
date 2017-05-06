@@ -19,7 +19,6 @@ $(document).ready(function(){
         defenseIV: defenseIVInput.val(),
     }
     var tableBody = $('#attack-proficiency-stats').find('tbody')
-    var autoSubmit = false
 
     $('#attacker').change(function() {
         filterQueryset(this.value)
@@ -52,11 +51,14 @@ $(document).ready(function(){
 
     $('#attack-pro-form').on('submit', function(event) {
         event.preventDefault()
+        tableBody.off('click')
+
         submitForm(formData)
     })
 
     helpButton.on('click', function(event) {
         event.preventDefault()
+
         $('.help-text').toggle('fast')
     })
 
@@ -74,10 +76,6 @@ $(document).ready(function(){
             }
         }
         submitButton.prop('disabled', disabled)
-
-        // if (disabled === false && autoSubmit === true) {
-        //     submitForm(formData)
-        // }
     })
 
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
@@ -85,7 +83,7 @@ $(document).ready(function(){
 
     function handleAttackProficiencyDetail(event) {
         event.preventDefault()
-        $('.table-explanation-text').hide('fast')
+        $('.table-explanation-text').hide()
         var currentTarget = $(event.currentTarget)
         var clickedCell = tableBody.find('#clicked-cell')
 
@@ -188,8 +186,6 @@ $(document).ready(function(){
             success: function(json){
                 displayAttackProficiency(json)
                 generateAttackProficiencyStats(json)
-                autoSubmit = true
-                tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
             },
             error: function(xhr, errmsg, err){
                 displayFieldErrors(xhr.responseJSON)
@@ -230,7 +226,8 @@ $(document).ready(function(){
                     }
                     tableBody.append(tr)
                 }
-                $('.attack-proficiency-stats-wrapper').show('fast')
+                $('.attack-proficiency-stats-wrapper').show()
+                tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
             },
             error: function(xhr, errmsg, err){
                 console.log('stats error', xhr)
@@ -239,7 +236,7 @@ $(document).ready(function(){
     }
 
     function displayAttackProficiency(json) {
-        $('.attack-proficiency-intro').hide('fast')
+        $('.attack-proficiency-intro').hide()
         $('.attack-proficiency-current').show('fast')
         $('#summary').html(json.summary)
         $('#attack_iv_assessment').html(json.attack_iv_assessment)
@@ -295,8 +292,8 @@ $(document).ready(function(){
             wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
             var detailsTable = $('<table class="table table-striped" width="'
                 + totalWidth + '"></table>')
-            detailsTable.append($('<tr id="detail-summary"><td width="10%">' +
-                details[0][0] + '</td><td width="30%">' + details[0][1] +
+            detailsTable.append($('<tr><td width="10%">' + details[0][0] +
+                '</td><td width="30%">' + details[0][1] +
                 '</td><td width="30%">' + details[0][2] + '</td><td width="30%">'
                 + details[0][3] + '</td></tr>'))
 

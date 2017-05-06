@@ -65,7 +65,6 @@ $(document).ready(function(){
     var formInputs = $('.attack-pro-select, .attack-pro-input')
     formInputs.on('change keyup paste blur', function() {
         var disabled = true
-        tableBody.off('click')
 
         if (Object.keys(formData).length === formInputs.length) {
             disabled = false
@@ -77,7 +76,6 @@ $(document).ready(function(){
         }
         submitButton.prop('disabled', disabled)
     })
-
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
 
 

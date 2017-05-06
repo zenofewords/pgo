@@ -61,8 +61,9 @@ $(document).ready(function(){
     })
 
     var formInputs = $('.attack-pro-select, .attack-pro-input')
-    formInputs.on('change keyup paste', function() {
+    formInputs.on('change keyup paste blur', function() {
         var disabled = true
+        tableBody.off('click')
 
         if (Object.keys(formData).length === formInputs.length) {
             disabled = false
@@ -188,6 +189,7 @@ $(document).ready(function(){
                 displayAttackProficiency(json)
                 generateAttackProficiencyStats(json)
                 autoSubmit = true
+                tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
             },
             error: function(xhr, errmsg, err){
                 displayFieldErrors(xhr.responseJSON)

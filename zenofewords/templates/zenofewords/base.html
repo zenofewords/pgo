@@ -12,22 +12,6 @@
             </title>
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-
-            <style type="text/css">
-                #navbar-toggle-cbox {
-                    display: none;
-                }
-                #navbar-toggle-cbox:checked ~ .collapse {
-                    margin: 2rem 0;
-                    display: block;
-                }
-                .navbar-default {
-                    background: none;
-                }
-                #navbar {
-                    padding-right: 1.4rem;
-                }
-            </style>
         {% endblock head %}
     </head>
 
@@ -42,8 +26,8 @@
 
                 {% block footer %}
                     <hr>
-                    <p>
-                        &copy; zenofewords {% now 'Y' %}
+                    <p class="small">
+                        &copy; {% now 'Y' %} Dominik Zen
                     </p>
                 {% endblock footer %}
             </div>

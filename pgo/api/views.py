@@ -24,6 +24,13 @@ from pgo.utils import (
     calculate_weave_damage,
 )
 
+MAX_IV = 15
+DEFAULT_EFFECTIVNESS = Decimal('1.0')
+EFFECTIVNESS_THRESHOLD = 93
+DEFENDER_IV_RANGE = range(11, 16)
+DEFENDER_LEVEL_CUTOFF = 37
+CC_FACTOR = 1.2
+
 
 class MoveViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -72,7 +79,6 @@ class AttackProficiencyAPIView(GenericAPIView):
     def _fetch_data(self, data):
         cpm_qs = CPM.objects.all()
         self.max_cpm_value = cpm_qs.last().value
-        self.max_iv = 15
 
         self.attacker = self._get_pokemon(data.get('attacker'))
         self.attacker.atk_iv = data.get('attack_iv')
@@ -107,7 +113,7 @@ class AttackProficiencyAPIView(GenericAPIView):
     def _get_battle_summary(self):
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
         self.defender.health = calculate_defender_health(
-            self.defender.pgo_stamina + self.max_iv, self.defender.cpm
+            self.defender.pgo_stamina + MAX_IV, self.defender.cpm
         )
         battle_time = calculate_weave_damage(
             self.qk_move, self.cc_move, self.defender.health
@@ -137,7 +143,7 @@ class AttackProficiencyAPIView(GenericAPIView):
         )
 
     def _get_effectivness(self, move, pokemon):
-        secondary_type_effectivness = Decimal('1.0')
+        secondary_type_effectivness = DEFAULT_EFFECTIVNESS
         if pokemon.secondary_type_id:
             secondary_type_effectivness = TypeEffectivness.objects.get(
                 type_offense__id=move.move_type_id,
@@ -161,11 +167,11 @@ class AttackProficiencyAPIView(GenericAPIView):
         current_qk_dph = self.qk_move.damage_per_hit
         current_cc_dph = self.cc_move.damage_per_hit
 
-        self.attacker.atk_iv = self.max_iv
+        self.attacker.atk_iv = MAX_IV
         self._calculate_move_stats()
 
-        if (current_qk_dph == self.qk_move.damage_per_hit and
-                current_cc_dph / self.cc_move.damage_per_hit * 100 > 93):
+        if (current_qk_dph == self.qk_move.damage_per_hit and current_cc_dph /
+                self.cc_move.damage_per_hit * 100 > EFFECTIVNESS_THRESHOLD):
             attack_iv_assessment = '''
                 Your {}\'s ATK IV is high enough for it to reach its
                 maximum potential against {}!'''.format(
@@ -199,9 +205,8 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
         return response.Response(data, status=status.HTTP_200_OK)
 
     def _process_data(self, data):
-        self.defense_iv_range = range(11, 16)
+        self.defense_iv_range = DEFENDER_IV_RANGE
         attacker_cpm_list = data['attacker']['cpm_list']
-        defender_cpm_qs = CPM.objects.filter(level__gte=37)
 
         total_attack = data['attacker']['pgo_attack'] + data['attacker']['atk_iv']
         self.attack_multiplier = total_attack * attacker_cpm_list[0]['value']
@@ -213,7 +218,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
             def_ivs.append('')
         stats = [{'L/IV': def_ivs}]
 
-        for cpm in defender_cpm_qs:
+        for cpm in CPM.objects.filter(level__gte=DEFENDER_LEVEL_CUTOFF):
             stats.append({
                 '{0:g}'.format(float(cpm.level)):
                 self._calculate_moves_dph(
@@ -251,7 +256,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
             move['power'], attack_modifiers[1],
             move['stab'], move['effectivness'])
 
-        if current_dph / max_dph * 100 < 93:
+        if current_dph / max_dph * 100 < EFFECTIVNESS_THRESHOLD:
             return '{} <b>({})</b><br>'.format(current_dph, max_dph)
         if current_dph == max_dph:
             return '{}<br>'.format(current_dph)
@@ -263,12 +268,12 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        self._fetch_data(serializer.data)
 
-        data = self._process_data(serializer.data)
+        data = self._process_data()
         return response.Response(data, status=status.HTTP_200_OK)
 
-    def _process_data(self, data):
-        self._fetch_data(data)
+    def _process_data(self):
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
         starting_qk_dph = self.qk_move.damage_per_hit
         starting_cc_dph = self.cc_move.damage_per_hit
@@ -279,11 +284,10 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
         self._set_qk_move_proficiency(starting_qk_dph)
         self._set_cc_move_proficiency(starting_cc_dph, self._get_max_cc_move_dph())
 
-        info = {
+        return {
             'summary': summary,
             'details': self._get_details_table(starting_qk_dph),
         }
-        return info
 
     def _get_max_cc_move_dph(self):
         self._calculate_attack_multiplier()
@@ -320,7 +324,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
             if ([x for x in self.qk_move_proficiency if cpm['value'] == x[2]] or
                     current_cc_dph < self.cc_move.damage_per_hit and
-                    current_cc_dph / self.cc_move.damage_per_hit * 100 < 93):
+                    current_cc_dph * CC_FACTOR < self.cc_move.damage_per_hit):
                 self.cc_move_proficiency.append(
                     (self.cc_move.damage_per_hit, cpm['level'], cpm['value'],))
                 current_cc_dph = self.cc_move.damage_per_hit

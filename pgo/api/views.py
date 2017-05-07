@@ -259,8 +259,6 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
 
 class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
-    permission_classes = (AllowAny,)
-    serializer_class = AttackProficiencySerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -319,7 +317,6 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
             if self.cc_move.damage_per_hit == max_cc_dph:
                 self.cc_move_proficiency.append(
                     (self.cc_move.damage_per_hit, cpm['level'], cpm['value'],))
-                return
 
             if ([x for x in self.qk_move_proficiency if cpm['value'] == x[2]] or
                     current_cc_dph < self.cc_move.damage_per_hit and

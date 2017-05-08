@@ -11,45 +11,46 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Pokemon</th>
-                <th>Moveset</th>
-                <th colspan="5" class="text-center">Moveset damage over 99s for level</th>
-
-            {% for pokemon in object_list %}
-                {% for moveset in pokemon.moveset_set.all %}
-                    {% if forloop.first %}
-                        <tr>
-                            <th colspan="2"></th>
-                            {% if forloop.parentloop.first %}
-                                {% for moveset_data in moveset.weave_damage %}
-                                    <th>
-                                        {{ moveset_data.0|floatformat:"0" }}
-                                    </th>
-                                {% endfor %}
-                            {% else %}
-                                <th colspan="5"></th>
-                            {% endif %}
-                        </tr>
+                <th>
+                    {% include 'pgo/includes/moveset_sortable_header.html' with name='Pokemon' sort_by='pokemon__number&amp;weave_damage' %}
+                </th>
+                <th>
+                    Moveset
+                </th>
+                <th colspan="5">
+                    {% include 'pgo/includes/moveset_sortable_header.html' with name='Moveset damage over 100s for level' sort_by='weave_damage' %}
+                </th>
+            </tr>
+            <tr>
+                <th>Filter placeholder</th>
+                <th>Filter placeholder</th>
+                <th>20</th>
+                <th>25</th>
+                <th>30</th>
+                <th>35</th>
+                <th>40</th>
             </tr>
         </thead>
-                {% endif %}
 
-                <tr>
+        {% for moveset in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'pgo:pokemon-detail' moveset.pokemon.slug %}">
+                        {{ moveset.pokemon.name }}
+                    </a>
+                </td>
+                <td>
+                    {{ moveset.key }}
+                    {% if moveset.legacy %}
+                        <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+                    {% endif %}
+                </td>
+                {% for moveset_data in moveset.weave_damage %}
                     <td>
-                        <a href="{% url 'pgo:pokemon-detail' moveset.pokemon.slug %}">
-                            {{ moveset.pokemon.name }}
-                        </a>
+                        {{ moveset_data.1|floatformat:"0" }}
                     </td>
-                    <td>
-                        {{ moveset.key }}
-                    </td>
-                    {% for moveset_data in moveset.weave_damage %}
-                        <td>
-                            {{ moveset_data.1|floatformat:"0" }}
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
+                {% endfor %}
+            </tr>
         {% endfor %}
     </table>
 

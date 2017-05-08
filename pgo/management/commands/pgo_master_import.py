@@ -13,7 +13,7 @@ from pgo.models import (
     CPM,
     Pokemon,
     Move,
-    MoveSet,
+    Moveset,
     Type,
     TypeEffectivness,
     TypeEffectivnessScalar,
@@ -121,7 +121,7 @@ class Command(BaseCommand):
                         TypeEffectivnessScalar.objects.get(scalar=scalar))
 
     def _process_pokemon(self, pokemon_data):
-        existing_movesets = MoveSet.objects.all()
+        existing_movesets = Moveset.objects.all()
         new_movesets = []
 
         for pokemon_number, data in pokemon_data.items():
@@ -181,7 +181,7 @@ class Command(BaseCommand):
 
             for quick_move in quick_moves:
                 for cinematic_move in cinematic_moves:
-                    new_movesets.append(MoveSet.objects.get_or_create(
+                    new_movesets.append(Moveset.objects.get_or_create(
                         pokemon=pokemon,
                         key='{} - {}'.format(quick_move, cinematic_move)
                     ))

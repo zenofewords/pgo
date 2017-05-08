@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from pgo.models import (
     CPM,
     Pokemon,
-    MoveSet,
+    Moveset,
 )
 LEVELS = (20.0, 25.0, 30.0, 35.0, 40.0)
 IV = 15
@@ -18,7 +18,7 @@ TIMEOUT = 99000
 class Command(BaseCommand):
     help = 'Calculate and store DPS details for all currently listed pokemon.'
 
-    def _calculate_weave_damage(self, attack, quick_move, cinematic_move, stab):
+    def _simulate_weave_damage(self, attack, quick_move, cinematic_move, stab):
         weave_damage = {}
 
         for level in LEVELS:
@@ -65,7 +65,7 @@ class Command(BaseCommand):
             pokemon.primary_type, pokemon.secondary_type) else False
 
     def _get_moveset(self, pokemon, quick_move, cinematic_move):
-        return MoveSet.objects.filter(
+        return Moveset.objects.filter(
             pokemon_id=pokemon.pk,
             key='{} - {}'.format(quick_move, cinematic_move)
         ).first()
@@ -89,7 +89,7 @@ class Command(BaseCommand):
 
                     if moveset:
                         moveset.weave_damage = sorted(
-                            self._calculate_weave_damage(
+                            self._simulate_weave_damage(
                                 pokemon.pgo_attack,
                                 quick_move,
                                 cinematic_move,

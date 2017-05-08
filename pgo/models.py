@@ -9,6 +9,12 @@ from zenofewords.mixins import (
     OrderMixin,
 )
 
+DEFAULT_ORDER = {
+    'Pokemon': ('number',),
+    'Move': ('-category', 'name',),
+    'Moveset': ('pokemon__number', 'weave_damage',),
+}
+
 
 class Pokemon(DefaultModelMixin, NameMixin):
     number = models.CharField(max_length=5)
@@ -45,7 +51,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
     class Meta:
         verbose_name = 'Pokemon'
         verbose_name_plural = 'Pokemon'
-        ordering = ('number',)
+        ordering = DEFAULT_ORDER['Pokemon']
 
 
 class Type(DefaultModelMixin, NameMixin, OrderMixin):
@@ -104,10 +110,10 @@ class Move(DefaultModelMixin, NameMixin):
         return self.name
 
     class Meta:
-        ordering = ('-category', 'name',)
+        ordering = DEFAULT_ORDER['Move']
 
 
-class MoveSet(DefaultModelMixin):
+class Moveset(DefaultModelMixin):
     pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True)
     key = models.CharField(max_length=50, blank=True)
     legacy = models.BooleanField(default=False)
@@ -117,7 +123,7 @@ class MoveSet(DefaultModelMixin):
         return '{} {}'.format(self.pokemon.name, self.key)
 
     class Meta:
-        ordering = ('pokemon__number', 'weave_damage',)
+        ordering = DEFAULT_ORDER['Moveset']
         unique_together = ('pokemon', 'key',)
 
 

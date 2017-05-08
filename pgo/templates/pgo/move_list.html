@@ -9,50 +9,32 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Category</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Power</th>
-                <th>Energy delta</th>
-                <th>Duration</th>
-                <th>Damage start</th>
-                <th>DPS</th>
-                <th>EPS</th>
+                <th>
+                    {% include 'pgo/includes/move_sortable_header.html' with name='Name' sort_by='name' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/move_sortable_header.html' with name='Type' sort_by='move_type' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/move_sortable_header.html' with name='Power' sort_by='power' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/move_sortable_header.html' with name='Energy' sort_by='energy_delta' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/move_sortable_header.html' with name='Duration' sort_by='duration' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/move_sortable_header.html' with name='DPS' sort_by='dps' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/move_sortable_header.html' with name='EPS' sort_by='eps' %}
+                </th>
             </tr>
         </thead>
         <tbody>
-            {% for obj in object_list %}
-                <tr>
-                    <td>
-                        {{ obj.get_category_display }}
-                    </td>
-                    <td>
-                        <a href="{% url 'pgo:move-detail' obj.slug %}">
-                            {{ obj.name }} {{ obj.legacy|yesno:"Legacy Move," }}
-                        </a>
-                    </td>
-                    <td>
-                        {{ obj.move_type }}
-                    </td>
-                    <td>
-                        {{ obj.power }}
-                    </td>
-                    <td>
-                        {{ obj.energy_delta }}
-                    </td>
-                    <td>
-                        {{ obj.duration }}ms
-                    </td>
-                    <td>
-                        {{ obj.damage_window_start }}ms
-                    </td>
-                    <td>
-                        {{ obj.dps }}
-                    </td>
-                    <td>
-                        {{ obj.eps }}
-                    </td>
-                </tr>
+            {% for object in object_list %}
+                {% include 'pgo/includes/move_row.html' %}
             {% endfor %}
         </tbody>
     </table>

@@ -10,46 +10,28 @@ from pgo.models import (
     Pokemon,
     Moveset,
 )
+from pgo.utils import calculate_weave_damage
+
 LEVELS = (20.0, 25.0, 30.0, 35.0, 40.0)
 IV = 15
-TIMEOUT = 99000
 
 
 class Command(BaseCommand):
     help = 'Calculate and store DPS details for all currently listed pokemon.'
 
-    def _simulate_weave_damage(self, attack, quick_move, cinematic_move, stab):
+    def _calculate_weave_damage(self, attack, qk_move, cc_move, stab):
         weave_damage = {}
 
         for level in LEVELS:
-            self.step = 0
-            energy = 0
-            damage = 0
+            base_attack = self._get_base_attack(attack, level)
+            qk_move.damage_per_hit = self._calculate_dph(
+                qk_move.power, base_attack, self._get_stab(stab[0]))
+            cc_move.damage_per_hit = self._calculate_dph(
+                cc_move.power, base_attack, self._get_stab(stab[1]))
 
-            while self.step < TIMEOUT:
-                base_attack = self._get_base_attack(attack, level)
-
-                if not self._timeout(cinematic_move.duration):
-                    if energy >= cinematic_move.energy_delta * - 1:
-
-                        damage += self._calculate_dph(
-                            cinematic_move.power, base_attack, self._get_stab(stab[1]))
-                        self.step += (cinematic_move.duration + 1000)
-                        energy += cinematic_move.energy_delta
-
-                if self._timeout(quick_move.duration):
-                    break
-
-                damage += self._calculate_dph(
-                    quick_move.power, base_attack, self._get_stab(stab[0]))
-                self.step += quick_move.duration
-                energy += quick_move.energy_delta
-
-            weave_damage[level] = damage
+            cycle_dps = calculate_weave_damage(qk_move, cc_move)
+            weave_damage[level] = cycle_dps * 100
         return weave_damage
-
-    def _timeout(self, duration):
-        return self.step + duration > TIMEOUT
 
     def _get_base_attack(self, attack, level):
         return float((attack + IV) * CPM.objects.get(level=level).value)
@@ -89,7 +71,7 @@ class Command(BaseCommand):
 
                     if moveset:
                         moveset.weave_damage = sorted(
-                            self._simulate_weave_damage(
+                            self._calculate_weave_damage(
                                 pokemon.pgo_attack,
                                 quick_move,
                                 cinematic_move,

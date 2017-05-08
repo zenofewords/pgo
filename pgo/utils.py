@@ -40,13 +40,18 @@ def simulate_weave_damage(quick_move, cinematic_move, health):
     return damage, step / 1000
 
 
-def calculate_weave_damage(qk_move, cc_move, health):
-    qk_moves_required = (cc_move.energy_delta * - 1) / qk_move.energy_delta
+def calculate_weave_damage(qk_move, cc_move, health=None):
+    if qk_move.energy_delta > 0:
+        qk_moves_required = (cc_move.energy_delta * - 1) / qk_move.energy_delta
+    else:
+        qk_moves_required = 0
     cycle_dps = (
         qk_moves_required * qk_move.damage_per_hit + cc_move.damage_per_hit) / (
         (qk_moves_required * qk_move.duration + cc_move.duration) / 1000)
 
-    return health / cycle_dps
+    if health:
+        return health / cycle_dps
+    return cycle_dps
 
 
 def calculate_dph(power, attack_multiplier, stab, effectivness=1.0):

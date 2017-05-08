@@ -6,7 +6,7 @@
     <table class="table table-striped">
         <thead>
             <th>Number</th>
-            <th>Pokemon name</th>
+            <th>Name</th>
             <th>Primary type</th>
             <th>Secondary type</th>
             <th>Stamina</th>
@@ -25,7 +25,7 @@
             <td>
                 {% if object.secondary_type %}
                     <a href="{% url 'pgo:type-detail' object.secondary_type.slug %}">
-                        {{ object.secondary_type|default:'-' }}
+                        {{ object.secondary_type }}
                     </a>
                 {% else %}
                     {{ object.secondary_type|default:'-' }}
@@ -37,106 +37,42 @@
             <td>{{ object.maximum_cp|floor }}</td>
         </tr>
     </table>
+
     <table class="table table-striped">
         <thead>
             <th>
                 Moves
             </th>
             <tr>
-                <th>Category</th>
                 <th>Name</th>
                 <th>Type</th>
                 <th>Power</th>
                 <th>Energy delta</th>
                 <th>Duration</th>
-                <th>Damage start</th>
                 <th>DPS</th>
                 <th>EPS</th>
             </tr>
         </thead>
-        {% for move in object.quick_moves.all %}
-            <tr>
-                <td>
-                    {{ move.get_category_display }}
-                </td>
-                <td>
-                    <a href="{% url 'pgo:move-detail' move.slug %}">
-                        {{ move.name }} {{ move.legacy|yesno:"Legacy Move," }}
-                    </a>
-                </td>
-                <td>
-                    {{ move.move_type }}
-                </td>
-                <td>
-                    {{ move.power }}
-                </td>
-                <td>
-                    {{ move.energy_delta }}
-                </td>
-                <td>
-                    {{ move.duration }}ms
-                </td>
-                <td>
-                    {{ move.damage_window_start }}ms
-                </td>
-                <td>
-                    {{ move.dps }}
-                </td>
-                <td>
-                    {{ move.eps }}
-                </td>
-            </tr>
+        {% for object in object.quick_moves.all %}
+            {% include 'pgo/includes/move_row.html' %}
         {% endfor %}
 
-        {% for move in object.cinematic_moves.all %}
-            <tr>
-                <td>
-                    {{ move.get_category_display }}
-                </td>
-                <td>
-                    <a href="{% url 'pgo:move-detail' move.slug %}">
-                        {{ move.name }} {{ move.legacy|yesno:"Legacy Move," }}
-                    </a>
-                </td>
-                <td>
-                    {{ move.move_type }}
-                </td>
-                <td>
-                    {{ move.power }}
-                </td>
-                <td>
-                    {{ move.energy_delta }}
-                </td>
-                <td>
-                    {{ move.duration }}ms
-                </td>
-                <td>
-                    {{ move.damage_window_start }}ms
-                </td>
-                <td>
-                    {{ move.dps }}
-                </td>
-                <td>
-                    {{ move.eps }}
-                </td>
-            </tr>
+        {% for object in object.cinematic_moves.all %}
+            {% include 'pgo/includes/move_row.html' %}
         {% endfor %}
     </table>
 
     <table class="table table-striped">
         <thead>
-            <th colspan="2">
+            <th>
                 Movesets
             </th>
-            <th colspan="5" class="text-center">
-                Weave damage over 99s by level
+            <th colspan="5">
+                Moveset damage over 100s for level
             </th>
             <tr>
                 <th>
                     Moveset
-                </th>
-                <th>
-                    Legacy
                 </th>
         {% for moveset in movesets %}
             {% if forloop.first %}
@@ -151,9 +87,9 @@
             <tr>
                 <td>
                     {{ moveset.key }}
-                </td>
-                <td>
-                    {{ moveset.legacy|yesno:"Yes," }}
+                   {% if moveset.legacy %}
+                        <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+                    {% endif %}
                 </td>
 
                 {% for moveset_data in moveset.weave_damage %}

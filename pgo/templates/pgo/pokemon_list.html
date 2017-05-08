@@ -10,14 +10,30 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Number</th>
-                <th>Name</th>
-                <th>Primary Type</th>
-                <th>Secondary Type</th>
-                <th>Stamina</th>
-                <th>Attack</th>
-                <th>Defense</th>
-                <th>Max CP</th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='#' sort_by='number' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='Name' sort_by='name' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='Type I' sort_by='primary_type' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='Type II' sort_by='secondary_type' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='STA' sort_by='pgo_stamina' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='ATK' sort_by='pgo_attack' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='DEF' sort_by='pgo_defense' %}
+                </th>
+                <th>
+                    {% include 'pgo/includes/pokemon_sortable_header.html' with name='CP' sort_by='maximum_cp' %}
+                </th>
             </tr>
         </thead>
         {% for object in object_list %}
@@ -51,6 +67,4 @@
             </tr>
         {% endfor %}
     </table>
-
-    {{ block.super }}
 {% endblock content %}

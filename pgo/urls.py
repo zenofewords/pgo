@@ -4,7 +4,7 @@ from django.conf.urls import url
 
 from pgo.views import (
     PokemonDetailView, PokemonListView, MoveDetailView,
-    MoveListView, MoveSetDetailView, MoveSetListView, TypeDetailView,
+    MoveListView, MovesetDetailView, MovesetListView, TypeDetailView,
     TypeListView, AttackProficiencyView,
 )
 from zenofewords.views import HomeView
@@ -23,7 +23,7 @@ urlpatterns = (
         TypeDetailView.as_view(), name='type-detail'),
     url(r'^types/$', TypeListView.as_view(), name='type-list'),
     url(r'^moveset(?P<pk>[\d]+)/$',
-        MoveSetDetailView.as_view(), name='moveset-detail'),
-    url(r'^movesets/$', MoveSetListView.as_view(), name='moveset-list'),
+        MovesetDetailView.as_view(), name='moveset-detail'),
+    url(r'^movesets/$', MovesetListView.as_view(), name='moveset-list'),
     url(r'^$', HomeView.as_view(), name='pgo-home'),
 )

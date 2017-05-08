@@ -5,7 +5,7 @@ from django.contrib import admin
 from pgo.models import (
     CPM,
     Move,
-    MoveSet,
+    Moveset,
     Pokemon,
     Type,
     TypeEffectivness,
@@ -22,7 +22,7 @@ class PokemonAdmin(admin.ModelAdmin):
 
 admin.site.register(CPM)
 admin.site.register(Move)
-admin.site.register(MoveSet)
+admin.site.register(Moveset)
 admin.site.register(Pokemon, PokemonAdmin)
 admin.site.register(Type)
 admin.site.register(TypeEffectivness)

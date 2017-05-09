@@ -76,6 +76,10 @@ if DEBUG and DEBUG_TOOLBAR:
     INSTALLED_APPS.append('debug_toolbar')
     MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
+LOADERS = [
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader'
+]
 if CACHE:
     MIDDLEWARE.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
     MIDDLEWARE.append('django.middleware.cache.FetchFromCacheMiddleware')
@@ -86,10 +90,17 @@ if CACHE:
             'LOCATION': '127.0.0.1:11211',
         }
     }
+    LOADERS = [
+        ('django.template.loaders.cached.Loader', [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        ]),
+    ]
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     CACHE_MIDDLEWARE_KEY_PREFIX = 'zenofewords_'
 
 ROOT_URLCONF = 'zenofewords.urls'
+
 
 TEMPLATES = [
     {
@@ -102,12 +113,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                ]),
-            ],
+            'loaders': LOADERS,
         },
     },
 ]

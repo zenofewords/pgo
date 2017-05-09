@@ -26,6 +26,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = 'DENY'
 
@@ -85,6 +86,7 @@ if CACHE:
             'LOCATION': '127.0.0.1:11211',
         }
     }
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     CACHE_MIDDLEWARE_KEY_PREFIX = 'zenofewords_'
 
 ROOT_URLCONF = 'zenofewords.urls'
@@ -92,14 +94,19 @@ ROOT_URLCONF = 'zenofewords.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            'loaders': [
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                ]),
             ],
         },
     },
@@ -113,6 +120,7 @@ WSGI_APPLICATION = 'zenofewords.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config()
 }
+CONN_MAX_AGE = None
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -175,6 +183,9 @@ REST_FRAMEWORK = {
     ],
     'PAGE_SIZE': 251
 }
+
+DEFAULT_FROM_EMAIL = 'zen@dominikzen.com'
+SERVER_EMAIL = 'zen@dominikzen.com'
 
 LOGGING = {
     'version': 1,

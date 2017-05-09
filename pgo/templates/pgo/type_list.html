@@ -19,30 +19,28 @@
             <th>Resistant</th>
             <th>Weak</th>
         </thead>
-        {% for obj in object_list %}
+        {% for object in object_list %}
             <tr>
                 <td width="8%">
-                    <a href="{% url 'pgo:type-detail' obj.slug %}">
-                        {{ obj }}
-                    </a>
+                    {{ object }}
                 </td>
                 <td width="23%">
-                    {% for strong in obj.strong %}
+                    {% for strong in object.strong %}
                         {{ strong.0 }}
                     {% endfor %}
                 </td>
                 <td width="23%">
-                    {% for feeble in obj.feeble %}
+                    {% for feeble in object.feeble %}
                         {{ feeble.0 }}
                     {% endfor %}
                 </td>
                 <td width="23%">
-                    {% for resistant in obj.resistant %}
+                    {% for resistant in object.resistant %}
                         {{ resistant.0 }}
                     {% endfor %}
                 </td>
                 <td width="23%">
-                    {% for weak in obj.weak %}
+                    {% for weak in object.weak %}
                         {{ weak.0 }}
                     {% endfor %}
                 </td>

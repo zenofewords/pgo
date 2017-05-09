@@ -18,18 +18,10 @@
             <td>{{ object.number }}</td>
             <td>{{ object.name }}</td>
             <td>
-                <a href="{% url 'pgo:type-detail' object.primary_type.slug %}">
-                    {{ object.primary_type }}
-                </a>
+                {{ object.primary_type }}
             </td>
             <td>
-                {% if object.secondary_type %}
-                    <a href="{% url 'pgo:type-detail' object.secondary_type.slug %}">
-                        {{ object.secondary_type }}
-                    </a>
-                {% else %}
-                    {{ object.secondary_type|default:'-' }}
-                {% endif %}
+                {{ object.secondary_type|default:'-' }}
             </td>
             <td>{{ object.pgo_stamina }}</td>
             <td>{{ object.pgo_attack }}</td>

@@ -4,6 +4,4 @@
 {% if object.category == 'CC' %}
     <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
 {% endif %}
-<a href="{% url 'pgo:move-detail' object.slug %}">
-    {{ object.name }}
-</a>
+{{ object.name }}

@@ -33,7 +33,7 @@ $(document).ready(function(){
     cinematicMoveSelect.change(function() {
         formData.cinematicMove = this.value
     })
-    $('#attacker_level').on('change', function() {
+    $('#attacker_lvl').on('change', function() {
         setValidLevel(this, 'attackerLevel')
     })
     $('#attack_iv').on('change keyup', function() {

@@ -21,6 +21,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = bool(os.getenv('DEBUG', False))
+DEBUG_TOOLBAR = bool(os.getenv('DEBUG_TOOLBAR', False))
+CACHE = not DEBUG
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -30,10 +35,9 @@ CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = 'DENY'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv('DEBUG', False))
-DEBUG_TOOLBAR = bool(os.getenv('DEBUG_TOOLBAR', False))
-CACHE = not DEBUG
+FORCE_SSL = bool(os.getenv('FORCE_SSL', False))
+if not DEBUG and FORCE_SSL:
+    SECURE_SSL_REDIRECT = True
 
 ALLOWED_HOSTS = [
     hostname.strip() for hostname in os.getenv('ALLOWED_HOSTS').split(',')

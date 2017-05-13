@@ -6,11 +6,6 @@
     {{ block.super }} - Attack Proficiency Calculator
 {% endblock title %}
 
-{% block head %}
-    {{ block.super }}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
-{% endblock head %}
-
 {% block content %}
 <div class="attack-pro-wrapper row">
     <div class="attack-pro-form-wrapper col-md-4">
@@ -125,10 +120,8 @@
 {% block scripts %}
     {{ block.super }}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
     <script type="text/javascript">
         window.pgoAPIURLs = {}
-        window.token = '{{ csrf_token }}'
         pgoAPIURLs = {
             'move-list': "{% url 'api-pgo:move-list' %}",
             'attack-proficiency': "{% url 'api-pgo:attack-proficiency' %}",

@@ -12,7 +12,7 @@ from zenofewords.mixins import (
 DEFAULT_ORDER = {
     'Pokemon': ('number',),
     'Move': ('-category', 'name',),
-    'Moveset': ('pokemon__number', 'weave_damage',),
+    'Moveset': ('pokemon__name', '-weave_damage',),
 }
 
 

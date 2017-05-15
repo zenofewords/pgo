@@ -2,6 +2,10 @@
 {% load zenofewords_tags %}
 
 
+{% block title %}
+    {{ block.super }} - {{ object.name }}
+{% endblock title %}
+
 {% block content %}
     <table class="table table-striped">
         <thead>

@@ -33,7 +33,7 @@ class SortMixin(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(SortMixin, self).get_context_data(**kwargs)
-        context['sort_key'] = '&amp;'.join(self.sort_by)
+        context['sort_key'] = '&'.join(self.sort_by)
         return context
 
 
@@ -43,10 +43,34 @@ class PGoHomeView(TemplateView):
 
 class PokemonListView(SortMixin):
     model = Pokemon
+    paginate_by = 151
+
+    def get(self, request, *args, **kwargs):
+        self.pokemon_id = int(request.GET.get('pokemon_id', 0))
+        self.type_id = int(request.GET.get('type_id', 0))
+
+        return super(PokemonListView, self).get(request, args, kwargs)
 
     def get_queryset(self):
-        queryset = super(PokemonListView, self).get_queryset()
-        return queryset.select_related('primary_type', 'secondary_type')
+        qs = super(PokemonListView, self).get_queryset()
+
+        if self.pokemon_id != 0:
+            qs = qs.filter(id=self.pokemon_id)
+        if self.type_id != 0:
+            qs = qs.filter(primary_type_id=self.type_id)
+
+        return qs.select_related('primary_type', 'secondary_type')
+
+    def get_context_data(self, **kwargs):
+        context = super(PokemonListView, self).get_context_data(**kwargs)
+        data = {
+            'pokemon_data': self.model.objects.values_list('id', 'name'),
+            'types': Type.objects.values_list('id', 'name'),
+            'pokemon_id': self.pokemon_id,
+            'type_id': self.type_id,
+        }
+        context.update(data)
+        return context
 
 
 class PokemonDetailView(DetailView):
@@ -67,9 +91,26 @@ class PokemonDetailView(DetailView):
 class MoveListView(SortMixin):
     model = Move
 
+    def get(self, request, *args, **kwargs):
+        self.move_id = int(request.GET.get('move_id', 0))
+
+        return super(MoveListView, self).get(request, args, kwargs)
+
     def get_queryset(self):
-        queryset = super(MoveListView, self).get_queryset()
-        return queryset.select_related('move_type')
+        qs = super(MoveListView, self).get_queryset()
+
+        if self.move_id != 0:
+            qs = qs.filter(id=self.move_id)
+        return qs.select_related('move_type')
+
+    def get_context_data(self, **kwargs):
+        context = super(MoveListView, self).get_context_data(**kwargs)
+        data = {
+            'move_data': self.model.objects.values_list('id', 'name'),
+            'move_id': self.move_id,
+        }
+        context.update(data)
+        return context
 
 
 class MoveDetailView(DetailView):
@@ -87,11 +128,33 @@ class TypeDetailView(DetailView):
 class MovesetListView(SortMixin):
     model = Moveset
     template_name = 'pgo/moveset_list.html'
-    paginate_by = 300
+    paginate_by = 200
+
+    def get(self, request, *args, **kwargs):
+        self.pokemon_id = int(request.GET.get('pokemon_id', 0))
+        self.moveset_filter = request.GET.get('moveset-filter')
+
+        return super(MovesetListView, self).get(request, args, kwargs)
 
     def get_queryset(self):
-        queryset = super(MovesetListView, self).get_queryset()
-        return queryset.select_related('pokemon')
+        qs = super(
+            MovesetListView, self).get_queryset().select_related('pokemon')
+
+        if self.pokemon_id != 0:
+            qs = qs.filter(pokemon_id=self.pokemon_id)
+        if self.moveset_filter:
+            qs = qs.filter(key__icontains=self.moveset_filter)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(MovesetListView, self).get_context_data(**kwargs)
+        data = {
+            'pokemon_data': Pokemon.objects.values_list('id', 'name'),
+            'pokemon_id': self.pokemon_id,
+            'moveset_filter': self.moveset_filter,
+        }
+        context.update(data)
+        return context
 
 
 class MovesetDetailView(DetailView):

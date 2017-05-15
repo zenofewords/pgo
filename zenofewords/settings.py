@@ -30,7 +30,7 @@ CACHE = not DEBUG
 SECRET_KEY = os.getenv('SECRET_KEY')
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = 'DENY'
@@ -84,6 +84,7 @@ LOADERS = [
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader'
 ]
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 if CACHE:
     MIDDLEWARE.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
     MIDDLEWARE.append('django.middleware.cache.FetchFromCacheMiddleware')

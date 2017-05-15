@@ -1,12 +1,24 @@
 {% extends 'zenofewords/base.html' %}
 {% load zenofewords_tags %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
     PGO
 {% endblock title %}
 
+{% block head %}
+    {{ block.super }}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+{% endblock head %}
+
 {% block header %}
     {{ block.super }}
     {% navigation_tag 'pgo' True %}
 {% endblock header %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    {% render_bundle 'main' %}
+{% endblock scripts %}

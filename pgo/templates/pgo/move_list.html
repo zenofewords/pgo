@@ -9,6 +9,26 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th class="row" colspan="7">
+                    <div class="move-form-wrapper col-xs-4">
+                        <form id="move-select-form">
+                            <select class="move-select" tabindex="1">
+                                <option value="0" selected disabled>Find move</option>
+
+                                {% for move in move_data %}
+                                    <option value="{{ move.0 }}" {% if move_id == move.0 %}selected{% endif %}>{{ move.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                    <div class="col-xs-8">
+                        <a href="{% url 'pgo:move-list' %}" class="btn btn-primary btn-sm clear-move-filter-button" tabindex="4">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </th>
+            </tr>
+            <tr>
                 <th>
                     {% include 'pgo/includes/move_sortable_header.html' with name='Name' sort_by='name' %}
                 </th>

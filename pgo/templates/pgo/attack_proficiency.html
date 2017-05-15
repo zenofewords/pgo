@@ -1,5 +1,4 @@
 {% extends 'pgo/pgo_base.html' %}
-{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
@@ -129,5 +128,4 @@
             'attack-proficiency-detail': "{% url 'api-pgo:attack-proficiency-detail' %}",
         }
     </script>
-    {% render_bundle 'main' %}
 {% endblock scripts %}

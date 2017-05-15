@@ -6,24 +6,48 @@
 {% endblock title %}
 
 {% block content %}
-    {{ block.super }}
-
-    <table class="table table-striped">
+    <table class="table table-striped col-xs-12">
         <thead>
             <tr>
                 <th>
-                    {% include 'pgo/includes/moveset_sortable_header.html' with name='Pokemon' sort_by='pokemon__number&amp;weave_damage' %}
+                    <div class="moveset-search">
+                        <form id="moveset-select-pokemon">
+                            <select class="moveset-select-pokemon" tabindex="1">
+                                <option value="0" selected disabled>Pokemon</option>
+
+                                {% for pokemon in pokemon_data %}
+                                    <option value="{{ pokemon.0 }}" {% if pokemon_id == pokemon.0 %}selected{% endif %}>{{ pokemon.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
                 </th>
                 <th>
-                    Moveset
+                    <div class="row moveset-filter-wrapper">
+                        <form>
+                            <div class="col-xs-6 moveset-filter-input-wrapper">
+                                <input type="text" name="moveset-filter" class="form-control moveset-filter-input" placeholder="Moveset filter" value="{{ moveset_filter|default:'' }}" tabindex="2">
+                            </div>
+                            <div class="col-xs-4">
+                                <button class="btn btn-primary btn-sm moveset-filter-button" tabindex="3">
+                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                            <div class="col-xs-2">
+                                <a href="{% url 'pgo:moveset-list' %}" class="btn btn-primary btn-sm clear-moveset-filter-button" tabindex="4">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </th>
-                <th colspan="5">
+                <th colspan="5" class="moveset-header">
                     {% include 'pgo/includes/moveset_sortable_header.html' with name='Damage over 100s for level' sort_by='weave_damage' %}
                 </th>
             </tr>
             <tr>
-                <th>Filter placeholder</th>
-                <th>Filter placeholder</th>
+                <th>Pokemon</th>
+                <th>Moveset</th>
                 <th>20</th>
                 <th>25</th>
                 <th>30</th>
@@ -50,6 +74,10 @@
                         {{ moveset_data.1|floatformat:"0" }}
                     </td>
                 {% endfor %}
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7">No results found. (Move names must be separated by a hyphen.)</td>
             </tr>
         {% endfor %}
     </table>

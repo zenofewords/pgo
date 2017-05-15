@@ -10,6 +10,39 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th colspan="2">
+                    <div class="type-form-wrapper">
+                        <form id="pokemon-select-form">
+                            <select class="pokemon-select" tabindex="1">
+                                <option value="0" selected disabled>Find pokemon</option>
+
+                                {% for pokemon in pokemon_data %}
+                                    <option value="{{ pokemon.0 }}" {% if pokemon_id == pokemon.0 %}selected{% endif %}>{{ pokemon.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                </th>
+                <th class="row type-filter-wrapper" colspan="6">
+                    <div class="col-xs-6 type-wrapper">
+                        <form id="type-filter-form">
+                            <select class="type-select" tabindex="2">
+                                <option value="0" selected disabled>Filtery by type</option>
+
+                                {% for type in types %}
+                                    <option value="{{ type.0 }}" {% if type_id == type.0 %}selected{% endif %}>{{ type.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                    <div class="col-xs-6">
+                        <a href="{% url 'pgo:pokemon-list' %}" class="btn btn-primary btn-sm clear-pokemon-filter-button" tabindex="4">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        </a>
+                    </div>
+                </th>
+            </tr>
+            <tr>
                 <th>
                     {% include 'pgo/includes/pokemon_sortable_header.html' with name='#' sort_by='number' %}
                 </th>
@@ -69,4 +102,6 @@
             </tr>
         {% endfor %}
     </table>
+
+    {{ block.super }}
 {% endblock content %}

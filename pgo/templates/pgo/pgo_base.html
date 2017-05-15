@@ -1,5 +1,6 @@
 {% extends 'zenofewords/base.html' %}
 {% load zenofewords_tags %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
@@ -19,4 +20,5 @@
 {% block scripts %}
     {{ block.super }}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+    {% render_bundle 'main' %}
 {% endblock scripts %}

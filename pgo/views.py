@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
 
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import (
     DetailView, ListView, TemplateView,
 )
@@ -45,17 +48,17 @@ class PokemonListView(SortMixin):
     model = Pokemon
     paginate_by = 151
 
-    def get(self, request, *args, **kwargs):
-        self.pokemon_id = int(request.GET.get('pokemon_id', 0))
-        self.type_id = int(request.GET.get('type_id', 0))
+    def dispatch(self, request, *args, **kwargs):
+        pokemon_id = int(request.GET.get('pokemon_id', 0))
+        if pokemon_id != 0:
+            pokemon_slug = get_object_or_404(Pokemon, pk=pokemon_id).slug
+            return redirect(reverse('pgo:pokemon-detail', kwargs={'slug': pokemon_slug}))
 
-        return super(PokemonListView, self).get(request, args, kwargs)
+        self.type_id = int(request.GET.get('type_id', 0))
+        return super(PokemonListView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         qs = super(PokemonListView, self).get_queryset()
-
-        if self.pokemon_id != 0:
-            qs = qs.filter(id=self.pokemon_id)
         if self.type_id != 0:
             qs = qs.filter(primary_type_id=self.type_id)
 
@@ -66,7 +69,6 @@ class PokemonListView(SortMixin):
         data = {
             'pokemon_data': self.model.objects.values_list('id', 'name'),
             'types': Type.objects.values_list('id', 'name'),
-            'pokemon_id': self.pokemon_id,
             'type_id': self.type_id,
         }
         context.update(data)

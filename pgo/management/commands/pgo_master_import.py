@@ -18,10 +18,15 @@ from pgo.models import (
     TypeEffectivness,
     TypeEffectivnessScalar,
 )
+from pgo.utils import (
+    SUPER_EFFECTIVE_SCALAR,
+    NOT_VERY_EFFECTIVE_SCALAR,
+    NEUTRAL_SCALAR,
+)
 TYPE_EFFECTIVNESS = {
-    'Super effective': 1.25,
-    'Not very effective': 0.8,
-    'Neutral': 1.0,
+    'Super effective': SUPER_EFFECTIVE_SCALAR,
+    'Not very effective': NOT_VERY_EFFECTIVE_SCALAR,
+    'Neutral': NEUTRAL_SCALAR,
 }
 TYPE_IMPORT_ORDER = (
     'normal',
@@ -187,11 +192,12 @@ class Command(BaseCommand):
                     ))
             pokemon.save()
 
-        legacy_movesets = existing_movesets.exclude(
-            id__in=[x[0].pk for x in new_movesets])
-        for legacy_moveset in legacy_movesets:
-            legacy_moveset.legacy = True
-            legacy_moveset.save()
+        # do not mark legacy movesets
+        # legacy_movesets = existing_movesets.exclude(
+        #     id__in=[x[0].pk for x in new_movesets])
+        # for legacy_moveset in legacy_movesets:
+        #     legacy_moveset.legacy = True
+        #     legacy_moveset.save()
 
     def _process_moves(self, move_data):
         for move_slug, data in move_data.items():
@@ -259,7 +265,7 @@ class Command(BaseCommand):
         parser.add_argument('path', nargs='?', type=str)
 
     def handle(self, *args, **options):
-        path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/resources/master.csv')
+        path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/resources/master671.csv')
         file_path = options.get('path') if options.get('path') else path
 
         Type.objects.get_or_create(slug='dark', defaults={'name': 'Dark'})

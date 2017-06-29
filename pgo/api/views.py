@@ -22,10 +22,11 @@ from pgo.utils import (
     calculate_dph,
     calculate_defender_health,
     calculate_weave_damage,
+    NEUTRAL_SCALAR,
 )
 
 MAX_IV = 15
-DEFAULT_EFFECTIVNESS = Decimal('1.0')
+DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 EFFECTIVNESS_THRESHOLD = 93
 DEFENDER_IV_RANGE = range(11, 16)
 DEFENDER_LEVEL_CUTOFF = 37

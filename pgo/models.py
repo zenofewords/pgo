@@ -78,7 +78,7 @@ class TypeEffectivness(models.Model):
 
 
 class TypeEffectivnessScalar(NameMixin):
-    scalar = models.DecimalField(max_digits=4, decimal_places=2)
+    scalar = models.DecimalField(max_digits=4, decimal_places=3)
 
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.scalar)

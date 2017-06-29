@@ -2,6 +2,12 @@ from __future__ import division
 
 from math import floor
 
+# game constants
+SUPER_EFFECTIVE_SCALAR = 1.4
+NOT_VERY_EFFECTIVE_SCALAR = 0.714
+NEUTRAL_SCALAR = 1.0
+STAB_SCALAR = 1.2
+
 TIMEOUT = 99000
 
 
@@ -57,7 +63,7 @@ def calculate_weave_damage(qk_move, cc_move, health=None):
 def calculate_dph(power, attack_multiplier, stab, effectivness=1.0):
 
     def _get_stab(stab):
-        return 1.25 if stab else 1.0
+        return STAB_SCALAR if stab else NEUTRAL_SCALAR
 
     return int(floor(0.5 * power * float(attack_multiplier) *
         _get_stab(stab) * float(effectivness)) + 1)

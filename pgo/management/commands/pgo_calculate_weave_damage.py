@@ -10,7 +10,11 @@ from pgo.models import (
     Pokemon,
     Moveset,
 )
-from pgo.utils import calculate_weave_damage
+from pgo.utils import (
+    calculate_weave_damage,
+    NEUTRAL_SCALAR,
+    STAB_SCALAR,
+)
 
 LEVELS = (20.0, 25.0, 30.0, 35.0, 40.0)
 IV = 15
@@ -40,7 +44,7 @@ class Command(BaseCommand):
         return floor(0.5 * power * (attack / self.defender_defense) * stab) + 1
 
     def _get_stab(self, stab):
-        return 1.25 if stab else 1.0
+        return STAB_SCALAR if stab else NEUTRAL_SCALAR
 
     def _is_stab(self, pokemon, move_type):
         return True if move_type in (

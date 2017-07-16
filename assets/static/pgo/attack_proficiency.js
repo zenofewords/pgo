@@ -105,8 +105,8 @@ $(document).ready(function(){
 
             var level = tableBody.find('tr').eq(
                 currentTarget.parent().index()).find('td').eq(0)[0].textContent
-            var defenseIV = tableBody.find('tr').eq(
-                0).find('td').eq(currentTarget.index())[0].textContent
+            var defenseIV = tableBody.find('tr').eq(0).find('td').eq(
+                currentTarget.index())[0].textContent.replace(/[^0-9]/g,'')
 
             getAttackProficiencyDetail(level, defenseIV, formData, currentTarget.parent())
         }
@@ -220,7 +220,7 @@ $(document).ready(function(){
                             td.append(json[i][value][j])
 
                             if (j % 2 === 1) {
-                                if (td[0].textContent.length > 2) {
+                                if (td[0].textContent !== 'Attack breakdown against 15 def IV') {
                                     td.addClass('attack-proficiency-detail')
                                 }
                                 tr.append(td)

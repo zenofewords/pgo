@@ -28,8 +28,8 @@ from pgo.utils import (
 MAX_IV = 15
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 EFFECTIVNESS_THRESHOLD = 93
-DEFENDER_IV_RANGE = range(11, 16)
-DEFENDER_LEVEL_CUTOFF = 37
+DEFENDER_IV_RANGE = [15]
+DEFENDER_LEVEL_LIST = [20, 30, 39, 39.5, 40]
 CC_FACTOR = 1.2
 
 
@@ -215,11 +215,11 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         def_ivs = []
         for defense_iv in self.defense_iv_range:
-            def_ivs.append(defense_iv)
+            def_ivs.append('Attack breakdown against {} def IV'.format(defense_iv))
             def_ivs.append('')
-        stats = [{'L/IV': def_ivs}]
+        stats = [{'Defender level': def_ivs}]
 
-        for cpm in CPM.objects.filter(level__gte=DEFENDER_LEVEL_CUTOFF):
+        for cpm in CPM.objects.filter(level__in=DEFENDER_LEVEL_LIST):
             stats.append({
                 '{0:g}'.format(float(cpm.level)):
                 self._calculate_moves_dph(
@@ -239,8 +239,10 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         dph_list = []
         for attack_modifiers in zip(attack_modifiers, max_attack_modifiers):
-            dph_list.append(self._build_move_stats(attack_modifiers, qk_move))
-            dph_list.append(self._build_move_stats(attack_modifiers, cc_move))
+            dph_list.append(('{} DPH '.format(qk_move['name']),
+                self._build_move_stats(attack_modifiers, qk_move)))
+            dph_list.append(('{} DPH '.format(cc_move['name']),
+                self._build_move_stats(attack_modifiers, cc_move)))
         return dph_list
 
     def _calculate_attack_modifiers(self, attack_multiplier, defense, cpm_value):

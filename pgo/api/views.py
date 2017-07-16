@@ -239,9 +239,9 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         dph_list = []
         for attack_modifiers in zip(attack_modifiers, max_attack_modifiers):
-            dph_list.append(('{} DPH '.format(qk_move['name']),
+            dph_list.append(('{} DPH is '.format(qk_move['name']),
                 self._build_move_stats(attack_modifiers, qk_move)))
-            dph_list.append(('{} DPH '.format(cc_move['name']),
+            dph_list.append(('{} DPH is '.format(cc_move['name']),
                 self._build_move_stats(attack_modifiers, cc_move)))
         return dph_list
 
@@ -259,11 +259,9 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
             move['power'], attack_modifiers[1],
             move['stab'], move['effectivness'])
 
-        if current_dph / max_dph * 100 < EFFECTIVNESS_THRESHOLD:
-            return '{} <b>({})</b><br>'.format(current_dph, max_dph)
         if current_dph == max_dph:
             return '{}<br>'.format(current_dph)
-        return '{} ({})<br>'.format(current_dph, max_dph)
+        return '{} <b>({} possible)</b><br>'.format(current_dph, max_dph)
 
 
 class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):

@@ -413,9 +413,7 @@ $(document).ready(function(){
 
     function displayFieldErrors(errorObject) {
         for (error in errorObject) {
-            console.log(error)
             var selector = '#' + error
-
             $(selector).addClass('error')
             $(selector).next().addClass('error')
         }

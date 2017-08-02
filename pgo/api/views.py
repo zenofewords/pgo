@@ -185,17 +185,21 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.attacker.atk_iv = MAX_IV
         self._calculate_move_stats()
 
+        boss_or_level = 'raid boss' if self.raid_tier > 0 else 'level {0:g}'.format(self.defender.level)
         if (current_qk_dph == self.qk_move.damage_per_hit and current_cc_dph /
                 self.cc_move.damage_per_hit * 100 > EFFECTIVNESS_THRESHOLD):
+
             attack_iv_assessment = '''
-                Your {}\'s ATK IV is high enough for it to reach its maximum potential against {}.
-                <br />Note that powering pokemon over level 39 is currently not possible.'''.format(
-                self.attacker.name, self.defender.name)
+                Your {}\'s ATK IV is high enough for it to reach the last {}
+                breakpoint against a {} {}. <br /><br />Note that powering pokemon
+                over level 39 is currently not possible.'''.format(
+                self.attacker.name, self.qk_move.name,
+                boss_or_level, self.defender.name)
         else:
             attack_iv_assessment = '''
-                Unfortunately, your {}\'s ATK IV is too low for it to reach its
-                maximum potential against {}.'''.format(
-                self.attacker.name, self.defender.name)
+                Unfortunately, your {}\'s ATK IV is too low for it to reach the
+                last breakpoint for {} against a {} {}.'''.format(
+                self.attacker.name, self.qk_move.name, boss_or_level, self.defender.name)
 
         data.update({'attack_iv_assessment': attack_iv_assessment})
         return data

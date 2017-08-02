@@ -233,7 +233,7 @@ $(document).ready(function(){
                     clearDefenderSelect('raid boss (Tier ' + value + ')')
                     $.each(json.results, function(i, pokemon) {
                         defenderSelect.append(
-                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + 'DEF)</option>'
+                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + ' DEF)</option>'
                         )
                     })
                 },
@@ -250,7 +250,7 @@ $(document).ready(function(){
                     clearDefenderSelect('defender')
                     $.each(json.results, function(i, pokemon) {
                         defenderSelect.append(
-                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + 'DEF)</option>'
+                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + ' DEF)</option>'
                         )
                     })
                 },

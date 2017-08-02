@@ -38,7 +38,7 @@ class Command(BaseCommand):
         return weave_damage
 
     def _get_base_attack(self, attack, level):
-        return float((attack + IV) * CPM.objects.get(level=level).value)
+        return float((attack + IV) * CPM.gyms.get(level=level).value)
 
     def _calculate_dph(self, power, attack, stab):
         return floor(0.5 * power * (attack / self.defender_defense) * stab) + 1

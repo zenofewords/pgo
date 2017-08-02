@@ -26,6 +26,7 @@
     margin: 0.2rem 0 1rem -.5rem;
 }
 .form-error {
+    font-size: 2rem;
     color: red;
 }
 .attack-proficiency-info {
@@ -57,7 +58,7 @@
     display: none;
 }
 .table-explanation-text {
-    color: red;
+    color: #2e6da4;
     font-size: 1.5rem;
     padding: .2rem;
 }
@@ -83,4 +84,30 @@
 }
 #detail-summary-cell {
     border: .1rem solid #2e6da4;
+}
+.error {
+    margin: .125rem;
+    border: .2rem solid red;
+    border-radius: .4rem;
+}
+
+/* raid boss input */
+input[type=checkbox] {
+  transform: scale(1.4);
+}
+input[type=radio] {
+  transform: scale(1.1);
+}
+.raid-boss-input-wrapper {
+    padding: .3rem .6rem 0 .8rem;
+}
+.raid-boss-text {
+    font-size: 1.2rem;
+    margin: 0 .6rem;
+    padding: .3rem .4rem;
+}
+.boss-tier-radio {
+    font-size: 1.25rem;
+    font-weight: normal;
+    padding: 0 .5rem;
 }

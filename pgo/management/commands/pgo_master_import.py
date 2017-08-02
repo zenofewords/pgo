@@ -56,7 +56,7 @@ class Command(BaseCommand):
     '''
 
     def get_or_create_cpm(self, value, level):
-        obj, created = CPM.objects.get_or_create(
+        obj, created = CPM.gyms.get_or_create(
             level=level,
             defaults={'value': value}
         )

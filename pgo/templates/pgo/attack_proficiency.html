@@ -9,7 +9,6 @@
 <div class="attack-pro-wrapper row">
     <div class="attack-pro-form-wrapper col-md-4">
         <form id="attack-pro-form">
-            <span id="attacker_error" class="form-error"></span>
             <select id="attacker" class="attack-pro-select" tabindex="1">
                 <option value="-1" disabled selected>Select attacker</option>
                 {% for data in pokemon_data %}
@@ -18,20 +17,18 @@
             </select>
             <br>
 
-            <span id="quick_move_error" class="form-error"></span>
             <select id="quick_move" class="attack-pro-select" tabindex="2" disabled>
                 <option value="-1" disabled selected>Quick move</option>
             </select>
             <br>
 
-            <span id="cinematic_move_error" class="form-error"></span>
             <select id="cinematic_move" class="attack-pro-select" tabindex="3" disabled>
                 <option value="-1" disabled selected>Cinematic move</option>
             </select>
 
             <div class="row attack-pro-input-wrapper">
                 <div class="col-xs-6">
-                    <input type="number" id="attacker_lvl" class="attack-pro-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" tabindex="4">
+                    <input type="number" id="attacker_level" class="attack-pro-input level-input form-control" name="attacker_level" placeholder="Attacker level" min="1" max="40" step="0.5" tabindex="4">
                 </div>
                 <div class="col-xs-4">
                     <input type="number" id="attack_iv" class="attack-pro-input iv-input form-control" name="attack_iv" placeholder="ATK IV" min="0" max="15" step="1" tabindex="5">
@@ -47,8 +44,23 @@
                 </div>
             </div>
 
-            <span id="defender_error" class="form-error"></span>
-            <select id="defender" class="attack-pro-select" tabindex="6">
+            <div class="row raid-boss-input-wrapper">
+                <div class="col-xs-12 raid-boss-check-wrapper">
+                    <input type="checkbox" id="raid_boss_check" name="raid_boss_check" tabindex="6" checked>
+                    <label for="raid_boss_check" class="label label-info raid-boss-text">Raid</label>
+
+                    <input type="radio" class="raid_tier_radio" id="tier_2_radio" name="raid_tier_group" tabindex="7">
+                    <label for="tier_2_radio" class="boss-tier-radio">T2</label>
+                    <input type="radio" class="raid_tier_radio" id="tier_3_radio" name="raid_tier_group" tabindex="7">
+                    <label for="tier_3_radio" class="boss-tier-radio">T3</label>
+                    <input type="radio" class="raid_tier_radio" id="tier_4_radio" name="raid_tier_group" checked tabindex="7">
+                    <label for="tier_4_radio" class="boss-tier-radio">T4</label>
+                    <input type="radio" class="raid_tier_radio" id="tier_5_radio" name="raid_tier_group" checked tabindex="7">
+                    <label for="tier_5_radio" class="boss-tier-radio">T5</label>
+                </div>
+            </div>
+
+            <select id="defender" class="attack-pro-select" tabindex="8">
                 <option value="-1" disabled selected>Select defender</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
@@ -57,17 +69,15 @@
 
             <div class="row attack-pro-input-wrapper hidden">
                 <div class="col-xs-8">
-                    <span id="defender_level_error" class="form-error"></span>
                     <input type="number" id="defender_level" class="attack-pro-input level-input form-control" name="defender_level" placeholder="Defender level" min="1" max="40" step="0.5" value="40">
                 </div>
                 <div class="col-xs-4">
-                    <span id="defense_iv_error" class="form-error"></span>
                     <input type="number" id="defense_iv" class="attack-pro-input iv-input form-control" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
                 </div>
             </div>
             <br>
 
-            <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" tabindex="7" disabled>
+            <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" tabindex="9">
         </form>
     </div>
     <div class="attack-proficiency-info col-md-8">
@@ -82,13 +92,12 @@
         <div class="attack-proficiency-current">
             <p>
                 <span id="attack_iv_assessment"></span>
-                <span id="summary"></span>
             </p>
-            <p>
+            <p hidden>
                 <span id="attacker_quick_move"></span> would do
                 <span id="quick_attack_damage"></span>, and
                 <span id="attacker_cinematic_move"></span>
-                <span id="cinematic_attack_damage"></span>, damage per hit.
+                <span id="cinematic_attack_damage"></span>, damage per hit to the target.
             </p>
         </div>
     </div>
@@ -121,9 +130,12 @@
         window.pgoAPIURLs = {}
         pgoAPIURLs = {
             'move-list': "{% url 'api-pgo:move-list' %}",
+            'defender-list': "{% url 'api-pgo:pokemon-list' %}",
             'attack-proficiency': "{% url 'api-pgo:attack-proficiency' %}",
             'attack-proficiency-stats': "{% url 'api-pgo:attack-proficiency-stats' %}",
             'attack-proficiency-detail': "{% url 'api-pgo:attack-proficiency-detail' %}",
         }
     </script>
+    <style type="text/css">
+    </style>
 {% endblock scripts %}

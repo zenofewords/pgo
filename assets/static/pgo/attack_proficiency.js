@@ -10,6 +10,7 @@ $(document).ready(function(){
 
     var quickMoveSelect = $('#quick_move')
     var cinematicMoveSelect = $('#cinematic_move')
+    var defenderSelect = $('#defender')
     var defenderLevelInput = $('#defender_level')
     var defenseIVInput = $('#defense_iv')
     var submitButton = $('#submit')
@@ -17,8 +18,16 @@ $(document).ready(function(){
     var formData = {
         defenderLevel: defenderLevelInput.val(),
         defenseIV: defenseIVInput.val(),
+        raidTier: 5
     }
     var tableBody = $('#attack-proficiency-stats').find('tbody')
+    var raidBossCheck = $('#raid_boss_check')
+    var raidTier1 = $('#tier_1_radio')
+    var raidTier2 = $('#tier_2_radio')
+    var raidTier3 = $('#tier_3_radio')
+    var raidTier4 = $('#tier_4_radio')
+    var raidTier5 = $('#tier_5_radio')
+    var raidTier = 5
     var dirty = false
 
     $('#attacker').change(function() {
@@ -33,7 +42,7 @@ $(document).ready(function(){
     cinematicMoveSelect.change(function() {
         formData.cinematicMove = this.value
     })
-    $('#attacker_lvl').on('change', function() {
+    $('#attacker_level').on('change', function() {
         setValidLevel(this, 'attackerLevel')
     })
     $('#attack_iv').on('change keyup', function() {
@@ -46,7 +55,7 @@ $(document).ready(function(){
         setValidIV(this, 'defenseIV')
     })
 
-    $('#defender').change(function() {
+    defenderSelect.change(function() {
         formData.defender = this.value
     })
 
@@ -57,29 +66,68 @@ $(document).ready(function(){
         submitForm(formData)
     })
 
+    filterDefenderSelect(raidTier)
+    raidBossCheck.change(function() {
+        if (this.checked) {
+            filterDefenderSelect(raidTier)
+            $('.raid_tier_radio').prop('disabled', false)
+            formData.raidTier = raidTier
+        }
+        else {
+            filterDefenderSelect(0)
+            $('.raid_tier_radio').prop('disabled', true)
+            formData.raidTier = 0
+            formData.defender = undefined
+        }
+    })
+    raidTier1.change(function() {
+        if (this.checked) {
+            raidTier = 1
+            formData.raidTier = raidTier
+        }
+        formData.defender = undefined
+        filterDefenderSelect(raidTier)
+    })
+    raidTier2.change(function() {
+        if (this.checked) {
+            raidTier = 2
+            formData.raidTier = raidTier
+        }
+        formData.defender = undefined
+        filterDefenderSelect(raidTier)
+    })
+    raidTier3.change(function() {
+        if (this.checked) {
+            raidTier = 3
+            formData.raidTier = raidTier
+        }
+        formData.defender = undefined
+        filterDefenderSelect(raidTier)
+    })
+    raidTier4.change(function() {
+        if (this.checked) {
+            raidTier = 4
+            formData.raidTier = raidTier
+        }
+        formData.defender = undefined
+        filterDefenderSelect(raidTier)
+    })
+    raidTier5.change(function() {
+        if (this.checked) {
+            raidTier = 5
+            formData.raidTier = raidTier
+        }
+        formData.defender = undefined
+        filterDefenderSelect(raidTier)
+    })
+
     helpButton.on('click', function(event) {
         event.preventDefault()
 
         $('.help-text').toggle('fast')
     })
 
-    var formInputs = $('.attack-pro-select, .attack-pro-input')
-    formInputs.on('change keyup paste blur', function() {
-        var disabled = true
-        dirty = true
-
-        if (Object.keys(formData).length === formInputs.length) {
-            disabled = false
-            for (prop in formData) {
-                if (formData[prop] < 0) {
-                    disabled = true
-                }
-            }
-        }
-        submitButton.prop('disabled', disabled)
-    })
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
-
 
     function handleAttackProficiencyDetail(event) {
         if (dirty) {
@@ -173,6 +221,46 @@ $(document).ready(function(){
         }
     }
 
+    function filterDefenderSelect(value) {
+        if (parseInt(value) > 0) {
+            $.ajax({
+                url: window.pgoAPIURLs['defender-list'],
+                type: 'GET',
+                data: {
+                    'raid-boss-tier-group': value
+                },
+                success: function(json) {
+                    clearDefenderSelect('raid boss (Tier ' + value + ')')
+                    $.each(json.results, function(i, pokemon) {
+                        defenderSelect.append(
+                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + 'DEF)</option>'
+                        )
+                    })
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log('defender fileter error', xhr)
+                }
+            })
+        }
+        else {
+            $.ajax({
+                url: window.pgoAPIURLs['defender-list'],
+                type: 'GET',
+                success: function(json) {
+                    clearDefenderSelect('defender')
+                    $.each(json.results, function(i, pokemon) {
+                        defenderSelect.append(
+                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + 'DEF)</option>'
+                        )
+                    })
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log('defender filter error', xhr)
+                }
+            })
+        }
+    }
+
     function submitForm(formData) {
         $.ajax({
             url: window.pgoAPIURLs['attack-proficiency'],
@@ -186,8 +274,10 @@ $(document).ready(function(){
                 'defender': formData.defender,
                 'defender_level': formData.defenderLevel,
                 'defense_iv': formData.defenseIV,
+                'raid_tier': formData.raidTier
             },
             success: function(json){
+                clearErrors()
                 displayAttackProficiency(json)
                 generateAttackProficiencyStats(json)
             },
@@ -206,6 +296,7 @@ $(document).ready(function(){
                 'quick_move': JSON.stringify(json.quick_move),
                 'cinematic_move': JSON.stringify(json.cinematic_move),
                 'defender': JSON.stringify(json.defender),
+                'raid_tier': json.raid_tier
             },
             success: function(json){
                 tableBody.empty()
@@ -271,6 +362,7 @@ $(document).ready(function(){
                 'defender': formData.defender,
                 'defender_level': level,
                 'defense_iv': defenseIV,
+                'raid_tier': formData.raidTier
             },
             success: function(json) {
                 displayAttackProficiencyDetail(json, rowToAppend)
@@ -321,9 +413,17 @@ $(document).ready(function(){
 
     function displayFieldErrors(errorObject) {
         for (error in errorObject) {
-            var selector = '#' + error + '_error'
-            $(selector).html(errorObject[error])
+            console.log(error)
+            var selector = '#' + error
+
+            $(selector).addClass('error')
+            $(selector).next().addClass('error')
         }
+    }
+
+    function clearErrors() {
+        $('.error').removeClass('error')
+        $('.form-error').empty()
     }
 
     function clearMoveInputs() {
@@ -337,6 +437,13 @@ $(document).ready(function(){
         )
         formData['quickMove'] = -1
         formData['cinematicMove'] = -1
+    }
+
+    function clearDefenderSelect(text) {
+        defenderSelect.empty()
+        defenderSelect.append(
+            '<option value="-1" disabled selected>Select ' + text + ' </option>'
+        )
     }
 
     function validateLevel(input) {

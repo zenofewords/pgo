@@ -9,7 +9,7 @@ from pgo.models import (
     CPM,
     Pokemon,
 )
-cpm = CPM.objects.get(level=Decimal('40.0')).value
+cpm = CPM.gyms.get(level=Decimal('40.0')).value
 IVs = 15
 
 

@@ -36,6 +36,11 @@ class Pokemon(DefaultModelMixin, NameMixin):
     maximum_cp = models.DecimalField(verbose_name='Combat Power',
         max_digits=7, decimal_places=2, blank=True, null=True)
 
+    raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM',
+        blank=True, null=True)
+    raid_stamina = models.IntegerField(verbose_name='Raid Stamina',
+        blank=True, null=True)
+
     legendary = models.BooleanField(default=False)
 
     attack = models.IntegerField(blank=True, null=True)
@@ -127,9 +132,25 @@ class Moveset(DefaultModelMixin):
         unique_together = ('pokemon', 'key',)
 
 
+class CPMManager(models.Manager):
+    def get_queryset(self):
+        return super(CPMManager, self).get_queryset().filter(raid_cpm=False)
+
+
+class RaidCPMManager(models.Manager):
+    def get_queryset(self):
+        return super(RaidCPMManager, self).get_queryset().filter(raid_cpm=True)
+
+
 class CPM(models.Model):
     level = models.DecimalField(max_digits=3, decimal_places=1)
     value = models.DecimalField(max_digits=10, decimal_places=9)
+    raid_cpm = models.BooleanField(default=False)
+    raid_tier = models.PositiveIntegerField(blank=True, null=True)
+
+    objects = models.Manager()
+    gyms = CPMManager()
+    raids = RaidCPMManager()
 
     def __str__(self):
         return 'l{0}: \t{1}'.format(self.level, self.value)

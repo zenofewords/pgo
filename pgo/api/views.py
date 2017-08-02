@@ -23,14 +23,15 @@ from pgo.utils import (
     calculate_defender_health,
     calculate_weave_damage,
     NEUTRAL_SCALAR,
+    RAID_TIER_POKEMON_GROUPS,
 )
 
-MAX_IV = 15
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 EFFECTIVNESS_THRESHOLD = 93
-DEFENDER_IV_RANGE = [15]
-DEFENDER_LEVEL_LIST = [25, 30, 39, 39.5, 40]
 CC_FACTOR = 1.2
+MAX_IV = 15
+DEFENDER_IV_RANGE = [15]
+DEFENDER_LEVEL_LIST = [25, 30, 40]
 
 
 class MoveViewSet(viewsets.ModelViewSet):
@@ -59,6 +60,13 @@ class PokemonViewSet(viewsets.ModelViewSet):
     queryset = Pokemon.objects.all()
     serializer_class = PokemonSerializer
 
+    def get_queryset(self):
+        if 'raid-boss-tier-group' in self.request.GET:
+            pokemon_slug_list = RAID_TIER_POKEMON_GROUPS[
+                self.request.GET.get('raid-boss-tier-group')]
+            return self.queryset.filter(slug__in=pokemon_slug_list)
+        return super(PokemonViewSet, self).get_queryset()
+
 
 class TypeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -74,11 +82,10 @@ class AttackProficiencyAPIView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self._fetch_data(serializer.data)
-
         return response.Response(self._process_data(), status=status.HTTP_200_OK)
 
     def _fetch_data(self, data):
-        cpm_qs = CPM.objects.all()
+        cpm_qs = CPM.gyms.all()
         self.max_cpm_value = cpm_qs.last().value
 
         self.attacker = self._get_pokemon(data.get('attacker'))
@@ -90,7 +97,13 @@ class AttackProficiencyAPIView(GenericAPIView):
 
         self.defender = self._get_pokemon(data.get('defender'))
         self.defender.level = data.get('defender_level')
-        self.defender.cpm = cpm_qs.get(level=self.defender.level).value
+
+        self.raid_tier = data.get('raid_tier', 0)
+        if self.raid_tier > 0:
+            self.defender.cpm = CPM.raids.get(
+                raid_cpm=True, raid_tier=self.raid_tier).value
+        else:
+            self.defender.cpm = cpm_qs.get(level=self.defender.level).value
         self.defender.defense_iv = data.get('defense_iv')
 
     def _get_pokemon(self, id):
@@ -108,6 +121,7 @@ class AttackProficiencyAPIView(GenericAPIView):
             'cinematic_move': self._serialize(self.cc_move),
             'attacker': self._serialize(self.attacker),
             'defender': self._serialize(self.defender),
+            'raid_tier': self.raid_tier,
         }
         return self._assess_attack_iv(data)
 
@@ -174,8 +188,8 @@ class AttackProficiencyAPIView(GenericAPIView):
         if (current_qk_dph == self.qk_move.damage_per_hit and current_cc_dph /
                 self.cc_move.damage_per_hit * 100 > EFFECTIVNESS_THRESHOLD):
             attack_iv_assessment = '''
-                Your {}\'s ATK IV is high enough for it to reach its
-                maximum potential against {}!'''.format(
+                Your {}\'s ATK IV is high enough for it to reach its maximum potential against {}.
+                <br />Note that powering pokemon over level 39 is currently not possible.'''.format(
                 self.attacker.name, self.defender.name)
         else:
             attack_iv_assessment = '''
@@ -219,7 +233,13 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
             def_ivs.append('')
         stats = [{'Defender level': def_ivs}]
 
-        for cpm in CPM.objects.filter(level__in=DEFENDER_LEVEL_LIST):
+        raid_tier = data.get('raid_tier') or None
+        if raid_tier:
+            cpm_list = CPM.raids.filter(raid_tier=raid_tier)
+        else:
+            cpm_list = CPM.gyms.filter(level__in=DEFENDER_LEVEL_LIST)
+
+        for cpm in cpm_list:
             stats.append({
                 '{0:g}'.format(float(cpm.level)):
                 self._calculate_moves_dph(

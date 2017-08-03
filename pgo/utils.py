@@ -2,16 +2,10 @@ from __future__ import division
 
 from math import floor
 
-# game constants
 SUPER_EFFECTIVE_SCALAR = 1.4
 NOT_VERY_EFFECTIVE_SCALAR = 0.714
 NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
-RAID_BOSS_CPM_REMAPPING = {
-    40.0: 0.79,
-    30.0: 0.73,
-    25.0: 0.67,
-}
 TIMEOUT = 99000
 RAID_TIER_POKEMON_GROUPS = {
     '5': ('lugia', 'articuno', 'moltres', 'zapdos', 'ho-oh', 'suicune', 'entei', 'raikou', 'mew', 'mewtwo', 'celebi'),
@@ -90,9 +84,3 @@ def calculate_defender_health(total_stamina, cpm):
 
 def calculate_defense(total_defense, cpm):
     return int(floor(total_defense * cpm))
-
-
-def remap_cpm(cpm_level, cpm_value):
-    if cpm_level in [40.0, 30.0, 25.0]:
-        return RAID_BOSS_CPM_REMAPPING[cpm_level]
-    return cpm_value

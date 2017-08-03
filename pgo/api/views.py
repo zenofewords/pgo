@@ -127,8 +127,13 @@ class AttackProficiencyAPIView(GenericAPIView):
 
     def _get_battle_summary(self):
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
+
+        if self.raid_tier > 0:
+            stamina = self.defender.raid_stamina
+        else:
+            stamina = self.defender.pgo_stamina
         self.defender.health = calculate_defender_health(
-            self.defender.pgo_stamina + MAX_IV, self.defender.cpm
+            stamina + MAX_IV, self.defender.cpm
         )
         battle_time = calculate_weave_damage(
             self.qk_move, self.cc_move, self.defender.health

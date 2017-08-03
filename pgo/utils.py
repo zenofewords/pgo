@@ -11,7 +11,7 @@ RAID_TIER_POKEMON_GROUPS = {
     '5': ('lugia', 'articuno', 'moltres', 'zapdos', 'ho-oh', 'suicune', 'entei', 'raikou', 'mew', 'mewtwo', 'celebi'),
     '4': ('venusaur', 'charizard', 'blastoise', 'snorlax', 'lapras', 'tyranitar', 'rhydon'),
     '3': ('machamp', 'alakazam', 'gengar', 'jolteon', 'flareon', 'vaporeon'),
-    '2': ('weezing', 'muk', 'exeggutor', 'magmar', 'electabuz'),
+    '2': ('weezing', 'muk', 'exeggutor', 'magmar', 'electabuzz'),
     '1': ('quilava', 'bayleef', 'croconaw', 'magikarp'),
 }
 

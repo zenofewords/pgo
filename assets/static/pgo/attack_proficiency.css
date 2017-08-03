@@ -2,7 +2,7 @@
     margin: 0.3rem;
 }
 .attack-pro-wrapper {
-    max-width: 85rem;
+    max-width: 86rem;
 }
 .attack-pro-input-wrapper {
     max-width: 27rem;
@@ -105,7 +105,7 @@ input[type=radio] {
 }
 .raid-boss-text {
     font-size: 1.2rem;
-    margin: 0 .5rem;
+    margin: 0 .3rem;
     padding: .3rem .5rem;
 }
 .boss-tier-radio {

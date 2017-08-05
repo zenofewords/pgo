@@ -11,7 +11,7 @@ $(document).ready(function(){
     var quickMoveSelect = $('#quick_move')
     var cinematicMoveSelect = $('#cinematic_move')
     var defenderSelect = $('#defender')
-    var defenderLevelInput = $('#defender_level')
+    var defenderLevelInput = $('#defender_lvl')
     var defenseIVInput = $('#defense_iv')
     var submitButton = $('#submit')
     var helpButton = $('#help_button')
@@ -42,7 +42,7 @@ $(document).ready(function(){
     cinematicMoveSelect.change(function() {
         formData.cinematicMove = this.value
     })
-    $('#attacker_level').on('change', function() {
+    $('#attacker_lvl').on('change', function() {
         setValidLevel(this, 'attackerLevel')
     })
     $('#attack_iv').on('change keyup', function() {

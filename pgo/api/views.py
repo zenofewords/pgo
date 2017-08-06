@@ -11,6 +11,7 @@ from rest_framework.generics import GenericAPIView
 
 from django.db.models import Q
 
+from metrics.utils import update_stats
 from pgo.api.serializers import (
     AttackProficiencySerializer, AttackProficiencyStatsSerializer,
     SimpleMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
@@ -81,6 +82,8 @@ class AttackProficiencyAPIView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        update_stats('apro')
         self._fetch_data(serializer.data)
         return response.Response(self._process_data(), status=status.HTTP_200_OK)
 

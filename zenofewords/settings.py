@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'zenofewords',
+    'metrics',
     'pgo',
     'blog',
     'book',

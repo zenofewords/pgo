@@ -108,6 +108,8 @@ class AttackProficiencyAPIView(GenericAPIView):
         else:
             self.defender.cpm = cpm_qs.get(level=self.defender.level).value
         self.defender.defense_iv = data.get('defense_iv')
+        self.boss_or_level = ('raid boss' if self.raid_tier > 0 else
+            'level {:g}'.format(self.defender.level))
 
     def _get_pokemon(self, id):
         return Pokemon.objects.only('name', 'pgo_attack', 'pgo_stamina',
@@ -141,9 +143,10 @@ class AttackProficiencyAPIView(GenericAPIView):
         battle_time = calculate_weave_damage(
             self.qk_move, self.cc_move, self.defender.health
         )
-        return '''At its current level your pokemon would defeat a level {:g}
-            {} with {} DEF IV in {:.1f} seconds.'''.format(self.defender.level,
-            self.defender.name, self.defender.defense_iv, battle_time)
+        return '''At its current level your {} would defeat a {} {} with {}
+            DEF IV in {:.1f} seconds.'''.format(
+            self.attacker.name, self.boss_or_level, self.defender.name,
+            self.defender.defense_iv, battle_time)
 
     def _calculate_move_stats(self, attacker_cpm=None):
         self._calculate_attack_multiplier(attacker_cpm)
@@ -188,25 +191,21 @@ class AttackProficiencyAPIView(GenericAPIView):
     def _assess_attack_iv(self, data):
         self._calculate_move_stats()
         current_qk_dph = self.qk_move.damage_per_hit
-        current_cc_dph = self.cc_move.damage_per_hit
 
         self.attacker.atk_iv = MAX_IV
         self._calculate_move_stats()
 
-        boss_or_level = 'raid boss' if self.raid_tier > 0 else 'level {:g}'.format(self.defender.level)
-        if (current_qk_dph == self.qk_move.damage_per_hit and current_cc_dph /
-                self.cc_move.damage_per_hit * 100 > EFFECTIVNESS_THRESHOLD):
-
+        if (current_qk_dph == self.qk_move.damage_per_hit):
             attack_iv_assessment = '''
                 Your {}\'s ATK IV is high enough for it to reach the last {}
                 breakpoint against a {} {}. <br /><br />'''.format(
                 self.attacker.name, self.qk_move.name,
-                boss_or_level, self.defender.name)
+                self.boss_or_level, self.defender.name)
         else:
             attack_iv_assessment = '''
                 Unfortunately, your {}\'s ATK IV is too low for it to reach the
                 last breakpoint for {} against a {} {}.'''.format(
-                self.attacker.name, self.qk_move.name, boss_or_level, self.defender.name)
+                self.attacker.name, self.qk_move.name, self.boss_or_level, self.defender.name)
 
         data.update({'attack_iv_assessment': attack_iv_assessment})
         return data

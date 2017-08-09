@@ -48,10 +48,10 @@ class AttackProficiencySerializer(serializers.Serializer):
     attacker = serializers.IntegerField()
     quick_move = serializers.IntegerField()
     cinematic_move = serializers.IntegerField()
-    attacker_level = serializers.FloatField()
+    attacker_lvl = serializers.FloatField()
     attack_iv = serializers.IntegerField()
     defender = serializers.IntegerField()
-    defender_level = serializers.FloatField()
+    defender_lvl = serializers.FloatField()
     defense_iv = serializers.IntegerField()
     raid_tier = serializers.IntegerField(required=False)
 

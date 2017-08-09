@@ -94,12 +94,12 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.attacker = self._get_pokemon(data.get('attacker'))
         self.attacker.atk_iv = data.get('attack_iv')
         self.attacker.cpm_list = cpm_qs.filter(
-            level__gte=data.get('attacker_level')).values('level', 'value')
+            level__gte=data.get('attacker_lvl')).values('level', 'value')
         self.qk_move = self._get_move(data.get('quick_move'))
         self.cc_move = self._get_move(data.get('cinematic_move'))
 
         self.defender = self._get_pokemon(data.get('defender'))
-        self.defender.level = data.get('defender_level')
+        self.defender.level = data.get('defender_lvl')
 
         self.raid_tier = data.get('raid_tier', 0)
         if self.raid_tier > 0:

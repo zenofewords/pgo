@@ -94,12 +94,12 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.attacker = self._get_pokemon(data.get('attacker'))
         self.attacker.atk_iv = data.get('attack_iv')
         self.attacker.cpm_list = cpm_qs.filter(
-            level__gte=data.get('attacker_level')).values('level', 'value')
+            level__gte=data.get('attacker_lvl')).values('level', 'value')
         self.qk_move = self._get_move(data.get('quick_move'))
         self.cc_move = self._get_move(data.get('cinematic_move'))
 
         self.defender = self._get_pokemon(data.get('defender'))
-        self.defender.level = data.get('defender_level')
+        self.defender.level = data.get('defender_lvl')
 
         self.raid_tier = data.get('raid_tier', 0)
         if self.raid_tier > 0:
@@ -108,6 +108,8 @@ class AttackProficiencyAPIView(GenericAPIView):
         else:
             self.defender.cpm = cpm_qs.get(level=self.defender.level).value
         self.defender.defense_iv = data.get('defense_iv')
+        self.boss_or_level = ('raid boss' if self.raid_tier > 0 else
+            'level {:g}'.format(self.defender.level))
 
     def _get_pokemon(self, id):
         return Pokemon.objects.only('name', 'pgo_attack', 'pgo_stamina',
@@ -141,9 +143,10 @@ class AttackProficiencyAPIView(GenericAPIView):
         battle_time = calculate_weave_damage(
             self.qk_move, self.cc_move, self.defender.health
         )
-        return '''At its current level your pokemon would defeat a level {:g}
-            {} with {} DEF IV in {:.1f} seconds.'''.format(self.defender.level,
-            self.defender.name, self.defender.defense_iv, battle_time)
+        return '''At its current level your {} would defeat a {} {} with {}
+            DEF IV in {:.1f} seconds.'''.format(
+            self.attacker.name, self.boss_or_level, self.defender.name,
+            self.defender.defense_iv, battle_time)
 
     def _calculate_move_stats(self, attacker_cpm=None):
         self._calculate_attack_multiplier(attacker_cpm)
@@ -188,26 +191,21 @@ class AttackProficiencyAPIView(GenericAPIView):
     def _assess_attack_iv(self, data):
         self._calculate_move_stats()
         current_qk_dph = self.qk_move.damage_per_hit
-        current_cc_dph = self.cc_move.damage_per_hit
 
         self.attacker.atk_iv = MAX_IV
         self._calculate_move_stats()
 
-        boss_or_level = 'raid boss' if self.raid_tier > 0 else 'level {0:g}'.format(self.defender.level)
-        if (current_qk_dph == self.qk_move.damage_per_hit and current_cc_dph /
-                self.cc_move.damage_per_hit * 100 > EFFECTIVNESS_THRESHOLD):
-
+        if (current_qk_dph == self.qk_move.damage_per_hit):
             attack_iv_assessment = '''
                 Your {}\'s ATK IV is high enough for it to reach the last {}
-                breakpoint against a {} {}. <br /><br />Note that powering pokemon
-                over level 39 is currently not possible.'''.format(
+                breakpoint against a {} {}. <br /><br />'''.format(
                 self.attacker.name, self.qk_move.name,
-                boss_or_level, self.defender.name)
+                self.boss_or_level, self.defender.name)
         else:
             attack_iv_assessment = '''
                 Unfortunately, your {}\'s ATK IV is too low for it to reach the
                 last breakpoint for {} against a {} {}.'''.format(
-                self.attacker.name, self.qk_move.name, boss_or_level, self.defender.name)
+                self.attacker.name, self.qk_move.name, self.boss_or_level, self.defender.name)
 
         data.update({'attack_iv_assessment': attack_iv_assessment})
         return data
@@ -253,7 +251,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         for cpm in cpm_list:
             stats.append({
-                '{0:g}'.format(float(cpm.level)):
+                '{:g}'.format(float(cpm.level)):
                 self._calculate_moves_dph(
                     cpm.value,
                     data['defender']['pgo_defense'],
@@ -363,7 +361,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 current_cc_dph = self.cc_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [('Lvl', self.qk_move.name, self.cc_move.name, 'Battle Duration',)]
+        details = [('Level', self.qk_move.name, self.cc_move.name, 'Battle Duration',)]
 
         for c in sorted(self.cc_move_proficiency):
             for q in sorted(self.qk_move_proficiency):

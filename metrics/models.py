@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+from zenofewords.mixins import DefaultModelMixin
 
-class Stat(models.Model):
+
+class Stat(DefaultModelMixin):
     """
     Tracks visitor stats for apps.
 

@@ -7,7 +7,7 @@ $(document).ready(function(){
     $('select').on('select2:close', function() {
         $(this).focus()
     })
-
+    var csrfToken = $('#csrf_token').val()
     var quickMoveSelect = $('#quick_move')
     var cinematicMoveSelect = $('#cinematic_move')
     var defenderSelect = $('#defender')
@@ -62,7 +62,6 @@ $(document).ready(function(){
     $('#attack-pro-form').on('submit', function(event) {
         event.preventDefault()
         tableBody.off('click')
-
         submitForm(formData)
     })
 
@@ -136,7 +135,6 @@ $(document).ready(function(){
         }
 
         event.preventDefault()
-        $('.table-explanation-text').hide()
         var currentTarget = $(event.currentTarget)
         var clickedCell = tableBody.find('#clicked-cell')
 
@@ -269,12 +267,13 @@ $(document).ready(function(){
                 'attacker': formData.attacker,
                 'quick_move': formData.quickMove,
                 'cinematic_move': formData.cinematicMove,
-                'attacker_level': formData.attackerLevel,
+                'attacker_lvl': formData.attackerLevel,
                 'attack_iv': formData.attackIV,
                 'defender': formData.defender,
-                'defender_level': formData.defenderLevel,
+                'defender_lvl': formData.defenderLevel,
                 'defense_iv': formData.defenseIV,
-                'raid_tier': formData.raidTier
+                'raid_tier': formData.raidTier,
+                'csrfmiddlewaretoken': csrfToken
             },
             success: function(json){
                 clearErrors()
@@ -296,7 +295,8 @@ $(document).ready(function(){
                 'quick_move': JSON.stringify(json.quick_move),
                 'cinematic_move': JSON.stringify(json.cinematic_move),
                 'defender': JSON.stringify(json.defender),
-                'raid_tier': json.raid_tier
+                'raid_tier': json.raid_tier,
+                'csrfmiddlewaretoken': csrfToken
             },
             success: function(json){
                 tableBody.empty()
@@ -322,7 +322,10 @@ $(document).ready(function(){
                     tableBody.append(tr)
                 }
                 $('.attack-proficiency-stats-wrapper').show()
-                tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+
+                var $lastRow = $('#attack-proficiency-stats tr:last')
+                $lastRow.find('td:last').attr('id', 'clicked-cell')
+                getAttackProficiencyDetail(40, 15, formData, $lastRow)
                 dirty = false
             },
             error: function(xhr, errmsg, err){
@@ -357,12 +360,13 @@ $(document).ready(function(){
                 'attacker': formData.attacker,
                 'quick_move': formData.quickMove,
                 'cinematic_move': formData.cinematicMove,
-                'attacker_level': formData.attackerLevel,
+                'attacker_lvl': formData.attackerLevel,
                 'attack_iv': formData.attackIV,
                 'defender': formData.defender,
-                'defender_level': level,
+                'defender_lvl': level,
                 'defense_iv': defenseIV,
-                'raid_tier': formData.raidTier
+                'raid_tier': formData.raidTier,
+                'csrfmiddlewaretoken': csrfToken
             },
             success: function(json) {
                 displayAttackProficiencyDetail(json, rowToAppend)
@@ -387,7 +391,7 @@ $(document).ready(function(){
         var details = json.details
         if (details.length > 1) {
             wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
-            var detailsTable = $('<table class="table table-striped" width="'
+            var detailsTable = $('<table class="table table-striped inner-table" width="'
                 + totalWidth + '"></table>')
             detailsTable.append($('<tr><td width="10%">' + details[0][0] +
                 '</td><td width="30%">' + details[0][1] +
@@ -408,6 +412,8 @@ $(document).ready(function(){
             wrapperTd.append(detailsTable)
         }
         rowToAppend.after(wrapper)
+        $('.inner-table').after(
+            $('<span>* powering pokemon over level 39 is currently not possible<span>'))
         wrapper.show('fast')
     }
 
@@ -473,31 +479,4 @@ $(document).ready(function(){
         }
         return attack
     }
-
-    function getCookie(name) {
-        var cookieValue = null
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';')
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i])
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-                    break
-                }
-            }
-        }
-        return cookieValue
-    }
-    var csrftoken = getCookie('csrftoken')
-
-    function csrfSafeMethod(method) {
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
-    }
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken)
-            }
-        }
-    })
 })

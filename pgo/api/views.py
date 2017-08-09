@@ -193,14 +193,13 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.attacker.atk_iv = MAX_IV
         self._calculate_move_stats()
 
-        boss_or_level = 'raid boss' if self.raid_tier > 0 else 'level {0:g}'.format(self.defender.level)
+        boss_or_level = 'raid boss' if self.raid_tier > 0 else 'level {:g}'.format(self.defender.level)
         if (current_qk_dph == self.qk_move.damage_per_hit and current_cc_dph /
                 self.cc_move.damage_per_hit * 100 > EFFECTIVNESS_THRESHOLD):
 
             attack_iv_assessment = '''
                 Your {}\'s ATK IV is high enough for it to reach the last {}
-                breakpoint against a {} {}. <br /><br />Note that powering pokemon
-                over level 39 is currently not possible.'''.format(
+                breakpoint against a {} {}. <br /><br />'''.format(
                 self.attacker.name, self.qk_move.name,
                 boss_or_level, self.defender.name)
         else:
@@ -253,7 +252,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         for cpm in cpm_list:
             stats.append({
-                '{0:g}'.format(float(cpm.level)):
+                '{:g}'.format(float(cpm.level)):
                 self._calculate_moves_dph(
                     cpm.value,
                     data['defender']['pgo_defense'],
@@ -363,7 +362,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 current_cc_dph = self.cc_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [('Lvl', self.qk_move.name, self.cc_move.name, 'Battle Duration',)]
+        details = [('Level', self.qk_move.name, self.cc_move.name, 'Battle Duration',)]
 
         for c in sorted(self.cc_move_proficiency):
             for q in sorted(self.qk_move_proficiency):

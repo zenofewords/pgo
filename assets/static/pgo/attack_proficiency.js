@@ -135,7 +135,6 @@ $(document).ready(function(){
         }
 
         event.preventDefault()
-        $('.table-explanation-text').hide()
         var currentTarget = $(event.currentTarget)
         var clickedCell = tableBody.find('#clicked-cell')
 
@@ -323,7 +322,10 @@ $(document).ready(function(){
                     tableBody.append(tr)
                 }
                 $('.attack-proficiency-stats-wrapper').show()
-                tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+
+                var $lastRow = $('#attack-proficiency-stats tr:last')
+                $lastRow.find('td:last').attr('id', 'clicked-cell')
+                getAttackProficiencyDetail(40, 15, formData, $lastRow)
                 dirty = false
             },
             error: function(xhr, errmsg, err){
@@ -389,7 +391,7 @@ $(document).ready(function(){
         var details = json.details
         if (details.length > 1) {
             wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
-            var detailsTable = $('<table class="table table-striped" width="'
+            var detailsTable = $('<table class="table table-striped inner-table" width="'
                 + totalWidth + '"></table>')
             detailsTable.append($('<tr><td width="10%">' + details[0][0] +
                 '</td><td width="30%">' + details[0][1] +
@@ -410,6 +412,8 @@ $(document).ready(function(){
             wrapperTd.append(detailsTable)
         }
         rowToAppend.after(wrapper)
+        $('.inner-table').after(
+            $('<span>* powering pokemon over level 39 is currently not possible<span>'))
         wrapper.show('fast')
     }
 

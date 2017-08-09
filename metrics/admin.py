@@ -5,4 +5,8 @@ from django.contrib import admin
 from metrics.models import Stat
 
 
-admin.site.register(Stat)
+class StatAdmin(admin.ModelAdmin):
+    readonly_fields = ('created',)
+
+
+admin.site.register(Stat, StatAdmin)

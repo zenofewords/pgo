@@ -130,6 +130,7 @@ class AttackProficiencyAPIView(GenericAPIView):
         return self._assess_attack_iv(data)
 
     def _get_battle_summary(self):
+        self._set_move_parameters()
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
 
         if self.raid_tier > 0:
@@ -147,10 +148,21 @@ class AttackProficiencyAPIView(GenericAPIView):
             self.attacker.name, self.boss_or_level, self.defender.name,
             self.defender.defense_iv, battle_time)
 
+    def _set_move_parameters(self):
+        self.qk_move.stab = self._is_stab(self.attacker, self.qk_move)
+        self.cc_move.stab = self._is_stab(self.attacker, self.cc_move)
+
+        self.qk_move.effectivness = self._get_effectivness(
+            self.qk_move, self.defender)
+        self.cc_move.effectivness = self._get_effectivness(
+            self.cc_move, self.defender)
+
     def _calculate_move_stats(self, attacker_cpm=None):
         self._calculate_attack_multiplier(attacker_cpm)
-        self._set_move_damage(self.qk_move)
-        self._set_move_damage(self.cc_move)
+        self._set_move_damage(
+            self.qk_move, self.qk_move.stab, self.qk_move.effectivness)
+        self._set_move_damage(
+            self.cc_move, self.cc_move.stab, self.cc_move.effectivness)
 
     def _calculate_attack_multiplier(self, attacker_cpm=None):
         if not attacker_cpm:
@@ -160,12 +172,8 @@ class AttackProficiencyAPIView(GenericAPIView):
             (self.attacker.pgo_attack + self.attacker.atk_iv) * attacker_cpm) / (
             (self.defender.pgo_defense + self.defender.defense_iv) * self.defender.cpm)
 
-    def _set_move_damage(self, move):
-        move.effectivness = self._get_effectivness(move, self.defender)
-        move.stab = self._is_stab(self.attacker, move)
-        move.damage_per_hit = self._calculate_damage(
-            move, move.stab, move.effectivness
-        )
+    def _set_move_damage(self, move, stab, effectivness):
+        move.damage_per_hit = self._calculate_damage(move, stab, effectivness)
 
     def _get_effectivness(self, move, pokemon):
         secondary_type_effectivness = DEFAULT_EFFECTIVNESS
@@ -304,24 +312,30 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
         return response.Response(data, status=status.HTTP_200_OK)
 
     def _process_data(self):
+        self._set_move_parameters()
+
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
         starting_qk_dph = self.qk_move.damage_per_hit
         starting_cc_dph = self.cc_move.damage_per_hit
 
         summary = self._get_battle_summary()
+
         self.qk_move_proficiency = []
         self.cc_move_proficiency = []
+
         self._set_qk_move_proficiency(starting_qk_dph)
         self._set_cc_move_proficiency(starting_cc_dph, self._get_max_cc_move_dph())
 
+        details_table = self._get_details_table(starting_qk_dph)
         return {
             'summary': summary,
-            'details': self._get_details_table(starting_qk_dph),
+            'details': details_table,
         }
 
     def _get_max_cc_move_dph(self):
         self._calculate_attack_multiplier()
-        self._set_move_damage(self.cc_move)
+        self._set_move_damage(
+            self.cc_move, self.cc_move.stab, self.cc_move.effectivness)
         return self.cc_move.damage_per_hit
 
     def _set_qk_move_proficiency(self, starting_qk_dph):
@@ -329,7 +343,8 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
         for cpm in self.attacker.cpm_list:
             self._calculate_attack_multiplier(cpm['value'])
-            self._set_move_damage(self.qk_move)
+            self._set_move_damage(
+                self.qk_move, self.qk_move.stab, self.qk_move.effectivness)
 
             if current_qk_dph < self.qk_move.damage_per_hit:
                 self.qk_move_proficiency.append(
@@ -344,7 +359,8 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
         for index, cpm in enumerate(self.attacker.cpm_list):
             self._calculate_attack_multiplier(cpm['value'])
-            self._set_move_damage(self.cc_move)
+            self._set_move_damage(
+                self.cc_move, self.cc_move.stab, self.cc_move.effectivness)
 
             # ensure to get the max cinematic move damage row, which might
             # otherwise get filtered out

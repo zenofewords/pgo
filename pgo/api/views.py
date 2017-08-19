@@ -17,14 +17,13 @@ from pgo.api.serializers import (
     SimpleMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
 )
 from pgo.models import (
-    CPM, Move, Pokemon, Type, TypeEffectivness,
+    CPM, Move, Pokemon, Type, TypeEffectivness, RaidBoss,
 )
 from pgo.utils import (
     calculate_dph,
     calculate_defender_health,
     calculate_weave_damage,
     NEUTRAL_SCALAR,
-    RAID_TIER_POKEMON_GROUPS,
 )
 
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
@@ -62,9 +61,11 @@ class PokemonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if 'raid-boss-tier-group' in self.request.GET:
-            pokemon_slug_list = RAID_TIER_POKEMON_GROUPS[
-                self.request.GET.get('raid-boss-tier-group')]
-            return self.queryset.filter(slug__in=pokemon_slug_list)
+            raid_boss_ids = RaidBoss.objects.filter(
+                raid_tier=self.request.GET.get('raid-boss-tier-group')
+            ).values_list('pokemon__id', flat=True)
+
+            return self.queryset.filter(id__in=raid_boss_ids).order_by('name')
         return super(PokemonViewSet, self).get_queryset()
 
 
@@ -134,7 +135,8 @@ class AttackProficiencyAPIView(GenericAPIView):
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
 
         if self.raid_tier > 0:
-            stamina = self.defender.raid_stamina
+            stamina = self.defender.raidboss_set.get(
+                raid_tier=self.raid_tier).raid_tier.tier_stamina
         else:
             stamina = self.defender.pgo_stamina
         self.defender.health = calculate_defender_health(
@@ -246,7 +248,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         def_ivs = []
         for defense_iv in self.defense_iv_range:
-            def_ivs.append('Attack breakdown against {} def IV'.format(defense_iv))
+            def_ivs.append('Attack breakdown against {} DEF IV'.format(defense_iv))
             def_ivs.append('')
         stats = [{'Defender level': def_ivs}]
 

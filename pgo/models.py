@@ -35,12 +35,6 @@ class Pokemon(DefaultModelMixin, NameMixin):
         blank=True, null=True)
     maximum_cp = models.DecimalField(verbose_name='Combat Power',
         max_digits=7, decimal_places=2, blank=True, null=True)
-
-    raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM',
-        blank=True, null=True)
-    raid_stamina = models.IntegerField(verbose_name='Raid Stamina',
-        blank=True, null=True)
-
     legendary = models.BooleanField(default=False)
 
     attack = models.IntegerField(blank=True, null=True)
@@ -153,9 +147,38 @@ class CPM(models.Model):
     raids = RaidCPMManager()
 
     def __str__(self):
-        return 'l{0}: \t{1}'.format(self.level, self.value)
+        raid = '(raid)' if self.raid_cpm else ''
+        return 'l{0}: \t{1} {2}'.format(self.level, self.value, raid)
 
     class Meta:
         verbose_name = 'CP multiplier'
         verbose_name_plural = 'CP multiplier'
-        ordering = ('level',)
+        ordering = ('-raid_cpm', 'level',)
+        # add un tgtr
+
+
+class RaidTier(models.Model):
+    raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM')
+    tier = models.PositiveIntegerField(verbose_name='Tier Level')
+    tier_stamina = models.PositiveIntegerField(verbose_name='Tier Stamina')
+
+    def __str__(self):
+        return str(self.tier)
+
+    class Meta:
+        verbose_name = 'Raid Tier'
+        verbose_name_plural = 'Raid Tiers'
+        ordering = ('-tier',)
+
+
+class RaidBoss(models.Model):
+    pokemon = models.ForeignKey('pgo.Pokemon', verbose_name='Pokemon')
+    raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier')
+
+    def __str__(self):
+        return 'T{} raid boss {}'.format(self.raid_tier.tier, self.pokemon.name)
+
+    class Meta:
+        verbose_name = 'Raid Boss'
+        verbose_name_plural = 'Raid Bosses'
+        ordering = ('-raid_tier__tier', 'pokemon__name')

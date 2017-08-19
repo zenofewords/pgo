@@ -7,13 +7,6 @@ NOT_VERY_EFFECTIVE_SCALAR = 0.714
 NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
 TIMEOUT = 99000
-RAID_TIER_POKEMON_GROUPS = {
-    '5': ('lugia', 'articuno', 'moltres', 'zapdos', 'ho-oh', 'suicune', 'entei', 'raikou', 'mew', 'mewtwo', 'celebi'),
-    '4': ('venusaur', 'charizard', 'blastoise', 'snorlax', 'lapras', 'tyranitar', 'rhydon'),
-    '3': ('machamp', 'alakazam', 'gengar', 'jolteon', 'flareon', 'vaporeon', 'arcanine'),
-    '2': ('weezing', 'muk', 'exeggutor', 'magmar', 'electabuzz'),
-    '1': ('quilava', 'bayleef', 'croconaw', 'magikarp'),
-}
 
 
 def simulate_weave_damage(quick_move, cinematic_move, health):

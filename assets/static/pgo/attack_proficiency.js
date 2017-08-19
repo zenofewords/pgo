@@ -311,7 +311,7 @@ $(document).ready(function(){
                             td.append(json[i][value][j])
 
                             if (j % 2 === 1) {
-                                if (td[0].textContent !== 'Attack breakdown against 15 def IV') {
+                                if (td[0].textContent !== 'Attack breakdown against 15 DEF IV') {
                                     td.addClass('attack-proficiency-detail')
                                 }
                                 tr.append(td)

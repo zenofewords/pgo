@@ -123,7 +123,7 @@ $(document).ready(function(){
     helpButton.on('click', function(event) {
         event.preventDefault()
 
-        $('.help-text').toggle('fast')
+        $('.help-text').toggle()
     })
 
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
@@ -311,7 +311,7 @@ $(document).ready(function(){
                             td.append(json[i][value][j])
 
                             if (j % 2 === 1) {
-                                if (td[0].textContent !== 'Attack breakdown against 15 def IV') {
+                                if (td[0].textContent !== 'Attack breakdown against 15 DEF IV') {
                                     td.addClass('attack-proficiency-detail')
                                 }
                                 tr.append(td)
@@ -336,7 +336,7 @@ $(document).ready(function(){
 
     function displayAttackProficiency(json) {
         $('.attack-proficiency-intro').hide()
-        $('.attack-proficiency-current').show('fast')
+        $('.attack-proficiency-current').show()
         $('#summary').html(json.summary)
         $('#attack_iv_assessment').html(json.attack_iv_assessment)
 
@@ -414,7 +414,7 @@ $(document).ready(function(){
         rowToAppend.after(wrapper)
         $('.inner-table').after(
             $('<span>* powering pokemon over level 39 is currently not possible<span>'))
-        wrapper.show('fast')
+        wrapper.show()
     }
 
     function displayFieldErrors(errorObject) {

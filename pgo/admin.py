@@ -7,6 +7,8 @@ from pgo.models import (
     Move,
     Moveset,
     Pokemon,
+    RaidBoss,
+    RaidTier,
     Type,
     TypeEffectivness,
     TypeEffectivnessScalar,
@@ -24,6 +26,8 @@ admin.site.register(CPM)
 admin.site.register(Move)
 admin.site.register(Moveset)
 admin.site.register(Pokemon, PokemonAdmin)
+admin.site.register(RaidBoss)
+admin.site.register(RaidTier)
 admin.site.register(Type)
 admin.site.register(TypeEffectivness)
 admin.site.register(TypeEffectivnessScalar)

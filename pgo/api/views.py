@@ -142,13 +142,13 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.defender.health = calculate_defender_health(
             stamina + MAX_IV, self.defender.cpm
         )
-        battle_time = calculate_weave_damage(
+        self.cycle_dps, battle_time = calculate_weave_damage(
             self.qk_move, self.cc_move, self.defender.health
         )
-        return '''At its current level your {} would defeat a {} {} with {}
-            DEF IV in {:.1f} seconds.'''.format(
-            self.attacker.name, self.boss_or_level, self.defender.name,
-            self.defender.defense_iv, battle_time)
+        return '''At its current level, your {} does {:.1f} damage per second (DPS) to a {} {}
+            with {} DEF IV.'''.format(
+            self.attacker.name, self.cycle_dps, self.boss_or_level,
+            self.defender.name, self.defender.defense_iv)
 
     def _set_move_parameters(self):
         self.qk_move.stab = self._is_stab(self.attacker, self.qk_move)
@@ -278,9 +278,9 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         dph_list = []
         for attack_modifiers in zip(attack_modifiers, max_attack_modifiers):
-            dph_list.append(('{} DPH is '.format(qk_move['name']),
+            dph_list.append(('{} damage per hit is '.format(qk_move['name']),
                 self._build_move_stats(attack_modifiers, qk_move)))
-            dph_list.append(('{} DPH is '.format(cc_move['name']),
+            dph_list.append(('{} damage per hit is '.format(cc_move['name']),
                 self._build_move_stats(attack_modifiers, cc_move)))
         return dph_list
 
@@ -378,7 +378,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 current_cc_dph = self.cc_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [('Level', self.qk_move.name, self.cc_move.name, 'Battle Duration',)]
+        details = [('Level', self.qk_move.name, self.cc_move.name, '+DPS%', 'Battle Duration',)]
 
         for c in sorted(self.cc_move_proficiency):
             for q in sorted(self.qk_move_proficiency):
@@ -392,20 +392,25 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
             self.qk_move.damage_per_hit = starting_qk_dph
             self.cc_move.damage_per_hit = c[0]
 
-            battle_time = calculate_weave_damage(
+            cycle_dps, battle_time = calculate_weave_damage(
                 self.qk_move, self.cc_move, self.defender.health)
-            details.append(self._get_detail_row(c[1], battle_time))
+            details.append(self._get_detail_row(c[1], cycle_dps, battle_time))
 
         # edge case when there's improvement for quick moves, but not for cinematic
         if len(self.cc_move_proficiency) == 0 and len(self.qk_move_proficiency) > 0:
             for q in sorted(self.qk_move_proficiency):
                 self.qk_move.damage_per_hit = q[0]
 
-                battle_time = calculate_weave_damage(
+                cycle_dps, battle_time = calculate_weave_damage(
                     self.qk_move, self.cc_move, self.defender.health)
-                details.append(self._get_detail_row(q[1], battle_time))
+                details.append(self._get_detail_row(q[1], cycle_dps, battle_time))
         return details
 
-    def _get_detail_row(self, level, battle_time):
-        return (level, self.qk_move.damage_per_hit,
-            self.cc_move.damage_per_hit, '{:.1f}s'.format(battle_time))
+    def _get_detail_row(self, level, cycle_dps, battle_time):
+        return (level, self.qk_move.damage_per_hit, self.cc_move.damage_per_hit,
+            self._get_formatted_dps(cycle_dps), '{:.1f}s'.format(battle_time))
+
+    def _get_formatted_dps(self, cycle_dps):
+        dps_increase = cycle_dps * 100 / self.cycle_dps - 100
+        self.cycle_dps = cycle_dps
+        return '{:.1f}%'.format(dps_increase)

@@ -393,10 +393,13 @@ $(document).ready(function(){
             wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
             var detailsTable = $('<table class="table table-striped inner-table" width="'
                 + totalWidth + '"></table>')
-            detailsTable.append($('<tr><td width="10%">' + details[0][0] +
-                '</td><td width="30%">' + details[0][1] +
-                '</td><td width="30%">' + details[0][2] + '</td><td width="30%">'
-                + details[0][3] + '</td></tr>'))
+            detailsTable.append($(
+                '<tr><td width="12%">' + details[0][0] +
+                '</td><td width="22%">' + details[0][1] +
+                '</td><td width="22%">' + details[0][2] +
+                '</td><td width="22%">' + details[0][3] +
+                '</td><td width="22%">' + details[0][4] +
+            '</td></tr>'))
 
             for (row in details) {
                 if (row > 0) {
@@ -405,6 +408,7 @@ $(document).ready(function(){
                         '</td><td>' + details[row][1] +
                         '</td><td>' + details[row][2] +
                         '</td><td>' + details[row][3] +
+                        '</td><td>' + details[row][4] +
                         '</td></tr>'
                     ))
                 }

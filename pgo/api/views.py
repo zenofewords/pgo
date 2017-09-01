@@ -145,10 +145,10 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.cycle_dps, battle_time = calculate_weave_damage(
             self.qk_move, self.cc_move, self.defender.health
         )
-        return '''At its current level, your {} does {:.1f} damage per second (DPS) to a {} {}
-            with {} DEF IV.'''.format(
+        return '''Your {} would do {:.1f} DPS to a {} {}
+            with {} defense IV, knocking it out in {:.1f} seconds.'''.format(
             self.attacker.name, self.cycle_dps, self.boss_or_level,
-            self.defender.name, self.defender.defense_iv)
+            self.defender.name, self.defender.defense_iv, battle_time)
 
     def _set_move_parameters(self):
         self.qk_move.stab = self._is_stab(self.attacker, self.qk_move)
@@ -206,13 +206,13 @@ class AttackProficiencyAPIView(GenericAPIView):
 
         if (current_qk_dph == self.qk_move.damage_per_hit):
             attack_iv_assessment = '''
-                Your {}\'s ATK IV is high enough for it to reach the last {}
+                Your {}\'s attack IV is high enough for it to reach the last {}
                 breakpoint against a {} {}. <br /><br />'''.format(
                 self.attacker.name, self.qk_move.name,
                 self.boss_or_level, self.defender.name)
         else:
             attack_iv_assessment = '''
-                Unfortunately, your {}\'s ATK IV is too low for it to reach the
+                Unfortunately, your {}\'s attack IV is too low for it to reach the
                 last breakpoint for {} against a {} {}.'''.format(
                 self.attacker.name, self.qk_move.name, self.boss_or_level, self.defender.name)
 
@@ -278,9 +278,9 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
         dph_list = []
         for attack_modifiers in zip(attack_modifiers, max_attack_modifiers):
-            dph_list.append(('{} damage per hit is '.format(qk_move['name']),
+            dph_list.append(('{} would do '.format(qk_move['name']),
                 self._build_move_stats(attack_modifiers, qk_move)))
-            dph_list.append(('{} damage per hit is '.format(cc_move['name']),
+            dph_list.append(('{} would do '.format(cc_move['name']),
                 self._build_move_stats(attack_modifiers, cc_move)))
         return dph_list
 
@@ -378,7 +378,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 current_cc_dph = self.cc_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [('Level', self.qk_move.name, self.cc_move.name, '+DPS%', 'Battle Duration',)]
+        details = [('Level', self.qk_move.name, self.cc_move.name, 'DPS (+%)', 'Time to KO',)]
 
         for c in sorted(self.cc_move_proficiency):
             for q in sorted(self.qk_move_proficiency):
@@ -413,4 +413,4 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
     def _get_formatted_dps(self, cycle_dps):
         dps_increase = cycle_dps * 100 / self.cycle_dps - 100
         self.cycle_dps = cycle_dps
-        return '{:.1f}%'.format(dps_increase)
+        return '{:g} ({:g}%)'.format(round(cycle_dps, 1), round(dps_increase, 1))

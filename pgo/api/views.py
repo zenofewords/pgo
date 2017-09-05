@@ -321,12 +321,15 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
         starting_cc_dph = self.cc_move.damage_per_hit
 
         summary = self._get_battle_summary()
-
         self.qk_move_proficiency = []
         self.cc_move_proficiency = []
 
+        max_damage_qk = self._get_max_damage_move(self.qk_move)
+        max_damage_cc = self._get_max_damage_move(self.cc_move)
+        self.max_dps, _ = calculate_weave_damage(max_damage_qk, max_damage_cc)
+
         self._set_qk_move_proficiency(starting_qk_dph)
-        self._set_cc_move_proficiency(starting_cc_dph, self._get_max_cc_move_dph())
+        self._set_cc_move_proficiency(starting_cc_dph, max_damage_cc.damage_per_hit)
 
         details_table = self._get_details_table(starting_qk_dph)
         return {
@@ -334,11 +337,10 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
             'details': details_table,
         }
 
-    def _get_max_cc_move_dph(self):
+    def _get_max_damage_move(self, move):
         self._calculate_attack_multiplier()
-        self._set_move_damage(
-            self.cc_move, self.cc_move.stab, self.cc_move.effectivness)
-        return self.cc_move.damage_per_hit
+        self._set_move_damage(move, move.stab, move.effectivness)
+        return move
 
     def _set_qk_move_proficiency(self, starting_qk_dph):
         current_qk_dph = starting_qk_dph
@@ -378,7 +380,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 current_cc_dph = self.cc_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [('Level', self.qk_move.name, self.cc_move.name, 'DPS (+%)', 'Time to KO',)]
+        details = [('Level', self.qk_move.name, self.cc_move.name, 'DPS (%)', 'Time to KO',)]
 
         for c in sorted(self.cc_move_proficiency):
             for q in sorted(self.qk_move_proficiency):
@@ -411,6 +413,6 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
             self._get_formatted_dps(cycle_dps), '{:.1f}s'.format(battle_time))
 
     def _get_formatted_dps(self, cycle_dps):
-        dps_increase = cycle_dps * 100 / self.cycle_dps - 100
         self.cycle_dps = cycle_dps
-        return '{:g} ({:g}%)'.format(round(cycle_dps, 1), round(dps_increase, 1))
+        dps_percentage = self.cycle_dps * 100 / self.max_dps
+        return '{:g} ({:g}%)'.format(round(cycle_dps, 1), round(dps_percentage, 1))

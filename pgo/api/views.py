@@ -206,13 +206,13 @@ class AttackProficiencyAPIView(GenericAPIView):
 
         if (current_qk_dph == self.qk_move.damage_per_hit):
             attack_iv_assessment = '''
-                Your {}\'s attack IV is high enough for it to reach the last {}
+                Your {}\'s <b>attack IV is high enough</b> for it to reach the last {}
                 breakpoint against a {} {}. <br /><br />'''.format(
                 self.attacker.name, self.qk_move.name,
                 self.boss_or_level, self.defender.name)
         else:
             attack_iv_assessment = '''
-                Unfortunately, your {}\'s attack IV is too low for it to reach the
+                Unfortunately, your {}\'s <b>attack IV is too low</b> for it to reach the
                 last breakpoint for {} against a {} {}.'''.format(
                 self.attacker.name, self.qk_move.name, self.boss_or_level, self.defender.name)
 

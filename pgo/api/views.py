@@ -93,8 +93,8 @@ class AttackProficiencyAPIView(GenericAPIView):
 
         self.attacker = self._get_pokemon(data.get('attacker'))
         self.attacker.atk_iv = data.get('attack_iv')
-        self.attacker.cpm_list = cpm_qs.filter(
-            level__gte=data.get('attacker_lvl')).values('level', 'value')
+        self.attacker.cpm_list = cpm_qs.filter(level__gte=data.get(
+            'attacker_lvl')).values('level', 'value', 'total_powerup_cost')
         self.qk_move = self._get_move(data.get('quick_move'))
         self.cc_move = self._get_move(data.get('cinematic_move'))
 
@@ -323,6 +323,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
         summary = self._get_battle_summary()
         self.qk_move_proficiency = []
         self.cc_move_proficiency = []
+        self.powerup_cost = self.attacker.cpm_list.first()['total_powerup_cost']
 
         max_damage_qk = self._get_max_damage_move(self.qk_move)
         max_damage_cc = self._get_max_damage_move(self.cc_move)
@@ -351,8 +352,8 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 self.qk_move, self.qk_move.stab, self.qk_move.effectivness)
 
             if current_qk_dph < self.qk_move.damage_per_hit:
-                self.qk_move_proficiency.append(
-                    (self.qk_move.damage_per_hit, cpm['level'], cpm['value'],))
+                self.qk_move_proficiency.append((self.qk_move.damage_per_hit,
+                    cpm['level'], cpm['value'], cpm['total_powerup_cost'],))
                 current_qk_dph = self.qk_move.damage_per_hit
 
     def _set_cc_move_proficiency(self, starting_cc_dph, max_cc_dph):
@@ -369,18 +370,18 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
             # ensure to get the max cinematic move damage row, which might
             # otherwise get filtered out
             if self.cc_move.damage_per_hit == max_cc_dph:
-                self.cc_move_proficiency.append(
-                    (self.cc_move.damage_per_hit, cpm['level'], cpm['value'],))
+                self.cc_move_proficiency.append((self.cc_move.damage_per_hit,
+                    cpm['level'], cpm['value'], cpm['total_powerup_cost'],))
 
             if ([x for x in self.qk_move_proficiency if cpm['value'] == x[2]] or
                     current_cc_dph < self.cc_move.damage_per_hit and
                     current_cc_dph * CC_FACTOR < self.cc_move.damage_per_hit):
-                self.cc_move_proficiency.append(
-                    (self.cc_move.damage_per_hit, cpm['level'], cpm['value'],))
+                self.cc_move_proficiency.append((self.cc_move.damage_per_hit,
+                    cpm['level'], cpm['value'], cpm['total_powerup_cost'],))
                 current_cc_dph = self.cc_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [('Level', self.qk_move.name, self.cc_move.name, 'DPS (%)', 'Time to KO',)]
+        details = [('Level (dust)', self.qk_move.name, self.cc_move.name, 'DPS (%)', 'Time to KO',)]
 
         for c in sorted(self.cc_move_proficiency):
             for q in sorted(self.qk_move_proficiency):
@@ -396,7 +397,8 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
             cycle_dps, battle_time = calculate_weave_damage(
                 self.qk_move, self.cc_move, self.defender.health)
-            details.append(self._get_detail_row(c[1], cycle_dps, battle_time))
+            details.append(
+                self._get_detail_row(c[1], cycle_dps, battle_time, c[3]))
 
         # edge case when there's improvement for quick moves, but not for cinematic
         if len(self.cc_move_proficiency) == 0 and len(self.qk_move_proficiency) > 0:
@@ -405,12 +407,19 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
                 cycle_dps, battle_time = calculate_weave_damage(
                     self.qk_move, self.cc_move, self.defender.health)
-                details.append(self._get_detail_row(q[1], cycle_dps, battle_time))
+                details.append(
+                    self._get_detail_row(q[1], cycle_dps, battle_time, q[3]))
         return details
 
-    def _get_detail_row(self, level, cycle_dps, battle_time):
-        return (level, self.qk_move.damage_per_hit, self.cc_move.damage_per_hit,
+    def _get_detail_row(self, level, cycle_dps, battle_time, powerup_cost):
+        return (self._level_and_pu_cost(level, powerup_cost),
+            self.qk_move.damage_per_hit, self.cc_move.damage_per_hit,
             self._get_formatted_dps(cycle_dps), '{:.1f}s'.format(battle_time))
+
+    def _level_and_pu_cost(self, level, powerup_cost):
+        line = '{:g} ({})'.format(float(level), powerup_cost - self.powerup_cost)
+        self.powerup_cost = powerup_cost
+        return line
 
     def _get_formatted_dps(self, cycle_dps):
         self.cycle_dps = cycle_dps

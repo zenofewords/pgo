@@ -141,6 +141,8 @@ class CPM(models.Model):
     value = models.DecimalField(max_digits=10, decimal_places=9)
     raid_cpm = models.BooleanField(default=False)
     raid_tier = models.PositiveIntegerField(blank=True, null=True)
+    powerup_cost = models.PositiveIntegerField(blank=True, null=True)
+    total_powerup_cost = models.PositiveIntegerField(blank=True, null=True)
 
     objects = models.Manager()
     gyms = CPMManager()

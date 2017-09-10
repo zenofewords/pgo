@@ -145,10 +145,21 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.cycle_dps, battle_time = calculate_weave_damage(
             self.qk_move, self.cc_move, self.defender.health
         )
-        return '''Your {} would do {:.1f} DPS to a {} {}
+
+        max_damage_qk = self._get_max_damage_move(self.qk_move)
+        self.max_damage_cc = self._get_max_damage_move(self.cc_move)
+        self.max_dps, _ = calculate_weave_damage(max_damage_qk, self.max_damage_cc)
+
+        return '''Your {} would do {:g} DPS ({:g}%) to a {} {}
             with {} defense IV, knocking it out in {:.1f} seconds.'''.format(
-            self.attacker.name, self.cycle_dps, self.boss_or_level,
+            self.attacker.name, round(self.cycle_dps, 1),
+            round(self.cycle_dps * 100 / self.max_dps, 1), self.boss_or_level,
             self.defender.name, self.defender.defense_iv, battle_time)
+
+    def _get_max_damage_move(self, move):
+        self._calculate_attack_multiplier()
+        self._set_move_damage(move, move.stab, move.effectivness)
+        return move
 
     def _set_move_parameters(self):
         self.qk_move.stab = self._is_stab(self.attacker, self.qk_move)
@@ -325,23 +336,15 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
         self.cc_move_proficiency = []
         self.powerup_cost = self.attacker.cpm_list.first()['total_powerup_cost']
 
-        max_damage_qk = self._get_max_damage_move(self.qk_move)
-        max_damage_cc = self._get_max_damage_move(self.cc_move)
-        self.max_dps, _ = calculate_weave_damage(max_damage_qk, max_damage_cc)
-
         self._set_qk_move_proficiency(starting_qk_dph)
-        self._set_cc_move_proficiency(starting_cc_dph, max_damage_cc.damage_per_hit)
+        self._set_cc_move_proficiency(
+            starting_cc_dph, self.max_damage_cc.damage_per_hit)
 
         details_table = self._get_details_table(starting_qk_dph)
         return {
             'summary': summary,
             'details': details_table,
         }
-
-    def _get_max_damage_move(self, move):
-        self._calculate_attack_multiplier()
-        self._set_move_damage(move, move.stab, move.effectivness)
-        return move
 
     def _set_qk_move_proficiency(self, starting_qk_dph):
         current_qk_dph = starting_qk_dph
@@ -381,7 +384,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
                 current_cc_dph = self.cc_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [('Level (dust)', self.qk_move.name, self.cc_move.name, 'DPS (%)', 'Time to KO',)]
+        details = [('Level ($)', self.qk_move.name, self.cc_move.name, 'DPS (%)', 'Time to KO',)]
 
         for c in sorted(self.cc_move_proficiency):
             for q in sorted(self.qk_move_proficiency):
@@ -417,9 +420,8 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
             self._get_formatted_dps(cycle_dps), '{:.1f}s'.format(battle_time))
 
     def _level_and_pu_cost(self, level, powerup_cost):
-        line = '{:g} ({})'.format(float(level), powerup_cost - self.powerup_cost)
-        self.powerup_cost = powerup_cost
-        return line
+        return '{:g} ({:g}k)'.format(
+            float(level), (powerup_cost - self.powerup_cost) / 1000)
 
     def _get_formatted_dps(self, cycle_dps):
         self.cycle_dps = cycle_dps

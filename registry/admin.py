@@ -3,11 +3,7 @@ from django.contrib import admin
 from registry.models import Country, Town, Team, Trainer
 
 
-class ReadOnlyMixin:
-    readonly_fields = ('trainer_count',)
-
-
-class CountryAdmin(ReadOnlyMixin, admin.ModelAdmin):
+class CountryAdmin(admin.ModelAdmin):
     fields = (
         'name', 'slug',
     )
@@ -15,8 +11,13 @@ class CountryAdmin(ReadOnlyMixin, admin.ModelAdmin):
         'name', 'slug', 'trainer_count',
     )
 
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        obj.save()
+        super(CountryAdmin, self).save_model(request, obj, form, change)
 
-class TownAdmin(ReadOnlyMixin, admin.ModelAdmin):
+
+class TownAdmin(admin.ModelAdmin):
     fields = (
         'name', 'slug', 'country',
     )
@@ -24,14 +25,24 @@ class TownAdmin(ReadOnlyMixin, admin.ModelAdmin):
         'name', 'slug', 'trainer_count',
     )
 
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        obj.save()
+        super(TownAdmin, self).save_model(request, obj, form, change)
 
-class TeamAdmin(ReadOnlyMixin, admin.ModelAdmin):
+
+class TeamAdmin(admin.ModelAdmin):
     fields = (
         'name', 'slug', 'color',
     )
     list_display = (
         'name', 'slug', 'trainer_count',
     )
+
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        obj.save()
+        super(TeamAdmin, self).save_model(request, obj, form, change)
 
 
 class TrainerAdmin(admin.ModelAdmin):
@@ -44,6 +55,11 @@ class TrainerAdmin(admin.ModelAdmin):
     search_fields = (
         'nickname', 'level',
     )
+
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        obj.save()
+        super(TrainerAdmin, self).save_model(request, obj, form, change)
 
 
 admin.site.register(Country, CountryAdmin)

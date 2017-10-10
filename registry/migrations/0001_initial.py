@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
                 ('recruited', models.BooleanField(default=False, help_text='The trainer is included in our groups/chats.')),
                 ('retired', models.BooleanField(default=False, help_text='The trainer used to play, but they no longer do, or at least not currently.')),
                 ('team', models.ForeignKey(help_text='Select "Harmony" if the trainer has never chosen a team.', on_delete=django.db.models.deletion.CASCADE, to='registry.Team')),
-                ('towns', models.ManyToManyField(blank=True, help_text='Where the trainer usually plays.', related_name='trainers', to='registry.Town')),
+                ('towns', models.ManyToManyField(blank=False, help_text='Where the trainer usually plays.', related_name='trainers', to='registry.Town')),
                 ('user', models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={

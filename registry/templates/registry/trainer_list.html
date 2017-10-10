@@ -1,0 +1,33 @@
+{% extends 'zenofewords/base.html' %}
+
+
+{% block title %}
+    {{ block.super }} - Trainers
+{% endblock title %}
+
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+            <th>Nickname</th>
+            <th>Level</th>
+            <th>Team</th>
+        </thead>
+        <tbody>
+            {% for object in object_list %}
+                <tr>
+                    <td>
+                        {{ object.nickname }}
+                    </td>
+                    <td>
+                        {{ object.level }}
+                    </td>
+                    <td>
+                        {{ object.team }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {{ block.super }}
+{% endblock content %}

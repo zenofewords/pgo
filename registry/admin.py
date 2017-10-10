@@ -36,10 +36,10 @@ class TeamAdmin(ReadOnlyMixin, admin.ModelAdmin):
 
 class TrainerAdmin(admin.ModelAdmin):
     fields = (
-        'nickname', 'team', 'legit', 'recruited', 'retired', 'level', 'town',
+        'nickname', 'team', 'legit', 'recruited', 'retired', 'level', 'towns',
     )
     list_display = (
-        'nickname', 'team', 'legit', 'recruited', 'retired', 'level', 'town', 'created',
+        'nickname', 'team', 'legit', 'recruited', 'retired', 'level', 'created',
     )
     search_fields = (
         'nickname', 'level',

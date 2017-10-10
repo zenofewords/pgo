@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.postgres.fields import CICharField
 from django.core.validators import (
     MinValueValidator, MaxValueValidator, RegexValidator,
 )
@@ -59,7 +60,7 @@ class Team(StatMixin):
 
 
 class Trainer(DefaultModelMixin):
-    nickname = models.CharField(max_length=15, blank=False, null=True,
+    nickname = CICharField(max_length=15, blank=False, null=False, unique=True,
         validators=[RegexValidator(r'^[0-9a-zA-Z]{4,}$', TRAINER_NAME_VALIDATION_ERROR)])
     level = models.PositiveIntegerField(blank=True, null=True,
         validators=[MinValueValidator(20), MaxValueValidator(40)],
@@ -77,6 +78,9 @@ class Trainer(DefaultModelMixin):
 
     def __unicode__(self):
         return '{0}'.format(self.nickname)
+
+    class Meta:
+        ordering = ('nickname',)
 
 
 @receiver(post_save, sender=Trainer, dispatch_uid='update_team_trainer_count')

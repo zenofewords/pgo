@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'zenofewords',
     'metrics',
     'pgo',
+    'registry',
     'blog',
     'book',
     'tcg',

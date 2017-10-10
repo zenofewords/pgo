@@ -17,6 +17,7 @@ urlpatterns = [
 
     url(r'^blog/', include('blog.urls', namespace='blog')),
     url(r'^pgo/', include('pgo.urls', namespace='pgo')),
+    url(r'^registry/', include('registry.urls', namespace='registry')),
     url(r'^book/', include('book.urls', namespace='book')),
     url(r'^tcg/', include('tcg.urls', namespace='tcg')),
     url(r'^$', HomeView.as_view(), name='home'),

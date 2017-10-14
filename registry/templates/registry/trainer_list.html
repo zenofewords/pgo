@@ -1,4 +1,6 @@
 {% extends 'zenofewords/base.html' %}
+{% load static %}
+{% load registry_tags %}
 
 
 {% block title %}
@@ -8,21 +10,27 @@
 {% block content %}
     <table class="table table-striped">
         <thead>
-            <th>Nickname</th>
-            <th>Level</th>
             <th>Team</th>
+            <th>Trainer</th>
+            <th>Level</th>
+            <th>Location</th>
         </thead>
         <tbody>
             {% for object in object_list %}
                 <tr>
-                    <td>
+                    <td width="5%" align="center">
+                        <img src="{{ object.team.slug|team_logo_url }}" alt="team {{ object.team.slug }} logo" width="25px" height="25px" />
+                    </td>
+                    <td width="20%">
                         {{ object.nickname }}
                     </td>
-                    <td>
-                        {{ object.level }}
+                    <td width="10%">
+                        {{ object.level|default:"-" }}
                     </td>
-                    <td>
-                        {{ object.team }}
+                    <td width="50%">
+                        {% for town in object.towns.all %}
+                            {{ town.name }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
                     </td>
                 </tr>
             {% endfor %}

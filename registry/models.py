@@ -58,6 +58,9 @@ class Team(StatMixin):
     def __unicode__(self):
         return '{0}'.format(self.name)
 
+    class Meta:
+        ordering = ('pk',)
+
 
 class Trainer(DefaultModelMixin):
     nickname = CICharField(max_length=15, blank=False, null=False, unique=True,

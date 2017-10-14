@@ -1,0 +1,35 @@
+{% extends 'zenofewords/base.html' %}
+{% load static %}
+{% load registry_tags %}
+
+
+{% block title %}
+    {{ block.super }} - Teams
+{% endblock title %}
+
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+            <th>Team</th>
+            <th>Trainer count</th>
+        </thead>
+        <tbody>
+            {% for object in object_list %}
+                <tr>
+                    <td width="50%">
+                        <a href="#">
+                            <img src="{{ object.slug|team_logo_url }}" alt="team {{ object.slug }} logo" width="50px" height="50px" />
+                        </a>
+                    </td>
+                    <td width="50%">
+                        <h4>
+                            {{ object.trainer_count }}
+                        </h4>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {{ block.super }}
+{% endblock content %}

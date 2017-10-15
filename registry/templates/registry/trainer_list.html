@@ -14,7 +14,7 @@
     <br>
     <div class="row">
         <form id="trainer-filter-form">
-            <div class="col-xs-4 col-sm-2">
+            <div class="col-xs-12 col-sm-12">
                 <select class="trainer-select">
                     <option value="0" selected disabled>Find trainer</option>
 
@@ -22,16 +22,6 @@
                         <option value="{{ nickname }}" {% if trainer_nickname == nickname %}selected{% endif %}>{{ nickname }}</option>
                     {% endfor %}
                 </select>
-            </div>
-            <div class="col-xs-8 col-sm-8">
-                <!--
-                {% for team in teams %}
-                    <label for="checkbox-{{ team.slug}}">
-                        <img src="{{ team.slug|team_logo_url }}" alt="team {{ team.slug }} logo" width="25px" height="25px" />
-                    </label>
-                    <input type="checkbox" id="checkbox-{{ team.slug}}" value="{{ team.slug }}" checked="{% if team.slug == instinct %}{{ team_instinct }}{% endif %}" />
-                {% endfor %}
-                -->
                 <a href="{% url 'registry:trainers' %}" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </a>
@@ -99,7 +89,7 @@
             }
         })
         trainerSelect.select2({
-            'width': 103
+            'width': 150
         })
     </script>
 {% endblock scripts %}

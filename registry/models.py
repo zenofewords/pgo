@@ -51,15 +51,22 @@ class Town(StatMixin):
         return '{0}'.format(self.name)
 
 
+class TeamManager(models.Manager):
+    def get_queryset(self):
+        return super(TeamManager, self).get_queryset().filter(active=True)
+
+
 class Team(StatMixin):
     color = models.CharField(
         max_length=10, choices=TeamColor.CHOICES, default=TeamColor.YELLOW)
+
+    objects = TeamManager()
 
     def __unicode__(self):
         return '{0}'.format(self.name)
 
     class Meta:
-        ordering = ('pk',)
+        ordering = ('slug',)
 
 
 class Trainer(DefaultModelMixin):

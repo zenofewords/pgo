@@ -1,6 +1,6 @@
-{% extends 'zenofewords/base.html' %}
-{% load static %}
+{% extends 'registry/registry_base.html' %}
 {% load registry_tags %}
+{% load static %}
 
 
 {% block title %}
@@ -8,26 +8,69 @@
 {% endblock title %}
 
 {% block content %}
+    <h4>
+        There are {{ total_trainer_count }} trainers listed in the registry.
+    </h4>
+    <br>
+    <div class="row">
+        <form id="trainer-filter-form">
+            <div class="col-xs-4 col-sm-2">
+                <select class="trainer-select">
+                    <option value="0" selected disabled>Find trainer</option>
+
+                    {% for nickname in trainer_nicknames %}
+                        <option value="{{ nickname }}" {% if trainer_nickname == nickname %}selected{% endif %}>{{ nickname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-xs-8 col-sm-8">
+                <!--
+                {% for team in teams %}
+                    <label for="checkbox-{{ team.slug}}">
+                        <img src="{{ team.slug|team_logo_url }}" alt="team {{ team.slug }} logo" width="25px" height="25px" />
+                    </label>
+                    <input type="checkbox" id="checkbox-{{ team.slug}}" value="{{ team.slug }}" checked="{% if team.slug == instinct %}{{ team_instinct }}{% endif %}" />
+                {% endfor %}
+                -->
+                <a href="{% url 'registry:trainers' %}" class="btn btn-primary btn-xs">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </a>
+            </div>
+        </form>
+    </div>
+    <hr>
     <table class="table table-striped">
         <thead>
-            <th>Team</th>
-            <th>Trainer</th>
-            <th>Level</th>
-            <th>Location</th>
+            <th width="10%">
+                Team
+            </th>
+            <th width="20%">
+                <a href="{% url 'registry:trainers' %}?sort_key={% if sort_key == 'nickname' %}-{% endif %}nickname">
+                    Trainer
+                </a>
+            </th>
+            <th width="10%">
+                <a href="{% url 'registry:trainers' %}?sort_key={% if sort_key == 'level' %}-{% endif %}level">
+                    Level
+                </a>
+            </th>
+            <th width="60%">
+                Location
+            </th>
         </thead>
         <tbody>
             {% for object in object_list %}
                 <tr>
-                    <td width="5%" align="center">
+                    <td>
                         <img src="{{ object.team.slug|team_logo_url }}" alt="team {{ object.team.slug }} logo" width="25px" height="25px" />
                     </td>
-                    <td width="20%">
+                    <td>
                         {{ object.nickname }}
                     </td>
-                    <td width="10%">
+                    <td>
                         {{ object.level|default:"-" }}
                     </td>
-                    <td width="50%">
+                    <td>
                         {% for town in object.towns.all %}
                             {{ town.name }}{% if not forloop.last %},{% endif %}
                         {% endfor %}
@@ -37,5 +80,26 @@
         </tbody>
     </table>
 
+    <p>Notice a trainer missing, or outdated information? Contact one of our administrators on facebook.</p>
+
     {{ block.super }}
 {% endblock content %}
+
+{% block scripts %}
+    {{ block.super }}
+
+    <script type="text/javascript">
+        var trainerSelect = $('.trainer-select')
+        var trainerFilterForm = $('#trainer-filter-form')
+        trainerSelect.on('change', function (event) {
+            if (this.value) {
+                trainerFilterForm.append(
+                    '<input type="hidden" name="trainer_nickname" value="' + this.value + '" />')
+                trainerFilterForm.submit()
+            }
+        })
+        trainerSelect.select2({
+            'width': 103
+        })
+    </script>
+{% endblock scripts %}

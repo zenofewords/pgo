@@ -10,6 +10,7 @@ class CountryAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'slug', 'trainer_count',
     )
+    prepopulated_fields = {'slug': ('name',)}
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
@@ -24,6 +25,7 @@ class TownAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'slug', 'trainer_count',
     )
+    prepopulated_fields = {'slug': ('name',)}
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
@@ -38,6 +40,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'slug', 'trainer_count',
     )
+    prepopulated_fields = {'slug': ('name',)}
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
@@ -47,7 +50,7 @@ class TeamAdmin(admin.ModelAdmin):
 
 class TrainerAdmin(admin.ModelAdmin):
     fields = (
-        'nickname', 'team', 'legit', 'recruited', 'retired', 'level', 'towns',
+        'nickname', 'team', 'level', 'towns', 'legit', 'recruited', 'retired',
     )
     list_display = (
         'nickname', 'team', 'legit', 'recruited', 'retired', 'level', 'created',

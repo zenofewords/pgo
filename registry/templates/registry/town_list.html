@@ -4,13 +4,13 @@
 
 
 {% block title %}
-    {{ block.super }} - Teams
+    {{ block.super }} - Towns
 {% endblock title %}
 
 {% block content %}
     <table class="table table-striped">
         <thead>
-            <th>Team</th>
+            <th>Town</th>
             <th>Trainer count</th>
         </thead>
         <tbody>
@@ -18,13 +18,11 @@
                 <tr>
                     <td width="50%">
                         <a href="#">
-                            <img src="{{ object.slug|team_logo_url }}" alt="team {{ object.slug }} logo" width="50px" height="50px" />
+                            {{ object.name }}
                         </a>
                     </td>
                     <td width="50%">
-                        <h4>
-                            {{ object.trainer_count }}
-                        </h4>
+                        {{ object.trainer_count }}
                     </td>
                 </tr>
             {% endfor %}

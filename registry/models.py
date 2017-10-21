@@ -73,8 +73,8 @@ class Trainer(DefaultModelMixin):
     nickname = CICharField(max_length=15, blank=False, null=False, unique=True,
         validators=[RegexValidator(r'^[0-9a-zA-Z]{4,}$', TRAINER_NAME_VALIDATION_ERROR)])
     level = models.PositiveIntegerField(blank=True, null=True,
-        validators=[MinValueValidator(20), MaxValueValidator(40)],
-        help_text='Level 20 is the minimum level required to be included in the registry.')
+        validators=[MaxValueValidator(40)], default=0,
+        help_text='Defaults to 0 if not set.')
     team = models.ForeignKey('registry.team',
         help_text='Select \"Harmony\" if the trainer has never chosen a team.')
     legit = models.BooleanField(default=True,

@@ -34,7 +34,8 @@ class Command(BaseCommand):
                 cc_move.power, base_attack, self._get_stab(stab[1]))
 
             cycle_dps = calculate_weave_damage(qk_move, cc_move)
-            weave_damage[level] = cycle_dps * 100
+
+            weave_damage[level] = cycle_dps[0] * 100
         return weave_damage
 
     def _get_base_attack(self, attack, level):

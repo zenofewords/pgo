@@ -22,10 +22,12 @@ from pgo.utils import (
     SUPER_EFFECTIVE_SCALAR,
     NOT_VERY_EFFECTIVE_SCALAR,
     NEUTRAL_SCALAR,
+    IMMUNE,
 )
 TYPE_EFFECTIVNESS = {
     'Super effective': SUPER_EFFECTIVE_SCALAR,
     'Not very effective': NOT_VERY_EFFECTIVE_SCALAR,
+    'Immune': IMMUNE,
     'Neutral': NEUTRAL_SCALAR,
 }
 TYPE_IMPORT_ORDER = (
@@ -77,6 +79,7 @@ class Command(BaseCommand):
 
     def get_or_create_type_advantage(self, first_type, second_type, effectivness):
         relation = '{0}:{1}'.format(first_type.slug, second_type.slug)
+
         obj, created = TypeEffectivness.objects.get_or_create(
             relation=relation,
             defaults={
@@ -85,6 +88,8 @@ class Command(BaseCommand):
                 'effectivness': effectivness,
             }
         )
+        obj.effectivness = effectivness
+        obj.save()
 
     def get_or_create_pokemon(self, number):
         obj, created = Pokemon.objects.get_or_create(number=number)
@@ -117,6 +122,7 @@ class Command(BaseCommand):
 
     def _process_type_advantages(self, type_and_scalar_data):
         for first_type_slug, type_data_and_scalars in type_and_scalar_data.items():
+
             first_type = Type.objects.get(slug=first_type_slug)
 
             for data in type_data_and_scalars:
@@ -126,7 +132,7 @@ class Command(BaseCommand):
                         TypeEffectivnessScalar.objects.get(scalar=scalar))
 
     def _process_pokemon(self, pokemon_data):
-        existing_movesets = Moveset.objects.all()
+        # existing_movesets = Moveset.objects.all()
         new_movesets = []
 
         for pokemon_number, data in pokemon_data.items():
@@ -225,12 +231,15 @@ class Command(BaseCommand):
         types = Type.objects.all()
         se = TypeEffectivnessScalar.objects.get(slug='super-effective').scalar
         nve = TypeEffectivnessScalar.objects.get(slug='not-very-effective').scalar
+        imn = TypeEffectivnessScalar.objects.get(slug='immune').scalar
 
         for _type in types:
             type_offense_strong = []
             type_offense_feeble = []
+            type_offense_puny = []
             type_defense_resistant = []
             type_defense_weak = []
+            type_defense_immune = []
 
             for type_e in _type.type_offense.all():
                 scalar = type_e.effectivness.scalar
@@ -238,24 +247,30 @@ class Command(BaseCommand):
                     type_offense_strong.append((type_e.type_defense, scalar))
                 if scalar == nve:
                     type_offense_feeble.append((type_e.type_defense, scalar))
+                if scalar == imn:
+                    type_offense_puny.append((type_e.type_defense, scalar))
             for type_e in _type.type_defense.all():
                 scalar = type_e.effectivness.scalar
                 if scalar == nve:
-                    type_defense_resistant.append(
-                        (type_e.type_offense, scalar))
+                    type_defense_resistant.append((type_e.type_offense, scalar))
                 if scalar == se:
-                    type_defense_weak.append(
-                        (type_e.type_offense, scalar))
+                    type_defense_weak.append((type_e.type_offense, scalar))
+                if scalar == imn:
+                    type_defense_immune.append((type_e.type_offense, scalar))
 
             type_offense_strong.sort(key=lambda x: x[0].name)
             type_offense_feeble.sort(key=lambda x: x[0].name)
             type_defense_resistant.sort(key=lambda x: x[0].name)
             type_defense_weak.sort(key=lambda x: x[0].name)
+            type_offense_puny.sort(key=lambda x: x[0].name)
+            type_defense_immune.sort(key=lambda x: x[0].name)
 
             _type.strong = [(x[0].name, float(x[1])) for x in type_offense_strong]
             _type.feeble = [(x[0].name, float(x[1])) for x in type_offense_feeble]
+            _type.puny = [(x[0].name, float(x[1])) for x in type_offense_puny]
             _type.resistant = [(x[0].name, float(x[1])) for x in type_defense_resistant]
             _type.weak = [(x[0].name, float(x[1])) for x in type_defense_weak]
+            _type.immune = [(x[0].name, float(x[1])) for x in type_defense_immune]
             _type.save()
 
     def _next(self, csv_object, slice_start=None, slice_end=None):
@@ -284,15 +299,19 @@ class Command(BaseCommand):
                 if 'cp_multiplier' in row[0]:
                     cpm_data.append(Decimal(row[0].strip()[15:]))
 
-                if 'template_id: "POKEMON_TYPE' in row[0]:
-                    key = slugify(row[0][29:].replace('"', ''))
+                if 'templateId": "POKEMON_TYPE' in row[0]:
+                    key = slugify(row[0][32:].replace('"', ''))
                     type_data[key] = ''
                     self._next(csv_object)
 
                     type_data_scalars = []
+                    effectivness_array = self._next(csv_object, 23).replace(']', '').split(',', 18)
+
                     for n in range(1, 19):
+                        effectivness_scalar = effectivness_array[n - 1]
+
                         type_data_scalars.append(
-                            {TYPE_IMPORT_ORDER[n - 1]: self._next(csv_object, 19)})
+                            {TYPE_IMPORT_ORDER[n - 1]: effectivness_scalar})
                     type_data[key] = type_data_scalars
 
                 if 'template_id: "V' in row[0]:
@@ -388,8 +407,8 @@ class Command(BaseCommand):
                                 'energy_delta': self._next(csv_object, 17)})
                         move_data[move_slug] = data
 
-        self._process_pokemon(pokemon_data)
+        # self._process_pokemon(pokemon_data)
         self._process_type_advantages(type_data)
-        self._process_cpm(cpm_data)
-        self._process_moves(move_data)
+        # self._process_cpm(cpm_data)
+        # self._process_moves(move_data)
         self._map_type_effectivness()

@@ -20,6 +20,9 @@ class PokemonAdmin(admin.ModelAdmin):
         'number', 'name', 'primary_type', 'secondary_type', 'pgo_stamina',
         'pgo_attack', 'pgo_defense', 'maximum_cp',
     )
+    search_fields = (
+        'number', 'name',
+    )
 
 
 admin.site.register(CPM)

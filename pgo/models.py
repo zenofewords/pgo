@@ -56,8 +56,10 @@ class Pokemon(DefaultModelMixin, NameMixin):
 class Type(DefaultModelMixin, NameMixin, OrderMixin):
     strong = JSONField(blank=True, null=True)
     feeble = JSONField(blank=True, null=True)
+    puny = JSONField(blank=True, null=True)
     resistant = JSONField(blank=True, null=True)
     weak = JSONField(blank=True, null=True)
+    immune = JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ('slug',)

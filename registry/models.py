@@ -75,8 +75,7 @@ class Trainer(DefaultModelMixin):
     level = models.PositiveIntegerField(blank=True, null=True,
         validators=[MaxValueValidator(40)], default=0,
         help_text='Defaults to 0 if not set.')
-    team = models.ForeignKey('registry.team',
-        help_text='Select \"Harmony\" if the trainer has never chosen a team.')
+    team = models.ForeignKey('registry.team')
     legit = models.BooleanField(default=True,
         help_text='Will never be shown publicly, untick only for confirmed spoofers/botters.')
     recruited = models.BooleanField(default=False,

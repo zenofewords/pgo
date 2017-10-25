@@ -15,6 +15,12 @@ from pgo.models import (
 )
 
 
+class MoveAdmin(admin.ModelAdmin):
+    search_fields = (
+        'name',
+    )
+
+
 class PokemonAdmin(admin.ModelAdmin):
     list_display = (
         'number', 'name', 'primary_type', 'secondary_type', 'pgo_stamina',
@@ -26,7 +32,7 @@ class PokemonAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CPM)
-admin.site.register(Move)
+admin.site.register(Move, MoveAdmin)
 admin.site.register(Moveset)
 admin.site.register(Pokemon, PokemonAdmin)
 admin.site.register(RaidBoss)

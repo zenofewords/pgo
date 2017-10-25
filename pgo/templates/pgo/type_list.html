@@ -9,37 +9,49 @@
     <table class="table table-striped">
         <thead>
             <th rowspan="2">&nbsp;</th>
-            <th colspan="2" class="text-center">Offense</th>
-            <th colspan="2" class="text-center">Defense</th>
+            <th colspan="3" class="text-center">Offense</th>
+            <th colspan="3" class="text-center">Defense</th>
         </thead>
         <thead>
             <th>Type</th>
             <th>Strong</th>
             <th>Feeble</th>
+            <th>Puny</th>
+            <th>Immune</th>
             <th>Resistant</th>
             <th>Weak</th>
         </thead>
         {% for object in object_list %}
             <tr>
-                <td width="8%">
+                <td width="4%">
                     {{ object }}
                 </td>
-                <td width="23%">
+                <td width="16%">
                     {% for strong in object.strong %}
                         {{ strong.0 }}
                     {% endfor %}
                 </td>
-                <td width="23%">
+                <td width="16%">
                     {% for feeble in object.feeble %}
                         {{ feeble.0 }}
                     {% endfor %}
                 </td>
-                <td width="23%">
+                <td width="16%">
+                    {% for puny in object.puny %}
+                        {{ puny.0 }}
+                    {% endfor %}
+                </td>
+                <td width="16%">
+                    {% for immune in object.immune %}
+                        {{ immune.0 }}
+                    {% endfor %}
+                </td>
+                <td width="16%">
                     {% for resistant in object.resistant %}
                         {{ resistant.0 }}
                     {% endfor %}
                 </td>
-                <td width="23%">
+                <td width="16%">
                     {% for weak in object.weak %}
                         {{ weak.0 }}
                     {% endfor %}

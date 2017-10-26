@@ -2,9 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.postgres.fields import CICharField
-from django.core.validators import (
-    MinValueValidator, MaxValueValidator, RegexValidator,
-)
+from django.core.validators import MaxValueValidator, RegexValidator
 from django.db import models
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
@@ -33,6 +31,7 @@ class StatMixin(DefaultModelMixin, NameMixin):
 
     class Meta:
         abstract = True
+        ordering = ('-trainer_count',)
 
 
 class Country(StatMixin):
@@ -64,9 +63,6 @@ class Team(StatMixin):
 
     def __unicode__(self):
         return '{0}'.format(self.name)
-
-    class Meta:
-        ordering = ('slug',)
 
 
 class Trainer(DefaultModelMixin):

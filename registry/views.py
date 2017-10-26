@@ -10,6 +10,7 @@ from registry.models import (
 
 class TrainerListView(ListView):
     model = Trainer
+    paginate_by = 200
 
     def get(self, request, *args, **kwargs):
         self.trainer_nickname = request.GET.get('trainer_nickname')

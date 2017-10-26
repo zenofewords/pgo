@@ -11,7 +11,6 @@
     <h4>
         There are {{ total_trainer_count }} trainers listed in the registry.
     </h4>
-    <br>
     <div class="row">
         <form id="trainer-filter-form">
             <div class="col-xs-12 col-sm-12">
@@ -29,6 +28,7 @@
         </form>
     </div>
     <hr>
+    {% include 'zenofewords/includes/pagination.html' %}
     <table class="table table-striped">
         <thead>
             <th width="10%">
@@ -40,7 +40,7 @@
                 </a>
             </th>
             <th width="10%">
-                <a href="{% url 'registry:trainers' %}?sort_key={% if sort_key == 'level' %}-{% endif %}level">
+                <a href="{% url 'registry:trainers' %}?sort_key={% if sort_key == 'nickname' or sort_key == 'level' %}-{% endif %}level">
                     Level
                 </a>
             </th>

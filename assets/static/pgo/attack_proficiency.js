@@ -416,8 +416,6 @@ $(document).ready(function(){
             wrapperTd.append(detailsTable)
         }
         rowToAppend.after(wrapper)
-        $('.inner-table').after(
-            $('<span>* powering pokemon over level 39 is currently not possible<span>'))
         wrapper.show()
     }
 

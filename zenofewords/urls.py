@@ -4,8 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from pgo.api.urls import pgo_api_urls
-
-from zenofewords.views import HomeView
+from pgo.views import AttackProficiencyView
 
 
 urlpatterns = [
@@ -20,7 +19,8 @@ urlpatterns = [
     url(r'^registry/', include('registry.urls', namespace='registry')),
     url(r'^book/', include('book.urls', namespace='book')),
     url(r'^tcg/', include('tcg.urls', namespace='tcg')),
-    url(r'^$', HomeView.as_view(), name='home'),
+
+    url(r'^$', AttackProficiencyView.as_view(), name='pgo:attack-proficiency'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

@@ -196,6 +196,7 @@ class Command(BaseCommand):
                         pokemon=pokemon,
                         key='{} - {}'.format(quick_move, cinematic_move)
                     ))
+
             pokemon.save()
 
         # do not mark legacy movesets
@@ -216,15 +217,15 @@ class Command(BaseCommand):
                     move.move_type_id = \
                         self.get_or_create_type(detail['move_type']).id
                 if 'power' in detail:
-                    move.power = detail['power']
+                    move.power = Decimal(detail['power'])
                 if 'duration' in detail:
-                    move.duration = detail['duration']
+                    move.duration = int(detail['duration'])
                 if 'damage_window_start' in detail:
-                    move.damage_window_start = detail['damage_window_start']
+                    move.damage_window_start = int(detail['damage_window_start'])
                 if 'damage_window_end' in detail:
-                    move.damage_window_end = detail['damage_window_end']
+                    move.damage_window_end = int(detail['damage_window_end'])
                 if 'energy_delta' in detail:
-                    move.energy_delta = detail['energy_delta']
+                    move.energy_delta = int(detail['energy_delta'])
             move.save()
 
     def _map_type_effectivness(self):
@@ -280,7 +281,7 @@ class Command(BaseCommand):
         parser.add_argument('path', nargs='?', type=str)
 
     def handle(self, *args, **options):
-        path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/resources/master671.csv')
+        path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/resources/master201801.csv')
         file_path = options.get('path') if options.get('path') else path
 
         Type.objects.get_or_create(slug='dark', defaults={'name': 'Dark'})
@@ -314,21 +315,44 @@ class Command(BaseCommand):
                             {TYPE_IMPORT_ORDER[n - 1]: effectivness_scalar})
                     type_data[key] = type_data_scalars
 
-                if 'template_id: "V' in row[0]:
-                    template_id = '#{0}'.format(row[0][18:21])
+                if 'templateId": "V' in row[0]:
+                    # [
+                    #     {u'slug': u'bulbasaur'},
+                    #     {u'pokemon_types': ('GRASS', 'POISON')},
+                    #     {u'stats': (
+                    #         {u'stamina': '90'}, {u'attack': '118'}, {u'defense': '118'}
+                    #     )},
+                    #     {u'moves':
+                    #         {u'quick': ['VINE_WHIP', 'TACKLE'],
+                    #          u'cinematic': ['SLUDGE_BOMB', 'SEED_BOMB', 'POWER_WHIP']
+                    #         }
+                    #     }
+                    # ]
 
-                    if 'pokemon_settings' in self._next(csv_object):
+                    # [
+                    #     {u'category': u'CC'},
+                    #     {u'move_type': u'normal'},
+                    #     {u'power': '60'},
+                    #     {u'duration': '2900'},
+                    #     {u'damage_window_start': '2050'},
+                    #     {u'damage_window_end': '2700'},
+                    #     {u'energy_delta': '-33'}
+                    # ]
+                    template_id = '#{0}'.format(row[0][21:24])
+
+                    if 'pokemonSettings' in self._next(csv_object):
                         # name
                         data = []
                         data.append({'slug': slugify(
-                            self._next(csv_object, 15).replace('_', '-')
+                            self._next(csv_object, 16).replace('_', '-')
                         )})
+
                         self._next(csv_object)
                         # types
                         data.append({
                             'pokemon_types': (
-                                self._next(csv_object, 23),
-                                self._next(csv_object, 25)
+                                self._next(csv_object, 28).replace('",', ''),
+                                self._next(csv_object, 29).replace('",', '')
                             )
                         })
 
@@ -337,9 +361,9 @@ class Command(BaseCommand):
                         # stats
                         data.append({
                             'stats': (
-                                {'stamina': self._next(csv_object, 20)},
-                                {'attack': self._next(csv_object, 19)},
-                                {'defense': self._next(csv_object, 20)}
+                                {'stamina': self._next(csv_object, 23).replace(',', '')},
+                                {'attack': self._next(csv_object, 22).replace(',', '')},
+                                {'defense': self._next(csv_object, 23).replace(',', '')}
                             )
                         })
                         self._next(csv_object)
@@ -349,11 +373,16 @@ class Command(BaseCommand):
                         cinematic = []
                         next_line = self._next(csv_object)
 
-                        while 'moves' in next_line:
-                            if 'quick_moves' in next_line:
-                                quick.append(next_line[13:-5])
-                            if 'cinematic_moves' in next_line:
-                                cinematic.append(next_line[17:])
+                        while 'moves' in next_line.lower():
+                            if 'quickMoves' in next_line:
+                                quick_moves = next_line[16:-2].split(',')
+                                for qm in quick_moves:
+                                    if 'fast' in qm.lower():
+                                        quick.append(qm.replace('"', '')[:-5])
+                            if 'cinematicMoves' in next_line:
+                                charge_moves = next_line[19:-2].split(',')
+                                for cm in charge_moves:
+                                    cinematic.append(cm.replace('"', ''))
                             next_line = self._next(csv_object)
 
                         moves = {
@@ -385,30 +414,30 @@ class Command(BaseCommand):
                         data.append({'category': category})
                         # move type
                         data.append(
-                            {'move_type': slugify(self._next(csv_object, 31))})
+                            {'move_type': slugify(self._next(csv_object, 35))})
                         # power
 
-                        if move_slug not in ['transform', 'splash']:
-                            data.append({'power': self._next(csv_object, 11)})
+                        if move_slug not in ['transform', 'splash', 'yawn']:
+                            data.append({'power': self._next(csv_object, 15).replace(',', '')})
 
-                        while 'vfx_name' not in self._next(csv_object):
+                        while 'vfxName' not in self._next(csv_object):
                             pass
 
                         # durations & delta
                         data.append({
-                            'duration': self._next(csv_object, 16)})
+                            'duration': self._next(csv_object, 20).replace(',', '')})
                         data.append({
-                            'damage_window_start': self._next(csv_object, 27)})
+                            'damage_window_start': self._next(csv_object, 29).replace(',', '')})
                         data.append({
-                            'damage_window_end': self._next(csv_object, 25)})
+                            'damage_window_end': self._next(csv_object, 27).replace(',', '')})
 
                         if move_slug not in ['transform', 'struggle']:
                             data.append({
-                                'energy_delta': self._next(csv_object, 17)})
+                                'energy_delta': self._next(csv_object, 21).replace(',', '')})
                         move_data[move_slug] = data
 
-        # self._process_pokemon(pokemon_data)
-        self._process_type_advantages(type_data)
+        # self._process_type_advantages(type_data)
         # self._process_cpm(cpm_data)
-        # self._process_moves(move_data)
-        self._map_type_effectivness()
+        # self._map_type_effectivness()
+        self._process_moves(move_data)
+        self._process_pokemon(pokemon_data)

@@ -7,6 +7,7 @@ NOT_VERY_EFFECTIVE_SCALAR = 0.714
 IMMUNE = 0.51
 NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
+WEATHER_BOOST_SCALAR = 1.2
 TIMEOUT = 99000
 
 
@@ -57,13 +58,16 @@ def calculate_weave_damage(qk_move, cc_move, health=0):
     return cycle_dps, health / cycle_dps
 
 
-def calculate_dph(power, attack_multiplier, stab, effectivness=1.0):
+def calculate_dph(power, attack_multiplier, stab, weather_boost, effectivness=1.0):
 
     def _get_stab(stab):
         return STAB_SCALAR if stab else NEUTRAL_SCALAR
 
+    def _get_weather_boost(weather_boost):
+        return WEATHER_BOOST_SCALAR if weather_boost else NEUTRAL_SCALAR
+
     return int(floor(0.5 * power * float(attack_multiplier) *
-        _get_stab(stab) * float(effectivness)) + 1)
+        _get_stab(stab) * float(effectivness) * _get_weather_boost(weather_boost))) + 1
 
 
 def calculate_health(total_stamina, cpm):

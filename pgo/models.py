@@ -186,3 +186,15 @@ class RaidBoss(models.Model):
         verbose_name = 'Raid Boss'
         verbose_name_plural = 'Raid Bosses'
         ordering = ('-raid_tier__tier', 'pokemon__name')
+
+
+class WeatherCondition(DefaultModelMixin, NameMixin):
+    types_boosted = models.ManyToManyField('pgo.Type', verbose_name='Boosts Type')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Weather Condition'
+        verbose_name_plural = 'Weather Conditions'
+        ordering = ('slug',)

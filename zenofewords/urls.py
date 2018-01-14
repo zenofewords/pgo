@@ -20,8 +20,7 @@ urlpatterns = [
     url(r'^book/', include('book.urls', namespace='book')),
     url(r'^tcg/', include('tcg.urls', namespace='tcg')),
 
-    url(r'^$', AttackProficiencyView.as_view(), name='pgo:attack-proficiency'),
-
+    url(r'^$', AttackProficiencyView.as_view(), name='attack-proficiency'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

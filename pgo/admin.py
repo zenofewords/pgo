@@ -12,6 +12,7 @@ from pgo.models import (
     Type,
     TypeEffectivness,
     TypeEffectivnessScalar,
+    WeatherCondition,
 )
 
 
@@ -40,3 +41,4 @@ admin.site.register(RaidTier)
 admin.site.register(Type)
 admin.site.register(TypeEffectivness)
 admin.site.register(TypeEffectivnessScalar)
+admin.site.register(WeatherCondition)

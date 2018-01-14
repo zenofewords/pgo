@@ -7,7 +7,7 @@ from django.views.generic import (
 )
 
 from pgo.models import (
-    Pokemon, Move, Moveset, Type, DEFAULT_ORDER
+    Pokemon, Move, Moveset, Type, WeatherCondition, DEFAULT_ORDER
 )
 
 
@@ -168,6 +168,10 @@ class AttackProficiencyView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AttackProficiencyView, self).get_context_data(**kwargs)
 
-        context['pokemon_data'] = Pokemon.objects.values_list(
-            'id', 'name', 'pgo_attack', 'pgo_defense')
+        data = {
+            'pokemon_data': Pokemon.objects.values_list('id', 'name', 'pgo_attack', 'pgo_defense'),
+            'attack_iv_range': list(xrange(15, -1, -1)),
+            'weather_conditions': WeatherCondition.objects.values_list('id', 'name'),
+        }
+        context.update(data)
         return context

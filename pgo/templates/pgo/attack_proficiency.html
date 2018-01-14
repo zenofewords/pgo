@@ -9,7 +9,7 @@
 <div class="attack-pro-wrapper row">
     <div class="attack-pro-form-wrapper col-md-4">
         <form id="attack-pro-form">
-            <select id="attacker" class="attack-pro-select" tabindex="1">
+            <select id="attacker" class="attack-pro-select" autofocus tabindex="1">
                 <option value="-1" disabled selected>Select attacker</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
@@ -17,12 +17,12 @@
             </select>
             <br>
 
-            <select id="quick_move" class="attack-pro-select" tabindex="2" disabled>
+            <select id="quick_move" class="attack-pro-select-move" tabindex="2" disabled>
                 <option value="-1" disabled selected>Quick move</option>
             </select>
             <br>
 
-            <select id="cinematic_move" class="attack-pro-select" tabindex="3" disabled>
+            <select id="cinematic_move" class="attack-pro-select-move" tabindex="3" disabled>
                 <option value="-1" disabled selected>Cinematic move</option>
             </select>
 
@@ -31,7 +31,11 @@
                     <input type="number" id="attacker_lvl" class="attack-pro-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" tabindex="4">
                 </div>
                 <div class="col-xs-4">
-                    <input type="number" id="attack_iv" class="attack-pro-input iv-input form-control" name="attack_iv" placeholder="ATK IV" min="0" max="15" step="1" tabindex="5">
+                    <select id="attack_iv" class="attack-pro-select-atk-iv form-control" tabindex="5">
+                        {% for n in attack_iv_range %}
+                            <option value="{{ n }}">{{ n }} ATK</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="col-xs-2">
                     <a href="#" id="help_button" class="btn btn-info help-button">?</a>
@@ -44,23 +48,29 @@
                 </div>
             </div>
 
-            <div class="row raid-boss-input-wrapper">
+            <div class="row">
                 <div class="col-xs-12 raid-boss-check-wrapper">
-                    <input type="checkbox" id="raid_boss_check" name="raid_boss_check" tabindex="6" checked>
-                    <label for="raid_boss_check" class="label label-info raid-boss-text">Raid</label>
+                    <select id="weather_condition" class="attack-pro-select-weather" tabindex="6">
+                        <option value="0" selected>Weather (None)</option>
+                        {% for weather_id, weather_name in weather_conditions %}
+                            <option value="{{ weather_id }}">{{ weather_name }}</option>
+                        {% endfor %}
+                    </select>
 
-                    <input type="radio" class="raid_tier_radio" id="tier_2_radio" name="raid_tier_group" tabindex="7">
-                    <label for="tier_2_radio" class="boss-tier-radio">T2</label>
-                    <input type="radio" class="raid_tier_radio" id="tier_3_radio" name="raid_tier_group" tabindex="7">
-                    <label for="tier_3_radio" class="boss-tier-radio">T3</label>
-                    <input type="radio" class="raid_tier_radio" id="tier_4_radio" name="raid_tier_group" checked tabindex="7">
-                    <label for="tier_4_radio" class="boss-tier-radio">T4</label>
-                    <input type="radio" class="raid_tier_radio" id="tier_5_radio" name="raid_tier_group" checked tabindex="7">
-                    <label for="tier_5_radio" class="boss-tier-radio">T5</label>
+                    <input type="checkbox" id="raid_boss_check" name="raid_boss_check" hidden checked>
+                    <input type="button" id="raid_toggle_button" name="raid_toggle_button" class="btn-sm btn-success raid-toggle-button" value="Raid" tabindex="7">
+
+                    <select id="raid_tier" class="attack-pro-select-raid-tier" tabindex="8">
+                        <option value="5">T5</option>
+                        <option value="4">T4</option>
+                        <option value="3">T3</option>
+                        <option value="2">T2</option>
+                        <option value="1">T1</option>
+                    </select>
                 </div>
             </div>
 
-            <select id="defender" class="attack-pro-select" tabindex="8">
+            <select id="defender" class="attack-pro-select" tabindex="9">
                 <option value="-1" disabled selected>Select defender</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
@@ -77,7 +87,7 @@
             </div>
             <br>
 
-            <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" tabindex="9">
+            <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" tabindex="10">
             <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
         </form>
     </div>
@@ -113,14 +123,18 @@
     </div>
 </div>
 
-<div class="disclaimer row">
-    <div class="col-md-12 well" style="margin:0 13px 7px 13px;">
-        Moving to a smaller server done. Updated for gen III. Next up, weather boosts.
-        Thank you for your support and patience.
+<div class="shoutbox row">
+    <div class="col-md-12 changelog">
+        <hr>
+        Recent changes:
+        <ul>
+            <li>1/14/2018 added weather boosts</li>
+            <li>1/14/2018 redesigned the UI slightly</li>
+            <li>1/12/2018 updated for gen III</li>
+            <li>1/12/2018 moved to a smaller server</li>
+        </ul>
+        Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords">reddit</a>.
     </div>
-    <p class="col-sm-12">
-        For complex battle simulations, and much more, check out <a href="https://www.pokebattler.com/" target="_blank">Pokebattler</a>.
-    </p>
 </div>
 {% endblock content %}
 

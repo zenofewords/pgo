@@ -1,7 +1,26 @@
 $(document).ready(function(){
     $('.attack-pro-select').select2({
-        'dropdownAutoWidth': false,
-        'width': 250
+        dropdownAutoWidth: false,
+        width: 250
+    })
+    $('.attack-pro-select-move').select2({
+        minimumResultsForSearch: -1,
+        dropdownAutoWidth: false,
+        width: 250
+    })
+    $('.attack-pro-select-atk-iv').select2({
+        minimumResultsForSearch: -1,
+        dropdownAutoWidth: false,
+        width: 80
+    })
+    $('.attack-pro-select-raid-tier').select2({
+        minimumResultsForSearch: -1,
+        dropdownAutoWidth: false,
+        width: 55
+    })
+    $('.attack-pro-select-weather').select2({
+        dropdownAutoWidth: false,
+        width: 128
     })
     // maintain tab index order
     $('select').on('select2:close', function() {
@@ -10,23 +29,24 @@ $(document).ready(function(){
     var csrfToken = $('#csrf_token').val()
     var quickMoveSelect = $('#quick_move')
     var cinematicMoveSelect = $('#cinematic_move')
+    var attackIvSelect = $('#attack_iv')
     var defenderSelect = $('#defender')
+    var weatherConditionSelect = $('#weather_condition')
     var defenderLevelInput = $('#defender_lvl')
     var defenseIVInput = $('#defense_iv')
     var submitButton = $('#submit')
     var helpButton = $('#help_button')
     var formData = {
+        attackIv: attackIvSelect.val(),
         defenderLevel: defenderLevelInput.val(),
         defenseIV: defenseIVInput.val(),
-        raidTier: 5
+        raidTier: 5,
+        weatherCondition: 0
     }
     var tableBody = $('#attack-proficiency-stats').find('tbody')
+    var raidToggleButton = $('#raid_toggle_button')
     var raidBossCheck = $('#raid_boss_check')
-    var raidTier1 = $('#tier_1_radio')
-    var raidTier2 = $('#tier_2_radio')
-    var raidTier3 = $('#tier_3_radio')
-    var raidTier4 = $('#tier_4_radio')
-    var raidTier5 = $('#tier_5_radio')
+    var raidTierSelect = $('#raid_tier')
     var raidTier = 5
     var dirty = false
 
@@ -45,8 +65,11 @@ $(document).ready(function(){
     $('#attacker_lvl').on('change', function() {
         setValidLevel(this, 'attackerLevel')
     })
-    $('#attack_iv').on('change keyup', function() {
-        setValidIV(this, 'attackIV')
+    attackIvSelect.on('change', function() {
+        formData.attackIv = this.value
+    })
+    weatherConditionSelect.on('change', function() {
+        formData.weatherCondition = this.value
     })
     defenderLevelInput.on('change', function() {
         setValidLevel(this, 'defenderLevel')
@@ -54,7 +77,6 @@ $(document).ready(function(){
     defenseIVInput.on('change keyup', function() {
         setValidIV(this, 'defenseIV')
     })
-
     defenderSelect.change(function() {
         formData.defender = this.value
     })
@@ -66,54 +88,31 @@ $(document).ready(function(){
     })
 
     filterDefenderSelect(raidTier)
-    raidBossCheck.change(function() {
-        if (this.checked) {
-            filterDefenderSelect(raidTier)
-            $('.raid_tier_radio').prop('disabled', false)
-            formData.raidTier = raidTier
-        }
-        else {
+    raidToggleButton.on('click', function(event) {
+        event.preventDefault()
+
+        if (raidBossCheck.prop('checked')) {
+            raidBossCheck.prop('checked', false)
+            raidToggleButton.addClass('btn-default').removeClass('btn-success')
+
             filterDefenderSelect(0)
-            $('.raid_tier_radio').prop('disabled', true)
+            raidTierSelect.prop('disabled', true)
             formData.raidTier = 0
             formData.defender = undefined
         }
-    })
-    raidTier1.change(function() {
-        if (this.checked) {
-            raidTier = 1
+        else {
+            raidBossCheck.prop('checked', true)
+            raidToggleButton.addClass('btn-success').removeClass('btn-default')
+
+            filterDefenderSelect(raidTier)
+            raidTierSelect.prop('disabled', false)
             formData.raidTier = raidTier
         }
-        formData.defender = undefined
-        filterDefenderSelect(raidTier)
     })
-    raidTier2.change(function() {
-        if (this.checked) {
-            raidTier = 2
-            formData.raidTier = raidTier
-        }
-        formData.defender = undefined
-        filterDefenderSelect(raidTier)
-    })
-    raidTier3.change(function() {
-        if (this.checked) {
-            raidTier = 3
-            formData.raidTier = raidTier
-        }
-        formData.defender = undefined
-        filterDefenderSelect(raidTier)
-    })
-    raidTier4.change(function() {
-        if (this.checked) {
-            raidTier = 4
-            formData.raidTier = raidTier
-        }
-        formData.defender = undefined
-        filterDefenderSelect(raidTier)
-    })
-    raidTier5.change(function() {
-        if (this.checked) {
-            raidTier = 5
+
+    raidTierSelect.change(function() {
+        if (parseInt(this.value)) {
+            raidTier = this.value
             formData.raidTier = raidTier
         }
         formData.defender = undefined
@@ -268,11 +267,12 @@ $(document).ready(function(){
                 'quick_move': formData.quickMove,
                 'cinematic_move': formData.cinematicMove,
                 'attacker_lvl': formData.attackerLevel,
-                'attack_iv': formData.attackIV,
+                'attack_iv': formData.attackIv,
                 'defender': formData.defender,
                 'defender_lvl': formData.defenderLevel,
                 'defense_iv': formData.defenseIV,
                 'raid_tier': formData.raidTier,
+                'weather_condition': formData.weatherCondition,
                 'csrfmiddlewaretoken': csrfToken
             },
             success: function(json){
@@ -361,11 +361,12 @@ $(document).ready(function(){
                 'quick_move': formData.quickMove,
                 'cinematic_move': formData.cinematicMove,
                 'attacker_lvl': formData.attackerLevel,
-                'attack_iv': formData.attackIV,
+                'attack_iv': formData.attackIv,
                 'defender': formData.defender,
                 'defender_lvl': level,
                 'defense_iv': defenseIV,
                 'raid_tier': formData.raidTier,
+                'weather_condition': formData.weatherCondition,
                 'csrfmiddlewaretoken': csrfToken
             },
             success: function(json) {
@@ -420,10 +421,9 @@ $(document).ready(function(){
     }
 
     function displayFieldErrors(errorObject) {
-        for (error in errorObject) {
-            var selector = '#' + error
-            $(selector).addClass('error')
-            $(selector).next().addClass('error')
+        for (field in errorObject) {
+            $('#' + field).addClass('error')
+            $('#select2-' + field + '-container').addClass('error')
         }
     }
 

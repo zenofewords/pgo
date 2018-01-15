@@ -89,7 +89,6 @@ $(document).ready(function(){
 
     filterDefenderSelect(raidTier)
     raidToggleButton.on('click', function(event) {
-        event.preventDefault()
 
         if (raidBossCheck.prop('checked')) {
             raidBossCheck.prop('checked', false)
@@ -123,6 +122,12 @@ $(document).ready(function(){
         event.preventDefault()
 
         $('.help-text').toggle()
+    })
+
+    $('#toggle-changelog').on('click', function(event) {
+        event.preventDefault()
+
+        $('.changelog').toggle()
     })
 
     tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
@@ -453,7 +458,8 @@ $(document).ready(function(){
     }
 
     function validateLevel(input) {
-        var level = parseFloat(input.value)
+        var val = input.value.replace(',', '.')
+        var level = parseFloat(val)
 
         if (level < 0) {
             level *= - 1

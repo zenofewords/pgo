@@ -194,7 +194,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAdminUser',
     ],
-    'PAGE_SIZE': 251
+    'PAGE_SIZE': 400
 }
 
 DEFAULT_FROM_EMAIL = 'zen@dominikzen.com'

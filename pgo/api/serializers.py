@@ -54,6 +54,7 @@ class AttackProficiencySerializer(serializers.Serializer):
     defender_lvl = serializers.FloatField()
     defense_iv = serializers.IntegerField()
     raid_tier = serializers.IntegerField(required=False)
+    weather_condition = serializers.IntegerField(required=False)
 
 
 class AttackProficiencyStatsSerializer(serializers.Serializer):
@@ -62,3 +63,4 @@ class AttackProficiencyStatsSerializer(serializers.Serializer):
     cinematic_move = serializers.JSONField()
     defender = serializers.JSONField()
     raid_tier = serializers.IntegerField(required=False)
+    weather_condition = serializers.IntegerField(required=False)

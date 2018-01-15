@@ -17,7 +17,7 @@ from pgo.api.serializers import (
     SimpleMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
 )
 from pgo.models import (
-    CPM, Move, Pokemon, Type, TypeEffectivness, RaidBoss,
+    CPM, Move, Pokemon, Type, TypeEffectivness, RaidBoss, WeatherCondition,
 )
 from pgo.utils import (
     calculate_dph,
@@ -111,6 +111,11 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.boss_or_level = ('raid boss' if self.raid_tier > 0 else
             'level {:g}'.format(self.defender.level))
 
+        self.boosted_types = []
+        if data.get('weather_condition', 0) > 0:
+            weather_condition = WeatherCondition.objects.get(pk=data.get('weather_condition'))
+            self.boosted_types = list(weather_condition.types_boosted.values_list('pk', flat=True))
+
     def _get_pokemon(self, id):
         return Pokemon.objects.only('name', 'pgo_attack', 'pgo_stamina',
             'primary_type_id', 'secondary_type_id').get(pk=id)
@@ -158,7 +163,7 @@ class AttackProficiencyAPIView(GenericAPIView):
 
     def _get_max_damage_move(self, move):
         self._calculate_attack_multiplier()
-        self._set_move_damage(move, move.stab, move.effectivness)
+        self._set_move_damage(move)
         return move
 
     def _set_move_parameters(self):
@@ -170,12 +175,13 @@ class AttackProficiencyAPIView(GenericAPIView):
         self.cc_move.effectivness = self._get_effectivness(
             self.cc_move, self.defender)
 
+        self.qk_move.weather_boosted = self.qk_move.move_type_id in self.boosted_types
+        self.cc_move.weather_boosted = self.cc_move.move_type_id in self.boosted_types
+
     def _calculate_move_stats(self, attacker_cpm=None):
         self._calculate_attack_multiplier(attacker_cpm)
-        self._set_move_damage(
-            self.qk_move, self.qk_move.stab, self.qk_move.effectivness)
-        self._set_move_damage(
-            self.cc_move, self.cc_move.stab, self.cc_move.effectivness)
+        self._set_move_damage(self.qk_move)
+        self._set_move_damage(self.cc_move)
 
     def _calculate_attack_multiplier(self, attacker_cpm=None):
         if not attacker_cpm:
@@ -185,8 +191,8 @@ class AttackProficiencyAPIView(GenericAPIView):
             (self.attacker.pgo_attack + self.attacker.atk_iv) * attacker_cpm) / (
             (self.defender.pgo_defense + self.defender.defense_iv) * self.defender.cpm)
 
-    def _set_move_damage(self, move, stab, effectivness):
-        move.damage_per_hit = self._calculate_damage(move, stab, effectivness)
+    def _set_move_damage(self, move):
+        move.damage_per_hit = self._calculate_damage(move)
 
     def _get_effectivness(self, move, pokemon):
         secondary_type_effectivness = DEFAULT_EFFECTIVNESS
@@ -205,8 +211,9 @@ class AttackProficiencyAPIView(GenericAPIView):
             pokemon.secondary_type_id == move.move_type_id
         )
 
-    def _calculate_damage(self, move, stab, effectivness):
-        return calculate_dph(move.power, self.attack_multiplier, stab, effectivness)
+    def _calculate_damage(self, move):
+        return calculate_dph(
+            move.power, self.attack_multiplier, move.stab, move.weather_boosted, move.effectivness)
 
     def _assess_attack_iv(self, data):
         self._calculate_move_stats()
@@ -269,6 +276,11 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
         else:
             cpm_list = CPM.gyms.filter(level__in=DEFENDER_LEVEL_LIST)
 
+        self.boosted_types = []
+        if data.get('weather_condition', 0) > 0:
+            weather_condition = WeatherCondition.objects.get(pk=data.get('weather_condition'))
+            self.boosted_types = list(weather_condition.types_boosted.values_list('pk', flat=True))
+
         for cpm in cpm_list:
             stats.append({
                 '{:g}'.format(float(cpm.level)):
@@ -303,11 +315,11 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
 
     def _build_move_stats(self, attack_modifiers, move):
         current_dph = calculate_dph(
-            move['power'], attack_modifiers[0],
-            move['stab'], move['effectivness'])
+            move['power'], attack_modifiers[0], move['stab'],
+            move['weather_boosted'], move['effectivness'])
         max_dph = calculate_dph(
-            move['power'], attack_modifiers[1],
-            move['stab'], move['effectivness'])
+            move['power'], attack_modifiers[1], move['stab'],
+            move['weather_boosted'], move['effectivness'])
 
         if current_dph == max_dph:
             return '{}<br>'.format(current_dph)
@@ -351,8 +363,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
         for cpm in self.attacker.cpm_list:
             self._calculate_attack_multiplier(cpm['value'])
-            self._set_move_damage(
-                self.qk_move, self.qk_move.stab, self.qk_move.effectivness)
+            self._set_move_damage(self.qk_move)
 
             if current_qk_dph < self.qk_move.damage_per_hit:
                 self.qk_move_proficiency.append((self.qk_move.damage_per_hit,
@@ -367,8 +378,7 @@ class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
 
         for index, cpm in enumerate(self.attacker.cpm_list):
             self._calculate_attack_multiplier(cpm['value'])
-            self._set_move_damage(
-                self.cc_move, self.cc_move.stab, self.cc_move.effectivness)
+            self._set_move_damage(self.cc_move)
 
             # ensure to get the max cinematic move damage row, which might
             # otherwise get filtered out

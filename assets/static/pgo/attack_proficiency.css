@@ -85,7 +85,8 @@
     box-shadow:inset 0 0 0 .2rem #f00;
 }
 #select2-attacker-container, #select2-quick_move-container, #select2-cinematic_move-container,
-#select2-attack_iv-container, #select2-weather_condition-container, #select2-defender-container {
+#select2-attack_iv-container, #select2-weather_condition-container, #select2-defender_raid_boss-container,
+#select2-defender-container {
     margin-top: -0.1rem;
 }
 .raid-toggle-button {

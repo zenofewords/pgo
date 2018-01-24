@@ -31,6 +31,7 @@ $(document).ready(function(){
     var cinematicMoveSelect = $('#cinematic_move')
     var attackIvSelect = $('#attack_iv')
     var defenderSelect = $('#defender')
+    var defenderRaidBossSelect = $('#defender_raid_boss')
     var weatherConditionSelect = $('#weather_condition')
     var defenderLevelInput = $('#defender_lvl')
     var defenseIVInput = $('#defense_iv')
@@ -78,6 +79,9 @@ $(document).ready(function(){
         setValidIV(this, 'defenseIV')
     })
     defenderSelect.change(function() {
+        formData.defender = this.value
+    })
+    defenderRaidBossSelect.change(function() {
         formData.defender = this.value
     })
 
@@ -225,6 +229,9 @@ $(document).ready(function(){
 
     function filterDefenderSelect(value) {
         if (parseInt(value) > 0) {
+            defenderRaidBossSelect.parent().show()
+            defenderSelect.parent().hide()
+
             $.ajax({
                 url: window.pgoAPIURLs['defender-list'],
                 type: 'GET',
@@ -234,7 +241,7 @@ $(document).ready(function(){
                 success: function(json) {
                     clearDefenderSelect('raid boss (Tier ' + value + ')')
                     $.each(json.results, function(i, pokemon) {
-                        defenderSelect.append(
+                        defenderRaidBossSelect.append(
                             '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + ' DEF)</option>'
                         )
                     })
@@ -245,21 +252,9 @@ $(document).ready(function(){
             })
         }
         else {
-            $.ajax({
-                url: window.pgoAPIURLs['defender-list'],
-                type: 'GET',
-                success: function(json) {
-                    clearDefenderSelect('defender')
-                    $.each(json.results, function(i, pokemon) {
-                        defenderSelect.append(
-                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + ' DEF)</option>'
-                        )
-                    })
-                },
-                error: function(xhr, errmsg, err) {
-                    console.log('defender filter error', xhr)
-                }
-            })
+            defenderSelect.val('-1').trigger('change')
+            defenderSelect.parent().show()
+            defenderRaidBossSelect.parent().hide()
         }
     }
 
@@ -428,6 +423,10 @@ $(document).ready(function(){
     function displayFieldErrors(errorObject) {
         for (field in errorObject) {
             $('#' + field).addClass('error')
+
+            if (field === 'defender') {
+                $('#select2-defender_raid_boss-container').addClass('error')
+            }
             $('#select2-' + field + '-container').addClass('error')
         }
     }
@@ -451,8 +450,8 @@ $(document).ready(function(){
     }
 
     function clearDefenderSelect(text) {
-        defenderSelect.empty()
-        defenderSelect.append(
+        defenderRaidBossSelect.empty()
+        defenderRaidBossSelect.append(
             '<option value="-1" disabled selected>Select ' + text + ' </option>'
         )
     }

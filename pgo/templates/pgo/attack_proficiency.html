@@ -9,18 +9,16 @@
 <div class="attack-pro-wrapper row">
     <div class="attack-pro-form-wrapper col-md-4">
         <form id="attack-pro-form">
-            <select id="attacker" class="attack-pro-select" autofocus tabindex="1">
+            <select id="attacker" class="attack-pro-select" tabindex="1">
                 <option value="-1" disabled selected>Select attacker</option>
                 {% for data in pokemon_data %}
                     <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
                 {% endfor %}
             </select>
-            <br>
 
             <select id="quick_move" class="attack-pro-select-move" tabindex="2" disabled>
                 <option value="-1" disabled selected>Quick move</option>
             </select>
-            <br>
 
             <select id="cinematic_move" class="attack-pro-select-move" tabindex="3" disabled>
                 <option value="-1" disabled selected>Cinematic move</option>
@@ -70,12 +68,23 @@
                 </div>
             </div>
 
-            <select id="defender" class="attack-pro-select" tabindex="9">
-                <option value="-1" disabled selected>Select defender</option>
-                {% for data in pokemon_data %}
-                    <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
-                {% endfor %}
-            </select>
+            <div class="row">
+                <div class="col-xs-12">
+                    <select id="defender_raid_boss" class="attack-pro-select" tabindex="9">
+                    </select>
+                </div>
+            </div>
+
+            <div class="row" >
+                <div class="col-xs-12" hidden>
+                    <select id="defender" class="attack-pro-select" tabindex="9">
+                        <option value="-1" selected disabled>Select defender</option>
+                        {% for data in pokemon_data %}
+                            <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
             <div class="row attack-pro-input-wrapper hidden">
                 <div class="col-xs-8">
@@ -85,7 +94,6 @@
                     <input type="number" id="defense_iv" class="attack-pro-input" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
                 </div>
             </div>
-            <br>
 
             <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" tabindex="10">
             <input type="hidden" id="csrf_token" value="{{ csrf_token }}">

@@ -1,17 +1,17 @@
 $(document).ready(function(){
     $('.attack-pro-select').select2({
         dropdownAutoWidth: false,
-        width: 250
+        width: 280
     })
     $('.attack-pro-select-move').select2({
         minimumResultsForSearch: -1,
         dropdownAutoWidth: false,
-        width: 250
+        width: 280
     })
     $('.attack-pro-select-atk-iv').select2({
         minimumResultsForSearch: -1,
         dropdownAutoWidth: false,
-        width: 80
+        width: 90
     })
     $('.attack-pro-select-raid-tier').select2({
         minimumResultsForSearch: -1,
@@ -20,7 +20,7 @@ $(document).ready(function(){
     })
     $('.attack-pro-select-weather').select2({
         dropdownAutoWidth: false,
-        width: 128
+        width: 140
     })
     // maintain tab index order
     $('select').on('select2:close', function() {
@@ -93,6 +93,7 @@ $(document).ready(function(){
 
     filterDefenderSelect(raidTier)
     raidToggleButton.on('click', function(event) {
+        event.preventDefault()
 
         if (raidBossCheck.prop('checked')) {
             raidBossCheck.prop('checked', false)
@@ -339,6 +340,7 @@ $(document).ready(function(){
         $('.attack-proficiency-current').show()
         $('#summary').html(json.summary)
         $('#attack_iv_assessment').html(json.attack_iv_assessment)
+        $('#weather_boost').html(json.weather_boost)
 
         $('#attacker_quick_move').html(json.quick_move.name)
         $('#quick_attack_damage').html(json.quick_move.damage_per_hit)

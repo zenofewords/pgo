@@ -7,28 +7,40 @@
 
 {% block content %}
 <div class="attack-pro-wrapper row">
-    <div class="attack-pro-form-wrapper col-md-4">
+    <div class="attack-pro-form-wrapper col-md-5">
         <form id="attack-pro-form">
-            <select id="attacker" class="attack-pro-select" tabindex="1">
-                <option value="-1" disabled selected>Select attacker</option>
-                {% for data in pokemon_data %}
-                    <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
-                {% endfor %}
-            </select>
+            <div class="row">
+                <div class="col-xs-12">
+                    <select id="attacker" class="attack-pro-select" tabindex="1">
+                        <option value="-1" disabled selected>Select attacker</option>
+                        {% for data in pokemon_data %}
+                            <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
-            <select id="quick_move" class="attack-pro-select-move" tabindex="2" disabled>
-                <option value="-1" disabled selected>Quick move</option>
-            </select>
+            <div class="row">
+                <div class="col-xs-12">
+                    <select id="quick_move" class="attack-pro-select-move" tabindex="2" disabled>
+                        <option value="-1" disabled selected>Quick move</option>
+                    </select>
+                </div>
+            </div>
 
-            <select id="cinematic_move" class="attack-pro-select-move" tabindex="3" disabled>
-                <option value="-1" disabled selected>Cinematic move</option>
-            </select>
+            <div class="row">
+                <div class="col-xs-12">
+                    <select id="cinematic_move" class="attack-pro-select-move" tabindex="3" disabled>
+                        <option value="-1" disabled selected>Cinematic move</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="row attack-pro-input-wrapper">
                 <div class="col-xs-6">
                     <input type="number" id="attacker_lvl" class="attack-pro-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" tabindex="4">
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-4 attack-pro-atk-iv-wrapper">
                     <select id="attack_iv" class="attack-pro-select-atk-iv" tabindex="5">
                         {% for n in attack_iv_range %}
                             <option value="{{ n }}">{{ n }} ATK</option>
@@ -42,22 +54,28 @@
 
             <div class="row">
                 <div class="help-text col-xs-12">
-                    Don't know the level and ATK IV? You can find out at <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
+                    Don't know your pokemon's level and ATK IV? Find out at <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-xs-12 raid-boss-check-wrapper">
+            <div class="row raid-select-wrapper">
+                <div class="col-xs-6">
                     <select id="weather_condition" class="attack-pro-select-weather" tabindex="6">
                         <option value="0" selected>Weather (None)</option>
                         {% for weather_id, weather_name in weather_conditions %}
                             <option value="{{ weather_id }}">{{ weather_name }}</option>
                         {% endfor %}
                     </select>
+                </div>
 
+                <div class="col-xs-4 raid-toggle-wrapper">
                     <input type="checkbox" id="raid_boss_check" name="raid_boss_check" hidden checked>
-                    <input type="button" id="raid_toggle_button" name="raid_toggle_button" class="btn btn-success raid-toggle-button" value="Raid" tabindex="7">
+                    <button id="raid_toggle_button" name="raid_toggle_button" type="button" class="btn btn-success raid-toggle-button" tabindex="7">
+                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span> Raid
+                    </button>
+                </div>
 
+                <div class="col-xs-2 raid-tier-wrapper">
                     <select id="raid_tier" class="attack-pro-select-raid-tier" tabindex="8">
                         <option value="5">T5</option>
                         <option value="4">T4</option>
@@ -99,18 +117,19 @@
             <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
         </form>
     </div>
-    <div class="attack-proficiency-info col-md-8">
+    <div class="col-md-7 attack-proficiency-info">
         <div class="attack-proficiency-intro">
             <p>
-                The attack proficiency calculator was built to help find damage "breakpoints".
+                The attack proficiency calculator was built to help find damage breakpoints.
             </p>
             <p>
-                To begin, select your attacker and its attacks, enter its level and ATK IV and choose what you'll be attacking, then hit submit.
+                To begin, select your attacker and its attacks, enter the level and ATK IV, choose what you'll be attacking and hit submit.
             </p>
         </div>
         <div class="attack-proficiency-current">
             <p>
                 <span id="attack_iv_assessment"></span>
+                <span id="weather_boost"></span>
             </p>
             <p hidden>
                 <span id="attacker_quick_move"></span> would do
@@ -142,6 +161,12 @@
 
     <div class="col-md-12 changelog">
         <ul>
+            <li>1/25/2018</li>
+            <ul>
+                <li>made more UI tweaks (longer form fields look better on windows based OS)</li>
+                <li>added weather boost info for attacks</li>
+                <li>fixed the delay when switching from raid bosses to regular defenders</li>
+            </ul>
             <li>1/15/2018</li>
             <ul>
                 <li>fixed attacker level input not displaying placeholder and value on firefox (OSX)</li>

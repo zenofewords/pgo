@@ -11,16 +11,19 @@
     margin: 0.3rem;
 }
 .level-input {
-    width: 12.8rem;
+    width: 14rem;
     height: 2.8rem;
     padding: 0 0 0 .8rem;
 }
+.attack-pro-atk-iv-wrapper {
+    margin: 0 -1.6rem 0 1.5rem;
+}
 .attack-pro-button {
-    width: 25rem;
+    width: 28rem;
     margin: 0.3rem;
 }
 .attack-pro-form-wrapper {
-    margin: 0.2rem 0 1rem -.5rem;
+    margin: 0.2rem 0 1rem -.3rem;
 }
 .form-error {
     font-size: 2rem;
@@ -42,13 +45,13 @@
     padding: 1rem;
 }
 .help-button {
-    margin: .3rem 0 0 -0.1rem;
+    margin: .3rem 0 0 2.9rem;
     padding: .3rem 1rem;
 }
 .help-text {
     font-size: 1.2rem;
     padding: .2rem 2rem;
-    max-width: 30rem;
+    max-width: 32rem;
     display: none;
 }
 .shoutbox {
@@ -84,12 +87,23 @@
     border-radius: .3rem;
     box-shadow:inset 0 0 0 .2rem #f00;
 }
-#select2-attacker-container, #select2-quick_move-container, #select2-cinematic_move-container,
-#select2-attack_iv-container, #select2-weather_condition-container, #select2-defender_raid_boss-container,
-#select2-defender-container {
-    margin-top: -0.1rem;
+.raid-select-wrapper {
+    max-width: 27rem;
+}
+.raid-toggle-wrapper {
+    margin: 0 -3rem 0 2.2rem;
 }
 .raid-toggle-button {
-    margin: 0 .1rem;
-    padding: .3rem 1.1rem .3rem 1rem;
+    margin: .3rem -.4rem;
+    padding: .3rem .9rem .3rem .8rem;
+}
+.raid-tier-wrapper {
+    margin: 0 0 0 .8rem;
+}
+
+#select2-attacker-container, #select2-quick_move-container, #select2-cinematic_move-container,
+#select2-attack_iv-container, #select2-weather_condition-container,
+#select2-defender_raid_boss-container, #select2-raid_tier-container,
+#select2-defender-container {
+    margin-top: -0.1rem;
 }

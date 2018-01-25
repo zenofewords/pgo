@@ -1,17 +1,17 @@
 $(document).ready(function(){
     $('.attack-pro-select').select2({
         dropdownAutoWidth: false,
-        width: 250
+        width: 280
     })
     $('.attack-pro-select-move').select2({
         minimumResultsForSearch: -1,
         dropdownAutoWidth: false,
-        width: 250
+        width: 280
     })
     $('.attack-pro-select-atk-iv').select2({
         minimumResultsForSearch: -1,
         dropdownAutoWidth: false,
-        width: 80
+        width: 90
     })
     $('.attack-pro-select-raid-tier').select2({
         minimumResultsForSearch: -1,
@@ -20,7 +20,7 @@ $(document).ready(function(){
     })
     $('.attack-pro-select-weather').select2({
         dropdownAutoWidth: false,
-        width: 128
+        width: 140
     })
     // maintain tab index order
     $('select').on('select2:close', function() {
@@ -31,6 +31,7 @@ $(document).ready(function(){
     var cinematicMoveSelect = $('#cinematic_move')
     var attackIvSelect = $('#attack_iv')
     var defenderSelect = $('#defender')
+    var defenderRaidBossSelect = $('#defender_raid_boss')
     var weatherConditionSelect = $('#weather_condition')
     var defenderLevelInput = $('#defender_lvl')
     var defenseIVInput = $('#defense_iv')
@@ -80,6 +81,9 @@ $(document).ready(function(){
     defenderSelect.change(function() {
         formData.defender = this.value
     })
+    defenderRaidBossSelect.change(function() {
+        formData.defender = this.value
+    })
 
     $('#attack-pro-form').on('submit', function(event) {
         event.preventDefault()
@@ -89,6 +93,7 @@ $(document).ready(function(){
 
     filterDefenderSelect(raidTier)
     raidToggleButton.on('click', function(event) {
+        event.preventDefault()
 
         if (raidBossCheck.prop('checked')) {
             raidBossCheck.prop('checked', false)
@@ -225,6 +230,9 @@ $(document).ready(function(){
 
     function filterDefenderSelect(value) {
         if (parseInt(value) > 0) {
+            defenderRaidBossSelect.parent().show()
+            defenderSelect.parent().hide()
+
             $.ajax({
                 url: window.pgoAPIURLs['defender-list'],
                 type: 'GET',
@@ -234,7 +242,7 @@ $(document).ready(function(){
                 success: function(json) {
                     clearDefenderSelect('raid boss (Tier ' + value + ')')
                     $.each(json.results, function(i, pokemon) {
-                        defenderSelect.append(
+                        defenderRaidBossSelect.append(
                             '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + ' DEF)</option>'
                         )
                     })
@@ -245,21 +253,9 @@ $(document).ready(function(){
             })
         }
         else {
-            $.ajax({
-                url: window.pgoAPIURLs['defender-list'],
-                type: 'GET',
-                success: function(json) {
-                    clearDefenderSelect('defender')
-                    $.each(json.results, function(i, pokemon) {
-                        defenderSelect.append(
-                            '<option value=' + pokemon.id + '>' + pokemon.name + ' (' + pokemon.pgo_defense + ' DEF)</option>'
-                        )
-                    })
-                },
-                error: function(xhr, errmsg, err) {
-                    console.log('defender filter error', xhr)
-                }
-            })
+            defenderSelect.val('-1').trigger('change')
+            defenderSelect.parent().show()
+            defenderRaidBossSelect.parent().hide()
         }
     }
 
@@ -344,6 +340,7 @@ $(document).ready(function(){
         $('.attack-proficiency-current').show()
         $('#summary').html(json.summary)
         $('#attack_iv_assessment').html(json.attack_iv_assessment)
+        $('#weather_boost').html(json.weather_boost)
 
         $('#attacker_quick_move').html(json.quick_move.name)
         $('#quick_attack_damage').html(json.quick_move.damage_per_hit)
@@ -428,6 +425,10 @@ $(document).ready(function(){
     function displayFieldErrors(errorObject) {
         for (field in errorObject) {
             $('#' + field).addClass('error')
+
+            if (field === 'defender') {
+                $('#select2-defender_raid_boss-container').addClass('error')
+            }
             $('#select2-' + field + '-container').addClass('error')
         }
     }
@@ -451,8 +452,8 @@ $(document).ready(function(){
     }
 
     function clearDefenderSelect(text) {
-        defenderSelect.empty()
-        defenderSelect.append(
+        defenderRaidBossSelect.empty()
+        defenderRaidBossSelect.append(
             '<option value="-1" disabled selected>Select ' + text + ' </option>'
         )
     }

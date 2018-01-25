@@ -113,8 +113,9 @@ class AttackProficiencyAPIView(GenericAPIView):
 
         self.boosted_types = []
         if data.get('weather_condition', 0) > 0:
-            weather_condition = WeatherCondition.objects.get(pk=data.get('weather_condition'))
-            self.boosted_types = list(weather_condition.types_boosted.values_list('pk', flat=True))
+            self.weather_condition = WeatherCondition.objects.get(pk=data.get('weather_condition'))
+            self.boosted_types = list(
+                self.weather_condition.types_boosted.values_list('pk', flat=True))
 
     def _get_pokemon(self, id):
         return Pokemon.objects.only('name', 'pgo_attack', 'pgo_stamina',
@@ -125,15 +126,16 @@ class AttackProficiencyAPIView(GenericAPIView):
             'name', 'power', 'duration', 'move_type_id').get(pk=id)
 
     def _process_data(self):
-        data = {
+        return {
             'summary': self._get_battle_summary(),
             'quick_move': self._serialize(self.qk_move),
             'cinematic_move': self._serialize(self.cc_move),
             'attacker': self._serialize(self.attacker),
             'defender': self._serialize(self.defender),
             'raid_tier': self.raid_tier,
+            'weather_boost': self._check_weather_boost(),
+            'attack_iv_assessment': self._assess_attack_iv(),
         }
-        return self._assess_attack_iv(data)
 
     def _get_battle_summary(self):
         self._set_move_parameters()
@@ -215,7 +217,22 @@ class AttackProficiencyAPIView(GenericAPIView):
         return calculate_dph(
             move.power, self.attack_multiplier, move.stab, move.weather_boosted, move.effectivness)
 
-    def _assess_attack_iv(self, data):
+    def _check_weather_boost(self):
+        weather_boost_info = ''
+        if self.qk_move.weather_boosted or self.cc_move.weather_boosted:
+            qk_move_boosted = self.qk_move.name if self.qk_move.weather_boosted else ''
+            cc_move_boosted = self.cc_move.name if self.cc_move.weather_boosted else ''
+
+            conjuction = ' and ' if qk_move_boosted and cc_move_boosted else ''
+            verb = 'are' if qk_move_boosted and cc_move_boosted else 'is'
+
+            weather_boost_info = '<br><br>{0}{1}{2} {3} boosted by {4} weather.'.format(
+                qk_move_boosted, conjuction, cc_move_boosted,
+                verb, self.weather_condition
+            )
+        return weather_boost_info
+
+    def _assess_attack_iv(self):
         self._calculate_move_stats()
         current_qk_dph = self.qk_move.damage_per_hit
 
@@ -225,7 +242,7 @@ class AttackProficiencyAPIView(GenericAPIView):
         if (current_qk_dph == self.qk_move.damage_per_hit):
             attack_iv_assessment = '''
                 Your {}\'s <b>attack IV is high enough</b> for it to reach the last {}
-                breakpoint against a {} {}. <br /><br />'''.format(
+                breakpoint against a {} {}.'''.format(
                 self.attacker.name, self.qk_move.name,
                 self.boss_or_level, self.defender.name)
         else:
@@ -234,8 +251,7 @@ class AttackProficiencyAPIView(GenericAPIView):
                 last breakpoint for {} against a {} {}.'''.format(
                 self.attacker.name, self.qk_move.name, self.boss_or_level, self.defender.name)
 
-        data.update({'attack_iv_assessment': attack_iv_assessment})
-        return data
+        return attack_iv_assessment
 
     def _serialize(self, obj):
         data = {}

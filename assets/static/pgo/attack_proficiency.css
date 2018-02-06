@@ -44,8 +44,11 @@
 .detail-summary-text {
     padding: 1rem;
 }
+.help-button-wrapper {
+    margin: 0 0 0 -1rem;
+}
 .help-button {
-    margin: .3rem 0 0 2.9rem;
+    margin: .3rem 0 0 .1rem;
     padding: .3rem 1rem;
 }
 .help-text {

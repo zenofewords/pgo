@@ -219,7 +219,7 @@ $(document).ready(function(){
                         else {
                             cinematicMoveSelect.prop('disabled', false)
                             cinematicMoveSelect.append(
-                                '<option ' + (ccDefaultSet ? '' : 'selected') + ' value=' + pokemonMove.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
+                                '<option ' + (ccDefaultSet ? '' : 'selected') + ' value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
                             )
                             if (!ccDefaultSet) {
                                 formData.cinematicMove = move.id

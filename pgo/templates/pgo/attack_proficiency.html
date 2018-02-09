@@ -38,17 +38,21 @@
 
             <div class="row attack-pro-input-wrapper">
                 <div class="col-xs-6">
-                    <input type="number" id="attacker_lvl" class="attack-pro-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" tabindex="4">
+                    <input type="number" id="attacker_lvl" class="attack-pro-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" value="20" tabindex="4">
                 </div>
-                <div class="col-xs-4 attack-pro-atk-iv-wrapper">
-                    <select id="attack_iv" class="attack-pro-select-atk-iv" tabindex="5">
-                        {% for n in attack_iv_range %}
-                            <option value="{{ n }}">{{ n }} ATK</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-xs-2">
-                    <a href="#" id="help_button" class="btn btn-info help-button">?</a>
+                <div class="col-xs-6 attack-pro-atk-iv-wrapper">
+                    <div class="row">
+                        <div class="col-xs-10">
+                            <select id="attack_iv" class="attack-pro-select-atk-iv" tabindex="5">
+                                {% for n in attack_iv_range %}
+                                    <option value="{{ n }}">{{ n }} ATK</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-xs-2 help-button-wrapper">
+                            <a href="#" id="help_button" class="btn btn-info help-button">?</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -153,9 +157,6 @@
 <div class="shoutbox row">
     <div class="col-md-12">
         <hr>
-        <p>
-            If you are having issues with the calc try hard reloading (ctrl + shift + r or cmd + shift + r on mac). For mobile browsers, clearing your cached files should help. You do <b>not</b> need to delete your cookies or browsing history.
-        </p>
         <p>Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank">reddit</a>.</p>
         <a href="#" id="toggle-changelog">
             <p>Changelog <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></p>
@@ -164,6 +165,16 @@
 
     <div class="col-md-12 changelog">
         <ul>
+            <li>2/9/2018</li>
+            <ul>
+                <li>implemented auto-select for moves</li>
+                    <ul>
+                        <li>best case scenario: the guess is correct (saves time and effort)</li>
+                        <li>worst case: one or both moves have to be reselected (same amount of actions as before)</li>
+                    </ul>
+                <li>prepopulated attacker level with level 20</li>
+                <li>fixed ATK IV dropdown not being clickable/tapable at the rightmost edge</li>
+            </ul>
             <li>1/25/2018</li>
             <ul>
                 <li>made more UI tweaks (longer form fields look better on windows based OS)</li>

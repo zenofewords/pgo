@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from pgo.models import (
-    Move, Pokemon, Type,
+    PokemonMove, Move, Pokemon, Type,
 )
 
 
@@ -29,6 +29,16 @@ class SimpleMoveSerializer(serializers.HyperlinkedModelSerializer):
         model = Move
         fields = (
             'id', 'name', 'category', 'power',
+        )
+
+
+class PokemonMoveSerializer(serializers.HyperlinkedModelSerializer):
+    move = SimpleMoveSerializer()
+
+    class Meta:
+        model = PokemonMove
+        fields = (
+            'id', 'score', 'move',
         )
 
 

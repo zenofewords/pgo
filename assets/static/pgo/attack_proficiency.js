@@ -39,6 +39,7 @@ $(document).ready(function(){
     var helpButton = $('#help_button')
     var formData = {
         attackIv: attackIvSelect.val(),
+        attackerLevel: 20,
         defenderLevel: defenderLevelInput.val(),
         defenseIV: defenseIVInput.val(),
         raidTier: 5,
@@ -201,18 +202,29 @@ $(document).ready(function(){
                 },
                 success: function(json){
                     clearMoveInputs()
-                    $.each(json.results, function(i, move) {
+                    var qkDefaultSet = false
+                    var ccDefaultSet = false
+                    $.each(json.results, function(i, pokemonMove) {
+                        var move = pokemonMove.move
                         if (move.category === 'QK') {
                             quickMoveSelect.prop('disabled', false)
                             quickMoveSelect.append(
-                                '<option value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
+                                '<option ' + (qkDefaultSet ? '' : 'selected') + ' value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
                             )
+                            if (!qkDefaultSet) {
+                                formData.quickMove = move.id
+                                qkDefaultSet = true
+                            }
                         }
                         else {
                             cinematicMoveSelect.prop('disabled', false)
                             cinematicMoveSelect.append(
-                                '<option value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
+                                '<option ' + (ccDefaultSet ? '' : 'selected') + ' value=' + pokemonMove.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
                             )
+                            if (!ccDefaultSet) {
+                                formData.cinematicMove = move.id
+                                ccDefaultSet = true
+                            }
                         }
                     })
                 },
@@ -248,7 +260,7 @@ $(document).ready(function(){
                     })
                 },
                 error: function(xhr, errmsg, err) {
-                    console.log('defender fileter error', xhr)
+                    console.log('defender filter error', xhr)
                 }
             })
         }

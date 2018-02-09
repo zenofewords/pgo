@@ -14,10 +14,10 @@ from django.db.models import Q
 from metrics.utils import update_stats
 from pgo.api.serializers import (
     AttackProficiencySerializer, AttackProficiencyStatsSerializer,
-    SimpleMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
+    PokemonMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
 )
 from pgo.models import (
-    CPM, Move, Pokemon, Type, TypeEffectivness, RaidBoss, WeatherCondition,
+    CPM, PokemonMove, Move, Pokemon, Type, TypeEffectivness, RaidBoss, WeatherCondition,
 )
 from pgo.utils import (
     calculate_dph,
@@ -43,10 +43,13 @@ class MoveViewSet(viewsets.ModelViewSet):
             query = int(self.request.GET.get('pokemon-id', 0))
 
             if query != 0:
-                self.serializer_class = SimpleMoveSerializer
-                return self.queryset.filter(
-                    Q(quick_moves_pokemon__id=query) |
-                    Q(cinematic_moves_pokemon__id=query)
+                self.serializer_class = PokemonMoveSerializer
+                return PokemonMove.objects.filter(
+                    Q(pokemon_id=query) &
+                    (
+                        Q(move__quick_moves_pokemon__id=query) |
+                        Q(move__cinematic_moves_pokemon__id=query)
+                    )
                 )
             else:
                 return []

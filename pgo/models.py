@@ -16,6 +16,15 @@ DEFAULT_ORDER = {
 }
 
 
+class MoveCategory:
+    QK = 'QK'
+    CC = 'CC'
+    MOVE_CATEGORY = (
+        (QK, 'Quick'),
+        (CC, 'Cinematic'),
+    )
+
+
 class Pokemon(DefaultModelMixin, NameMixin):
     number = models.CharField(max_length=5)
     primary_type = models.ForeignKey('pgo.Type',
@@ -86,13 +95,7 @@ class TypeEffectivnessScalar(NameMixin):
 
 
 class Move(DefaultModelMixin, NameMixin):
-    QK = 'QK'
-    CC = 'CC'
-    MOVE_CATEGORY = (
-        (QK, 'Quick'),
-        (CC, 'Cinematic'),
-    )
-    category = models.CharField(max_length=2, choices=MOVE_CATEGORY)
+    category = models.CharField(max_length=2, choices=MoveCategory.MOVE_CATEGORY)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True)
 
     power = models.IntegerField(blank=True, default=0)
@@ -114,9 +117,30 @@ class Move(DefaultModelMixin, NameMixin):
         ordering = DEFAULT_ORDER['Move']
 
 
+class PokemonMove(DefaultModelMixin):
+    pokemon = models.ForeignKey('pgo.Pokemon')
+    move = models.ForeignKey('pgo.Move')
+
+    legacy = models.BooleanField(default=False)
+    stab = models.BooleanField(default=False)
+    score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return '{}\'s {}'.format(self.pokemon, self.move)
+
+    class Meta:
+        ordering = ('pokemon', '-stab', '-score',)
+        unique_together = ('pokemon', 'move',)
+
+
 class Moveset(DefaultModelMixin):
     pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True)
+    quick_move = models.ForeignKey(
+        'pgo.PokemonMove', blank=True, null=True, related_name='quick_moves')
+    cinematic_move = models.ForeignKey(
+        'pgo.PokemonMove', blank=True, null=True, related_name='cinematic_moves')
     key = models.CharField(max_length=50, blank=True)
+
     legacy = models.BooleanField(default=False)
     weave_damage = JSONField(blank=True, null=True)
 

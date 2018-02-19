@@ -9,7 +9,7 @@ class TypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Type
         fields = (
-            'id', 'name', 'strong', 'feeble', 'resistant', 'weak',
+            'id', 'name', 'strong', 'feeble', 'resistant', 'weak', 'immune', 'puny',
         )
 
 

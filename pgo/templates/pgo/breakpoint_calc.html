@@ -2,16 +2,16 @@
 
 
 {% block title %}
-    {{ block.super }} - Attack Proficiency Calculator
+    {{ block.super }} - Breakpoint Calculator
 {% endblock title %}
 
 {% block content %}
-<div class="attack-pro-wrapper row">
-    <div class="attack-pro-form-wrapper col-md-5">
-        <form id="attack-pro-form">
+<div class="breakpoint-calc-wrapper row">
+    <div class="breakpoint-calc-form-wrapper col-md-5">
+        <form id="breakpoint-calc-form">
             <div class="row">
                 <div class="col-xs-12">
-                    <select id="attacker" class="attack-pro-select" tabindex="1">
+                    <select id="attacker" class="breakpoint-calc-select" tabindex="1">
                         <option value="-1" disabled selected>Select attacker</option>
                         {% for data in pokemon_data %}
                             <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
@@ -22,7 +22,7 @@
 
             <div class="row">
                 <div class="col-xs-12">
-                    <select id="quick_move" class="attack-pro-select-move" tabindex="2" disabled>
+                    <select id="quick_move" class="breakpoint-calc-select-move" tabindex="2" disabled>
                         <option value="-1" disabled selected>Quick move</option>
                     </select>
                 </div>
@@ -30,20 +30,20 @@
 
             <div class="row">
                 <div class="col-xs-12">
-                    <select id="cinematic_move" class="attack-pro-select-move" tabindex="3" disabled>
+                    <select id="cinematic_move" class="breakpoint-calc-select-move" tabindex="3" disabled>
                         <option value="-1" disabled selected>Cinematic move</option>
                     </select>
                 </div>
             </div>
 
-            <div class="row attack-pro-input-wrapper">
+            <div class="row breakpoint-calc-input-wrapper">
                 <div class="col-xs-6">
-                    <input type="number" id="attacker_lvl" class="attack-pro-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" value="20" tabindex="4">
+                    <input type="number" id="attacker_lvl" class="breakpoint-calc-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" value="20" tabindex="4">
                 </div>
-                <div class="col-xs-6 attack-pro-atk-iv-wrapper">
+                <div class="col-xs-6 breakpoint-calc-atk-iv-wrapper">
                     <div class="row">
                         <div class="col-xs-10">
-                            <select id="attack_iv" class="attack-pro-select-atk-iv" tabindex="5">
+                            <select id="attack_iv" class="breakpoint-calc-select-atk-iv" tabindex="5">
                                 {% for n in attack_iv_range %}
                                     <option value="{{ n }}">{{ n }} ATK</option>
                                 {% endfor %}
@@ -64,7 +64,7 @@
 
             <div class="row raid-select-wrapper">
                 <div class="col-xs-6">
-                    <select id="weather_condition" class="attack-pro-select-weather" tabindex="6">
+                    <select id="weather_condition" class="breakpoint-calc-select-weather" tabindex="6">
                         <option value="0" selected>Weather (None)</option>
                         {% for weather_id, weather_name in weather_conditions %}
                             <option value="{{ weather_id }}">{{ weather_name }}</option>
@@ -80,7 +80,7 @@
                 </div>
 
                 <div class="col-xs-2 raid-tier-wrapper">
-                    <select id="raid_tier" class="attack-pro-select-raid-tier" tabindex="8">
+                    <select id="raid_tier" class="breakpoint-calc-select-raid-tier" tabindex="8">
                         <option value="5">T5</option>
                         <option value="4">T4</option>
                         <option value="3">T3</option>
@@ -92,14 +92,14 @@
 
             <div class="row">
                 <div class="col-xs-12">
-                    <select id="defender_raid_boss" class="attack-pro-select" tabindex="9">
+                    <select id="defender_raid_boss" class="breakpoint-calc-select" tabindex="9">
                     </select>
                 </div>
             </div>
 
             <div class="row" >
                 <div class="col-xs-12" hidden>
-                    <select id="defender" class="attack-pro-select" tabindex="9">
+                    <select id="defender" class="breakpoint-calc-select" tabindex="9">
                         <option value="-1" selected disabled>Select defender</option>
                         {% for data in pokemon_data %}
                             <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
@@ -108,29 +108,29 @@
                 </div>
             </div>
 
-            <div class="row attack-pro-input-wrapper hidden">
+            <div class="row breakpoint-calc-input-wrapper hidden">
                 <div class="col-xs-8">
-                    <input type="number" id="defender_lvl" class="attack-pro-input level-input" name="defender_lvl" placeholder="Defender level" min="1" max="40" step="0.5" value="40">
+                    <input type="number" id="defender_lvl" class="breakpoint-calc-input level-input" name="defender_lvl" placeholder="Defender level" min="1" max="40" step="0.5" value="40">
                 </div>
                 <div class="col-xs-4">
-                    <input type="number" id="defense_iv" class="attack-pro-input" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
+                    <input type="number" id="defense_iv" class="breakpoint-calc-input" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
                 </div>
             </div>
 
-            <input type="submit" id="submit" name="submit" value="Submit" class="attack-pro-button btn btn-primary" tabindex="10">
+            <input type="submit" id="submit" name="submit" value="Submit" class="breakpoint-calc-button btn btn-primary" tabindex="10">
             <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
         </form>
     </div>
-    <div class="col-md-7 attack-proficiency-info">
-        <div class="attack-proficiency-intro">
+    <div class="col-md-7 breakpoint-calc-info">
+        <div class="breakpoint-calc-intro">
             <p>
-                The attack proficiency calculator was built to help find damage breakpoints.
+                The Pokemon GO breakpoint calculator was built to help you find your pokemon's attack damage breakpoints.
             </p>
             <p>
-                To begin, select your attacker and its attacks, enter the level and ATK IV, choose what you'll be attacking and hit submit.
+                Select your pokemon, change the attacks, level, and ATK IV if necessary, then choose what you'll be attacking and hit submit.
             </p>
         </div>
-        <div class="attack-proficiency-current">
+        <div class="breakpoint-calc-current">
             <p>
                 <span id="attack_iv_assessment"></span>
                 <span id="weather_boost"></span>
@@ -145,10 +145,10 @@
     </div>
 </div>
 
-<div class="attack-proficiency-stats-wrapper row">
+<div class="breakpoint-calc-stats-wrapper row">
     <div class="col-sm-12">
-        <p class="attack-proficiency-summary"></p>
-        <table id="attack-proficiency-stats" class="table table-striped">
+        <p class="breakpoint-calc-summary"></p>
+        <table id="breakpoint-calc-stats" class="table table-striped">
             <tbody></tbody>
         </table>
     </div>
@@ -165,13 +165,22 @@
 
     <div class="col-md-12 changelog">
         <ul>
+            <li>2/19/2018</li>
+            <ul>
+                <li>Search engine optimisation/UX update</li>
+                <ul>
+                    <li>Simplified the URLs (address bar links) by dropping the '/pgo/' segment</li>
+                    <li>Added a permanent redirect from the legacy '/pgo*' URLs to the breakpoint calculator homepage</li>
+                    <li>Renamed the calculator and updated all text references</li>
+                </ul>
+            </ul>
             <li>2/9/2018</li>
             <ul>
                 <li>implemented auto-select for moves</li>
-                    <ul>
-                        <li>best case scenario: the guess is correct (saves time and effort)</li>
-                        <li>worst case: one or both moves have to be reselected (same amount of actions as before)</li>
-                    </ul>
+                <ul>
+                    <li>best case scenario: the guess is correct (saves time and effort)</li>
+                    <li>worst case: one or both moves have to be reselected (same amount of actions as before)</li>
+                </ul>
                 <li>prepopulated attacker level with level 20</li>
                 <li>fixed ATK IV dropdown not being clickable/tapable at the rightmost edge</li>
             </ul>

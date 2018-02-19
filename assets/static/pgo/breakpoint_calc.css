@@ -1,13 +1,13 @@
 .select2-container {
     margin: 0.3rem;
 }
-.attack-pro-wrapper {
+.breakpoint-calc-wrapper {
     max-width: 86rem;
 }
-.attack-pro-input-wrapper {
+.breakpoint-calc-input-wrapper {
     max-width: 27rem;
 }
-.attack-pro-input {
+.breakpoint-calc-input {
     margin: 0.3rem;
 }
 .level-input {
@@ -15,29 +15,29 @@
     height: 2.8rem;
     padding: 0 0 0 .8rem;
 }
-.attack-pro-atk-iv-wrapper {
+.breakpoint-calc-atk-iv-wrapper {
     margin: 0 -1.6rem 0 1.5rem;
 }
-.attack-pro-button {
+.breakpoint-calc-button {
     width: 28rem;
     margin: 0.3rem;
 }
-.attack-pro-form-wrapper {
+.breakpoint-calc-form-wrapper {
     margin: 0.2rem 0 1rem -.3rem;
 }
 .form-error {
     font-size: 2rem;
     color: red;
 }
-.attack-proficiency-info {
+.breakpoint-calc-info {
     font-size: 1.4rem;
     margin: .3rem 0 1rem 0;
 }
-.attack-proficiency-current {
+.breakpoint-calc-current {
     font-size: 1.4rem;
     display: none;
 }
-.attack-proficiency-stats-wrapper {
+.breakpoint-calc-stats-wrapper {
     max-width: 85rem;
     display: none;
 }
@@ -68,13 +68,13 @@
     display: none;
 }
 
-#attack-proficiency-stats td {
+#breakpoint-calc-stats td {
     font-size: 1.4rem;
     text-align: center;
     vertical-align: middle;
     padding: .4rem;
 }
-.attack-proficiency-detail {
+.breakpoint-calc-detail {
     cursor: pointer;
 }
 #clicked-cell {

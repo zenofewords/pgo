@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import (
-    DetailView, ListView, TemplateView,
+    DetailView, ListView, TemplateView, RedirectView,
 )
 
 from pgo.models import (
@@ -162,11 +162,11 @@ class MovesetDetailView(DetailView):
     model = DetailView
 
 
-class AttackProficiencyView(TemplateView):
-    template_name = 'pgo/attack_proficiency.html'
+class BreakpointCalculatorView(TemplateView):
+    template_name = 'pgo/breakpoint_calc.html'
 
     def get_context_data(self, **kwargs):
-        context = super(AttackProficiencyView, self).get_context_data(**kwargs)
+        context = super(BreakpointCalculatorView, self).get_context_data(**kwargs)
 
         data = {
             'pokemon_data': Pokemon.objects.values_list('id', 'name', 'pgo_attack', 'pgo_defense'),
@@ -175,3 +175,8 @@ class AttackProficiencyView(TemplateView):
         }
         context.update(data)
         return context
+
+
+class BreakpointCalcRedirectView(RedirectView):
+    permanent = True
+    pattern_name = 'pgo:breakpoint-calc'

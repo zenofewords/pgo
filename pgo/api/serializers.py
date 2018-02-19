@@ -54,7 +54,7 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class AttackProficiencySerializer(serializers.Serializer):
+class BreakpointCalcSerializer(serializers.Serializer):
     attacker = serializers.IntegerField()
     quick_move = serializers.IntegerField()
     cinematic_move = serializers.IntegerField()
@@ -67,7 +67,7 @@ class AttackProficiencySerializer(serializers.Serializer):
     weather_condition = serializers.IntegerField(required=False)
 
 
-class AttackProficiencyStatsSerializer(serializers.Serializer):
+class BreakpointCalcStatsSerializer(serializers.Serializer):
     attacker = serializers.JSONField()
     quick_move = serializers.JSONField()
     cinematic_move = serializers.JSONField()

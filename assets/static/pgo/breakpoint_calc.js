@@ -1,24 +1,24 @@
 $(document).ready(function(){
-    $('.attack-pro-select').select2({
+    $('.breakpoint-calc-select').select2({
         dropdownAutoWidth: false,
         width: 280
     })
-    $('.attack-pro-select-move').select2({
+    $('.breakpoint-calc-select-move').select2({
         minimumResultsForSearch: -1,
         dropdownAutoWidth: false,
         width: 280
     })
-    $('.attack-pro-select-atk-iv').select2({
+    $('.breakpoint-calc-select-atk-iv').select2({
         minimumResultsForSearch: -1,
         dropdownAutoWidth: false,
         width: 90
     })
-    $('.attack-pro-select-raid-tier').select2({
+    $('.breakpoint-calc-select-raid-tier').select2({
         minimumResultsForSearch: -1,
         dropdownAutoWidth: false,
         width: 55
     })
-    $('.attack-pro-select-weather').select2({
+    $('.breakpoint-calc-select-weather').select2({
         dropdownAutoWidth: false,
         width: 140
     })
@@ -45,7 +45,7 @@ $(document).ready(function(){
         raidTier: 5,
         weatherCondition: 0
     }
-    var tableBody = $('#attack-proficiency-stats').find('tbody')
+    var tableBody = $('#breakpoint-calc-stats').find('tbody')
     var raidToggleButton = $('#raid_toggle_button')
     var raidBossCheck = $('#raid_boss_check')
     var raidTierSelect = $('#raid_tier')
@@ -86,7 +86,7 @@ $(document).ready(function(){
         formData.defender = this.value
     })
 
-    $('#attack-pro-form').on('submit', function(event) {
+    $('#breakpoint-calc-form').on('submit', function(event) {
         event.preventDefault()
         tableBody.off('click')
         submitForm(formData)
@@ -136,7 +136,7 @@ $(document).ready(function(){
         $('.changelog').toggle()
     })
 
-    tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+    tableBody.one('click', 'td.breakpoint-calc-detail', handleAttackProficiencyDetail)
 
     function handleAttackProficiencyDetail(event) {
         if (dirty) {
@@ -151,7 +151,7 @@ $(document).ready(function(){
         if (clickedCell.length === 1 && clickedCell[0] === currentTarget[0]) {
             clickedCell.removeAttr('id')
             tableBody.find('#detail-summary').remove()
-            tableBody.one('click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+            tableBody.one('click', 'td.breakpoint-calc-detail', handleAttackProficiencyDetail)
         }
         else {
             clickedCell.removeAttr('id')
@@ -273,7 +273,7 @@ $(document).ready(function(){
 
     function submitForm(formData) {
         $.ajax({
-            url: window.pgoAPIURLs['attack-proficiency'],
+            url: window.pgoAPIURLs['breakpoint-calc'],
             type: 'POST',
             data: {
                 'attacker': formData.attacker,
@@ -301,7 +301,7 @@ $(document).ready(function(){
 
     function generateAttackProficiencyStats(json) {
         $.ajax({
-            url: window.pgoAPIURLs['attack-proficiency-stats'],
+            url: window.pgoAPIURLs['breakpoint-calc-stats'],
             type: 'POST',
             data: {
                 'attacker': JSON.stringify(json.attacker),
@@ -325,7 +325,7 @@ $(document).ready(function(){
 
                             if (j % 2 === 1) {
                                 if (td[0].textContent !== 'Attack breakdown against 15 DEF IV') {
-                                    td.addClass('attack-proficiency-detail')
+                                    td.addClass('breakpoint-calc-detail')
                                 }
                                 tr.append(td)
                                 td = $('<td>')
@@ -334,9 +334,9 @@ $(document).ready(function(){
                     }
                     tableBody.append(tr)
                 }
-                $('.attack-proficiency-stats-wrapper').show()
+                $('.breakpoint-calc-stats-wrapper').show()
 
-                var $lastRow = $('#attack-proficiency-stats tr:last')
+                var $lastRow = $('#breakpoint-calc-stats tr:last')
                 $lastRow.find('td:last').attr('id', 'clicked-cell')
                 getAttackProficiencyDetail(40, 15, formData, $lastRow)
                 dirty = false
@@ -348,8 +348,8 @@ $(document).ready(function(){
     }
 
     function displayAttackProficiency(json) {
-        $('.attack-proficiency-intro').hide()
-        $('.attack-proficiency-current').show()
+        $('.breakpoint-calc-intro').hide()
+        $('.breakpoint-calc-current').show()
         $('#summary').html(json.summary)
         $('#attack_iv_assessment').html(json.attack_iv_assessment)
         $('#weather_boost').html(json.weather_boost)
@@ -368,7 +368,7 @@ $(document).ready(function(){
 
     function getAttackProficiencyDetail(level, defenseIV, formData, rowToAppend) {
         $.ajax({
-            url: window.pgoAPIURLs['attack-proficiency-detail'],
+            url: window.pgoAPIURLs['breakpoint-calc-detail'],
             type: 'POST',
             data: {
                 'attacker': formData.attacker,
@@ -386,7 +386,7 @@ $(document).ready(function(){
             success: function(json) {
                 displayAttackProficiencyDetail(json, rowToAppend)
                 rowToAppend.parent().one(
-                    'click', 'td.attack-proficiency-detail', handleAttackProficiencyDetail)
+                    'click', 'td.breakpoint-calc-detail', handleAttackProficiencyDetail)
             },
             error: function(xhr, errmsg, err){
                 console.log('detail error', xhr)

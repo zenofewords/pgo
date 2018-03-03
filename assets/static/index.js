@@ -1,5 +1,5 @@
-require('./pgo/attack_proficiency.js')
-require('./pgo/attack_proficiency.css')
+require('./pgo/breakpoint_calc.js')
+require('./pgo/breakpoint_calc.css')
 
 require('./pgo/main.js')
 require('./pgo/main.css')

@@ -13,7 +13,7 @@ from django.db.models import Q
 
 from metrics.utils import update_stats
 from pgo.api.serializers import (
-    AttackProficiencySerializer, AttackProficiencyStatsSerializer,
+    BreakpointCalcSerializer, BreakpointCalcStatsSerializer,
     PokemonMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
 )
 from pgo.models import (
@@ -78,9 +78,9 @@ class TypeViewSet(viewsets.ModelViewSet):
     serializer_class = TypeSerializer
 
 
-class AttackProficiencyAPIView(GenericAPIView):
+class BreakpointCalcAPIView(GenericAPIView):
     permission_classes = (AllowAny,)
-    serializer_class = AttackProficiencySerializer
+    serializer_class = BreakpointCalcSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -264,9 +264,9 @@ class AttackProficiencyAPIView(GenericAPIView):
         return data
 
 
-class AttackProficiencyStatsAPIView(GenericAPIView):
+class BreakpointCalcStatsAPIView(GenericAPIView):
     permission_classes = (AllowAny,)
-    serializer_class = AttackProficiencyStatsSerializer
+    serializer_class = BreakpointCalcStatsSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -345,7 +345,7 @@ class AttackProficiencyStatsAPIView(GenericAPIView):
         return '{} <b>({} possible)</b><br>'.format(current_dph, max_dph)
 
 
-class AttackProficiencyDetailAPIView(AttackProficiencyAPIView):
+class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

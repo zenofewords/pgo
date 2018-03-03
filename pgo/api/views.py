@@ -10,6 +10,8 @@ from rest_framework.permissions import (
 from rest_framework.generics import GenericAPIView
 
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 from metrics.utils import update_stats
 from pgo.api.serializers import (
@@ -17,7 +19,7 @@ from pgo.api.serializers import (
     PokemonMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
 )
 from pgo.models import (
-    CPM, PokemonMove, Move, Pokemon, Type, TypeEffectivness, RaidBoss, WeatherCondition,
+    CPM, PokemonMove, Move, Pokemon, Type, TypeEffectivness, RaidBoss, WeatherCondition, RaidTier,
 )
 from pgo.utils import (
     calculate_dph,
@@ -104,7 +106,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.defender = self._get_pokemon(data.get('defender'))
         self.defender.level = data.get('defender_lvl')
 
-        self.raid_tier = data.get('raid_tier', 0)
+        self.raid_tier = self._verify_raid_tier(data.get('raid_tier', 0))
         if self.raid_tier > 0:
             self.defender.cpm = CPM.raids.get(
                 raid_cpm=True, raid_tier=self.raid_tier).value
@@ -116,17 +118,28 @@ class BreakpointCalcAPIView(GenericAPIView):
 
         self.boosted_types = []
         if data.get('weather_condition', 0) > 0:
-            self.weather_condition = WeatherCondition.objects.get(pk=data.get('weather_condition'))
+            self.weather_condition = get_object_or_404(
+                WeatherCondition.objects, pk=data.get('weather_condition'))
             self.boosted_types = list(
                 self.weather_condition.types_boosted.values_list('pk', flat=True))
 
+    def _verify_raid_tier(self, tier):
+        if tier in RaidTier.objects.values_list('tier', flat=True):
+            return tier
+        return 0
+
     def _get_pokemon(self, id):
-        return Pokemon.objects.only('name', 'pgo_attack', 'pgo_stamina',
-            'primary_type_id', 'secondary_type_id').get(pk=id)
+        try:
+            return Pokemon.objects.only('name', 'pgo_attack', 'pgo_stamina', 'primary_type_id',
+                'secondary_type_id').get(pk=id)
+        except Pokemon.DoesNotExist:
+            raise Http404
 
     def _get_move(self, id):
-        return Move.objects.only(
-            'name', 'power', 'duration', 'move_type_id').get(pk=id)
+        try:
+            return Move.objects.only('name', 'power', 'duration', 'move_type_id').get(pk=id)
+        except Move.DoesNotExist:
+            raise Http404
 
     def _process_data(self):
         return {
@@ -297,7 +310,8 @@ class BreakpointCalcStatsAPIView(GenericAPIView):
 
         self.boosted_types = []
         if data.get('weather_condition', 0) > 0:
-            weather_condition = WeatherCondition.objects.get(pk=data.get('weather_condition'))
+            weather_condition = get_object_or_404(
+                WeatherCondition.objects, pk=data.get('weather_condition'))
             self.boosted_types = list(weather_condition.types_boosted.values_list('pk', flat=True))
 
         for cpm in cpm_list:

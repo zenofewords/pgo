@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.text import slugify
 from django.views.generic import (
     DetailView, ListView, TemplateView, RedirectView,
 )
@@ -13,10 +15,10 @@ from pgo.models import (
 
 class SortMixin(ListView):
     def get(self, request, *args, **kwargs):
-        sort_by = request.GET.get('sort_by')
-        sort_key = request.GET.get('sort_key')
+        sort_by = slugify(request.GET.get('sort_by'))
+        sort_key = slugify(request.GET.get('sort_key'))
 
-        if sort_by:
+        if sort_by and sort_by != 'none':
             if sort_key == sort_by:
                 self.sort_by = ('-{}'.format(sort_by),)
             else:
@@ -30,7 +32,10 @@ class SortMixin(ListView):
 
     def get_queryset(self):
         if self.sort_by:
-            return self.model.objects.order_by(*self.sort_by)
+            try:
+                return self.model.objects.order_by(*self.sort_by)
+            except Exception:
+                raise Http404
         return self.model.objects
 
     def get_context_data(self, **kwargs):

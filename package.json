@@ -34,5 +34,8 @@
     "webpack": "2.1.0-beta.22",
     "webpack-bundle-tracker": "^0.2.0",
     "webpack-dev-server": "2.1.0-beta.9"
+  },
+  "dependencies": {
+    "npm": "^5.7.1"
   }
 }

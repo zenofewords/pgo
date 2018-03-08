@@ -4,48 +4,40 @@
 
 <!DOCTYPE html>
 <html>
-    <head>
-        {% block head %}
-            <title>
-                {% block title %}
-                    Zen's Repository
-                {% endblock title %}
-            </title>
-            <link rel="shortcut icon" href="{% static 'static/favicon.ico' %}">
-            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
-            <!-- Global site tag (gtag.js) - Google Analytics -->
-            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-115005498-1"></script>
-            <script>
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
+  <head>
+    {% block head %}
+      <title>
+        {% block title %}
+          Zen's Repository
+        {% endblock title %}
+      </title>
+      <link rel="shortcut icon" href="{% static 'static/favicon.ico' %}">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+      {% google_analytics_tag %}
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% endblock head %}
+  </head>
 
-              gtag('config', 'UA-115005498-1');
-            </script>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-        {% endblock head %}
-    </head>
+  {% block body %}
+    <body>
+      <div class="container">
+        {% block header %}
+        {% endblock header %}
+        {% block content %}
+          {% include 'zenofewords/includes/pagination.html' %}
+        {% endblock content %}
 
-    {% block body %}
-        <body>
-            <div class="container">
-                {% block header %}
-                {% endblock header %}
-                {% block content %}
-                    {% include 'zenofewords/includes/pagination.html' %}
-                {% endblock content %}
+        {% block footer %}
+          <hr>
+          <p class="small">
+            &copy; {% now 'Y' %} Dominik Zen
+          </p>
+        {% endblock footer %}
+      </div>
 
-                {% block footer %}
-                    <hr>
-                    <p class="small">
-                        &copy; {% now 'Y' %} Dominik Zen
-                    </p>
-                {% endblock footer %}
-            </div>
-
-            {% block scripts %}
-                <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-            {% endblock scripts %}
-        </body>
-    {% endblock body %}
+      {% block scripts %}
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+      {% endblock scripts %}
+    </body>
+  {% endblock body %}
 </html>

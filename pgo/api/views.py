@@ -1,7 +1,5 @@
 from __future__ import division
 
-import logging
-
 from decimal import Decimal
 
 from rest_framework import response, status, viewsets
@@ -28,7 +26,6 @@ from pgo.utils import (
     calculate_weave_damage,
     NEUTRAL_SCALAR,
 )
-logger = logging.getLogger(__name__)
 
 
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
@@ -159,14 +156,11 @@ class BreakpointCalcAPIView(GenericAPIView):
         self._set_move_parameters()
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
 
-        stamina = self.defender.pgo_stamina
         if self.raid_tier > 0:
-            try:
-                stamina = self.defender.raidboss_set.get(
-                    raid_tier=self.raid_tier).raid_tier.tier_stamina
-            except RaidBoss.DoesNotExist:
-                logger.exception('{}, {}, {}'.format(self.raid_tier, self.attacker, self.defender))
-
+            stamina = self.defender.raidboss_set.get(
+                raid_tier=self.raid_tier).raid_tier.tier_stamina
+        else:
+            stamina = self.defender.pgo_stamina
         self.defender.health = calculate_defender_health(
             stamina + MAX_IV, self.defender.cpm
         )

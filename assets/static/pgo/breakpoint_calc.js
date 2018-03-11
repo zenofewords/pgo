@@ -112,6 +112,7 @@ $(document).ready(function(){
             filterDefenderSelect(raidTier)
             raidTierSelect.prop('disabled', false)
             formData.raidTier = raidTier
+            formData.defender = undefined
         }
     })
 

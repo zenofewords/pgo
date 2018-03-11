@@ -21,6 +21,11 @@ def google_analytics_tag():
     return {'render': not settings.DEBUG}
 
 
+@register.inclusion_tag('zenofewords/tags/google_tag_manager.html')
+def google_tag_manager():
+    return {'render': not settings.DEBUG}
+
+
 @register.filter
 def floor(value):
     return int(value)

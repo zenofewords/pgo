@@ -13,14 +13,14 @@
       </title>
       <link rel="shortcut icon" href="{% static 'static/favicon.ico' %}">
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
-      {% google_analytics_tag %}
+      {% google_tag_manager %}
       <meta name="viewport" content="width=device-width, initial-scale=1">
     {% endblock head %}
   </head>
 
   {% block body %}
     <body>
-      {% google_tag_manager %}
+      {% google_noscript_tag_manager %}
       <div class="container">
         {% block header %}
         {% endblock header %}

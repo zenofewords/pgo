@@ -1,5 +1,7 @@
 from __future__ import division
 
+import logging
+
 from decimal import Decimal
 
 from rest_framework import response, status, viewsets
@@ -13,7 +15,6 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
-from metrics.utils import update_stats
 from pgo.api.serializers import (
     BreakpointCalcSerializer, BreakpointCalcStatsSerializer,
     PokemonMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
@@ -27,6 +28,8 @@ from pgo.utils import (
     calculate_weave_damage,
     NEUTRAL_SCALAR,
 )
+logger = logging.getLogger(__name__)
+
 
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 CC_FACTOR = 1.1
@@ -88,7 +91,6 @@ class BreakpointCalcAPIView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        update_stats('apro')
         self._fetch_data(serializer.data)
         return response.Response(self._process_data(), status=status.HTTP_200_OK)
 
@@ -157,11 +159,15 @@ class BreakpointCalcAPIView(GenericAPIView):
         self._set_move_parameters()
         self._calculate_move_stats(self.attacker.cpm_list.first()['value'])
 
+        stamina = self.defender.pgo_stamina
         if self.raid_tier > 0:
-            stamina = self.defender.raidboss_set.get(
-                raid_tier=self.raid_tier).raid_tier.tier_stamina
-        else:
-            stamina = self.defender.pgo_stamina
+            try:
+                raise RaidBoss.DoesNotExist
+                stamina = self.defender.raidboss_set.get(
+                    raid_tier=self.raid_tier).raid_tier.tier_stamina
+            except RaidBoss.DoesNotExist:
+                logger.exception('{}, {}, {}'.format(self.raid_tier, self.attacker, self.defender))
+
         self.defender.health = calculate_defender_health(
             stamina + MAX_IV, self.defender.cpm
         )

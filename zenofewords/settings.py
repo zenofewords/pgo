@@ -219,9 +219,9 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'myapp': {
+        'pgo': {
             'handlers': ['logfile'],
-            'level': 'WARNING',
+            'level': 'ERROR',
             'propagate': False
         },
     },

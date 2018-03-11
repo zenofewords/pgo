@@ -162,7 +162,6 @@ class BreakpointCalcAPIView(GenericAPIView):
         stamina = self.defender.pgo_stamina
         if self.raid_tier > 0:
             try:
-                raise RaidBoss.DoesNotExist
                 stamina = self.defender.raidboss_set.get(
                     raid_tier=self.raid_tier).raid_tier.tier_stamina
             except RaidBoss.DoesNotExist:

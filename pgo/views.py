@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import json
+
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -167,21 +169,51 @@ class MovesetDetailView(DetailView):
     model = DetailView
 
 
-class BreakpointCalculatorView(TemplateView):
-    template_name = 'pgo/breakpoint_calc.html'
+class BreakpointCalcRedirectView(RedirectView):
+    permanent = True
+    pattern_name = 'pgo:breakpoint-calc'
+
+
+class CalculatorInitialDataMixin(TemplateView):
+    def get(self, request, *args, **kwargs):
+        try:
+            self.initial_data = json.dumps(self._process_get_params(request.GET))
+        except (TypeError, ValueError,
+                Pokemon.DoesNotExist, Move.DoesNotExist, WeatherCondition.DoesNotExist):
+            self.initial_data = {}
+        return super(CalculatorInitialDataMixin, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(BreakpointCalculatorView, self).get_context_data(**kwargs)
+        context = super(CalculatorInitialDataMixin, self).get_context_data(**kwargs)
 
         data = {
             'pokemon_data': Pokemon.objects.values_list('id', 'name', 'pgo_attack', 'pgo_defense'),
             'attack_iv_range': list(xrange(15, -1, -1)),
             'weather_conditions': WeatherCondition.objects.values_list('id', 'name'),
+            'initial_data': self.initial_data,
         }
         context.update(data)
         return context
 
 
-class BreakpointCalcRedirectView(RedirectView):
-    permanent = True
-    pattern_name = 'pgo:breakpoint-calc'
+class BreakpointCalculatorView(CalculatorInitialDataMixin):
+    template_name = 'pgo/breakpoint_calc.html'
+
+    def _process_get_params(self, params):
+        return {}
+
+
+class GoodToGoView(CalculatorInitialDataMixin):
+    template_name = 'pgo/good_to_go.html'
+
+    def _process_get_params(self, params):
+        return {
+            'attacker_id': Pokemon.objects.get(slug=slugify(params.get('attacker'))).pk,
+            'attack_iv': int(params.get('attack_iv')),
+            'quick_move_id': Move.objects.get(slug=slugify(params.get('quick_move'))).pk,
+            'cinematic_move_id': Move.objects.get(slug=slugify(params.get('cinematic_move'))).pk,
+            'weather_id': WeatherCondition.objects.get(slug=slugify(params.get('weather'))).pk,
+            'current_raid_bosses': bool(int(params.get('current_raid_bosses'))),
+            'old_raid_bosses': bool(int(params.get('old_raid_bosses'))),
+            'relevant_defenders': bool(int(params.get('relevant_defenders'))),
+        }

@@ -1,0 +1,112 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block title %}
+  {{ block.super }} - Good to Go
+{% endblock title %}
+
+{% block content %}
+  <div class="breakpoint-calc-wrapper row">
+    <div class="breakpoint-calc-form-wrapper col-md-5">
+      <form id="breakpoint-calc-form">
+        <div class="row">
+          <div class="col-xs-12">
+            <select id="attacker" class="breakpoint-calc-select" tabindex="1">
+              <option value="-1" disabled selected>Select attacker</option>
+              {% for data in pokemon_data %}
+                <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-12">
+            <select id="quick_move" class="breakpoint-calc-select-move" tabindex="2" disabled>
+              <option value="-1" disabled selected>Quick move</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-12">
+            <select id="cinematic_move" class="breakpoint-calc-select-move" tabindex="3" disabled>
+              <option value="-1" disabled selected>Cinematic move</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row raid-select-wrapper">
+          <div class="col-xs-6">
+            <select id="weather_condition" class="breakpoint-calc-select-weather" tabindex="3">
+              <option value="0" selected>No weather</option>
+              {% for weather_id, weather_name in weather_conditions %}
+                <option value="{{ weather_id }}">{{ weather_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-xs-6 breakpoint-calc-atk-iv-wrapper">
+            <div class="row">
+              <div class="col-xs-10">
+                <select id="attack_iv" class="breakpoint-calc-select-atk-iv" tabindex="4">
+                  {% for n in attack_iv_range %}
+                    <option value="{{ n }}">{{ n }} ATK</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-xs-2 help-button-wrapper">
+                <a href="#" id="help_button" class="btn btn-info help-button">?</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="help-text col-xs-12">
+            Don't know your pokemon's ATK IV? Find out at <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-xs-12">
+            <input type="checkbox" id="current_raid_bosses" name="current_raid_bosses" hidden checked>
+            <button id="current_raid_bosses_toggle" name="current_raid_bosses_toggle" type="button" class="btn btn-success raid-toggle-button" style="margin: .3rem; min-width: 28rem;" tabindex="5">
+              Current and anticipated raid bosses
+            </button>
+          </div>
+          <div class="col-xs-12">
+            <input type="checkbox" id="old_raid_bosses" name="old_raid_bosses" hidden checked>
+            <button id="old_raid_bosses_toggle" name="old_raid_bosses_toggle" type="button" class="btn btn-success raid-toggle-button" style="margin: .3rem; min-width: 12rem;" tabindex="6">
+              Old raid bosses
+            </button>
+            <input type="checkbox" id="relevant_defenders" name="relevant_defenders" hidden checked>
+            <button id="relevant_defenders_toggle" name="relevant_defenders_toggle" type="button" class="btn btn-success raid-toggle-button" style="margin: .3rem; min-width: 15rem;" tabindex="7">
+              Relevant defenders
+            </button>
+          </div>
+        </div>
+
+        <input type="submit" id="submit" name="submit" value="Submit" class="breakpoint-calc-button btn btn-primary" tabindex="10">
+        <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+      </form>
+    </div>
+    <div class="col-md-7 breakpoint-calc-info">
+      <div class="breakpoint-calc-intro">
+        <p>
+          Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the last quick move breakpoint for all selected matchups.
+        </p>
+        <p>
+          Select your pokemon and its ATK IV, adjust the moves if necessary, then choose what you want to check against.
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script type="text/javascript">
+    var initialData = {{ initial_data|safe }};
+  </script>
+{% endblock scripts %}

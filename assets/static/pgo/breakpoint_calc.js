@@ -22,6 +22,10 @@ $(document).ready(function(){
         dropdownAutoWidth: false,
         width: 140
     })
+    $('.breakpoint-calc-select-weather').select2({
+        dropdownAutoWidth: false,
+        width: 140
+    })
     // maintain tab index order
     $('select').on('select2:close', function() {
         $(this).focus()
@@ -51,6 +55,22 @@ $(document).ready(function(){
     var raidTierSelect = $('#raid_tier')
     var raidTier = 5
     var dirty = false
+
+    if (Object.keys(initialData).length > 0) {
+        var attackerId = initialData.attacker_id
+        var weatherId = initialData.weather_id
+        var attackIv = initialData.attack_iv
+
+        formData.attacker = attackerId
+        $('#attacker').val(attackerId).trigger('change')
+        filterQueryset(attackerId)
+
+        weatherConditionSelect.val(weatherId).trigger('change')
+        formData.weatherCondition = weatherId
+
+        attackIvSelect.val(attackIv).trigger('change')
+        formData.attackIv = attackIv
+    }
 
     $('#attacker').change(function() {
         filterQueryset(this.value)
@@ -407,7 +427,7 @@ $(document).ready(function(){
         var details = json.details
         if (details.length > 1) {
             wrapperTd.append($('<p>It could do better if it was powered up!</p>'))
-            var detailsTable = $('<table class="table table-striped inner-table" width="'
+            var detailsTable = $('<table class="table inner-table" width="'
                 + totalWidth + '"></table>')
             detailsTable.append($(
                 '<tr><td width="12%">' + details[0][0] +

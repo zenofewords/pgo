@@ -48,8 +48,8 @@
     margin: 0 0 0 -1rem;
 }
 .help-button {
-    margin: .3rem 0 0 .1rem;
-    padding: .3rem 1rem;
+    margin: .3rem 0 0 0;
+    padding: .3rem 1.05rem;
 }
 .help-text {
     font-size: 1.2rem;
@@ -57,15 +57,9 @@
     max-width: 32rem;
     display: none;
 }
-.shoutbox {
-    font-size: 1.2rem;
-    max-width: 85rem;
-}
-#toggle-changelog {
-    text-decoration: none;
-}
-.changelog {
-    display: none;
+
+.inner-table tr {
+    border-top: .1rem solid #ddd;
 }
 
 #breakpoint-calc-stats td {

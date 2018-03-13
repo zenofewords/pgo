@@ -4,32 +4,83 @@
 
 
 {% block title %}
-    Pokemon GO
+  Pokemon GO
 {% endblock title %}
 
 {% block head %}
-    {{ block.super }}
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+  {{ block.super }}
 {% endblock head %}
 
 {% block header %}
-    {{ block.super }}
-    {% navigation_tag 'pgo' True %}
+  {{ block.super }}
+  {% navigation_tag 'pgo' True %}
 {% endblock header %}
 
-{% block scripts %}
-    {{ block.super }}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
-    {% render_bundle 'main' %}
+{% block footer %}
+  <hr>
+  <div class="shoutbox row">
+    <div class="col-md-12">
+      <p>Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.</p>
+      <a href="#" id="toggle-changelog">
+        <p>Changelog <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></p>
+      </a>
+    </div>
 
-    <script type="text/javascript">
-        window.pgoAPIURLs = {}
-        pgoAPIURLs = {
-            'move-list': "{% url 'api-pgo:move-list' %}",
-            'defender-list': "{% url 'api-pgo:pokemon-list' %}",
-            'breakpoint-calc': "{% url 'api-pgo:breakpoint-calc' %}",
-            'breakpoint-calc-stats': "{% url 'api-pgo:breakpoint-calc-stats' %}",
-            'breakpoint-calc-detail': "{% url 'api-pgo:breakpoint-calc-detail' %}",
-        }
-    </script>
+    <div class="col-md-12 changelog">
+      <ul>
+        <li>2/28/2018</li>
+        <ul>
+          <li>Search engine optimisation/UX update</li>
+          <ul>
+            <li>Simplified the URLs (address bar links) by dropping the '/pgo/' segment</li>
+            <li>Added a permanent redirect from the legacy '/pgo*' URLs to the breakpoint calculator homepage</li>
+            <li>Renamed the calculator and updated all text references</li>
+          </ul>
+        </ul>
+        <li>2/9/2018</li>
+        <ul>
+          <li>implemented auto-select for moves</li>
+          <ul>
+            <li>best case scenario: the guess is correct (saves time and effort)</li>
+            <li>worst case: one or both moves have to be reselected (same amount of actions as before)</li>
+          </ul>
+          <li>prepopulated attacker level with level 20</li>
+          <li>fixed ATK IV dropdown not being clickable/tapable at the rightmost edge</li>
+        </ul>
+        <li>1/25/2018</li>
+        <ul>
+          <li>made more UI tweaks (longer form fields look better on windows based OS)</li>
+          <li>added weather boost info for attacks</li>
+          <li>fixed the delay when switching from raid bosses to regular defenders</li>
+        </ul>
+        <li>1/15/2018</li>
+        <ul>
+          <li>fixed attacker level input not displaying placeholder and value on firefox (OSX)</li>
+          <li>added weather boosts</li>
+          <li>redesigned the UI slightly</li>
+        </ul>
+        <li>1/12/2018</li>
+        <ul>
+          <li>updated for gen III</li>
+          <li>moved to a smaller server</li>
+        </ul>
+      </ul>
+    </div>
+  </div>
+  {{ block.super }}
+{% endblock footer %}
+
+{% block scripts %}
+  {% render_bundle 'main' attrs='async' %}
+
+  <script type="text/javascript">
+    window.pgoAPIURLs = {}
+    pgoAPIURLs = {
+      'move-list': "{% url 'api-pgo:move-list' %}",
+      'defender-list': "{% url 'api-pgo:pokemon-list' %}",
+      'breakpoint-calc': "{% url 'api-pgo:breakpoint-calc' %}",
+      'breakpoint-calc-stats': "{% url 'api-pgo:breakpoint-calc-stats' %}",
+      'breakpoint-calc-detail': "{% url 'api-pgo:breakpoint-calc-detail' %}",
+    }
+  </script>
 {% endblock scripts %}

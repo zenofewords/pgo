@@ -32,7 +32,7 @@ DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 CC_FACTOR = 1.1
 MAX_IV = 15
 DEFENDER_IV_RANGE = [15]
-DEFENDER_LEVEL_LIST = [25, 30, 40]
+DEFENDER_LEVEL_LIST = [40]
 
 
 class MoveViewSet(viewsets.ModelViewSet):
@@ -172,11 +172,11 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.max_damage_cc = self._get_max_damage_move(self.cc_move)
         self.max_dps, _ = calculate_weave_damage(max_damage_qk, self.max_damage_cc)
 
-        return '''Your {} would do {:g} DPS ({:g}%) to a {} {}
-            with {} defense IV, knocking it out in {:.1f} seconds.'''.format(
+        return '''Your {} would do {:g} DPS ({:g}%) to a {} {},
+            knocking it out in {:.1f} seconds.'''.format(
             self.attacker.name, round(self.cycle_dps, 1),
             round(self.cycle_dps * 100 / self.max_dps, 1), self.boss_or_level,
-            self.defender.name, self.defender.defense_iv, battle_time)
+            self.defender.name, battle_time)
 
     def _get_max_damage_move(self, move):
         self._calculate_attack_multiplier()

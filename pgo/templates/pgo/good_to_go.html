@@ -7,13 +7,11 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="good-to-go-wrapper row" style="height: 40rem; padding: 1rem;">
-    <div class="col-md-5">
-      <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> One moment, please...
+  <div class="row" style="max-width: 86rem; min-height:">
+    <div class="good-to-go-form-wrapper col-md-5" style="height: 25.4rem;">
+      <span class="glyphicon glyphicon-hourglass" aria-hidden="true" style="margin: 1rem;"></span>One moment, please...
     </div>
-  </div>
-  <div class="good-to-go-wrapper row" hidden>
-    <div class="good-to-go-form-wrapper col-md-5">
+    <div class="good-to-go-form-wrapper col-md-5" style="padding-bottom: 1rem;" hidden>
       <form id="good-to-go-form">
         <div class="row">
           <div class="col-xs-12">
@@ -84,17 +82,19 @@
         <input id="good_to_go_submit" type="submit" value="Submit" class="submit-button btn btn-primary" tabindex="10">
       </form>
     </div>
-    <div class="col-md-7 good-to-go-text-wrapper">
-      <p>
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> This feature is in beta, expect significant additions to come soon.
-      </p>
-      <div class="good-to-go-summary-text">
+    <div class="col-md-7" style="max-width: 50rem; font-size: 1.4rem; margin: .3rem 0 5rem 0; text-align: justify;">
+      <div style="padding: .3rem .7rem">
         <p>
-          Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the final quick move breakpoint for all selected matchups.
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> This feature is in beta, expect significant additions to come soon.
         </p>
-        <p>
-          Select your pokemon and its ATK IV, adjust the moves if necessary, then choose what you want to check against.
-        </p>
+        <div class="good-to-go-summary-text">
+          <p>
+            Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the final quick move breakpoint for all selected matchups.
+          </p>
+          <p>
+            Select your pokemon and its ATK IV, adjust the moves if necessary, then choose what you want to check against.
+          </p>
+        </div>
       </div>
     </div>
   </div>

@@ -41,7 +41,7 @@ $(document).ready(function(){
   })
 
   // load form after select 2 is applied (looks nicer)
-  $('.good-to-go-wrapper').toggle()
+  $('.good-to-go-form-wrapper').toggle()
   var goodToGoForm = {
     attacker: $attackerSelect.val(),
     quick_move: $quickMoveSelect.val(),
@@ -102,17 +102,14 @@ $(document).ready(function(){
     toggleButtonCheckbox($relevantDefendersButton, $relevantDefendersCheckbox)
     goodToGoForm.relevant_defenders = $relevantDefendersCheckbox.prop('checked')
   })
-
   $('#good-to-go-form').on('submit', function(event) {
     event.preventDefault()
     submitForm(goodToGoForm)
   })
-
   $goodToGoResults.on('click', '.good-to-go-results-wrapper', function(event) {
     event.stopPropagation()
     $(this).children().slice(1).toggle()
   })
-
   $goodToGoResults.on('click', '.good-to-go-single-result', function(event) {
     event.stopPropagation()
   })
@@ -217,12 +214,12 @@ $(document).ready(function(){
 
   function toggleButtonCheckbox(button, checkbox) {
     if (checkbox.prop('checked')) {
-        checkbox.prop('checked', false)
-        button.addClass('btn-default').removeClass('btn-success')
+      checkbox.prop('checked', false)
+      button.addClass('btn-default').removeClass('btn-success')
     }
     else {
-        checkbox.prop('checked', true)
-        button.addClass('btn-success').removeClass('btn-default')
+      checkbox.prop('checked', true)
+      button.addClass('btn-success').removeClass('btn-default')
     }
   }
 
@@ -251,6 +248,7 @@ $(document).ready(function(){
   function submitForm(goodToGoForm) {
     $goodToGoSubmitButton.prop('disabled', true)
     $goodToGoResults.empty()
+    $goodToGoResults.html('<hr />')
     $goodToGoResults.append(
       '<span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> One moment, please...')
 

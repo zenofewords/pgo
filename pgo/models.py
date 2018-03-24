@@ -19,9 +19,23 @@ DEFAULT_ORDER = {
 class MoveCategory:
     QK = 'QK'
     CC = 'CC'
-    MOVE_CATEGORY = (
+    CHOICES = (
         (QK, 'Quick'),
         (CC, 'Cinematic'),
+    )
+
+
+class RaidBossStatus:
+    ANTICIPATED = 'anticipated'
+    CURRENT = 'current'
+    EXCLUSIVE = 'exclusive'
+    PAST = 'past'
+
+    CHOICES = (
+        (ANTICIPATED, 'Anticipated'),
+        (CURRENT, 'Current'),
+        (EXCLUSIVE, 'Exclusive'),
+        (PAST, 'Past'),
     )
 
 
@@ -95,7 +109,7 @@ class TypeEffectivnessScalar(NameMixin):
 
 
 class Move(DefaultModelMixin, NameMixin):
-    category = models.CharField(max_length=2, choices=MoveCategory.MOVE_CATEGORY)
+    category = models.CharField(max_length=2, choices=MoveCategory.CHOICES)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True)
 
     power = models.IntegerField(blank=True, default=0)
@@ -202,6 +216,7 @@ class RaidTier(models.Model):
 class RaidBoss(models.Model):
     pokemon = models.ForeignKey('pgo.Pokemon', verbose_name='Pokemon')
     raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier')
+    status = models.CharField(max_length=20, choices=RaidBossStatus.CHOICES, blank=True)
 
     def __str__(self):
         return 'T{} raid boss {}'.format(self.raid_tier.tier, self.pokemon.name)

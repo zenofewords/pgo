@@ -584,7 +584,9 @@ class GoodToGoAPIView(GenericAPIView):
 
     def _get_summary(self, total_breakpoints_reached, total_breakpoints):
         return '''
-            <p>Your {} can reach the final {} breakpoint in {} out of the {} tested matchups.</p>
+            <p>
+            Your {} can reach the final {} breakpoint in <b>{} out of the {}</b> tested matchups.
+            </p>
             <p>You can review the details below.</p>
             '''.format(
             self.attacker.name, self.quick_move.name, total_breakpoints_reached, total_breakpoints

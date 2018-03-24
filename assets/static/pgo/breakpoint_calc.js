@@ -365,16 +365,16 @@ $(document).ready(function(){
         $('#summary').html(json.summary)
         $('#attack_iv_assessment').html(json.attack_iv_assessment)
 
-        // $('#good_to_go_link').html(
-        //     '<a href="/good-to-go/?attacker=' + formData.attacker
-        //     + '&quick_move=' + formData.quickMove
-        //     + '&cinematic_move=' + formData.cinematicMove
-        //     + '&weather_condition=' + formData.weatherCondition
-        //     + '&attack_iv=' + formData.attackIv
-        //     + '&current_raid_bosses=true'
-        //     + '&past_raid_bosses=false'
-        //     + '&relevant_defenders=false" target="_blank" rel="noopener">'
-        //     + 'Quickly check if your pokemon can reach the final quick move breakpoint in all relevant matches.</a>')
+        $('#good_to_go_link').html(
+            'Use <a href="/good-to-go/?attacker=' + formData.attacker
+            + '&quick_move=' + formData.quickMove
+            + '&cinematic_move=' + formData.cinematicMove
+            + '&weather_condition=' + formData.weatherCondition
+            + '&attack_iv=' + formData.attackIv
+            + '&current_raid_bosses=true'
+            + '&past_raid_bosses=false'
+            + '&relevant_defenders=false" target="_blank" rel="noopener">'
+            + 'Good to Go</a> to check if your pokemon can reach the final quick move breakpoint in all relevant matches.')
         $('#weather_boost').html(json.weather_boost)
 
         $('#attacker_quick_move').html(json.quick_move.name)

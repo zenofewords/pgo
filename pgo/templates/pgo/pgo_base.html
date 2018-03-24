@@ -26,7 +26,7 @@
       </a>
     </div>
 
-    <div class="col-md-12 changelog">
+    <div class="col-md-12 changelog" hidden>
       <ul>
         <li>14/3/2018</li>
         <ul>
@@ -75,16 +75,8 @@
 {% endblock footer %}
 
 {% block scripts %}
+  {% block generic %}
+    {% render_bundle 'lists' attrs='async' %}
+  {% endblock generic %}
   {% render_bundle 'main' attrs='async' %}
-
-  <script type="text/javascript">
-    window.pgoAPIURLs = {}
-    pgoAPIURLs = {
-      'move-list': "{% url 'api-pgo:move-list' %}",
-      'defender-list': "{% url 'api-pgo:pokemon-list' %}",
-      'breakpoint-calc': "{% url 'api-pgo:breakpoint-calc' %}",
-      'breakpoint-calc-stats': "{% url 'api-pgo:breakpoint-calc-stats' %}",
-      'breakpoint-calc-detail': "{% url 'api-pgo:breakpoint-calc-detail' %}",
-    }
-  </script>
 {% endblock scripts %}

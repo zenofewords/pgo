@@ -7,7 +7,10 @@ var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 module.exports = {
   context: __dirname,
   entry: {
-      main: '../assets/static/index',
+      main: '../assets/static/main',
+      lists: '../assets/static/lists',
+      breakpointCalc: '../assets/static/breakpointCalc',
+      goodToGo: '../assets/static/goodToGo',
   },
 
   output: {
@@ -16,7 +19,7 @@ module.exports = {
   },
 
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('[name]-[hash].css'),
     new OptimizeCssAssetsPlugin({
       assetNameRegExp: /\.css$/g,
       cssProcessor: require('cssnano'),

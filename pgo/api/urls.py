@@ -7,6 +7,7 @@ from pgo.api.views import (
     BreakpointCalcAPIView,
     BreakpointCalcStatsAPIView,
     BreakpointCalcDetailAPIView,
+    GoodToGoAPIView,
 )
 
 
@@ -18,4 +19,5 @@ pgo_api_urls.extend((
         BreakpointCalcStatsAPIView.as_view(), name='breakpoint-calc-stats'),
     url(r'^breakpoint-calc-detail/$',
         BreakpointCalcDetailAPIView.as_view(), name='breakpoint-calc-detail'),
+    url(r'^good-to-go/$', GoodToGoAPIView.as_view(), name='good-to-go'),
 ))

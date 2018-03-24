@@ -33,12 +33,24 @@ class PokemonAdmin(admin.ModelAdmin):
     )
 
 
+class RaidBossAdmin(admin.ModelAdmin):
+    list_display = (
+        'pokemon', 'raid_tier', 'status',
+    )
+    list_editable = (
+        'status',
+    )
+    search_fields = (
+        'pokemon__slug',
+    )
+
+
 admin.site.register(CPM)
 admin.site.register(Move, MoveAdmin)
 admin.site.register(Moveset)
 admin.site.register(Pokemon, PokemonAdmin)
 admin.site.register(PokemonMove)
-admin.site.register(RaidBoss)
+admin.site.register(RaidBoss, RaidBossAdmin)
 admin.site.register(RaidTier)
 admin.site.register(Type)
 admin.site.register(TypeEffectivness)

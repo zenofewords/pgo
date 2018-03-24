@@ -1,5 +1,6 @@
 from __future__ import division, unicode_literals
 
+from collections import OrderedDict
 from decimal import Decimal
 
 from rest_framework import response, status, viewsets
@@ -14,11 +15,12 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 
 from pgo.api.serializers import (
-    BreakpointCalcSerializer, BreakpointCalcStatsSerializer,
-    PokemonMoveSerializer, MoveSerializer, PokemonSerializer, TypeSerializer,
+    BreakpointCalcSerializer, BreakpointCalcStatsSerializer, PokemonMoveSerializer, MoveSerializer,
+    PokemonSerializer, TypeSerializer, GoodToGoSerializer,
 )
 from pgo.models import (
     CPM, PokemonMove, Move, Pokemon, Type, TypeEffectivness, RaidBoss, WeatherCondition, RaidTier,
+    RaidBossStatus,
 )
 from pgo.utils import (
     calculate_dph,
@@ -469,3 +471,142 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
         self.cycle_dps = cycle_dps
         dps_percentage = self.cycle_dps * 100 / self.max_dps
         return '{:g} ({:g}%)'.format(round(cycle_dps, 1), round(dps_percentage, 1))
+
+
+class GoodToGoAPIView(GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = GoodToGoSerializer
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+
+        self._fetch_data(serializer.data)
+        return response.Response(self._process_data(), status=status.HTTP_200_OK)
+
+    def _fetch_data(self, data):
+        self.attacker = get_object_or_404(Pokemon, pk=data.get('attacker'))
+        self.quick_move = get_object_or_404(Move, pk=data.get('quick_move'))
+        self.cinematic_move = get_object_or_404(Move, pk=data.get('cinematic_move'))
+        self.boosted_types = list(get_object_or_404(WeatherCondition, pk=data.get(
+            'weather_condition')).types_boosted.values_list('pk', flat=True))
+        self.attack_iv = data.get('attack_iv')
+
+        self.current_raid_bosses = RaidBoss.objects.filter(
+            Q(status=RaidBossStatus.CURRENT) | Q(status=RaidBossStatus.ANTICIPATED)
+        ).order_by('-raid_tier', '-pokemon__slug') if data.get('current_raid_bosses') else []
+
+        self.past_raid_bosses = RaidBoss.objects.filter(status=RaidBossStatus.PAST).order_by(
+            '-raid_tier', '-pokemon__slug') if data.get('past_raid_bosses') else []
+        # todo devise a better metric for relevant defenders
+        self.relevant_defenders = Pokemon.objects.filter(
+            maximum_cp__gte=2000) if data.get('relevant_defenders') else []
+
+        self.max_cpm_value = CPM.gyms.last().value
+
+    # TODO DRY THIS
+    def _process_data(self):
+        total_breakpoints = 0
+        total_breakpoints_reached = 0
+
+        self.matchup_data = OrderedDict()
+        for defender in self.current_raid_bosses:
+            self._get_breakpoint_data(defender)
+
+        current = []
+        for key, value in self.matchup_data.items():
+            breakpoints_reached = sum(
+                [1 if x['final_breakpoint_reached'] is True else 0 for x in value])
+
+            current.append({
+                'tier': key,
+                'quick_move': self.quick_move.name,
+                'final_breakpoints_reached': breakpoints_reached,
+                'total_breakpoints': len(value),
+                'matchups': [x for x in value],
+            })
+            total_breakpoints += len(value)
+            total_breakpoints_reached += breakpoints_reached
+
+        self.matchup_data = OrderedDict()
+        for defender in self.past_raid_bosses:
+            self._get_breakpoint_data(defender)
+
+        past = []
+        for key, value in self.matchup_data.items():
+            breakpoints_reached = sum(
+                [1 if x['final_breakpoint_reached'] is True else 0 for x in value])
+
+            past.append({
+                'tier': key,
+                'quick_move': self.quick_move.name,
+                'final_breakpoints_reached': breakpoints_reached,
+                'total_breakpoints': len(value),
+                'matchups': [x for x in value],
+            })
+            total_breakpoints += len(value)
+            total_breakpoints_reached += breakpoints_reached
+
+        # for defender in self.relevant_defenders:
+        #     self._get_breakpoint_data(defender)
+        return {
+            'current': current,
+            'past': past,
+            'summary': self._get_summary(total_breakpoints_reached, total_breakpoints)
+        }
+
+    def _get_breakpoint_data(self, defender):
+        stab = self._is_stab(self.attacker, self.quick_move)
+        weather_boosted = self.quick_move.move_type_id in self.boosted_types
+        effectivness = self._get_effectivness(self.quick_move, defender)
+        max_multiplier = self._get_attack_multiplier(15, defender)
+
+        max_damage_per_hit = calculate_dph(
+            self.quick_move.power, max_multiplier, stab, weather_boosted, effectivness)
+
+        actual_multiplier = self._get_attack_multiplier(self.attack_iv, defender)
+        actual_damage_per_hit = calculate_dph(
+            self.quick_move.power, actual_multiplier, stab, weather_boosted, effectivness)
+
+        tier = defender.raid_tier.tier
+        matchup_stats = {
+            'defender': defender.pokemon.name,
+            'quick_move': self.quick_move.name,
+            'damage_per_hit': actual_damage_per_hit,
+            'max_damage_per_hit': max_damage_per_hit,
+            'final_breakpoint_reached': actual_damage_per_hit == max_damage_per_hit
+        }
+
+        if tier in self.matchup_data:
+            self.matchup_data[tier].append(matchup_stats)
+        else:
+            self.matchup_data[tier] = [matchup_stats]
+
+    def _get_summary(self, total_breakpoints_reached, total_breakpoints):
+        return '''
+            <p>Your {} can reach the final {} breakpoint in {} out of the {} tested matchups.</p>
+            <p>You can review the details below.</p>
+            '''.format(
+            self.attacker.name, self.quick_move.name, total_breakpoints_reached, total_breakpoints
+        )
+
+    def _get_attack_multiplier(self, attack_iv, defender):
+        return ((self.attacker.pgo_attack + attack_iv) * self.max_cpm_value) / (
+            (defender.pokemon.pgo_defense + 15) * defender.raid_tier.raid_cpm.value)
+
+    def _is_stab(self, pokemon, move):
+        return (
+            pokemon.primary_type_id == move.move_type_id or
+            pokemon.secondary_type_id == move.move_type_id
+        )
+
+    def _get_effectivness(self, move, pokemon):
+        secondary_type_effectivness = DEFAULT_EFFECTIVNESS
+        if pokemon.pokemon.secondary_type_id:
+            secondary_type_effectivness = TypeEffectivness.objects.get(
+                type_offense__id=move.move_type_id,
+                type_defense__id=pokemon.pokemon.secondary_type_id).effectivness.scalar
+        primary_type_effectivness = TypeEffectivness.objects.get(
+            type_offense__id=move.move_type_id,
+            type_defense__id=pokemon.pokemon.primary_type_id).effectivness.scalar
+        return secondary_type_effectivness * primary_type_effectivness

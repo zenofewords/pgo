@@ -1,4 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
@@ -6,12 +7,17 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="breakpoint-calc-wrapper row">
-    <div class="breakpoint-calc-form-wrapper col-md-5">
-      <form id="breakpoint-calc-form">
+  <div class="good-to-go-wrapper row" style="height: 40rem; padding: 1rem;">
+    <div class="col-md-5">
+      <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> One moment, please...
+    </div>
+  </div>
+  <div class="good-to-go-wrapper row" hidden>
+    <div class="good-to-go-form-wrapper col-md-5">
+      <form id="good-to-go-form">
         <div class="row">
           <div class="col-xs-12">
-            <select id="attacker" class="breakpoint-calc-select" tabindex="1">
+            <select id="good-to-go-select-attacker" tabindex="1">
               <option value="-1" disabled selected>Select attacker</option>
               {% for data in pokemon_data %}
                 <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
@@ -22,7 +28,7 @@
 
         <div class="row">
           <div class="col-xs-12">
-            <select id="quick_move" class="breakpoint-calc-select-move" tabindex="2" disabled>
+            <select id="good-to-go-select-quick-move" tabindex="2">
               <option value="-1" disabled selected>Quick move</option>
             </select>
           </div>
@@ -30,71 +36,61 @@
 
         <div class="row">
           <div class="col-xs-12">
-            <select id="cinematic_move" class="breakpoint-calc-select-move" tabindex="3" disabled>
+            <select id="good-to-go-select-cinematic-move" tabindex="3" disabled>
               <option value="-1" disabled selected>Cinematic move</option>
             </select>
           </div>
         </div>
 
-        <div class="row raid-select-wrapper">
+        <div class="row good-to-go-atk-iv-weather-wrapper">
           <div class="col-xs-6">
-            <select id="weather_condition" class="breakpoint-calc-select-weather" tabindex="3">
-              <option value="0" selected>No weather</option>
-              {% for weather_id, weather_name in weather_conditions %}
-                <option value="{{ weather_id }}">{{ weather_name }}</option>
+            <select id="good-to-go-select-atk-iv" tabindex="4">
+              {% for n in attack_iv_range %}
+                <option value="{{ n }}">{{ n }} ATK</option>
               {% endfor %}
             </select>
           </div>
 
-          <div class="col-xs-6 breakpoint-calc-atk-iv-wrapper">
-            <div class="row">
-              <div class="col-xs-10">
-                <select id="attack_iv" class="breakpoint-calc-select-atk-iv" tabindex="4">
-                  {% for n in attack_iv_range %}
-                    <option value="{{ n }}">{{ n }} ATK</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="col-xs-2 help-button-wrapper">
-                <a href="#" id="help_button" class="btn btn-info help-button">?</a>
-              </div>
+          <div class="col-xs-6">
+            <div class="good-to-go-weather-condition-wrapper">
+              <select id="good-to-go-select-weather-condition" tabindex="5">
+                {% for data in weather_condition_data %}
+                  <option value="{{ data.0 }}">{{ data.1 }}</option>
+                {% endfor %}
+              </select>
             </div>
           </div>
         </div>
 
         <div class="row">
-          <div class="help-text col-xs-12">
-            Don't know your pokemon's ATK IV? Find out at <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank">GamePress</a>.
-          </div>
-        </div>
-
-        <div class="row">
           <div class="col-xs-12">
-            <input type="checkbox" id="current_raid_bosses" name="current_raid_bosses" hidden checked>
-            <button id="current_raid_bosses_toggle" name="current_raid_bosses_toggle" type="button" class="btn btn-success raid-toggle-button" style="margin: .3rem; min-width: 28rem;" tabindex="5">
+            <input type="checkbox" id="current_raid_bosses" checked hidden>
+            <button id="toggle_current_raid_bosses" type="button" class="btn btn-success good-to-go-checkbox-button" tabindex="5">
               Current and anticipated raid bosses
             </button>
           </div>
           <div class="col-xs-12">
-            <input type="checkbox" id="old_raid_bosses" name="old_raid_bosses" hidden checked>
-            <button id="old_raid_bosses_toggle" name="old_raid_bosses_toggle" type="button" class="btn btn-success raid-toggle-button" style="margin: .3rem; min-width: 12rem;" tabindex="6">
-              Old raid bosses
+            <input type="checkbox" id="past_raid_bosses" hidden>
+            <button id="toggle_past_raid_bosses" type="button" class="btn btn-default good-to-go-checkbox-button" tabindex="6">
+              Past raid bosses
             </button>
-            <input type="checkbox" id="relevant_defenders" name="relevant_defenders" hidden checked>
-            <button id="relevant_defenders_toggle" name="relevant_defenders_toggle" type="button" class="btn btn-success raid-toggle-button" style="margin: .3rem; min-width: 15rem;" tabindex="7">
+            <input type="checkbox" id="relevant_defenders" hidden>
+            <button id="toggle_relevant_defenders" type="button" class="btn btn-default good-to-go-checkbox-button" tabindex="7" disabled>
               Relevant defenders
             </button>
           </div>
         </div>
 
-        <input type="submit" id="submit" name="submit" value="Submit" class="breakpoint-calc-button btn btn-primary" tabindex="10">
-        <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+        <input id="good_to_go_submit" type="submit" value="Submit" class="submit-button btn btn-primary" tabindex="10">
       </form>
     </div>
-    <div class="col-md-7 breakpoint-calc-info">
-      <div class="breakpoint-calc-intro">
+    <div class="col-md-7 good-to-go-text-wrapper">
+      <p>
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> This feature is in beta, expect significant additions to come soon.
+      </p>
+      <div class="good-to-go-summary-text">
         <p>
-          Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the last quick move breakpoint for all selected matchups.
+          Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the final quick move breakpoint for all selected matchups.
         </p>
         <p>
           Select your pokemon and its ATK IV, adjust the moves if necessary, then choose what you want to check against.
@@ -102,11 +98,25 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="good-to-go-results"></div>
+    </div>
+  </div>
 {% endblock content %}
 
 {% block scripts %}
+  {% render_bundle 'goodToGo' attrs='async' %}
   {{ block.super }}
+
+  {% block generic %}
+  {% endblock generic %}
+
   <script type="text/javascript">
     var initialData = {{ initial_data|safe }};
+    window.pgoAPIURLs = {
+      'move-list': "{% url 'api-pgo:move-list' %}",
+      'good-to-go': "{% url 'api-pgo:good-to-go' %}",
+    };
   </script>
 {% endblock scripts %}

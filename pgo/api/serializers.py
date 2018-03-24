@@ -74,3 +74,14 @@ class BreakpointCalcStatsSerializer(serializers.Serializer):
     defender = serializers.JSONField()
     raid_tier = serializers.IntegerField(required=False)
     weather_condition = serializers.IntegerField(required=False)
+
+
+class GoodToGoSerializer(serializers.Serializer):
+    attacker = serializers.IntegerField()
+    quick_move = serializers.IntegerField()
+    cinematic_move = serializers.IntegerField()
+    attack_iv = serializers.IntegerField()
+    weather_condition = serializers.IntegerField(required=False)
+    current_raid_bosses = serializers.BooleanField(required=False)
+    past_raid_bosses = serializers.BooleanField(required=False)
+    relevant_defenders = serializers.BooleanField(required=False)

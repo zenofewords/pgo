@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 
+from django.apps import apps
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -178,8 +179,9 @@ class CalculatorInitialDataMixin(TemplateView):
     def get(self, request, *args, **kwargs):
         try:
             self.initial_data = json.dumps(self._process_get_params(request.GET))
-        except (TypeError, ValueError,
-                Pokemon.DoesNotExist, Move.DoesNotExist, WeatherCondition.DoesNotExist):
+        except (TypeError, ValueError, LookupError,
+                Pokemon.DoesNotExist, Move.DoesNotExist, WeatherCondition.DoesNotExist) as e:
+            print e
             self.initial_data = {}
         return super(CalculatorInitialDataMixin, self).get(request, *args, **kwargs)
 
@@ -189,7 +191,7 @@ class CalculatorInitialDataMixin(TemplateView):
         data = {
             'pokemon_data': Pokemon.objects.values_list('id', 'name', 'pgo_attack', 'pgo_defense'),
             'attack_iv_range': list(xrange(15, -1, -1)),
-            'weather_conditions': WeatherCondition.objects.values_list('id', 'name'),
+            'weather_condition_data': WeatherCondition.objects.values_list('id', 'name'),
             'initial_data': self.initial_data,
         }
         context.update(data)
@@ -208,12 +210,20 @@ class GoodToGoView(CalculatorInitialDataMixin):
 
     def _process_get_params(self, params):
         return {
-            'attacker_id': Pokemon.objects.get(slug=slugify(params.get('attacker'))).pk,
+            'attacker': self._get_object_id('Pokemon', params.get('attacker')),
             'attack_iv': int(params.get('attack_iv')),
-            'quick_move_id': Move.objects.get(slug=slugify(params.get('quick_move'))).pk,
-            'cinematic_move_id': Move.objects.get(slug=slugify(params.get('cinematic_move'))).pk,
-            'weather_id': WeatherCondition.objects.get(slug=slugify(params.get('weather'))).pk,
-            'current_raid_bosses': bool(int(params.get('current_raid_bosses'))),
-            'old_raid_bosses': bool(int(params.get('old_raid_bosses'))),
-            'relevant_defenders': bool(int(params.get('relevant_defenders'))),
+            'quick_move': self._get_object_id('Move', params.get('quick_move')),
+            'cinematic_move': self._get_object_id('Move', params.get('cinematic_move')),
+            'weather_condition': self._get_object_id(
+                'WeatherCondition', params.get('weather_condition')),
+            'current_raid_bosses': bool(params.get('current_raid_bosses') == 'true'),
+            'past_raid_bosses': bool(params.get('past_raid_bosses') == 'true'),
+            'relevant_defenders': bool(params.get('relevant_defenders') == 'true'),
         }
+
+    def _get_object_id(self, model_name, value):
+        try:
+            return int(value)
+        except ValueError:
+            model = apps.get_model('pgo', model_name)
+            return model.objects.get(slug=slugify(value)).pk

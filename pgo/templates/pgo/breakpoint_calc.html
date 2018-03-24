@@ -1,4 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
@@ -65,8 +66,8 @@
         <div class="row raid-select-wrapper">
           <div class="col-xs-6">
             <select id="weather_condition" class="breakpoint-calc-select-weather" tabindex="6">
-              {% for weather_id, weather_name in weather_conditions %}
-                <option value="{{ weather_id }}">{{ weather_name }}</option>
+              {% for data in weather_condition_data %}
+                <option value="{{ data.0 }}">{{ data.1 }}</option>
               {% endfor %}
             </select>
           </div>
@@ -134,6 +135,7 @@
           <span id="attack_iv_assessment"></span>
           <span id="weather_boost"></span>
         </p>
+        <p id="good_to_go_link"></p>
         <p hidden>
           <span id="attacker_quick_move"></span> would do
           <span id="quick_attack_damage"></span>, and
@@ -155,8 +157,20 @@
 {% endblock content %}
 
 {% block scripts %}
+  {% render_bundle 'breakpointCalc' attrs='async' %}
   {{ block.super }}
+
+  {% block generic %}
+  {% endblock generic %}
+
   <script type="text/javascript">
     var initialData = {{ initial_data|safe }};
+    window.pgoAPIURLs = {
+      'move-list': "{% url 'api-pgo:move-list' %}",
+      'defender-list': "{% url 'api-pgo:pokemon-list' %}",
+      'breakpoint-calc': "{% url 'api-pgo:breakpoint-calc' %}",
+      'breakpoint-calc-stats': "{% url 'api-pgo:breakpoint-calc-stats' %}",
+      'breakpoint-calc-detail': "{% url 'api-pgo:breakpoint-calc-detail' %}",
+    };
   </script>
 {% endblock scripts %}

@@ -22,10 +22,6 @@ $(document).ready(function(){
         dropdownAutoWidth: false,
         width: 140
     })
-    $('.breakpoint-calc-select-weather').select2({
-        dropdownAutoWidth: false,
-        width: 140
-    })
     // maintain tab index order
     $('select').on('select2:close', function() {
         $(this).focus()
@@ -39,7 +35,6 @@ $(document).ready(function(){
     var weatherConditionSelect = $('#weather_condition')
     var defenderLevelInput = $('#defender_lvl')
     var defenseIVInput = $('#defense_iv')
-    var submitButton = $('#submit')
     var helpButton = $('#help_button')
     var formData = {
         attackIv: attackIvSelect.val(),
@@ -47,7 +42,7 @@ $(document).ready(function(){
         defenderLevel: defenderLevelInput.val(),
         defenseIV: defenseIVInput.val(),
         raidTier: 5,
-        weatherCondition: 0
+        weatherCondition: 8,
     }
     var tableBody = $('#breakpoint-calc-stats').find('tbody')
     var raidToggleButton = $('#raid_toggle_button')
@@ -151,12 +146,6 @@ $(document).ready(function(){
         $('.help-text').toggle()
     })
 
-    $('#toggle-changelog').on('click', function(event) {
-        event.preventDefault()
-
-        $('.changelog').toggle()
-    })
-
     tableBody.one('click', 'td.breakpoint-calc-detail', handleAttackProficiencyDetail)
 
     function handleAttackProficiencyDetail(event) {
@@ -230,7 +219,8 @@ $(document).ready(function(){
                         if (move.category === 'QK') {
                             quickMoveSelect.prop('disabled', false)
                             quickMoveSelect.append(
-                                '<option ' + (qkDefaultSet ? '' : 'selected') + ' value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
+                                '<option ' + (qkDefaultSet ? '' : 'selected') + ' value='
+                                + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
                             )
                             if (!qkDefaultSet) {
                                 formData.quickMove = move.id
@@ -240,7 +230,8 @@ $(document).ready(function(){
                         else {
                             cinematicMoveSelect.prop('disabled', false)
                             cinematicMoveSelect.append(
-                                '<option ' + (ccDefaultSet ? '' : 'selected') + ' value=' + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
+                                '<option ' + (ccDefaultSet ? '' : 'selected') + ' value='
+                                + move.id + '>' + move.name + ' (' + move.power + ' DPH)</option>'
                             )
                             if (!ccDefaultSet) {
                                 formData.cinematicMove = move.id
@@ -373,6 +364,17 @@ $(document).ready(function(){
         $('.breakpoint-calc-current').show()
         $('#summary').html(json.summary)
         $('#attack_iv_assessment').html(json.attack_iv_assessment)
+
+        // $('#good_to_go_link').html(
+        //     '<a href="/good-to-go/?attacker=' + formData.attacker
+        //     + '&quick_move=' + formData.quickMove
+        //     + '&cinematic_move=' + formData.cinematicMove
+        //     + '&weather_condition=' + formData.weatherCondition
+        //     + '&attack_iv=' + formData.attackIv
+        //     + '&current_raid_bosses=true'
+        //     + '&past_raid_bosses=false'
+        //     + '&relevant_defenders=false" target="_blank" rel="noopener">'
+        //     + 'Quickly check if your pokemon can reach the final quick move breakpoint in all relevant matches.</a>')
         $('#weather_boost').html(json.weather_boost)
 
         $('#attacker_quick_move').html(json.quick_move.name)

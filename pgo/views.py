@@ -181,7 +181,6 @@ class CalculatorInitialDataMixin(TemplateView):
             self.initial_data = json.dumps(self._process_get_params(request.GET))
         except (TypeError, ValueError, LookupError,
                 Pokemon.DoesNotExist, Move.DoesNotExist, WeatherCondition.DoesNotExist) as e:
-            print e
             self.initial_data = {}
         return super(CalculatorInitialDataMixin, self).get(request, *args, **kwargs)
 

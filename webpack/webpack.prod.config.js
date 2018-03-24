@@ -4,7 +4,7 @@ var config = require('./webpack.base.config.js')
 var CompressionPlugin = require("compression-webpack-plugin")
 
 
-config.output.filename = '[name].min.js',
+config.output.filename = '[name]-[hash].js',
 config.output.path = require('path').resolve('./assets/prod')
 
 config.plugins = config.plugins.concat([

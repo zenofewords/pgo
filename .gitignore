@@ -100,3 +100,4 @@ bundles/
 server.js
 webpack/webpack-stats.json
 /.eslintrc.js
+yarn.lock

@@ -21,7 +21,7 @@
   <div class="row" style="font-size: 1.2rem; max-width: 85rem;">
     <div class="col-md-12">
       <p>Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.</p>
-      <a href="#" id="toggle-changelog">
+      <a href="#" id="toggle-changelog" style="text-decoration: none;">
         <p>Changelog <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></p>
       </a>
     </div>
@@ -81,6 +81,15 @@
 {% block scripts %}
   {% block generic %}
     {% render_bundle 'lists' attrs='async' %}
+    <script type="text/javascript">
+      // TODO rewrite in plain js
+      // $(document).ready(function(){
+      //   $('#toggle-changelog').on('click', function(event) {
+      //     event.preventDefault()
+
+      //     $('.changelog').toggle()
+      //   })
+      // })
+    </script>
   {% endblock generic %}
-  {% render_bundle 'main' attrs='async' %}
 {% endblock scripts %}

@@ -225,7 +225,6 @@ $(document).ready(function(){
 
   function clearErrors() {
     $('.error').removeClass('error')
-    $('.form-error').empty()
   }
 
   function displayFieldErrors(errorObject) {

@@ -9,6 +9,8 @@ NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
 WEATHER_BOOST_SCALAR = 1.2
 TIMEOUT = 99000
+CINEMATIC_MOVE_FACTOR = 1.1
+MAX_IV = 15
 
 
 def simulate_weave_damage(quick_move, cinematic_move, health):

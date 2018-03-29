@@ -12,7 +12,7 @@ from django.views.generic import (
 )
 
 from pgo.models import (
-    Pokemon, Move, Moveset, Type, WeatherCondition, DEFAULT_ORDER
+    CPM, Pokemon, Move, Moveset, RaidTier, Type, WeatherCondition, DEFAULT_ORDER,
 )
 
 
@@ -180,17 +180,22 @@ class CalculatorInitialDataMixin(TemplateView):
         try:
             self.initial_data = json.dumps(self._process_get_params(request.GET))
         except (TypeError, ValueError, LookupError,
-                Pokemon.DoesNotExist, Move.DoesNotExist, WeatherCondition.DoesNotExist) as e:
+                Pokemon.DoesNotExist, Move.DoesNotExist, WeatherCondition.DoesNotExist):
             self.initial_data = {}
         return super(CalculatorInitialDataMixin, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CalculatorInitialDataMixin, self).get_context_data(**kwargs)
+        defender_cpm_data = (
+            list(RaidTier.objects.values_list('tier', 'raid_cpm__value')) +
+            list(CPM.objects.filter(level=40, raid_cpm=False).values_list('level', 'value'))
+        )
 
         data = {
             'pokemon_data': Pokemon.objects.values_list('id', 'name', 'pgo_attack', 'pgo_defense'),
-            'attack_iv_range': list(xrange(15, -1, -1)),
+            'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.values_list('id', 'name'),
+            'defender_cpm_data': defender_cpm_data,
             'initial_data': self.initial_data,
         }
         context.update(data)

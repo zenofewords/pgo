@@ -84,21 +84,38 @@
     </form>
   </div>
   <div class="col-xs-12 col-sm-6 col-md-7 col-lg-8">
-    <p id="breakpoint-calc-atk-iv-assessment">
+    <p id="breakpoint-calc-atk-iv-assessment" class="text-justify">
       The Pokemon GO breakpoint calculator was built to help you find your pokemon's attack damage breakpoints.
     </p>
-    <p id="breakpoint-calc-move-effectivness">
+    <p id="breakpoint-calc-move-effectivness" class="text-justify">
       Select your pokemon, change the attacks, level, and ATK IV if necessary, then choose what you'll be attacking and hit submit.
     </p>
   </div>
 </div>
 <div class="row">
   <div class="col-xs-12">
-    <p id="breakpoint-calc-summary" style="margin-top: 2rem;">
+    <p id="breakpoint-calc-summary" class="text-justify text-margin-top">
     </p>
-    <p id="breakpoint-calc-move-details">
+    <p id="breakpoint-calc-move-details" class="text-justify">
     </p>
-    <div id="breakpoint-calc-breakpoint-details" class="text-center" style="margin-top: 2rem;">
+    <div id="breakpoint-calc-breakpoint-details" class="text-left text-margin-top" hidden>
+      <table id="breakpoint-calc-breakpoint-details-table" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Lvl</th>
+            <th>Dust / candy</th>
+            <th class="text-left">
+              <span class="glyphicon glyphicon-flash breakpoint-calc-move-icon" aria-hidden="true"></span>
+            </th>
+            <th class="text-left">
+              <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+            </th>
+            <th>DPS (%)</th>
+            <th>KO time</th>
+          </tr>
+        </thead>
+        <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
+      </table>
     </div>
   </div>
 </div>

@@ -227,15 +227,14 @@ class BreakpointCalcAPIView(GenericAPIView):
         params = (
             self.attacker.name,
             self.quick_move.name,
-            'T{} raid boss'.format(self.raid_tier) if self.raid_tier else 'level 40',
-            self.defender.name
+            self.quick_move.damage_per_hit,
         )
         if (self.current_qk_dph == self.quick_move.damage_per_hit):
             return 'Your {}\'s <b>attack IV is high enough</b> for it to reach the final {} \
-                    breakpoint against a {} {}.'.format(*params)
+                    breakpoint ({}) in this matchup!'.format(*params)
         else:
             return 'Unfortunately, your {}\'s <b>attack IV is too low</b> for it to reach the \
-                    final breakpoint for {} against a {} {}.'''.format(*params)
+                    final breakpoint for {} ({}) in this matchup.'''.format(*params)
 
     def _calculate_moves_dph(self, cpm_value, defense, quick_move, cinematic_move):
         total_attack = self.attacker.pgo_attack + self.attacker.atk_iv
@@ -247,7 +246,8 @@ class BreakpointCalcAPIView(GenericAPIView):
         max_attack_modifier = max_attack_multiplier / ((defense + MAX_IV) * cpm_value)
 
         return {
-            'quick_move': 'Its {} would do {} and '.format(
+            'quick_move': 'At level {:g}, its {} would do {} and '.format(
+                self.attacker.level,
                 quick_move.name,
                 self._build_move_stats(attack_modifier, max_attack_modifier, quick_move)
             ),
@@ -263,7 +263,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         max_dph = calculate_dph(
             move.power, max_attack_modifier, move.stab, move.weather_boosted, move.effectivness)
 
-        return '{}<b>/{}</b>,'.format(current_dph, max_dph)
+        return '<b>{}</b> / {},'.format(current_dph, max_dph)
 
 
 class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
@@ -318,12 +318,13 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
         self.max_dps, _ = calculate_weave_damage(max_damage_qk, self.max_damage_cc)
 
         return (
-            'Your {} would do {:g} DPS ({:g}%) to a {} {}, knocking it out in {:.1f} seconds.'
+            'Your {} would do <b>{:g} DPS ({:g}%)</b> to a {} {}, knocking it out in {:.1f} seconds.'
             .format(
                 self.attacker.name,
                 round(self.cycle_dps, 1),
                 round(self.cycle_dps * 100 / self.max_dps, 1),
-                'T{} raid boss'.format(self.raid_tier) if self.raid_tier else 'level 40',
+                'T{} raid boss'.format(
+                    self.raid_tier) if self.raid_tier else 'level 40, 15 defense IV',
                 self.defender.name,
                 battle_time
             )
@@ -375,9 +376,7 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                 current_cc_dph = self.cinematic_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
-        details = [(
-            'Level ($)', self.quick_move.name, self.cinematic_move.name, 'DPS (%)', 'KO time',
-        )]
+        details = []
 
         for c in sorted(self.cinematic_move_proficiency):
             for q in sorted(self.quick_move_proficiency):
@@ -385,7 +384,7 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                     starting_qk_dph = q[0]
 
             # skip redundant rows
-            if (starting_qk_dph, c[0]) in [(x[1], x[2]) for x in details[1:]]:
+            if (starting_qk_dph, c[0]) in [(x[2], x[3]) for x in details[1:]]:
                 continue
 
             self.quick_move.damage_per_hit = starting_qk_dph
@@ -408,12 +407,15 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
         return details
 
     def _get_detail_row(self, level, cycle_dps, battle_time, powerup_cost):
-        return (self._format_level_and_powerup_cost(level, powerup_cost),
+        return (self._format_level(level), self._format_powerup_cost(powerup_cost),
                 self.quick_move.damage_per_hit, self.cinematic_move.damage_per_hit,
                 self._format_dps(cycle_dps), '{:.1f}s'.format(battle_time))
 
-    def _format_level_and_powerup_cost(self, level, powerup_cost):
-        return '{:g} ({:g}k|200)'.format(float(level), (powerup_cost - self.powerup_cost) / 1000)
+    def _format_level(self, level):
+        return '{:g}'.format(float(level))
+
+    def _format_powerup_cost(self, powerup_cost):
+        return '{:g}k / 58'.format((powerup_cost - self.powerup_cost) / 1000)
 
     def _format_dps(self, cycle_dps):
         self.cycle_dps = cycle_dps

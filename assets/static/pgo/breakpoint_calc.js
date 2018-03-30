@@ -206,16 +206,19 @@ $(document).ready(function () {
 
   function displayBreakpointCalcDetails (json) {
     $('#breakpoint-calc-summary').html(json.summary)
+    $breakpointCalcBreakpointDetails.prop('hidden', false)
 
-    if (json.details.length <= 1) {
-      $breakpointCalcBreakpointDetails.html('Your pokemon has reached its maximum potential in this matchup.')
+    if (json.details.length < 1) {
+      $breakpointCalcBreakpointDetails.html(
+        'Your pokemon has reached its maximum potential for this matchup.')
     } else {
-      $breakpointCalcBreakpointDetails.html(buildDetailTable(json.details))
+      buildTableData(json.details)
     }
   }
 
-  function buildDetailTable (data) {
-    var dataTable = $('<table class="table table-striped"><tbody></tbody></table>')
+  function buildTableData (data) {
+    var $dataTable = $('#breakpoint-calc-breakpoint-details-table-body')
+    $dataTable.empty()
 
     for (var i = 0; i < data.length; i++) {
       var dataRow = $('<tr></tr>')
@@ -226,9 +229,8 @@ $(document).ready(function () {
         dataCell.html(data[i][j])
         dataRow.append(dataCell)
       }
-      dataTable.append(dataRow)
+      $dataTable.append(dataRow)
     }
-    return dataTable
   }
 
   function showErrors (errorObject) {

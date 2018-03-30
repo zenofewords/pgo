@@ -22,6 +22,12 @@
 #breakpoint-calc-header-text {
   text-align: justify;
 }
+#breakpoint-calc-breakpoint-details-table {
+  border-top: .1rem solid gray;
+}
+.breakpoint-calc-move-icon {
+  margin-left: -.2rem;
+}
 .error {
   border-radius: .35rem;
   border-bottom: .2rem solid #f00;
@@ -30,7 +36,6 @@
 .select2 {
   width: 100% !important;
 }
-
 #select2-breakpoint-calc-select-attacker-container,
 #select2-breakpoint-calc-select-weather-condition-container,
 #select2-breakpoint-calc-select-defender-container {

@@ -1,9 +1,6 @@
 from __future__ import unicode_literals
 
-from decimal import Decimal
-
 from django.core.management.base import BaseCommand
-from django.template.defaultfilters import slugify
 
 from pgo.models import (
     Pokemon,

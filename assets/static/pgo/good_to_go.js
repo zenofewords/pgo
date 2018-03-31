@@ -246,6 +246,7 @@ $(document).ready(function(){
 
   function submitForm(goodToGoForm) {
     $goodToGoSubmitButton.prop('disabled', true)
+    $goodToGoResults.prop('hidden', false)
     $goodToGoResults.empty()
     $goodToGoResults.html('<hr />')
     $goodToGoResults.append(

@@ -98,6 +98,8 @@
       var changelog = document.querySelector('.changelog');
 
       document.querySelector('#toggle-changelog').addEventListener('click', function (event) {
+        event.preventDefault();
+
         if (changelog.style.display === '') {
           changelog.style.display = 'none';
         } else {

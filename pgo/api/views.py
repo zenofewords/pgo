@@ -18,7 +18,7 @@ from pgo.api.serializers import (
     PokemonSerializer, TypeSerializer, GoodToGoSerializer,
 )
 from pgo.models import (
-    CPM, PokemonMove, Move, Pokemon, Type, TypeEffectivness, RaidBoss, WeatherCondition,
+    CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, WeatherCondition,
     RaidBossStatus,
 )
 from pgo.utils import (
@@ -29,7 +29,6 @@ from pgo.utils import (
     get_move_data,
     determine_move_effectivness,
     is_move_stab,
-    DEFAULT_EFFECTIVNESS,
     CINEMATIC_MOVE_FACTOR,
     MAX_IV,
 )
@@ -477,7 +476,7 @@ class GoodToGoAPIView(GenericAPIView):
         }
 
     def _get_breakpoint_data(self, defender):
-        stab = is_move_stab(self.attacker, self.quick_move)
+        stab = is_move_stab(self.quick_move, self.attacker)
         weather_boosted = self.quick_move.move_type_id in self.boosted_types
         effectivness = determine_move_effectivness(self.quick_move, defender)
         max_multiplier = self._get_attack_multiplier(MAX_IV, defender)

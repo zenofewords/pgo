@@ -5,7 +5,7 @@ from math import floor
 
 from django.http import Http404
 
-from pgo.models import Move, Pokemon, TypeEffectivness
+from pgo.models import Move, Pokemon, RaidBoss, TypeEffectivness
 
 SUPER_EFFECTIVE_SCALAR = 1.4
 NOT_VERY_EFFECTIVE_SCALAR = 0.714
@@ -109,6 +109,9 @@ def get_move_data(id):
 
 
 def determine_move_effectivness(move, pokemon):
+    if isinstance(pokemon, RaidBoss):
+        pokemon = pokemon.pokemon
+
     secondary_type_effectivness = DEFAULT_EFFECTIVNESS
     if pokemon.secondary_type_id:
         secondary_type_effectivness = TypeEffectivness.objects.get(

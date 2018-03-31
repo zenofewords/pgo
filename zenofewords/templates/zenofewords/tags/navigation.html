@@ -1,40 +1,39 @@
 <nav class="row navbar-default">
-    <input type="checkbox" id="navbar-toggle-cbox">
-    <div class="navbar-header col-xs-12">
-        <label for="navbar-toggle-cbox" class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </label>
-    </div>
-    <div id="navbar" class="navbar-collapse collapse col-xs-12">
-        <ul class="nav navbar-nav">
-            {% for menu_item in navigation.navigationitem_set.all %}
-                {% if menu_item.active %}
-                    <li class="{% if menu_item.slug == current_url %}active{% endif %}{% if menu_item.slug == 'breakpoint-calc' and current_url == '' %}active{% endif %}">
-                        <a href="/{{ menu_item.slug }}/">{{ menu_item }}
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
+  <input type="checkbox" id="navbar-toggle-cbox">
+  <div class="col-xs-12">
+    <label for="navbar-toggle-cbox" class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </label>
+  </div>
+  <div id="navbar" class="col-xs-12 navbar-collapse collapse">
+    <ul class="nav navbar-nav">
+      {% for menu_item in navigation.navigationitem_set.all %}
+      {% if menu_item.active %}
+      <li class="{% if menu_item.slug == current_url %}active{% endif %}{% if menu_item.slug == 'breakpoint-calc' and current_url == '' %}active{% endif %}">
+        <a href="/{{ menu_item.slug }}/">{{ menu_item }}
+        </a>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
 </nav>
-<hr>
 
 <style type="text/css">
-    #navbar-toggle-cbox {
-        display: none;
-    }
-    #navbar-toggle-cbox:checked ~ .collapse {
-        margin: 2rem 0;
-        display: block;
-    }
-    .navbar-default {
-        background: none;
-    }
-    #navbar {
-        padding-right: 1.4rem;
-    }
+  #navbar-toggle-cbox:checked ~ .collapse {
+    display: block;
+  }
+  #navbar-toggle-cbox {
+    display: none;
+  }
+  #navbar {
+    padding-bottom: 2rem;
+  }
+  .navbar-default {
+    background: none;
+    padding-bottom: 1rem;
+  }
 </style>

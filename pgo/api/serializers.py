@@ -56,24 +56,13 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
 
 class BreakpointCalcSerializer(serializers.Serializer):
     attacker = serializers.IntegerField()
+    attacker_level = serializers.FloatField()
     quick_move = serializers.IntegerField()
     cinematic_move = serializers.IntegerField()
-    attacker_lvl = serializers.FloatField()
-    attack_iv = serializers.IntegerField()
+    attacker_atk_iv = serializers.IntegerField()
+    weather_condition = serializers.IntegerField(required=False)
     defender = serializers.IntegerField()
-    defender_lvl = serializers.FloatField()
-    defense_iv = serializers.IntegerField()
-    raid_tier = serializers.IntegerField(required=False)
-    weather_condition = serializers.IntegerField(required=False)
-
-
-class BreakpointCalcStatsSerializer(serializers.Serializer):
-    attacker = serializers.JSONField()
-    quick_move = serializers.JSONField()
-    cinematic_move = serializers.JSONField()
-    defender = serializers.JSONField()
-    raid_tier = serializers.IntegerField(required=False)
-    weather_condition = serializers.IntegerField(required=False)
+    defender_cpm = serializers.DecimalField(max_digits=11, decimal_places=10)
 
 
 class GoodToGoSerializer(serializers.Serializer):

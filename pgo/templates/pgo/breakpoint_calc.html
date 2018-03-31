@@ -7,153 +7,122 @@
 {% endblock title %}
 
 {% block content %}
-  <div class="breakpoint-calc-wrapper row">
-    <div class="breakpoint-calc-form-wrapper col-md-5">
-      <form id="breakpoint-calc-form">
-        <div class="row">
-          <div class="col-xs-12">
-            <select id="attacker" class="breakpoint-calc-select" tabindex="1">
-              <option value="-1" disabled selected>Select attacker</option>
-              {% for data in pokemon_data %}
-                <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
-              {% endfor %}
-            </select>
-          </div>
+<div class="row" style="max-width: 90rem;">
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="max-width: 45rem;">
+    <form id="breakpoint-calc-form">
+      <div class="row">
+        <div class="col-xs-8 input-padding-right">
+          <span class="loader-glyph glyphicon glyphicon-hourglass" aria-hidden="true" style="margin: .6rem 0 0 .6rem;"></span>
+
+          <select id="breakpoint-calc-select-attacker" class="breakpoint-calc-select" tabindex="1" hidden>
+            <option value="-1" disabled selected>Select attacker</option>
+            {% for data in pokemon_data %}
+              <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
+            {% endfor %}
+          </select>
         </div>
-
-        <div class="row">
-          <div class="col-xs-12">
-            <select id="quick_move" class="breakpoint-calc-select-move" tabindex="2" disabled>
-              <option value="-1" disabled selected>Quick move</option>
-            </select>
-          </div>
+        <div class="col-xs-4 input-padding-left">
+          <input id="breakpoint-calc-input-attacker-level" class="form-control breakpoint-calc-input" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20" tabindex="2">
         </div>
-
-        <div class="row">
-          <div class="col-xs-12">
-            <select id="cinematic_move" class="breakpoint-calc-select-move" tabindex="3" disabled>
-              <option value="-1" disabled selected>Cinematic move</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row breakpoint-calc-input-wrapper">
-          <div class="col-xs-6">
-            <input type="number" id="attacker_lvl" class="breakpoint-calc-input level-input form-control" name="attacker_lvl" placeholder="Attacker level" min="1" max="40" step="0.5" value="20" tabindex="4">
-          </div>
-          <div class="col-xs-6 breakpoint-calc-atk-iv-wrapper">
-            <div class="row">
-              <div class="col-xs-10">
-                <select id="attack_iv" class="breakpoint-calc-select-atk-iv" tabindex="5">
-                  {% for n in attack_iv_range %}
-                    <option value="{{ n }}">{{ n }} ATK</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="col-xs-2 help-button-wrapper">
-                <a href="#" id="help_button" class="btn btn-info help-button">?</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="help-text col-xs-12">
-            Don't know your pokemon's level and ATK IV? Find out at <a href="https://pokemongo.gamepress.gg/pokemongo-iv-calculator#/" target="_blank" rel="noopener">GamePress</a>.
-          </div>
-        </div>
-
-        <div class="row raid-select-wrapper">
-          <div class="col-xs-6">
-            <select id="weather_condition" class="breakpoint-calc-select-weather" tabindex="6">
-              {% for data in weather_condition_data %}
-                <option value="{{ data.0 }}">{{ data.1 }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="col-xs-4 raid-toggle-wrapper">
-            <input type="checkbox" id="raid_boss_check" name="raid_boss_check" hidden checked>
-            <button id="raid_toggle_button" name="raid_toggle_button" type="button" class="btn btn-success raid-toggle-button" tabindex="7">
-              <span class="glyphicon glyphicon-off" aria-hidden="true"></span> Raid
-            </button>
-          </div>
-
-          <div class="col-xs-2 raid-tier-wrapper">
-            <select id="raid_tier" class="breakpoint-calc-select-raid-tier" tabindex="8">
-              <option value="5">T5</option>
-              <option value="4">T4</option>
-              <option value="3">T3</option>
-              <option value="2">T2</option>
-              <option value="1">T1</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-xs-12">
-            <select id="defender_raid_boss" class="breakpoint-calc-select" tabindex="9">
-            </select>
-          </div>
-        </div>
-
-        <div class="row" >
-          <div class="col-xs-12" hidden>
-            <select id="defender" class="breakpoint-calc-select" tabindex="9">
-              <option value="-1" selected disabled>Select defender</option>
-              {% for data in pokemon_data %}
-                <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <div class="row breakpoint-calc-input-wrapper hidden">
-          <div class="col-xs-8">
-            <input type="number" id="defender_lvl" class="breakpoint-calc-input level-input" name="defender_lvl" placeholder="Defender level" min="1" max="40" step="0.5" value="40">
-          </div>
-          <div class="col-xs-4">
-            <input type="number" id="defense_iv" class="breakpoint-calc-input" name="defense_iv" placeholder="DEF IV" min="0" max="15" step="1" value="15">
-          </div>
-        </div>
-
-        <input type="submit" id="submit" name="submit" value="Submit" class="breakpoint-calc-button btn btn-primary" tabindex="10">
-        <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
-      </form>
-    </div>
-    <div class="col-md-7 breakpoint-calc-info">
-      <div class="breakpoint-calc-intro">
-        <p>
-          The Pokemon GO breakpoint calculator was built to help you find your pokemon's attack damage breakpoints.
-        </p>
-        <p>
-          Select your pokemon, change the attacks, level, and ATK IV if necessary, then choose what you'll be attacking and hit submit.
-        </p>
       </div>
-      <div class="breakpoint-calc-current">
-        <p>
-          <span id="attack_iv_assessment"></span>
-          <span id="weather_boost"></span>
-        </p>
-        <p id="good_to_go_link"></p>
-        <p hidden>
-          <span id="attacker_quick_move"></span> would do
-          <span id="quick_attack_damage"></span>, and
-          <span id="attacker_cinematic_move"></span>
-          <span id="cinematic_attack_damage"></span>, damage per hit to the target.
-        </p>
+      <div class="row">
+        <div class="col-xs-6 input-padding-right">
+          <select id="breakpoint-calc-select-quick-move" class="form-control breakpoint-calc-input" tabindex="3" disabled>
+            <option value="-1" disabled selected>Quick move</option>
+          </select>
+        </div>
+        <div class="col-xs-6 input-padding-left">
+          <select id="breakpoint-calc-select-cinematic-move" class="form-control breakpoint-calc-input" tabindex="4" disabled>
+            <option value="-1" disabled selected>Cinematic move</option>
+          </select>
+        </div>
       </div>
-    </div>
+      <div class="row">
+        <div class="col-xs-6 input-padding-right">
+          <select id="breakpoint-calc-select-attacker-atk-iv" class="form-control breakpoint-calc-input" tabindex="5">
+            {% for n in attack_iv_range %}
+              <option value="{{ n }}">{{ n }} ATK</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-xs-6 input-padding-left">
+          <select id="breakpoint-calc-select-weather-condition" class="form-control breakpoint-calc-input" tabindex="6">
+            {% for data in weather_condition_data %}
+              <option value="{{ data.0 }}">{{ data.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-8 input-padding-right">
+          <span class="loader-glyph glyphicon glyphicon-hourglass" aria-hidden="true" style="margin: .6rem 0 0 .6rem;"></span>
+
+          <select id="breakpoint-calc-select-defender" class="breakpoint-calc-select" tabindex="7" hidden>
+            <option value="-1" selected disabled>Select defender</option>
+            {% for data in pokemon_data %}
+              <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-xs-4 input-padding-left">
+          <select id="breakpoint-calc-select-defender-tier" class="form-control breakpoint-calc-input" tabindex="8">
+            {% for data in defender_cpm_data %}
+                {% if forloop.last %}
+                  <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
+                {% else %}
+                  <option value="{{ data.1 }}{{ data.0 }}">T{{ data.0 }}</option>
+                {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <input id="breakpoint-calc-input-submit" class="btn btn-primary btn-sm" type="submit" name="submit" value="Submit" tabindex="9" style="width: 100%;">
+        </div>
+      </div>
+    </form>
   </div>
-
-  <div class="breakpoint-calc-stats-wrapper row">
-    <div class="col-sm-12">
-      <p class="breakpoint-calc-summary"></p>
-      <table id="breakpoint-calc-stats" class="table">
-        <tbody></tbody>
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <p id="breakpoint-calc-atk-iv-assessment" class="text-left">
+      The Pokemon GO breakpoint calculator was built to help you find your pokemon's attack damage breakpoints.
+    </p>
+    <p id="breakpoint-calc-move-effectivness" class="text-left">
+      Select your pokemon, change the attacks, level, and ATK IV if necessary, then choose what you'll be attacking and hit submit.
+    </p>
+  </div>
+</div>
+<div class="row" style="max-width: 90rem;">
+  <div class="col-xs-12">
+    <p id="breakpoint-calc-summary" class="text-left text-margin-top">
+    </p>
+    <p id="breakpoint-calc-move-details" class="text-left">
+    </p>
+    <div id="breakpoint-calc-breakpoint-details" class="text-left text-margin-top" hidden>
+      <table id="breakpoint-calc-breakpoint-details-table" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Lvl</th>
+            <th>Dust / candy</th>
+            <th class="text-left">
+              <span class="glyphicon glyphicon-flash breakpoint-calc-move-icon" aria-hidden="true"></span>
+            </th>
+            <th class="text-left">
+              <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+            </th>
+            <th>DPS (%)</th>
+            <th>KO time*</th>
+          </tr>
+        </thead>
+        <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
       </table>
+      <span class="small">
+        * Knockout times are based exclusively on weave damage and defender HP. For thorough battle simulations visit
+        <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler.</a>
+      </span>
     </div>
   </div>
+</div>
 {% endblock content %}
 
 {% block scripts %}
@@ -164,12 +133,11 @@
   {% endblock generic %}
 
   <script type="text/javascript">
-    var initialData = {{ initial_data|safe }};
+    var initialData = {{ initial_data|safe }}
     window.pgoAPIURLs = {
       'move-list': "{% url 'api-pgo:move-list' %}",
       'defender-list': "{% url 'api-pgo:pokemon-list' %}",
       'breakpoint-calc': "{% url 'api-pgo:breakpoint-calc' %}",
-      'breakpoint-calc-stats': "{% url 'api-pgo:breakpoint-calc-stats' %}",
       'breakpoint-calc-detail': "{% url 'api-pgo:breakpoint-calc-detail' %}",
     };
   </script>

@@ -7,7 +7,6 @@ var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 module.exports = {
   context: __dirname,
   entry: {
-      main: '../assets/static/main',
       lists: '../assets/static/lists',
       breakpointCalc: '../assets/static/breakpointCalc',
       goodToGo: '../assets/static/goodToGo',

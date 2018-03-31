@@ -17,22 +17,32 @@
 {% endblock header %}
 
 {% block footer %}
-  <hr>
-  <div class="row" style="font-size: 1.2rem; max-width: 85rem;">
+  <div class="row" style="font-size: 1.2rem; max-width: 85rem; margin-top: 10rem;">
     <div class="col-md-12">
       <p>Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.</p>
-      <a href="#" id="toggle-changelog">
+      <a href="#" id="toggle-changelog" style="text-decoration: none;">
         <p>Changelog <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></p>
       </a>
     </div>
 
-    <div class="col-md-12 changelog" hidden>
+    <div class="col-md-12 changelog" style="display: none;">
       <ul>
-        <li>24/3/2018</li>
+        <li>3/31/2018</li>
+        <ul>
+          <li>The breakpoint calculator has finally been refreshed</li>
+          <ul>
+            <li>Improved layout and screen space useage</li>
+            <li>Removed the raid/regular toggle button, every target pokemon can now be simulated as any raid boss or L40 defender</li>
+            <li>Added candy amount together with stardust powerup costs</li>
+            <li>Reworked the results table: was using legacy code and layout which predated raids and even gen II!</li>
+            <li>Added support for GET URLs: after you press submit, the link in the browser is updated and can be copied to easily share your results</li>
+          </ul>
+        </ul>
+        <li>3/24/2018</li>
         <ul>
           <li>Added the good to go calculator</li>
         </ul>
-        <li>14/3/2018</li>
+        <li>3/14/2018</li>
         <ul>
           <li>Experimenting with css/js compression for faster load times</li>
         </ul>
@@ -82,5 +92,18 @@
   {% block generic %}
     {% render_bundle 'lists' attrs='async' %}
   {% endblock generic %}
-  {% render_bundle 'main' attrs='async' %}
+
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+      var changelog = document.querySelector('.changelog');
+
+      document.querySelector('#toggle-changelog').addEventListener('click', function (event) {
+        if (changelog.style.display === '') {
+          changelog.style.display = 'none';
+        } else {
+          changelog.style.display = '';
+        }
+      });
+    }, false);
+  </script>
 {% endblock scripts %}

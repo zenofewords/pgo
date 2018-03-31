@@ -7,8 +7,8 @@
 {% endblock title %}
 
 {% block content %}
-<div class="row">
-  <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">
+<div class="row" style="max-width: 90rem;">
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="max-width: 45rem;">
     <form id="breakpoint-calc-form">
       <div class="row">
         <div class="col-xs-8 input-padding-right">
@@ -83,20 +83,20 @@
       </div>
     </form>
   </div>
-  <div class="col-xs-12 col-sm-6 col-md-7 col-lg-8">
-    <p id="breakpoint-calc-atk-iv-assessment" class="text-justify">
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <p id="breakpoint-calc-atk-iv-assessment" class="text-left">
       The Pokemon GO breakpoint calculator was built to help you find your pokemon's attack damage breakpoints.
     </p>
-    <p id="breakpoint-calc-move-effectivness" class="text-justify">
+    <p id="breakpoint-calc-move-effectivness" class="text-left">
       Select your pokemon, change the attacks, level, and ATK IV if necessary, then choose what you'll be attacking and hit submit.
     </p>
   </div>
 </div>
-<div class="row">
+<div class="row" style="max-width: 90rem;">
   <div class="col-xs-12">
-    <p id="breakpoint-calc-summary" class="text-justify text-margin-top">
+    <p id="breakpoint-calc-summary" class="text-left text-margin-top">
     </p>
-    <p id="breakpoint-calc-move-details" class="text-justify">
+    <p id="breakpoint-calc-move-details" class="text-left">
     </p>
     <div id="breakpoint-calc-breakpoint-details" class="text-left text-margin-top" hidden>
       <table id="breakpoint-calc-breakpoint-details-table" class="table table-striped">

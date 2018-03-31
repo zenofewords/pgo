@@ -12,7 +12,6 @@ from rest_framework.generics import GenericAPIView
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.http import Http404
 
 from pgo.api.serializers import (
     BreakpointCalcSerializer, PokemonMoveSerializer, MoveSerializer,
@@ -26,12 +25,14 @@ from pgo.utils import (
     calculate_dph,
     calculate_defender_health,
     calculate_weave_damage,
-    NEUTRAL_SCALAR,
+    get_pokemon_data,
+    get_move_data,
+    determine_move_effectivness,
+    is_move_stab,
+    DEFAULT_EFFECTIVNESS,
     CINEMATIC_MOVE_FACTOR,
     MAX_IV,
 )
-
-DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 
 
 class MoveViewSet(viewsets.ModelViewSet):
@@ -106,18 +107,15 @@ class BreakpointCalcAPIView(GenericAPIView):
         cpm_qs = CPM.gyms.all()
         self.max_cpm_value = cpm_qs.last().value
 
-        self.attacker = self._get_pokemon(data.get('attacker'))
+        self.attacker = get_pokemon_data(data.get('attacker'))
         self.attacker.atk_iv = data.get('attacker_atk_iv')
         self.attacker.level = data.get('attacker_level')
-        self.attacker.cpm_list = cpm_qs.filter(
-            level__gte=self.attacker.level).values('level', 'value', 'total_powerup_cost')
-        self.quick_move = self._get_move(data.get('quick_move'))
-        self.cinematic_move = self._get_move(data.get('cinematic_move'))
-
-        self.defender = self._get_pokemon(data.get('defender'))
+        self.attacker.cpm_list = cpm_qs.filter(level__gte=self.attacker.level).values(
+            'level', 'value', 'total_stardust_cost', 'total_candy_cost')
+        self.quick_move = get_move_data(data.get('quick_move'))
+        self.cinematic_move = get_move_data(data.get('cinematic_move'))
+        self.defender = get_pokemon_data(data.get('defender'))
         self.defender.defense_iv = data.get('defense_iv', MAX_IV)
-
-        # todo check how the serializer handles bad data
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])
         self.raid_tier = int(data.get('defender_cpm')[11:12])
 
@@ -128,34 +126,17 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.boosted_types = list(
                 self.weather_condition.types_boosted.values_list('pk', flat=True))
 
-    # todo extract
-    def _get_pokemon(self, id):
-        try:
-            return Pokemon.objects.only(
-                'name', 'pgo_attack', 'pgo_stamina', 'primary_type_id', 'secondary_type_id'
-            ).get(pk=id)
-        except Pokemon.DoesNotExist:
-            raise Http404
-
-    # todo extract
-    def _get_move(self, id):
-        try:
-            return Move.objects.only('name', 'power', 'duration', 'move_type_id').get(pk=id)
-        except Move.DoesNotExist:
-            raise Http404
-
     def _get_max_damage_move(self, move):
         self._calculate_attack_multiplier()
         self._set_move_damage(move)
         return move
 
     def _set_move_parameters(self):
-        self.quick_move.stab = self._is_stab(self.attacker, self.quick_move)
-        self.cinematic_move.stab = self._is_stab(self.attacker, self.cinematic_move)
+        self.quick_move.stab = is_move_stab(self.quick_move, self.attacker)
+        self.cinematic_move.stab = is_move_stab(self.cinematic_move, self.attacker)
 
-        self.quick_move.effectivness = self._get_effectivness(
-            self.quick_move, self.defender)
-        self.cinematic_move.effectivness = self._get_effectivness(
+        self.quick_move.effectivness = determine_move_effectivness(self.quick_move, self.defender)
+        self.cinematic_move.effectivness = determine_move_effectivness(
             self.cinematic_move, self.defender)
 
         self.quick_move.weather_boosted = self.quick_move.move_type_id in self.boosted_types
@@ -183,25 +164,6 @@ class BreakpointCalcAPIView(GenericAPIView):
             move.stab,
             move.weather_boosted,
             move.effectivness
-        )
-
-    # todo extract
-    def _get_effectivness(self, move, pokemon):
-        secondary_type_effectivness = DEFAULT_EFFECTIVNESS
-        if pokemon.secondary_type_id:
-            secondary_type_effectivness = TypeEffectivness.objects.get(
-                type_offense__id=move.move_type_id,
-                type_defense__id=pokemon.secondary_type_id).effectivness.scalar
-        primary_type_effectivness = TypeEffectivness.objects.get(
-            type_offense__id=move.move_type_id,
-            type_defense__id=pokemon.primary_type_id).effectivness.scalar
-        return secondary_type_effectivness * primary_type_effectivness
-
-    # todo extract this
-    def _is_stab(self, pokemon, move):
-        return (
-            pokemon.primary_type_id == move.move_type_id or
-            pokemon.secondary_type_id == move.move_type_id
         )
 
     def _check_weather_boost(self):
@@ -285,7 +247,8 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
         summary = self._get_battle_summary()
         self.quick_move_proficiency = []
         self.cinematic_move_proficiency = []
-        self.powerup_cost = self.attacker.cpm_list.first()['total_powerup_cost']
+        self.stardust_cost = self.attacker.cpm_list.first()['total_stardust_cost']
+        self.candy_cost = self.attacker.cpm_list.first()['total_candy_cost']
 
         self._set_quick_move_proficiency(starting_qk_dph)
         self._set_cinematic_move_proficiency(
@@ -323,7 +286,7 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                 self.attacker.name,
                 round(self.cycle_dps, 1),
                 round(self.cycle_dps * 100 / self.max_dps, 1),
-                'T{} raid boss'.format(
+                'tier {} raid boss'.format(
                     self.raid_tier) if self.raid_tier else 'level 40, 15 defense IV',
                 self.defender.name,
                 battle_time
@@ -340,9 +303,11 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
             if current_qk_dph < self.quick_move.damage_per_hit:
                 self.quick_move_proficiency.append((
                     self.quick_move.damage_per_hit,
-                    cpm['level'], cpm['value'],
-                    cpm['total_powerup_cost'],)
-                )
+                    cpm['level'],
+                    cpm['value'],
+                    cpm['total_stardust_cost'],
+                    cpm['total_candy_cost'],
+                ))
                 current_qk_dph = self.quick_move.damage_per_hit
 
     def _set_cinematic_move_proficiency(self, starting_cc_dph, max_cc_dph):
@@ -362,7 +327,8 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                     self.cinematic_move.damage_per_hit,
                     cpm['level'],
                     cpm['value'],
-                    cpm['total_powerup_cost'],
+                    cpm['total_stardust_cost'],
+                    cpm['total_candy_cost'],
                 ))
 
             if ([x for x in self.quick_move_proficiency if cpm['value'] == x[2]] or
@@ -370,9 +336,11 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                     current_cc_dph * CINEMATIC_MOVE_FACTOR < self.cinematic_move.damage_per_hit):
                 self.cinematic_move_proficiency.append((
                     self.cinematic_move.damage_per_hit,
-                    cpm['level'], cpm['value'],
-                    cpm['total_powerup_cost'],)
-                )
+                    cpm['level'],
+                    cpm['value'],
+                    cpm['total_stardust_cost'],
+                    cpm['total_candy_cost'],
+                ))
                 current_cc_dph = self.cinematic_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
@@ -393,7 +361,7 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
             cycle_dps, battle_time = calculate_weave_damage(
                 self.quick_move, self.cinematic_move, self.defender.health)
             details.append(
-                self._get_detail_row(c[1], cycle_dps, battle_time, c[3]))
+                self._get_detail_row(c[1], cycle_dps, battle_time, c[3], c[4]))
 
         # edge case when there's improvement for quick moves, but not for cinematic
         if len(self.cinematic_move_proficiency) == 0 and len(self.quick_move_proficiency) > 0:
@@ -403,19 +371,22 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                 cycle_dps, battle_time = calculate_weave_damage(
                     self.quick_move, self.cinematic_move, self.defender.health)
                 details.append(
-                    self._get_detail_row(q[1], cycle_dps, battle_time, q[3]))
+                    self._get_detail_row(q[1], cycle_dps, battle_time, q[3], q[4]))
         return details
 
-    def _get_detail_row(self, level, cycle_dps, battle_time, powerup_cost):
-        return (self._format_level(level), self._format_powerup_cost(powerup_cost),
+    def _get_detail_row(self, level, cycle_dps, battle_time, stardust_cost, candy_cost):
+        return (self._format_level(level), self._format_powerup_cost(stardust_cost, candy_cost),
                 self.quick_move.damage_per_hit, self.cinematic_move.damage_per_hit,
                 self._format_dps(cycle_dps), '{:.1f}s'.format(battle_time))
 
     def _format_level(self, level):
         return '{:g}'.format(float(level))
 
-    def _format_powerup_cost(self, powerup_cost):
-        return '{:g}k / 58'.format((powerup_cost - self.powerup_cost) / 1000)
+    def _format_powerup_cost(self, stardust_cost, candy_cost):
+        return '{:g}k / {}'.format(
+            (stardust_cost - self.stardust_cost) / 1000,
+            (candy_cost - self.candy_cost)
+        )
 
     def _format_dps(self, cycle_dps):
         self.cycle_dps = cycle_dps
@@ -506,9 +477,9 @@ class GoodToGoAPIView(GenericAPIView):
         }
 
     def _get_breakpoint_data(self, defender):
-        stab = self._is_stab(self.attacker, self.quick_move)
+        stab = is_move_stab(self.attacker, self.quick_move)
         weather_boosted = self.quick_move.move_type_id in self.boosted_types
-        effectivness = self._get_effectivness(self.quick_move, defender)
+        effectivness = determine_move_effectivness(self.quick_move, defender)
         max_multiplier = self._get_attack_multiplier(MAX_IV, defender)
 
         max_damage_per_hit = calculate_dph(
@@ -545,20 +516,3 @@ class GoodToGoAPIView(GenericAPIView):
     def _get_attack_multiplier(self, attack_iv, defender):
         return ((self.attacker.pgo_attack + attack_iv) * self.max_cpm_value) / (
             (defender.pokemon.pgo_defense + MAX_IV) * defender.raid_tier.raid_cpm.value)
-
-    def _is_stab(self, pokemon, move):
-        return (
-            pokemon.primary_type_id == move.move_type_id or
-            pokemon.secondary_type_id == move.move_type_id
-        )
-
-    def _get_effectivness(self, move, pokemon):
-        secondary_type_effectivness = DEFAULT_EFFECTIVNESS
-        if pokemon.pokemon.secondary_type_id:
-            secondary_type_effectivness = TypeEffectivness.objects.get(
-                type_offense__id=move.move_type_id,
-                type_defense__id=pokemon.pokemon.secondary_type_id).effectivness.scalar
-        primary_type_effectivness = TypeEffectivness.objects.get(
-            type_offense__id=move.move_type_id,
-            type_defense__id=pokemon.pokemon.primary_type_id).effectivness.scalar
-        return secondary_type_effectivness * primary_type_effectivness

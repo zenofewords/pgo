@@ -99,5 +99,5 @@ node_modules/
 bundles/
 server.js
 webpack/webpack-stats.json
-/.eslintrc.js
+.eslintrc
 yarn.lock

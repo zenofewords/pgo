@@ -23,7 +23,8 @@
   text-align: justify;
 }
 #breakpoint-calc-breakpoint-details-table {
-  border-top: .1rem solid gray;
+  border-top: .1rem solid #cacaca;
+  border-bottom: .1rem solid #cacaca;
 }
 .breakpoint-calc-move-icon {
   margin-left: -.2rem;

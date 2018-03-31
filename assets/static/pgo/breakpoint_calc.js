@@ -9,7 +9,7 @@ $(document).ready(function () {
   var $breakpointCalcSelectAttackerAtkIv = $('#breakpoint-calc-select-attacker-atk-iv')
   var $breakpointCalcSelectWeatherCondition = $('#breakpoint-calc-select-weather-condition')
   var $breakpointCalcSelectDefender = $('#breakpoint-calc-select-defender')
-  var $breakpointCalcSelectDefenderTier = $('#breakpoint-calc-select-defender-tier')
+  var $breakpointCalcSelectDefenderCPM = $('#breakpoint-calc-select-defender-tier')
   var $breakpointCalcInputSubmit = $('#breakpoint-calc-input-submit')
   var $breakpointCalcBreakpointDetails = $('#breakpoint-calc-breakpoint-details')
 
@@ -28,44 +28,27 @@ $(document).ready(function () {
     attacker_atk_iv: $breakpointCalcSelectAttackerAtkIv.val(),
     weather_condition: $breakpointCalcSelectWeatherCondition.val(),
     defender: $breakpointCalcSelectDefender.val(),
-    defender_cpm: $breakpointCalcSelectDefenderTier.val(),
+    defender_cpm: $breakpointCalcSelectDefenderCPM.val(),
   }
 
-  // TODO check if this will work and finish
-  // handle values on browser back button
   if (breakpointCalcForm.attacker && !(breakpointCalcForm.quick_move && breakpointCalcForm.cinematic_move)) {
     var queryDict = {}
     location.search.substr(1).split('&').forEach(function (item) {
       queryDict[item.split('=')[0]] = item.split('=')[1]
     })
-    // restoreBreakpointCalcForm(queryDict)
+    restoreBreakpointCalcForm(queryDict)
   } else if (Object.keys(initialData).length > 0) {
-    // TODO finish initial load
-    // load initial data and submit request
-    // restoreBreakpointCalcForm(initialData)
-    var attackerId = initialData.attacker_id
-    var weatherId = initialData.weather_id
-    var attackIv = initialData.attack_iv
-
-    breakpointCalcForm.attacker = attackerId
-    $('#attacker').val(attackerId).trigger('change')
-    filterQueryset(attackerId)
-
-    $breakpointCalcSelectWeatherCondition.val(weatherId).trigger('change')
-    breakpointCalcForm.weather_condition = weatherId
-
-    $breakpointCalcSelectAttackerAtkIv.val(attackIv).trigger('change')
-    breakpointCalcForm.attacker_atk_iv = attackIv
+    restoreBreakpointCalcForm(initialData)
   }
 
   // handle events
   $breakpointCalcSelectAttacker.on('change', function () {
+    clearMoveInputs()
+
     filterQueryset(this.value)
     clearError('breakpoint-calc-select-attacker')
 
     breakpointCalcForm.attacker = this.value
-    breakpointCalcForm.quick_move = -1
-    breakpointCalcForm.cinematic_move = -1
   })
   $breakpointCalcInputAttackerLevel.on('change', function () {
     setValidLevel(this, 'attacker_level')
@@ -87,13 +70,28 @@ $(document).ready(function () {
 
     breakpointCalcForm.defender = this.value
   })
-  $breakpointCalcSelectDefenderTier.on('change', function () {
+  $breakpointCalcSelectDefenderCPM.on('change', function () {
     breakpointCalcForm.defender_cpm = this.value
   })
   $('#breakpoint-calc-form').on('submit', function (event) {
     event.preventDefault()
     submitBreakpointCalcForm()
   })
+
+  // define functions
+  function restoreBreakpointCalcForm (data) {
+    breakpointCalcForm = data
+
+    $breakpointCalcSelectAttacker.val(breakpointCalcForm.attacker).trigger('change')
+    $breakpointCalcInputAttackerLevel.val(breakpointCalcForm.attacker_level).trigger('change')
+    $breakpointCalcSelectAttackerAtkIv.val(breakpointCalcForm.attacker_atk_iv).trigger('change')
+    $breakpointCalcSelectWeatherCondition.val(breakpointCalcForm.weather_condition).trigger('change')
+    $breakpointCalcSelectDefender.val(breakpointCalcForm.defender).trigger('change')
+    $breakpointCalcSelectDefenderCPM.val(breakpointCalcForm.defender_cpm).trigger('change')
+
+    filterQueryset(breakpointCalcForm.attacker)
+    submitBreakpointCalcForm(breakpointCalcForm)
+  }
 
   function filterQueryset (value) {
     if (parseInt(value) > 0) {
@@ -106,7 +104,6 @@ $(document).ready(function () {
           'pokemon-id': value,
         },
         success: function (json) {
-          clearMoveInputs()
           selectMoves(json.results)
           $breakpointCalcInputSubmit.prop('disabled', false)
         },
@@ -171,6 +168,7 @@ $(document).ready(function () {
       success: function (json) {
         displayBreakpointCalcData(json)
         getBreakpointCalcDetails()
+        updateBrowserHistory()
       },
       error: function (xhr, errmsg, err) {
         showErrors(xhr.responseJSON)
@@ -254,6 +252,20 @@ $(document).ready(function () {
     )
     breakpointCalcForm['quick_move'] = -1
     breakpointCalcForm['cinematic_move'] = -1
+  }
+
+  function updateBrowserHistory () {
+    window.history.pushState(
+      {}, null, '/breakpoint-calc/' +
+      '?attacker=' + breakpointCalcForm.attacker +
+      '&attacker_level=' + breakpointCalcForm.attacker_level +
+      '&quick_move=' + breakpointCalcForm.quick_move +
+      '&cinematic_move=' + breakpointCalcForm.cinematic_move +
+      '&attacker_atk_iv=' + breakpointCalcForm.attacker_atk_iv +
+      '&weather_condition=' + breakpointCalcForm.weather_condition +
+      '&defender=' + breakpointCalcForm.defender +
+      '&defender_cpm=' + breakpointCalcForm.defender_cpm
+    )
   }
 
   function setValidLevel (input, inputName) {

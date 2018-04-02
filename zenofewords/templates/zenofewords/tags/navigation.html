@@ -11,12 +11,12 @@
   <div id="navbar" class="col-xs-12 navbar-collapse collapse">
     <ul class="nav navbar-nav">
       {% for menu_item in navigation.navigationitem_set.all %}
-      {% if menu_item.active %}
-      <li class="{% if menu_item.slug == current_url %}active{% endif %}{% if menu_item.slug == 'breakpoint-calc' and current_url == '' %}active{% endif %}">
-        <a href="/{{ menu_item.slug }}/">{{ menu_item }}
-        </a>
-      </li>
-      {% endif %}
+        {% if menu_item.active %}
+        <li class="{% if menu_item.slug == current_url %}active{% endif %}{% if menu_item.slug == 'breakpoint-calc' and current_url == '' %}active{% endif %}">
+          <a href="/{{ menu_item.slug }}/">{{ menu_item }}
+          </a>
+        </li>
+        {% endif %}
       {% endfor %}
     </ul>
   </div>

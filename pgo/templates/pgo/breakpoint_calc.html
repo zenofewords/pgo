@@ -6,6 +6,10 @@
   {{ block.super }} - Breakpoint Calculator
 {% endblock title %}
 
+{% block meta_description %}
+  <meta name="description" content="The Pokemon GO breakpoint calculator was built to help you find your pokemon's offensive breakpoints and plan your power-ups accordingly.">
+{% endblock %}
+
 {% block content %}
 <div class="row" style="max-width: 90rem;">
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="max-width: 45rem;">
@@ -22,16 +26,19 @@
           </select>
         </div>
         <div class="col-xs-4 input-padding-left">
+          <label for="breakpoint-calc-input-attacker-level" class="sr-only">Attacker level</label>
           <input id="breakpoint-calc-input-attacker-level" class="form-control breakpoint-calc-input" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20" tabindex="2">
         </div>
       </div>
       <div class="row">
         <div class="col-xs-6 input-padding-right">
+          <label for="breakpoint-calc-select-quick-move" class="sr-only">Quick move</label>
           <select id="breakpoint-calc-select-quick-move" class="form-control breakpoint-calc-input" tabindex="3" disabled>
             <option value="-1" disabled selected>Quick move</option>
           </select>
         </div>
         <div class="col-xs-6 input-padding-left">
+          <label for="breakpoint-calc-select-cinematic-move" class="sr-only">Cinematic move</label>
           <select id="breakpoint-calc-select-cinematic-move" class="form-control breakpoint-calc-input" tabindex="4" disabled>
             <option value="-1" disabled selected>Cinematic move</option>
           </select>
@@ -39,6 +46,7 @@
       </div>
       <div class="row">
         <div class="col-xs-6 input-padding-right">
+          <label for="breakpoint-calc-select-attacker-atk-iv" class="sr-only">Attacker ATK IV</label>
           <select id="breakpoint-calc-select-attacker-atk-iv" class="form-control breakpoint-calc-input" tabindex="5">
             {% for n in attack_iv_range %}
               <option value="{{ n }}">{{ n }} ATK</option>
@@ -46,6 +54,7 @@
           </select>
         </div>
         <div class="col-xs-6 input-padding-left">
+          <label for="breakpoint-calc-select-weather-condition" class="sr-only">Weather condition</label>
           <select id="breakpoint-calc-select-weather-condition" class="form-control breakpoint-calc-input" tabindex="6">
             {% for data in weather_condition_data %}
               <option value="{{ data.0 }}">{{ data.1 }}</option>
@@ -57,6 +66,7 @@
         <div class="col-xs-8 input-padding-right">
           <span class="loader-glyph glyphicon glyphicon-hourglass" aria-hidden="true" style="margin: .6rem 0 0 .6rem;"></span>
 
+          <label for="breakpoint-calc-select-defender" class="sr-only">Defender</label>
           <select id="breakpoint-calc-select-defender" class="breakpoint-calc-select" tabindex="7" hidden>
             <option value="-1" selected disabled>Select defender</option>
             {% for data in pokemon_data %}
@@ -65,6 +75,7 @@
           </select>
         </div>
         <div class="col-xs-4 input-padding-left">
+          <label for="breakpoint-calc-select-defender-tier" class="sr-only">Defender tier / level</label>
           <select id="breakpoint-calc-select-defender-tier" class="form-control breakpoint-calc-input" tabindex="8">
             {% for data in defender_cpm_data %}
                 {% if forloop.last %}
@@ -85,7 +96,7 @@
   </div>
   <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
     <p id="breakpoint-calc-atk-iv-assessment" class="text-left">
-      The Pokemon GO breakpoint calculator was built to help you find your pokemon's attack damage breakpoints.
+      The Pokemon GO breakpoint calculator was built to help you find your pokemon's offensive breakpoints and plan your power-ups accordingly.
     </p>
     <p id="breakpoint-calc-move-effectivness" class="text-left">
       Select your pokemon, change the attacks, level, and ATK IV if necessary, then choose what you'll be attacking and hit submit.

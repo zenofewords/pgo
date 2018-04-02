@@ -9,6 +9,12 @@
 
 {% block head %}
   {{ block.super }}
+
+  {% block meta_description %}
+    <meta name="description" content="Pokemon Go resources and tools.">
+  {% endblock %}
+  <meta name="keywords" content="breakpoint calculator, damage breakpoints, pokemon, pokemon go, pgo, game mechanics, game tools">
+  <link rel="manifest" href="manifest.json" />
 {% endblock head %}
 
 {% block header %}

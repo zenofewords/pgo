@@ -1,0 +1,6 @@
+{
+  "name": "Pokemon Go breakpoint calculator",
+  "short_name": "PGo BP calc",
+  "description": "Find your pokemon's offensive breakpoints.",
+  "start_url": "/breakpoint-calc/",
+}

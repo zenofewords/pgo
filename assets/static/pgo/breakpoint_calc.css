@@ -46,6 +46,7 @@
 select {
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSIgdmlld0JveD0iMCAwIDQuOTUgMTAiPg0KICA8cGF0aCBkPSJNMS40MSA0LjY3bDEuMDctMS40OSAxLjA2IDEuNDlIMS40MXptMi4xMy42NkwyLjQ4IDYuODIgMS40MSA1LjMzaDIuMTN6Ii8+DQo8L3N2Zz4=
     ) no-repeat 100% 50% !important;
+  background-size: 2.5rem 2.5rem;
   -webkit-appearance:none !important;
   -moz-appearance:none !important;
   -ms-appearance:none !important;

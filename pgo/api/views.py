@@ -330,9 +330,8 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                     cpm['total_candy_cost'],
                 ))
 
-            if ([x for x in self.quick_move_proficiency if cpm['value'] == x[2]] or
-                    current_cc_dph < self.cinematic_move.damage_per_hit and
-                    current_cc_dph * CINEMATIC_MOVE_FACTOR < self.cinematic_move.damage_per_hit):
+            if [x for x in self.quick_move_proficiency if cpm['value'] == x[2]]:
+                # or current_cc_dph < self.cinematic_move.damage_per_hit
                 self.cinematic_move_proficiency.append((
                     self.cinematic_move.damage_per_hit,
                     cpm['level'],

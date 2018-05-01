@@ -16,9 +16,8 @@
     <form id="breakpoint-calc-form">
       <div class="row">
         <div class="col-xs-8 input-padding-right">
-          <span class="loader-glyph glyphicon glyphicon-hourglass" aria-hidden="true" style="margin: .6rem 0 0 .6rem;"></span>
-
-          <select id="breakpoint-calc-select-attacker" class="breakpoint-calc-select" tabindex="1" hidden>
+          <label for="choices-single-default" class="sr-only">Select attacker</label>
+          <select class="form-control breakpoint-calc-select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
             <option value="-1" disabled selected>Select attacker</option>
             {% for data in pokemon_data %}
               <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
@@ -27,19 +26,19 @@
         </div>
         <div class="col-xs-4 input-padding-left">
           <label for="breakpoint-calc-input-attacker-level" class="sr-only">Attacker level</label>
-          <input id="breakpoint-calc-input-attacker-level" class="form-control breakpoint-calc-input" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20" tabindex="2">
+          <input id="breakpoint-calc-input-attacker-level" class="form-control breakpoint-calc-input" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
         </div>
       </div>
       <div class="row">
         <div class="col-xs-6 input-padding-right">
           <label for="breakpoint-calc-select-quick-move" class="sr-only">Quick move</label>
-          <select id="breakpoint-calc-select-quick-move" class="form-control breakpoint-calc-input" tabindex="3" disabled>
+          <select id="breakpoint-calc-select-quick-move" class="form-control breakpoint-calc-input" disabled>
             <option value="-1" disabled selected>Quick move</option>
           </select>
         </div>
         <div class="col-xs-6 input-padding-left">
           <label for="breakpoint-calc-select-cinematic-move" class="sr-only">Cinematic move</label>
-          <select id="breakpoint-calc-select-cinematic-move" class="form-control breakpoint-calc-input" tabindex="4" disabled>
+          <select id="breakpoint-calc-select-cinematic-move" class="form-control breakpoint-calc-input" disabled>
             <option value="-1" disabled selected>Cinematic move</option>
           </select>
         </div>
@@ -47,7 +46,7 @@
       <div class="row">
         <div class="col-xs-6 input-padding-right">
           <label for="breakpoint-calc-select-attacker-atk-iv" class="sr-only">Attacker ATK IV</label>
-          <select id="breakpoint-calc-select-attacker-atk-iv" class="form-control breakpoint-calc-input" tabindex="5">
+          <select id="breakpoint-calc-select-attacker-atk-iv" class="form-control breakpoint-calc-input">
             {% for n in attack_iv_range %}
               <option value="{{ n }}">{{ n }} ATK</option>
             {% endfor %}
@@ -55,7 +54,7 @@
         </div>
         <div class="col-xs-6 input-padding-left">
           <label for="breakpoint-calc-select-weather-condition" class="sr-only">Weather condition</label>
-          <select id="breakpoint-calc-select-weather-condition" class="form-control breakpoint-calc-input" tabindex="6">
+          <select id="breakpoint-calc-select-weather-condition" class="form-control breakpoint-calc-input">
             {% for data in weather_condition_data %}
               <option value="{{ data.0 }}">{{ data.1 }}</option>
             {% endfor %}
@@ -64,19 +63,17 @@
       </div>
       <div class="row">
         <div class="col-xs-8 input-padding-right">
-          <span class="loader-glyph glyphicon glyphicon-hourglass" aria-hidden="true" style="margin: .6rem 0 0 .6rem;"></span>
-
-          <label for="breakpoint-calc-select-defender" class="sr-only">Defender</label>
-          <select id="breakpoint-calc-select-defender" class="breakpoint-calc-select" tabindex="7" hidden>
-            <option value="-1" selected disabled>Select defender</option>
+          <label for="choices-single-default" class="sr-only">Select defender</label>
+          <select class="form-control breakpoint-calc-select-defender" data-trigger name="choices-single-default" id="choices-single-default">
+            <option value="-1" disabled selected>Select defender</option>
             {% for data in pokemon_data %}
-              <option value="{{ data.0 }}">{{ data.1 }} ({{ data.3 }} DEF)</option>
+              <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-xs-4 input-padding-left">
           <label for="breakpoint-calc-select-defender-tier" class="sr-only">Defender tier / level</label>
-          <select id="breakpoint-calc-select-defender-tier" class="form-control breakpoint-calc-input" tabindex="8">
+          <select id="breakpoint-calc-select-defender-tier" class="form-control breakpoint-calc-input">
             {% for data in defender_cpm_data %}
                 {% if forloop.last %}
                   <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
@@ -89,7 +86,7 @@
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <input id="breakpoint-calc-input-submit" class="btn btn-primary btn-sm" type="submit" name="submit" value="Submit" tabindex="9" style="width: 100%;">
+          <input id="breakpoint-calc-input-submit" class="btn btn-primary btn-sm" type="submit" name="submit" value="Submit" style="width: 100%;">
         </div>
       </div>
     </form>
@@ -109,28 +106,31 @@
     </p>
     <p id="breakpoint-calc-move-details" class="text-left">
     </p>
-    <div id="breakpoint-calc-breakpoint-details" class="text-left text-margin-top" hidden>
-      <table id="breakpoint-calc-breakpoint-details-table" class="table table-striped">
-        <thead>
-          <tr>
-            <th>Lvl</th>
-            <th>Dust / candy</th>
-            <th class="text-left">
-              <span class="glyphicon glyphicon-flash breakpoint-calc-move-icon" aria-hidden="true"></span>
-            </th>
-            <th class="text-left">
-              <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
-            </th>
-            <th>DPS (%)</th>
-            <th>KO time*</th>
-          </tr>
-        </thead>
-        <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
-      </table>
-      <span class="small">
-        * Knockout times are based exclusively on weave damage and defender HP. For thorough battle simulations visit
-        <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler.</a>
-      </span>
+    <div class="text-left text-margin-top">
+      <p id="breakpoint-calc-pokemon-maxed-text" hidden>Your pokemon has reached its maximum potential for this matchup.</p>
+      <div id="breakpoint-calc-breakpoint-details-table" hidden>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Lvl</th>
+              <th>Dust / candy</th>
+              <th class="text-left">
+                <span class="glyphicon glyphicon-flash breakpoint-calc-move-icon" aria-hidden="true"></span>
+              </th>
+              <th class="text-left">
+                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+              </th>
+              <th>DPS (%)</th>
+              <th>KO time*</th>
+            </tr>
+          </thead>
+          <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
+        </table>
+        <span class="small">
+          * Knockout times are based exclusively on weave damage and defender HP. For thorough battle simulations visit
+          <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
+        </span>
+      </div>
     </div>
   </div>
 </div>

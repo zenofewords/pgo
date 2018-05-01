@@ -3,18 +3,17 @@ var webpack = require('webpack')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
-
 module.exports = {
   context: __dirname,
   entry: {
-      lists: '../assets/static/lists',
-      breakpointCalc: '../assets/static/breakpointCalc',
-      goodToGo: '../assets/static/goodToGo',
+    lists: '../assets/static/lists',
+    breakpointCalc: '../assets/static/breakpointCalc',
+    goodToGo: '../assets/static/goodToGo',
   },
 
   output: {
-      path: path.resolve('./assets/bundles/'),
-      filename: '[name]-[hash].js',
+    path: path.resolve('./assets/bundles/'),
+    filename: '[name]-[hash].js',
   },
 
   plugins: [
@@ -23,7 +22,7 @@ module.exports = {
       assetNameRegExp: /\.css$/g,
       cssProcessor: require('cssnano'),
       cssProcessorOptions: { discardComments: { removeAll: true } },
-      canPrint: false
+      canPrint: false,
     }),
     new webpack.ProvidePlugin({
       $: 'jquery',
@@ -32,20 +31,23 @@ module.exports = {
   ],
   module: {
     loaders: [{
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-      },
-      {
-        test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: 'css-loader',
-        }),
-      },
-    ],
+      test: /\.jsx?$/,
+      exclude: /node_modules/,
+      loader: 'babel-loader',
+    },
+    {
+      test: /\.css$/,
+      loader: ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: 'css-loader',
+      }),
+    },
+    {
+      test: /\.svg$/,
+      loader: 'svg-inline-loader',
+    }],
   },
   resolve: {
-    extensions: ['.js',]
+    extensions: ['.js'],
   },
 }

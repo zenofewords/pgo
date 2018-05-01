@@ -18,7 +18,7 @@
         <div class="col-xs-8 input-padding-right">
           <label for="choices-single-default" class="sr-only">Select attacker</label>
           <select class="form-control breakpoint-calc-select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
-            <option value="-1" disabled selected>Select attacker</option>
+            <option value="-1" placeholder disabled selected>Select attacker</option>
             {% for data in pokemon_data %}
               <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
             {% endfor %}
@@ -65,7 +65,7 @@
         <div class="col-xs-8 input-padding-right">
           <label for="choices-single-default" class="sr-only">Select defender</label>
           <select class="form-control breakpoint-calc-select-defender" data-trigger name="choices-single-default" id="choices-single-default">
-            <option value="-1" disabled selected>Select defender</option>
+            <option value="-1" placeholder disabled selected>Select defender</option>
             {% for data in pokemon_data %}
               <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
             {% endfor %}

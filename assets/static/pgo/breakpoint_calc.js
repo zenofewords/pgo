@@ -115,6 +115,9 @@ ready(function() {
           breakpointCalcInputSubmit.disabled = false
         }
       }
+      request.onerror = function() {
+        breakpointCalcInputSubmit.disabled = false
+      }
       request.send()
     } else {
       breakpointCalcSelectQuickMove.disabled = true
@@ -183,6 +186,9 @@ ready(function() {
         breakpointCalcInputSubmit.disabled = false
       }
     }
+    request.onerror = function() {
+      breakpointCalcInputSubmit.disabled = false
+    }
     request.send()
   }
 
@@ -207,6 +213,9 @@ ready(function() {
 
         displayBreakpointCalcDetails(json)
       }
+    }
+    request.onerror = function() {
+      breakpointCalcInputSubmit.disabled = false
     }
     request.send()
     breakpointCalcInputSubmit.disabled = false

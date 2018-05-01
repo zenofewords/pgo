@@ -28,6 +28,7 @@ ready(function() {
   const breakpointCalcInputSubmit = document.getElementById('breakpoint-calc-input-submit')
   const breakpointCalcPokemonMaxed = document.getElementById('breakpoint-calc-pokemon-maxed-text')
   const breakpointCalcDetailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
+  const breakpointCalcToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
 
   let breakpointCalcForm = {
     attacker: breakpointCalcSelectAttacker.value,
@@ -80,6 +81,10 @@ ready(function() {
   })
   breakpointCalcSelectDefenderCPM.addEventListener('change', function () {
     breakpointCalcForm.defender_cpm = this.value
+  })
+  breakpointCalcToggleCinematicBreakpoints.addEventListener('click', function (event) {
+    event.preventDefault()
+    toggleCinematicBreakpoints()
   })
   document.getElementById('breakpoint-calc-form').addEventListener('submit', function (event) {
     event.preventDefault()
@@ -251,8 +256,24 @@ ready(function() {
     }
   }
 
-  function formatParams(params){
-    return '?' + Object.keys(params).map(function(key){
+  function toggleCinematicBreakpoints () {
+    if (breakpointCalcForm.show_cinematic_breakpoints) {
+      delete breakpointCalcForm.show_cinematic_breakpoints
+
+      breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-minus')
+      breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-plus')
+    }
+    else {
+      breakpointCalcForm.show_cinematic_breakpoints = true
+
+      breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-plus')
+      breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-minus')
+    }
+    getBreakpointCalcDetails()
+  }
+
+  function formatParams (params) {
+    return '?' + Object.keys(params).map(function (key) {
       return key + '=' + encodeURIComponent(params[key])
     }).join('&')
   }

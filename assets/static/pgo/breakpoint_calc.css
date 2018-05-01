@@ -29,6 +29,9 @@
 .breakpoint-calc-move-icon {
   margin-left: -.2rem;
 }
+#breakpoint-calc-toggle-cinematic-breakpoints {
+  padding: .1rem;
+}
 .error {
   border-radius: .4rem;
   border-bottom: .3rem solid #f00;

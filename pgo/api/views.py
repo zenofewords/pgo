@@ -230,6 +230,8 @@ class BreakpointCalcAPIView(GenericAPIView):
 class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
 
     def get(self, request, *args, **kwargs):
+        self.show_cinematic_breakpoints = request.GET.get('show_cinematic_breakpoints')
+
         serializer = self.get_serializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
 
@@ -330,8 +332,8 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
                     cpm['total_candy_cost'],
                 ))
 
-            if [x for x in self.quick_move_proficiency if cpm['value'] == x[2]]:
-                # or current_cc_dph < self.cinematic_move.damage_per_hit
+            if ([x for x in self.quick_move_proficiency if cpm['value'] == x[2]]
+                or (self.show_cinematic_breakpoints and current_cc_dph < self.cinematic_move.damage_per_hit)):
                 self.cinematic_move_proficiency.append((
                     self.cinematic_move.damage_per_hit,
                     cpm['level'],

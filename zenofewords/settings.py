@@ -39,9 +39,7 @@ FORCE_SSL = bool(os.getenv('FORCE_SSL', False))
 if not DEBUG and FORCE_SSL:
     SECURE_SSL_REDIRECT = True
 
-ALLOWED_HOSTS = [
-    hostname.strip() for hostname in os.getenv('ALLOWED_HOSTS').split(',')
-]
+ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS').split(',')]
 INTERNAL_IPS = ['127.0.0.1', ]
 
 # Application definition

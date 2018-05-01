@@ -1,38 +1,48 @@
-$(document).ready(function () {
+import Choices from 'choices.js'
+
+ready(function() {
   // assign selectors
-  var $breakpointCalcSelect = $('.breakpoint-calc-select')
-  var $loaderGlyph = $('.loader-glyph')
-  var $breakpointCalcSelectAttacker = $('#breakpoint-calc-select-attacker')
-  var $breakpointCalcInputAttackerLevel = $('#breakpoint-calc-input-attacker-level')
-  var $breakpointCalcSelectQuickMove = $('#breakpoint-calc-select-quick-move')
-  var $breakpointCalcSelectCinematicMove = $('#breakpoint-calc-select-cinematic-move')
-  var $breakpointCalcSelectAttackerAtkIv = $('#breakpoint-calc-select-attacker-atk-iv')
-  var $breakpointCalcSelectWeatherCondition = $('#breakpoint-calc-select-weather-condition')
-  var $breakpointCalcSelectDefender = $('#breakpoint-calc-select-defender')
-  var $breakpointCalcSelectDefenderCPM = $('#breakpoint-calc-select-defender-tier')
-  var $breakpointCalcInputSubmit = $('#breakpoint-calc-input-submit')
-  var $breakpointCalcBreakpointDetails = $('#breakpoint-calc-breakpoint-details')
+  const breakpointCalcSelectAttacker = new Choices(
+    '.breakpoint-calc-select-attacker',
+    {
+      searchPlaceholderValue: 'Type in the attacker\'s name',
+      searchResultLimit: 3,
+      itemSelectText: ''
+    }
+  )
+  const breakpointCalcSelectDefender = new Choices(
+    '.breakpoint-calc-select-defender',
+    {
+      searchPlaceholderValue: 'Type in the defender\'s name',
+      searchResultLimit: 3,
+      itemSelectText: '',
+    }
+  )
+  const breakpointCalcInputAttackerLevel = document.getElementById('breakpoint-calc-input-attacker-level')
+  const breakpointCalcSelectQuickMove = document.getElementById('breakpoint-calc-select-quick-move')
+  const breakpointCalcSelectCinematicMove = document.getElementById('breakpoint-calc-select-cinematic-move')
+  const breakpointCalcSelectAttackerAtkIv = document.getElementById('breakpoint-calc-select-attacker-atk-iv')
+  const breakpointCalcSelectWeatherCondition = document.getElementById('breakpoint-calc-select-weather-condition')
+  const breakpointCalcSelectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
 
-  // attach select2
-  $breakpointCalcSelect.select2()
+  const breakpointCalcInputSubmit = document.getElementById('breakpoint-calc-input-submit')
+  const breakpointCalcPokemonMaxed = document.getElementById('breakpoint-calc-pokemon-maxed-text')
+  const breakpointCalcDetailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
+  const breakpointCalcToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
 
-  // show select2 inputs when ready
-  $loaderGlyph.toggle()
-  $breakpointCalcSelect.toggle()
-
-  var breakpointCalcForm = {
-    attacker: $breakpointCalcSelectAttacker.val(),
-    attacker_level: $breakpointCalcInputAttackerLevel.val(),
-    quick_move: $breakpointCalcSelectQuickMove.val(),
-    cinematic_move: $breakpointCalcSelectCinematicMove.val(),
-    attacker_atk_iv: $breakpointCalcSelectAttackerAtkIv.val(),
-    weather_condition: $breakpointCalcSelectWeatherCondition.val(),
-    defender: $breakpointCalcSelectDefender.val(),
-    defender_cpm: $breakpointCalcSelectDefenderCPM.val(),
+  let breakpointCalcForm = {
+    attacker: breakpointCalcSelectAttacker.value,
+    attacker_level: breakpointCalcInputAttackerLevel.value,
+    quick_move: breakpointCalcSelectQuickMove.value,
+    cinematic_move: breakpointCalcSelectCinematicMove.value,
+    attacker_atk_iv: breakpointCalcSelectAttackerAtkIv.value,
+    weather_condition: breakpointCalcSelectWeatherCondition.value,
+    defender: breakpointCalcSelectDefender.value,
+    defender_cpm: breakpointCalcSelectDefenderCPM.value,
   }
 
   if (breakpointCalcForm.attacker && !(breakpointCalcForm.quick_move && breakpointCalcForm.cinematic_move)) {
-    var queryDict = {}
+    const queryDict = {}
     location.search.substr(1).split('&').forEach(function (item) {
       queryDict[item.split('=')[0]] = item.split('=')[1]
     })
@@ -42,112 +52,116 @@ $(document).ready(function () {
   }
 
   // handle events
-  $breakpointCalcSelectAttacker.on('change', function () {
+  breakpointCalcSelectAttacker.passedElement.addEventListener('change', function () {
     clearMoveInputs()
-
     filterQueryset(this.value)
     clearError('breakpoint-calc-select-attacker')
 
     breakpointCalcForm.attacker = this.value
   })
-  $breakpointCalcInputAttackerLevel.on('change', function () {
+  breakpointCalcInputAttackerLevel.addEventListener('change', function () {
     setValidLevel(this, 'attacker_level')
   })
-  $breakpointCalcSelectQuickMove.on('change', function () {
+  breakpointCalcSelectQuickMove.addEventListener('change', function () {
     breakpointCalcForm.quick_move = this.value
   })
-  $breakpointCalcSelectCinematicMove.on('change', function () {
+  breakpointCalcSelectCinematicMove.addEventListener('change', function () {
     breakpointCalcForm.cinematic_move = this.value
   })
-  $breakpointCalcSelectAttackerAtkIv.on('change', function () {
+  breakpointCalcSelectAttackerAtkIv.addEventListener('change', function () {
     breakpointCalcForm.attacker_atk_iv = this.value
   })
-  $breakpointCalcSelectWeatherCondition.on('change', function () {
+  breakpointCalcSelectWeatherCondition.addEventListener('change', function () {
     breakpointCalcForm.weather_condition = this.value
   })
-  $breakpointCalcSelectDefender.on('change', function () {
+  breakpointCalcSelectDefender.passedElement.addEventListener('change', function () {
     clearError('breakpoint-calc-select-defender')
 
     breakpointCalcForm.defender = this.value
   })
-  $breakpointCalcSelectDefenderCPM.on('change', function () {
+  breakpointCalcSelectDefenderCPM.addEventListener('change', function () {
     breakpointCalcForm.defender_cpm = this.value
   })
-  $('#breakpoint-calc-form').on('submit', function (event) {
+  breakpointCalcToggleCinematicBreakpoints.addEventListener('click', function (event) {
+    event.preventDefault()
+    toggleCinematicBreakpoints()
+  })
+  document.getElementById('breakpoint-calc-form').addEventListener('submit', function (event) {
     event.preventDefault()
     submitBreakpointCalcForm()
   })
 
   // define functions
   function restoreBreakpointCalcForm (data) {
+    breakpointCalcSelectAttacker.setValueByChoice(String(data.attacker))
+    breakpointCalcSelectDefender.setValueByChoice(String(data.defender))
+
+    breakpointCalcInputAttackerLevel.value = data.attacker_level
+    breakpointCalcSelectAttackerAtkIv.value = data.attacker_atk_iv
+    breakpointCalcSelectWeatherCondition.value = data.weather_condition
+    breakpointCalcSelectDefenderCPM.value = data.defender_cpm
+
+    filterQueryset(data.attacker)
     breakpointCalcForm = data
-
-    $breakpointCalcSelectAttacker.val(breakpointCalcForm.attacker).trigger('change')
-    $breakpointCalcInputAttackerLevel.val(breakpointCalcForm.attacker_level).trigger('change')
-    $breakpointCalcSelectAttackerAtkIv.val(breakpointCalcForm.attacker_atk_iv).trigger('change')
-    $breakpointCalcSelectWeatherCondition.val(breakpointCalcForm.weather_condition).trigger('change')
-    $breakpointCalcSelectDefender.val(breakpointCalcForm.defender).trigger('change')
-    $breakpointCalcSelectDefenderCPM.val(breakpointCalcForm.defender_cpm).trigger('change')
-
-    filterQueryset(breakpointCalcForm.attacker)
-    submitBreakpointCalcForm(breakpointCalcForm)
+    submitBreakpointCalcForm()
   }
 
   function filterQueryset (value) {
     if (parseInt(value) > 0) {
-      $breakpointCalcInputSubmit.prop('disabled', true)
+      breakpointCalcInputSubmit.disabled = true
 
-      $.ajax({
-        url: window.pgoAPIURLs['move-list'],
-        type: 'GET',
-        data: {
-          'pokemon-id': value,
-        },
-        success: function (json) {
+      const request = new XMLHttpRequest()
+      request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
+
+      request.onload = function() {
+        if (request.status >= 200 && request.status < 400) {
+          const json = JSON.parse(request.responseText)
           selectMoves(json.results)
-          $breakpointCalcInputSubmit.prop('disabled', false)
-        },
-        error: function (xhr, errmsg, err) {
-          $breakpointCalcInputSubmit.prop('disabled', false)
-        },
-      })
+          breakpointCalcInputSubmit.disabled = false
+        }
+      }
+      request.onerror = function() {
+        breakpointCalcInputSubmit.disabled = false
+      }
+      request.send()
     } else {
-      $breakpointCalcSelectQuickMove.prop('disabled', true)
-      $breakpointCalcSelectCinematicMove.prop('disabled', true)
+      breakpointCalcSelectQuickMove.disabled = true
+      breakpointCalcSelectCinematicMove.disabled = true
       clearMoveInputs()
     }
   }
 
   function selectMoves (data) {
-    var quickMoveId = parseInt(breakpointCalcForm.quick_move)
-    var cinematicMoveId = parseInt(breakpointCalcForm.cinematic_move)
+    const quickMoveId = parseInt(breakpointCalcForm.quick_move)
+    const cinematicMoveId = parseInt(breakpointCalcForm.cinematic_move)
 
-    $.each(data, function (i, pokemonMove) {
-      var move = pokemonMove.move
+    data.forEach(function(moveData, i){
+      const move = moveData.move
 
       if (move.category === 'QK') {
-        $breakpointCalcSelectQuickMove.prop('disabled', false)
-        $breakpointCalcSelectQuickMove.append(
-          '<option ' + (determineSelectedMove(quickMoveId, move, 'quick_move') ? 'selected' : '') +
-          ' value=' + move.id + '>' + move.name + ' (' + move.power + ')</option>'
+        breakpointCalcSelectQuickMove.disabled = false
+        breakpointCalcSelectQuickMove.options.add(
+          new Option(
+            move.name + ' (' + move.power + ')',
+            move.id,
+            false,
+            determineSelectedMove(quickMoveId, move, 'quick_move')
+          )
         )
       } else {
-        $breakpointCalcSelectCinematicMove.prop('disabled', false)
-        $breakpointCalcSelectCinematicMove.append(
-          '<option ' + (determineSelectedMove(cinematicMoveId, move, 'cinematic_move') ? 'selected' : '') +
-          ' value=' + move.id + '>' + move.name + ' (' + move.power + ')</option>'
+        breakpointCalcSelectCinematicMove.disabled = false
+        breakpointCalcSelectCinematicMove.options.add(
+          new Option(
+            move.name + ' (' + move.power + ')',
+            move.id,
+            false,
+            determineSelectedMove(cinematicMoveId, move, 'cinematic_move')
+          )
         )
       }
     })
-    // set first item as default if none selected so far
-    if ($breakpointCalcSelectQuickMove[0].selectedIndex <= 0) {
-      $breakpointCalcSelectQuickMove.prop('selectedIndex', 1)
-      breakpointCalcForm.quick_move = $breakpointCalcSelectQuickMove.val()
-    }
-    if ($breakpointCalcSelectCinematicMove[0].selectedIndex <= 0) {
-      $breakpointCalcSelectCinematicMove.prop('selectedIndex', 1)
-      breakpointCalcForm.cinematic_move = $breakpointCalcSelectCinematicMove.val()
-    }
+    breakpointCalcForm.quick_move = breakpointCalcSelectQuickMove.value
+    breakpointCalcForm.cinematic_move = breakpointCalcSelectCinematicMove.value
   }
 
   function determineSelectedMove (moveId, move, type) {
@@ -159,95 +173,130 @@ $(document).ready(function () {
   }
 
   function submitBreakpointCalcForm () {
-    $breakpointCalcInputSubmit.prop('disabled', true)
+    breakpointCalcInputSubmit.disabled = true
 
-    $.ajax({
-      url: window.pgoAPIURLs['breakpoint-calc'],
-      type: 'GET',
-      data: breakpointCalcForm,
-      success: function (json) {
+    const request = new XMLHttpRequest()
+    const url = window.pgoAPIURLs['breakpoint-calc'] + formatParams(breakpointCalcForm)
+    request.open('GET', url, true)
+
+    request.onload = function() {
+      const json = JSON.parse(request.responseText)
+
+      if (request.status >= 200 && request.status < 400) {
         displayBreakpointCalcData(json)
         getBreakpointCalcDetails()
         updateBrowserHistory()
-      },
-      error: function (xhr, errmsg, err) {
-        showErrors(xhr.responseJSON)
-        $breakpointCalcInputSubmit.prop('disabled', false)
-      },
-    })
+      } else {
+        showErrors(json)
+        breakpointCalcInputSubmit.disabled = false
+      }
+    }
+    request.onerror = function() {
+      breakpointCalcInputSubmit.disabled = false
+    }
+    request.send()
   }
 
   function displayBreakpointCalcData (json) {
-    $('#breakpoint-calc-atk-iv-assessment').html(json.attack_iv_assessment)
-    $('#breakpoint-calc-move-effectivness').html(json.weather_boost)
+    document.getElementById('breakpoint-calc-atk-iv-assessment').innerHTML = json.attack_iv_assessment
+    document.getElementById('breakpoint-calc-move-effectivness').innerHTML = json.weather_boost
 
-    $('#breakpoint-calc-move-details').html(
+    document.getElementById('breakpoint-calc-move-details').innerHTML = (
       json.damager_per_hit_details.quick_move +
       json.damager_per_hit_details.cinematic_move
     )
   }
 
   function getBreakpointCalcDetails () {
-    $.ajax({
-      url: window.pgoAPIURLs['breakpoint-calc-detail'],
-      type: 'GET',
-      data: breakpointCalcForm,
-      success: function (json) {
+    const request = new XMLHttpRequest()
+    const url = window.pgoAPIURLs['breakpoint-calc-detail'] + formatParams(breakpointCalcForm)
+    request.open('GET', url, true)
+
+    request.onload = function() {
+      if (request.status >= 200 && request.status < 400) {
+        const json = JSON.parse(request.responseText)
+
         displayBreakpointCalcDetails(json)
-      },
-      error: function (xhr, errmsg, err) {
-        console.log('detail error', xhr)
-      },
-    })
-    $breakpointCalcInputSubmit.prop('disabled', false)
+      }
+    }
+    request.onerror = function() {
+      breakpointCalcInputSubmit.disabled = false
+    }
+    request.send()
+    breakpointCalcInputSubmit.disabled = false
   }
 
   function displayBreakpointCalcDetails (json) {
-    $('#breakpoint-calc-summary').html(json.summary)
-    $breakpointCalcBreakpointDetails.prop('hidden', false)
+    document.getElementById('breakpoint-calc-summary').innerHTML = json.summary
 
     if (json.details.length < 1) {
-      $breakpointCalcBreakpointDetails.html(
-        'Your pokemon has reached its maximum potential for this matchup.')
+      breakpointCalcDetailsTable.hidden = true
+      breakpointCalcPokemonMaxed.hidden = false
     } else {
+      breakpointCalcPokemonMaxed.hidden = true
+      breakpointCalcDetailsTable.hidden = false
       buildTableData(json.details)
     }
   }
 
   function buildTableData (data) {
-    var $dataTable = $('#breakpoint-calc-breakpoint-details-table-body')
-    $dataTable.empty()
+    const dataTable = document.getElementById('breakpoint-calc-breakpoint-details-table-body')
+    dataTable.innerHTML = ''
 
-    for (var i = 0; i < data.length; i++) {
-      var dataRow = $('<tr></tr>')
+    for (let i = 0; i < data.length; i++) {
+      const dataRow = document.createElement('tr')
 
-      for (var j = 0; j < data[i].length; j++) {
-        var dataCell = $('<td></td>')
+      for (let j = 0; j < data[i].length; j++) {
+        const dataCell = document.createElement('td')
 
-        dataCell.html(data[i][j])
-        dataRow.append(dataCell)
+        dataCell.innerHTML = data[i][j]
+        dataRow.appendChild(dataCell)
       }
-      $dataTable.append(dataRow)
+      dataTable.appendChild(dataRow)
     }
   }
 
+  function toggleCinematicBreakpoints () {
+    if (breakpointCalcForm.show_cinematic_breakpoints) {
+      delete breakpointCalcForm.show_cinematic_breakpoints
+
+      breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-minus')
+      breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-plus')
+    }
+    else {
+      breakpointCalcForm.show_cinematic_breakpoints = true
+
+      breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-plus')
+      breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-minus')
+    }
+    getBreakpointCalcDetails()
+  }
+
+  function formatParams (params) {
+    return '?' + Object.keys(params).map(function (key) {
+      return key + '=' + encodeURIComponent(params[key])
+    }).join('&')
+  }
+
   function showErrors (errorObject) {
-    for (var field in errorObject) {
-      $('#select2-breakpoint-calc-select-' + field + '-container').addClass('error')
+    for (let field in errorObject) {
+      const invalidInput = document.getElementsByClassName('breakpoint-calc-select-' + field)[0]
+      invalidInput.parentElement.parentElement.classList.add('error')
     }
   }
 
   function clearError (elementName) {
-    $('#select2-' + elementName + '-container').removeClass('error')
+    const input = document.getElementsByClassName(elementName)[0]
+    input.parentElement.parentElement.classList.remove('error')
   }
 
   function clearMoveInputs () {
-    $breakpointCalcSelectQuickMove.empty()
-    $breakpointCalcSelectQuickMove.append(
+    breakpointCalcSelectQuickMove.innerHTML = ''
+    breakpointCalcSelectQuickMove.append(
       '<option value="-1" disabled selected>Select quick move</option>'
     )
-    $breakpointCalcSelectCinematicMove.empty()
-    $breakpointCalcSelectCinematicMove.append(
+    breakpointCalcSelectCinematicMove.innerHTML = ''
+    breakpointCalcSelectCinematicMove.append(
       '<option value="-1" disabled selected>Select cinematic move</option>'
     )
     breakpointCalcForm['quick_move'] = -1
@@ -269,7 +318,7 @@ $(document).ready(function () {
   }
 
   function setValidLevel (input, inputName) {
-    var choice = validateLevel(input)
+    const choice = validateLevel(input)
 
     if (!isNaN(choice)) {
       input.value = choice
@@ -280,8 +329,8 @@ $(document).ready(function () {
   }
 
   function validateLevel (input) {
-    var val = input.value.replace(',', '.')
-    var level = parseFloat(val)
+    const val = input.value.replace(',', '.')
+    const level = parseFloat(val)
 
     if (level < 0) {
       level *= -1
@@ -298,3 +347,11 @@ $(document).ready(function () {
     return level
   }
 })
+
+function ready(runBreakpointCalc) {
+  if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading'){
+    runBreakpointCalc()
+  } else {
+    document.addEventListener('DOMContentLoaded', runBreakpointCalc);
+  }
+}

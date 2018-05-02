@@ -1,5 +1,6 @@
 import Choices from 'choices.js'
 
+// testing webpack hash/cache busting
 ready(function() {
   const breakpointCalcSelectAttacker = new Choices(
     '.breakpoint-calc-select-attacker',

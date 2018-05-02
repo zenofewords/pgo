@@ -1,7 +1,6 @@
 import Choices from 'choices.js'
 
 ready(function() {
-  // assign selectors
   const breakpointCalcSelectAttacker = new Choices(
     '.breakpoint-calc-select-attacker',
     {
@@ -51,7 +50,6 @@ ready(function() {
     restoreBreakpointCalcForm(initialData)
   }
 
-  // handle events
   breakpointCalcSelectAttacker.passedElement.addEventListener('change', function () {
     clearMoveInputs()
     filterQueryset(this.value)
@@ -91,7 +89,6 @@ ready(function() {
     submitBreakpointCalcForm()
   })
 
-  // define functions
   function restoreBreakpointCalcForm (data) {
     breakpointCalcSelectAttacker.setValueByChoice(String(data.attacker))
     breakpointCalcSelectDefender.setValueByChoice(String(data.defender))

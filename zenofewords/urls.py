@@ -10,7 +10,6 @@ from pgo.views import BreakpointCalculatorView
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-pgo/', include(pgo_api_urls, namespace='api-pgo')),
 
     url(r'^', include('pgo.urls', namespace='pgo')),

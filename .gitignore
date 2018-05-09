@@ -101,3 +101,4 @@ server.js
 webpack/webpack-stats.json
 .eslintrc
 yarn.lock
+.flake8

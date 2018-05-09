@@ -54,13 +54,10 @@ INSTALLED_APPS = [
 
     'webpack_loader',
     'django_extensions',
-
     'rest_framework',
 
     'zenofewords',
-    'metrics',
     'pgo',
-    'registry',
 ]
 
 MIDDLEWARE = [

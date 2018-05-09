@@ -61,9 +61,6 @@ INSTALLED_APPS = [
     'metrics',
     'pgo',
     'registry',
-    'blog',
-    'book',
-    'tcg',
 ]
 
 MIDDLEWARE = [

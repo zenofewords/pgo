@@ -48,10 +48,6 @@ class SortMixin(ListView):
         return context
 
 
-class PGoHomeView(TemplateView):
-    template_name = 'pgo/pgo_home.html'
-
-
 class PokemonListView(SortMixin):
     model = Pokemon
     paginate_by = 151

@@ -1,9 +1,10 @@
 from __future__ import division, unicode_literals
 
+import six.moves.urllib as urllib
+
 from collections import OrderedDict
 from decimal import Decimal
 from operator import itemgetter
-from urllib.parse import urlencode
 
 from rest_framework import response, status, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -364,7 +365,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         return top_counters
 
     def _get_top_counter_url(self, top_counter):
-        params = urlencode({
+        params = urllib.parse.urlencode({
             'attacker': top_counter.counter.slug,
             'attacker_level': 20,
             'quick_move': slugify(top_counter.moveset_data[0][1]),

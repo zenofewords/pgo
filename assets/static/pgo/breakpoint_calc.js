@@ -1,13 +1,12 @@
 import Choices from 'choices.js'
 
-// testing webpack hash/cache busting
-ready(function() {
+ready(function () {
   const breakpointCalcSelectAttacker = new Choices(
     '.breakpoint-calc-select-attacker',
     {
       searchPlaceholderValue: 'Type in the attacker\'s name',
       searchResultLimit: 3,
-      itemSelectText: ''
+      itemSelectText: '',
     }
   )
   const breakpointCalcSelectDefender = new Choices(
@@ -26,9 +25,14 @@ ready(function() {
   const breakpointCalcSelectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
 
   const breakpointCalcInputSubmit = document.getElementById('breakpoint-calc-input-submit')
-  const breakpointCalcPokemonMaxed = document.getElementById('breakpoint-calc-pokemon-maxed-text')
+  const breakpointCalcMoveEffectivness = document.getElementById('breakpoint-calc-move-effectivness')
   const breakpointCalcDetailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
   const breakpointCalcToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
+
+  const breakpointCalcTabBreakpoints = document.getElementById('breakpoint-calc-breakpoints')
+  const breakpointCalcTabTopCounters = document.getElementById('breakpoint-calc-top-counters')
+  const breakpointCalcBreakpointsTable = document.getElementById('breakpoint-calc-breakpoints-table')
+  const breakpointCalcTopCountersTable = document.getElementById('breakpoint-calc-top-counters-table')
 
   let breakpointCalcForm = {
     attacker: breakpointCalcSelectAttacker.value,
@@ -89,6 +93,22 @@ ready(function() {
     event.preventDefault()
     submitBreakpointCalcForm()
   })
+  breakpointCalcTabBreakpoints.addEventListener('click', function (event) {
+    event.preventDefault()
+
+    this.classList.add('breakpoint-calc-selected-tab')
+    breakpointCalcBreakpointsTable.hidden = false
+    breakpointCalcTopCountersTable.hidden = true
+    breakpointCalcTabTopCounters.classList.remove('breakpoint-calc-selected-tab')
+  })
+  breakpointCalcTabTopCounters.addEventListener('click', function (event) {
+    event.preventDefault()
+
+    this.classList.add('breakpoint-calc-selected-tab')
+    breakpointCalcBreakpointsTable.hidden = true
+    breakpointCalcTopCountersTable.hidden = false
+    breakpointCalcTabBreakpoints.classList.remove('breakpoint-calc-selected-tab')
+  })
 
   function restoreBreakpointCalcForm (data) {
     breakpointCalcSelectAttacker.setValueByChoice(String(data.attacker))
@@ -111,14 +131,14 @@ ready(function() {
       const request = new XMLHttpRequest()
       request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
 
-      request.onload = function() {
+      request.onload = function () {
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
           selectMoves(json.results)
           breakpointCalcInputSubmit.disabled = false
         }
       }
-      request.onerror = function() {
+      request.onerror = function () {
         breakpointCalcInputSubmit.disabled = false
       }
       request.send()
@@ -133,7 +153,7 @@ ready(function() {
     const quickMoveId = parseInt(breakpointCalcForm.quick_move)
     const cinematicMoveId = parseInt(breakpointCalcForm.cinematic_move)
 
-    data.forEach(function(moveData, i){
+    data.forEach(function (moveData, i) {
       const move = moveData.move
 
       if (move.category === 'QK') {
@@ -177,67 +197,36 @@ ready(function() {
     const url = window.pgoAPIURLs['breakpoint-calc'] + formatParams(breakpointCalcForm)
     request.open('GET', url, true)
 
-    request.onload = function() {
+    request.onload = function () {
       const json = JSON.parse(request.responseText)
 
       if (request.status >= 200 && request.status < 400) {
-        displayBreakpointCalcData(json)
-        getBreakpointCalcDetails()
+        document.getElementById('breakpoint-calc-atk-iv-assessment').innerHTML = json.attack_iv_assessment
+
+        displayBreakpointCalcDetails(json)
+        generateTopCountersTable(json.top_counters)
         updateBrowserHistory()
       } else {
         showErrors(json)
-        breakpointCalcInputSubmit.disabled = false
       }
-    }
-    request.onerror = function() {
-      breakpointCalcInputSubmit.disabled = false
-    }
-    request.send()
-  }
-
-  function displayBreakpointCalcData (json) {
-    document.getElementById('breakpoint-calc-atk-iv-assessment').innerHTML = json.attack_iv_assessment
-    document.getElementById('breakpoint-calc-move-effectivness').innerHTML = json.weather_boost
-
-    document.getElementById('breakpoint-calc-move-details').innerHTML = (
-      json.damager_per_hit_details.quick_move +
-      json.damager_per_hit_details.cinematic_move
-    )
-  }
-
-  function getBreakpointCalcDetails () {
-    const request = new XMLHttpRequest()
-    const url = window.pgoAPIURLs['breakpoint-calc-detail'] + formatParams(breakpointCalcForm)
-    request.open('GET', url, true)
-
-    request.onload = function() {
-      if (request.status >= 200 && request.status < 400) {
-        const json = JSON.parse(request.responseText)
-
-        displayBreakpointCalcDetails(json)
-      }
-    }
-    request.onerror = function() {
-      breakpointCalcInputSubmit.disabled = false
     }
     request.send()
     breakpointCalcInputSubmit.disabled = false
   }
 
   function displayBreakpointCalcDetails (json) {
-    document.getElementById('breakpoint-calc-summary').innerHTML = json.summary
+    breakpointCalcDetailsTable.hidden = false
 
-    if (json.details.length < 1) {
-      breakpointCalcDetailsTable.hidden = true
-      breakpointCalcPokemonMaxed.hidden = false
+    if (json.breakpoint_details.length < 2) {
+      breakpointCalcToggleCinematicBreakpoints.parentElement.hidden = true
     } else {
-      breakpointCalcPokemonMaxed.hidden = true
-      breakpointCalcDetailsTable.hidden = false
-      buildTableData(json.details)
+      breakpointCalcToggleCinematicBreakpoints.parentElement.hidden = false
     }
+    breakpointCalcMoveEffectivness.innerHTML = ''
+    generateBreakpointTable(json.breakpoint_details)
   }
 
-  function buildTableData (data) {
+  function generateBreakpointTable (data) {
     const dataTable = document.getElementById('breakpoint-calc-breakpoint-details-table-body')
     dataTable.innerHTML = ''
 
@@ -254,20 +243,72 @@ ready(function() {
     }
   }
 
+  function generateTopCountersTable (dataset) {
+    const dataTable = document.getElementById('breakpoint-calc-top-counters-table-body')
+    dataTable.innerHTML = ''
+
+    for (const [key, data] of Object.entries(dataset)) {
+      for (let i = 0; i < data.length; i++) {
+        const dataRow = document.createElement('tr')
+        let dataCell
+
+        for (let j = 0; j < data[i].length; j++) {
+          dataCell = document.createElement('td')
+
+          dataCell.innerHTML = data[i][j]
+          dataRow.appendChild(dataCell)
+        }
+
+        let className = key.toLowerCase()
+        if (i > 0) {
+          className = 'toggle_' + className + ' breakpoint-calc-top-counter-subrow'
+          dataRow.hidden = true
+        } else if (!key.includes('user')) {
+          const chevron = document.createElement('span')
+          chevron.setAttribute(
+            'class', 'glyphicon glyphicon-chevron-down breakpoint-calc-top-counter-chevron')
+          chevron.setAttribute('aria-hidden', true)
+
+          const href = document.createElement('a')
+          href.setAttribute('class', 'breakpoint-calc-toggle-chevron')
+          href.onclick = function () {
+            if (chevron.classList.contains('glyphicon-chevron-down')) {
+              chevron.classList.remove('glyphicon-chevron-down')
+              chevron.classList.add('glyphicon-chevron-up')
+            } else {
+              chevron.classList.remove('glyphicon-chevron-up')
+              chevron.classList.add('glyphicon-chevron-down')
+            }
+
+            const elements = document.getElementsByClassName('toggle_' + className)
+            for (var i = 0; i < elements.length; i++) {
+              elements[i].hidden = !elements[i].hidden
+            }
+          }
+
+          href.appendChild(chevron)
+          dataCell.appendChild(href)
+        }
+        dataRow.setAttribute('class', className)
+
+        dataTable.appendChild(dataRow)
+      }
+    }
+  }
+
   function toggleCinematicBreakpoints () {
     if (breakpointCalcForm.show_cinematic_breakpoints) {
       delete breakpointCalcForm.show_cinematic_breakpoints
 
       breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-minus')
       breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-plus')
-    }
-    else {
+    } else {
       breakpointCalcForm.show_cinematic_breakpoints = true
 
       breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-plus')
       breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-minus')
     }
-    getBreakpointCalcDetails()
+    submitBreakpointCalcForm()
   }
 
   function formatParams (params) {
@@ -328,7 +369,7 @@ ready(function() {
 
   function validateLevel (input) {
     const val = input.value.replace(',', '.')
-    const level = parseFloat(val)
+    let level = parseFloat(val)
 
     if (level < 0) {
       level *= -1
@@ -346,10 +387,10 @@ ready(function() {
   }
 })
 
-function ready(runBreakpointCalc) {
-  if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading'){
+function ready (runBreakpointCalc) {
+  if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
     runBreakpointCalc()
   } else {
-    document.addEventListener('DOMContentLoaded', runBreakpointCalc);
+    document.addEventListener('DOMContentLoaded', runBreakpointCalc)
   }
 }

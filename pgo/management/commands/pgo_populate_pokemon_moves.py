@@ -26,14 +26,14 @@ class Command(BaseCommand):
         cinematic_move = Move.objects.get(slug=slugify(moves[1]))
 
         moveset.quick_move = self._get_or_create_pokemon_move(moveset, quick_move)
-        moveset.cinematic_move = self._get_or_create_pokemon_move(moveset, cinematic_move, True)
+        moveset.cinematic_move = self._get_or_create_pokemon_move(moveset, cinematic_move)
         moveset.save()
 
-    def _get_or_create_pokemon_move(self, moveset, move, cinematic=False):
+    def _get_or_create_pokemon_move(self, moveset, move):
         pokemon = moveset.pokemon
 
         obj, created = PokemonMove.objects.get_or_create(
-            pokemon=moveset.pokemon,
+            pokemon=pokemon,
             move=move,
             defaults={
                 'stab': True if move.move_type in (
@@ -41,13 +41,16 @@ class Command(BaseCommand):
                 'score': Decimal(moveset.weave_damage[4][1] / 100)
             }
         )
-        if not created:
+        if not created and obj.pokemon == pokemon:
             obj.stab = True if move.move_type in (
                 pokemon.primary_type, pokemon.secondary_type) else False
-            obj.score = Decimal(moveset.weave_damage[4][1] / 100)
+            new_score = Decimal(moveset.weave_damage[4][1] / 100)
+            obj.score = new_score if new_score > obj.score else obj.score
             obj.save()
         return obj
 
     def handle(self, *args, **options):
+        # reset scores
+        PokemonMove.objects.update(score=0)
         for moveset in Moveset.objects.all():
             self._populate_pokemon_moves(moveset)

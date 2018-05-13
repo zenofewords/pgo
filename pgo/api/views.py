@@ -2,24 +2,24 @@ from __future__ import division, unicode_literals
 
 from collections import OrderedDict
 from decimal import Decimal
+from operator import itemgetter
+from urllib.parse import urlencode
 
 from rest_framework import response, status, viewsets
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.generics import GenericAPIView
 
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 
 from pgo.api.serializers import (
     BreakpointCalcSerializer, PokemonMoveSerializer, MoveSerializer,
     PokemonSerializer, TypeSerializer, GoodToGoSerializer,
 )
 from pgo.models import (
-    CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, WeatherCondition,
-    RaidBossStatus,
+    CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, WeatherCondition, RaidBossStatus, TopCounter,
 )
 from pgo.utils import (
     calculate_dph,
@@ -80,25 +80,24 @@ class TypeViewSet(viewsets.ModelViewSet):
 
 
 class BreakpointCalcAPIView(GenericAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = BreakpointCalcSerializer
 
     def get(self, request, *args, **kwargs):
+        self.show_cinematic_breakpoints = request.GET.get('show_cinematic_breakpoints')
+
         serializer = self.get_serializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
 
         self._fetch_data(serializer.data)
-
         self._set_move_parameters()
+        self._set_defender_health()
+        self._set_move_stats(self.attacker.cpm_list.first()['value'], self.attacker.atk_iv)
+
         data = {
-            'weather_boost': self._check_weather_boost(),
+            'top_counters': self._get_top_counters(),
             'attack_iv_assessment': self._assess_attack_iv(),
-            'damager_per_hit_details': self._calculate_moves_dph(
-                self.defender.cpm,
-                self.defender.pgo_defense,
-                self.quick_move,
-                self.cinematic_move
-            )
+            'breakpoint_details': self._get_details_table(self._process_data()),
         }
         return response.Response(data, status=status.HTTP_200_OK)
 
@@ -125,10 +124,29 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.boosted_types = list(
                 self.weather_condition.types_boosted.values_list('pk', flat=True))
 
-    def _get_max_damage_move(self, move):
-        self._calculate_attack_multiplier()
-        self._set_move_damage(move)
-        return move
+    def _process_data(self):
+        attacker_starting_cpm = self.attacker.cpm_list.first()
+
+        self._set_move_stats(attacker_cpm=attacker_starting_cpm['value'])
+        starting_qk_dph = self.quick_move.damage_per_hit
+        starting_cc_dph = self.cinematic_move.damage_per_hit
+
+        self.perfect_max_dps, _ = calculate_weave_damage(
+            self._get_max_damage_move(self.quick_move, attack_iv=MAX_IV),
+            self._get_max_damage_move(self.cinematic_move, attack_iv=MAX_IV)
+        )
+
+        self.quick_move_proficiency = []
+        self.cinematic_move_proficiency = []
+        self.stardust_cost = attacker_starting_cpm['total_stardust_cost']
+        self.candy_cost = attacker_starting_cpm['total_candy_cost']
+
+        self._set_quick_move_proficiency(starting_qk_dph)
+        self._set_cinematic_move_proficiency(
+            starting_cc_dph,
+            self._get_max_damage_move(self.cinematic_move).damage_per_hit
+        )
+        return starting_qk_dph
 
     def _set_move_parameters(self):
         self.quick_move.stab = is_move_stab(self.quick_move, self.attacker)
@@ -141,7 +159,29 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.quick_move.weather_boosted = self.quick_move.move_type_id in self.boosted_types
         self.cinematic_move.weather_boosted = self.cinematic_move.move_type_id in self.boosted_types
 
-    def _calculate_move_stats(self, attacker_cpm=None, attack_iv=None):
+    def _set_defender_health(self):
+        stamina = self.defender.pgo_stamina
+        if self.raid_tier:
+            stamina = self.defender.raidboss_set.get(raid_tier=self.raid_tier).raid_tier.tier_stamina
+        self.defender.health = calculate_defender_health(stamina + MAX_IV, self.defender.cpm)
+
+    def _assess_attack_iv(self):
+        self._set_move_stats(attack_iv=self.attacker.atk_iv)
+        current_qk_dph = self.quick_move.damage_per_hit
+        self._set_move_stats(attack_iv=MAX_IV)
+
+        params = (
+            self.attacker.name,
+            'high enough' if current_qk_dph == self.quick_move.damage_per_hit else 'too low',
+            self.quick_move.name,
+            self.quick_move.damage_per_hit,
+            'tier {} raid boss'.format(self.raid_tier) if self.raid_tier else 'level 40, 15 defense IV',
+            self.defender.name,
+        )
+        return 'Your {}\'s <b>attack IV is {}</b> for it to reach the final {} breakpoint ({})\
+                against a {} {}.'.format(*params)
+
+    def _set_move_stats(self, attacker_cpm=None, attack_iv=None):
         self._calculate_attack_multiplier(attacker_cpm, attack_iv)
         self._set_move_damage(self.quick_move)
         self._set_move_damage(self.cinematic_move)
@@ -165,137 +205,23 @@ class BreakpointCalcAPIView(GenericAPIView):
             move.effectivness
         )
 
-    def _check_weather_boost(self):
-        weather_boost_info = ''
-        if self.quick_move.weather_boosted or self.cinematic_move.weather_boosted:
-            quick_move_boosted = self.quick_move.name if self.quick_move.weather_boosted else ''
-            cinematic_move_boosted = self.cinematic_move.name if self.cinematic_move.weather_boosted else ''
-
-            conjuction = ' and ' if quick_move_boosted and cinematic_move_boosted else ''
-            verb = 'are' if quick_move_boosted and cinematic_move_boosted else 'is'
-
-            weather_boost_info = '{0}{1}{2} {3} boosted by {4} weather.'.format(
-                quick_move_boosted, conjuction, cinematic_move_boosted,
-                verb, self.weather_condition
-            )
-        return weather_boost_info
-
-    def _assess_attack_iv(self):
-        self._calculate_move_stats()
-        self.current_qk_dph = self.quick_move.damage_per_hit
-        self._calculate_move_stats(attack_iv=MAX_IV)
-
-        params = (
-            self.attacker.name,
-            self.quick_move.name,
-            self.quick_move.damage_per_hit,
-        )
-        if (self.current_qk_dph == self.quick_move.damage_per_hit):
-            return 'Your {}\'s <b>attack IV is high enough</b> for it to reach the final {} \
-                    breakpoint ({}) in this matchup!'.format(*params)
-        else:
-            return 'Unfortunately, your {}\'s <b>attack IV is too low</b> for it to reach the \
-                    final breakpoint for {} ({}) in this matchup.'''.format(*params)
-
-    def _calculate_moves_dph(self, cpm_value, defense, quick_move, cinematic_move):
-        total_attack = self.attacker.pgo_attack + self.attacker.atk_iv
-
-        attack_multiplier = total_attack * CPM.objects.get(
-            level=self.attacker.level, raid_cpm=False).value
-        max_attack_multiplier = total_attack * self.max_cpm_value
-        attack_modifier = attack_multiplier / ((defense + MAX_IV) * cpm_value)
-        max_attack_modifier = max_attack_multiplier / ((defense + MAX_IV) * cpm_value)
-
-        return {
-            'quick_move': 'At level {:g}, its {} would do {} and '.format(
-                self.attacker.level,
-                quick_move.name,
-                self._build_move_stats(attack_modifier, max_attack_modifier, quick_move)
-            ),
-            'cinematic_move': '{} {} possible damage per hit.'.format(
-                cinematic_move.name,
-                self._build_move_stats(attack_modifier, max_attack_modifier, cinematic_move)
-            )
-        }
-
-    def _build_move_stats(self, attack_modifier, max_attack_modifier, move):
-        current_dph = calculate_dph(
-            move.power, attack_modifier, move.stab, move.weather_boosted, move.effectivness)
-        max_dph = calculate_dph(
-            move.power, max_attack_modifier, move.stab, move.weather_boosted, move.effectivness)
-
-        return '<b>{}</b> / {},'.format(current_dph, max_dph)
-
-
-class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
-
-    def get(self, request, *args, **kwargs):
-        self.show_cinematic_breakpoints = request.GET.get('show_cinematic_breakpoints')
-
-        serializer = self.get_serializer(data=request.GET)
-        serializer.is_valid(raise_exception=True)
-
-        self._fetch_data(serializer.data)
-        return response.Response(self._process_data(), status=status.HTTP_200_OK)
-
-    def _process_data(self):
-        self._set_move_parameters()
-
-        self._calculate_move_stats(attacker_cpm=self.attacker.cpm_list.first()['value'])
-        starting_qk_dph = self.quick_move.damage_per_hit
-        starting_cc_dph = self.cinematic_move.damage_per_hit
-
-        summary = self._get_battle_summary()
-        self.quick_move_proficiency = []
-        self.cinematic_move_proficiency = []
-        self.stardust_cost = self.attacker.cpm_list.first()['total_stardust_cost']
-        self.candy_cost = self.attacker.cpm_list.first()['total_candy_cost']
-
-        self._set_quick_move_proficiency(starting_qk_dph)
-        self._set_cinematic_move_proficiency(
-            starting_cc_dph, self.max_damage_cc.damage_per_hit)
-
-        details_table = self._get_details_table(starting_qk_dph)
-        return {
-            'summary': summary,
-            'details': details_table,
-        }
-
-    def _get_battle_summary(self):
-        self._set_move_parameters()
-        self._calculate_move_stats(attacker_cpm=self.attacker.cpm_list.first()['value'])
-
-        stamina = self.defender.pgo_stamina
-        if self.raid_tier:
-            stamina = self.defender.raidboss_set.get(
-                raid_tier=self.raid_tier).raid_tier.tier_stamina
-
-        self.defender.health = calculate_defender_health(
-            stamina + MAX_IV, self.defender.cpm
-        )
-        self.cycle_dps, battle_time = calculate_weave_damage(
-            self.quick_move, self.cinematic_move, self.defender.health
-        )
-
-        max_damage_qk = self._get_max_damage_move(self.quick_move)
-        self.max_damage_cc = self._get_max_damage_move(self.cinematic_move)
-        self.max_dps, _ = calculate_weave_damage(max_damage_qk, self.max_damage_cc)
-
-        return (
-            'Your {} would do <b>{:g} DPS ({:g}%)</b> to a {} {}, knocking it out in {:.1f} seconds.'
-            .format(
-                self.attacker.name,
-                round(self.cycle_dps, 1),
-                round(self.cycle_dps * 100 / self.max_dps, 1),
-                'tier {} raid boss'.format(
-                    self.raid_tier) if self.raid_tier else 'level 40, 15 defense IV',
-                self.defender.name,
-                battle_time
-            )
-        )
+    def _get_max_damage_move(self, move, attack_iv=None):
+        self._calculate_attack_multiplier(attack_iv=attack_iv)
+        self._set_move_damage(move)
+        return move
 
     def _set_quick_move_proficiency(self, starting_qk_dph):
         current_qk_dph = starting_qk_dph
+        current_cpm = self.attacker.cpm_list[0]
+
+        # include current level
+        self.quick_move_proficiency.append((
+            starting_qk_dph,
+            current_cpm['level'],
+            current_cpm['value'],
+            current_cpm['total_stardust_cost'],
+            current_cpm['total_candy_cost'],
+        ))
 
         for cpm in self.attacker.cpm_list:
             self._calculate_attack_multiplier(cpm['value'])
@@ -321,8 +247,7 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
             self._calculate_attack_multiplier(cpm['value'])
             self._set_move_damage(self.cinematic_move)
 
-            # ensure to get the max cinematic move damage row, which might
-            # otherwise get filtered out
+            # ensure to get the max cinematic move damage row, which might otherwise get filtered out
             if self.cinematic_move.damage_per_hit == max_cc_dph:
                 self.cinematic_move_proficiency.append((
                     self.cinematic_move.damage_per_hit,
@@ -375,14 +300,14 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
         return details
 
     def _get_detail_row(self, level, cycle_dps, battle_time, stardust_cost, candy_cost):
-        return (self._format_level(level), self._format_powerup_cost(stardust_cost, candy_cost),
+        return ('{:g}'.format(float(level)), self._format_powerup_cost(stardust_cost, candy_cost),
                 self.quick_move.damage_per_hit, self.cinematic_move.damage_per_hit,
                 self._format_dps(cycle_dps), '{:.1f}s'.format(battle_time))
 
-    def _format_level(self, level):
-        return '{:g}'.format(float(level))
-
     def _format_powerup_cost(self, stardust_cost, candy_cost):
+        if stardust_cost - self.stardust_cost == 0 and candy_cost - self.candy_cost == 0:
+            return '- / -'
+
         return '{:g}k / {}'.format(
             (stardust_cost - self.stardust_cost) / 1000,
             (candy_cost - self.candy_cost)
@@ -390,12 +315,72 @@ class BreakpointCalcDetailAPIView(BreakpointCalcAPIView):
 
     def _format_dps(self, cycle_dps):
         self.cycle_dps = cycle_dps
-        dps_percentage = self.cycle_dps * 100 / self.max_dps
+        dps_percentage = self.cycle_dps * 100 / self.perfect_max_dps
         return '{:g} ({:g}%)'.format(round(cycle_dps, 1), round(dps_percentage, 1))
+
+    def _get_top_counters(self):
+        top_counters_qs = TopCounter.objects.filter(
+            defender_id=self.defender.pk,
+            defender_cpm=self.defender.cpm,
+            weather_condition_id=self.weather_condition.pk
+        ).order_by('-highest_dps')[:12]
+
+        top_counters = OrderedDict()
+        cycle_dps, _ = calculate_weave_damage(self.quick_move, self.cinematic_move)
+        # todo: refactor this nonsense
+        for top_counter in top_counters_qs:
+            if round(cycle_dps, 1) >= top_counter.highest_dps:
+                top_counters['user_{}'.format(self.attacker.name)] = [(
+                    '<b>{}</b> (L{:g}, {}A)'.format(
+                        self.attacker.name,
+                        self.attacker.level,
+                        self.attacker.atk_iv,
+                    ),
+                    self.quick_move.name,
+                    self.cinematic_move.name,
+                    round(cycle_dps, 1),
+                )]
+            moveset_data = []
+            for data_row in top_counter.moveset_data:
+                moveset_data.append((
+                    self._get_top_counter_url(top_counter),
+                    data_row[1],
+                    data_row[2],
+                    round(data_row[0], 1),
+                ))
+            top_counters[top_counter.counter.name] = moveset_data
+
+        if not 'user_{}'.format(self.attacker.name) in top_counters:
+            top_counters['user_{}'.format(self.attacker.name)] = [(
+                    '<b>{}</b> (L{:g}, {}A)'.format(
+                        self.attacker.name,
+                        self.attacker.level,
+                        self.attacker.atk_iv,
+                    ),
+                    self.quick_move.name,
+                    self.cinematic_move.name,
+                    round(cycle_dps, 1),
+                )]
+        return top_counters
+
+    def _get_top_counter_url(self, top_counter):
+        params = urlencode({
+            'attacker': top_counter.counter.slug,
+            'attacker_level': 20,
+            'quick_move': slugify(top_counter.moveset_data[0][1]),
+            'cinematic_move': slugify(top_counter.moveset_data[0][2]),
+            'attacker_atk_iv': 15,
+            'weather_condition': top_counter.weather_condition_id,
+            'defender': top_counter.defender.slug,
+            'defender_cpm': '{}{}'.format(top_counter.defender_cpm, self.raid_tier),
+        })
+        return '<a href="{0}?{1}">{2}</a>'.format(
+            reverse('pgo:breakpoint-calc'), params, top_counter.counter.name,
+        )
 
 
 class GoodToGoAPIView(GenericAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = GoodToGoSerializer
 
     def get(self, request, *args, **kwargs):

@@ -67,13 +67,13 @@ class Pokemon(DefaultModelMixin, NameMixin):
     stamina = models.IntegerField(blank=True, null=True)
     speed = models.IntegerField(blank=True, null=True)
 
-    def __unicode__(self):
-        return '{0} ({1})'.format(self.name, self.number)
-
     class Meta:
         verbose_name = 'Pokemon'
         verbose_name_plural = 'Pokemon'
         ordering = DEFAULT_ORDER['Pokemon']
+
+    def __unicode__(self):
+        return '{0} ({1})'.format(self.name, self.number)
 
 
 class Type(DefaultModelMixin, NameMixin, OrderMixin):
@@ -124,11 +124,11 @@ class Move(DefaultModelMixin, NameMixin):
     eps = models.DecimalField(verbose_name='EPS',
         max_digits=3, decimal_places=1, blank=True, null=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = DEFAULT_ORDER['Move']
+
+    def __str__(self):
+        return self.name
 
 
 class PokemonMove(DefaultModelMixin):
@@ -139,12 +139,12 @@ class PokemonMove(DefaultModelMixin):
     stab = models.BooleanField(default=False)
     score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
 
+    class Meta:
+        ordering = ('pokemon', '-score', '-stab',)
+        unique_together = ('pokemon', 'move',)
+
     def __str__(self):
         return '{}\'s {}'.format(self.pokemon, self.move)
-
-    class Meta:
-        ordering = ('pokemon', '-stab', '-score',)
-        unique_together = ('pokemon', 'move',)
 
 
 class Moveset(DefaultModelMixin):
@@ -158,12 +158,12 @@ class Moveset(DefaultModelMixin):
     legacy = models.BooleanField(default=False)
     weave_damage = JSONField(blank=True, null=True)
 
-    def __str__(self):
-        return '{} {}'.format(self.pokemon.name, self.key)
-
     class Meta:
         ordering = DEFAULT_ORDER['Moveset']
         unique_together = ('pokemon', 'key',)
+
+    def __str__(self):
+        return '{} {}'.format(self.pokemon.name, self.key)
 
 
 class CPMManager(models.Manager):
@@ -190,15 +190,14 @@ class CPM(models.Model):
     gyms = CPMManager()
     raids = RaidCPMManager()
 
-    def __str__(self):
-        raid = '(raid)' if self.raid_cpm else ''
-        return 'l{0}: \t{1} {2}'.format(self.level, self.value, raid)
-
     class Meta:
         verbose_name = 'CP multiplier'
         verbose_name_plural = 'CP multiplier'
         ordering = ('-raid_cpm', 'level',)
-        # add un tgtr
+
+    def __str__(self):
+        raid = '(raid)' if self.raid_cpm else ''
+        return 'l{0}: \t{1} {2}'.format(self.level, self.value, raid)
 
 
 class RaidTier(models.Model):
@@ -206,13 +205,13 @@ class RaidTier(models.Model):
     tier = models.PositiveIntegerField(verbose_name='Tier Level')
     tier_stamina = models.PositiveIntegerField(verbose_name='Tier Stamina')
 
-    def __str__(self):
-        return str(self.tier)
-
     class Meta:
         verbose_name = 'Raid Tier'
         verbose_name_plural = 'Raid Tiers'
         ordering = ('-tier',)
+
+    def __str__(self):
+        return str(self.tier)
 
 
 class RaidBoss(models.Model):
@@ -220,21 +219,34 @@ class RaidBoss(models.Model):
     raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier')
     status = models.CharField(max_length=20, choices=RaidBossStatus.CHOICES, blank=True)
 
-    def __str__(self):
-        return 'T{} raid boss {}'.format(self.raid_tier.tier, self.pokemon.name)
-
     class Meta:
         verbose_name = 'Raid Boss'
         verbose_name_plural = 'Raid Bosses'
-        ordering = ('-raid_tier__tier', 'pokemon__name')
+        ordering = ('-raid_tier__tier', 'pokemon__name',)
+
+    def __str__(self):
+        return 'T{} raid boss {}'.format(self.raid_tier.tier, self.pokemon.name)
 
 
 class WeatherCondition(DefaultModelMixin, NameMixin, OrderMixin):
     types_boosted = models.ManyToManyField('pgo.Type', verbose_name='Boosts Type', blank=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = 'Weather Condition'
         verbose_name_plural = 'Weather Conditions'
+
+    def __str__(self):
+        return self.name
+
+
+class TopCounter(models.Model):
+    defender = models.ForeignKey('pgo.Pokemon', related_name='defenders')
+    defender_cpm = models.DecimalField(max_digits=10, decimal_places=9)
+    weather_condition = models.ForeignKey('pgo.WeatherCondition')
+
+    counter = models.ForeignKey('pgo.Pokemon', related_name='counters')
+    highest_dps = models.DecimalField(verbose_name='Highest DPS', max_digits=4, decimal_places=1)
+    moveset_data = JSONField()
+
+    class Meta:
+        unique_together = ('defender', 'defender_cpm', 'weather_condition', 'counter',)

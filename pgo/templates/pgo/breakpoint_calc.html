@@ -107,9 +107,12 @@
     <p id="breakpoint-calc-move-details" class="text-left">
     </p>
     <div class="text-left text-margin-top">
-      <p id="breakpoint-calc-pokemon-maxed-text" hidden>Your pokemon has reached its maximum potential for this matchup.</p>
       <div id="breakpoint-calc-breakpoint-details-table" hidden>
-        <table class="table table-striped">
+        <div class="breakpoint-calc-tabs">
+          <input class="btn breakpoint-calc-tab breakpoint-calc-selected-tab" type="submit" id="breakpoint-calc-breakpoints" value="Breakpoints">
+          <input class="btn breakpoint-calc-tab" type="submit" id="breakpoint-calc-top-counters" value="Top counters">
+        </div>
+        <table id="breakpoint-calc-breakpoints-table" class="table table-striped">
           <thead>
             <tr>
               <th>Lvl</th>
@@ -129,6 +132,21 @@
             </tr>
           </thead>
           <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
+        </table>
+        <table id="breakpoint-calc-top-counters-table" class="table" hidden>
+          <thead>
+            <tr>
+              <th width="20%">Pokemon</th>
+              <th width="40%" class="text-left">
+                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+              </th>
+              <th width="40%" class="text-left">
+                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+              </th>
+              <th width="10%">DPS</th>
+            </tr>
+          </thead>
+          <tbody id="breakpoint-calc-top-counters-table-body"></tbody>
         </table>
         <span class="small">
           * Knockout times are based exclusively on weave damage and defender HP. For thorough battle simulations visit
@@ -153,7 +171,6 @@
       'move-list': "{% url 'api-pgo:move-list' %}",
       'defender-list': "{% url 'api-pgo:pokemon-list' %}",
       'breakpoint-calc': "{% url 'api-pgo:breakpoint-calc' %}",
-      'breakpoint-calc-detail': "{% url 'api-pgo:breakpoint-calc-detail' %}",
     };
   </script>
 {% endblock scripts %}

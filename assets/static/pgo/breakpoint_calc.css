@@ -26,11 +26,31 @@
   border-top: .1rem solid #cacaca;
   border-bottom: .1rem solid #cacaca;
 }
+#breakpoint-calc-breakpoint-details-table-body tr:first-child {
+  font-weight: 900;
+}
 .breakpoint-calc-move-icon {
   margin-left: -.2rem;
 }
 #breakpoint-calc-toggle-cinematic-breakpoints {
   padding: .1rem;
+}
+.breakpoint-calc-tab {
+  margin-right: .2rem;
+  margin-bottom: -.1rem;
+  border-radius: .3rem .3rem 0 0;
+  border-color: #cacaca;
+  background-color: #fafafa;
+  outline-color: #fdfdfd !important;
+}
+.breakpoint-calc-selected-tab {
+  border-bottom-color: #fff;
+}
+.breakpoint-calc-top-counter-chevron {
+  margin-left: .5rem;
+}
+.breakpoint-calc-top-counter-subrow {
+  background-color: #f9f9f9;
 }
 .error {
   border-radius: .4rem;
@@ -38,15 +58,7 @@
   margin-top: -.3rem;
 }
 
-.select2 {
-  width: 100% !important;
-}
-#select2-breakpoint-calc-select-attacker-container,
-#select2-breakpoint-calc-select-weather-condition-container,
-#select2-breakpoint-calc-select-defender-container {
-  margin-top: -0.1rem;
-}
-
+/* fixing the hideous select input "gloss" in safari */
 select {
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSIgdmlld0JveD0iMCAwIDQuOTUgMTAiPg0KICA8cGF0aCBkPSJNMS40MSA0LjY3bDEuMDctMS40OSAxLjA2IDEuNDlIMS40MXptMi4xMy42NkwyLjQ4IDYuODIgMS40MSA1LjMzaDIuMTN6Ii8+DQo8L3N2Zz4=
     ) no-repeat 100% 50% !important;

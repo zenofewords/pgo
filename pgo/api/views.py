@@ -323,7 +323,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             defender_id=self.defender.pk,
             defender_cpm=self.defender.cpm,
             weather_condition_id=self.weather_condition.pk
-        ).order_by('-highest_dps')[:50]
+        ).order_by('-highest_dps')[:12]
 
         top_counters = OrderedDict()
         cycle_dps, _ = calculate_weave_damage(self.quick_move, self.cinematic_move)

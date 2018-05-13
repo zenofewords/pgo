@@ -19,41 +19,6 @@ MAX_IV = 15
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 
 
-def simulate_weave_damage(quick_move, cinematic_move, health):
-
-    def _timeout(step, duration):
-        return step + duration > TIMEOUT
-
-    def _knockout(damage, health):
-        return True if damage >= health else False
-
-    step = 0
-    energy = 0
-    damage = 0
-
-    while step < TIMEOUT:
-        if not _timeout(step, cinematic_move.duration):
-            if energy >= cinematic_move.energy_delta * - 1:
-                damage += cinematic_move.damage_per_hit
-                step += (cinematic_move.duration + 1000)
-
-                if _knockout(damage, health):
-                    return damage, step / 1000
-                energy += cinematic_move.energy_delta
-
-        if _timeout(step, quick_move.duration):
-            step = 99000
-            break
-
-        damage += quick_move.damage_per_hit
-        step += quick_move.duration
-
-        if _knockout(damage, health):
-            return damage, step / 1000
-        energy += quick_move.energy_delta
-    return damage, step / 1000
-
-
 def calculate_weave_damage(qk_move, cc_move, health=0):
     if qk_move.energy_delta > 0:
         qk_moves_required = (cc_move.energy_delta * - 1) / qk_move.energy_delta
@@ -62,6 +27,10 @@ def calculate_weave_damage(qk_move, cc_move, health=0):
     cycle_dps = (
         qk_moves_required * qk_move.damage_per_hit + cc_move.damage_per_hit) / (
         (qk_moves_required * qk_move.duration + cc_move.duration) / 1000)
+
+    # nerf moveset damage for single bar charge moves
+    if cc_move.energy_delta == -100:
+        cycle_dps = cycle_dps / 1.07
 
     return cycle_dps, health / cycle_dps
 

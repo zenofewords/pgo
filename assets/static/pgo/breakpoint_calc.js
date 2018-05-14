@@ -245,12 +245,13 @@ ready(function () {
 
   function generateTopCountersTable (dataset) {
     const dataTable = document.getElementById('breakpoint-calc-top-counters-table-body')
+    let dataRow
+    let dataCell
     dataTable.innerHTML = ''
 
     for (const [key, data] of Object.entries(dataset)) {
       for (let i = 0; i < data.length; i++) {
-        const dataRow = document.createElement('tr')
-        let dataCell
+        dataRow = document.createElement('tr')
 
         for (let j = 0; j < data[i].length; j++) {
           dataCell = document.createElement('td')
@@ -293,6 +294,18 @@ ready(function () {
 
         dataTable.appendChild(dataRow)
       }
+    }
+
+    // temp, remove when all results are generated
+    if (Object.keys(dataset).length < 2) {
+      dataRow = document.createElement('tr')
+      dataCell = document.createElement('td')
+
+      dataCell.setAttribute('colspan', 4)
+      dataCell.innerHTML = 'Results are still being generated, please check back later.'
+
+      dataRow.appendChild(dataCell)
+      dataTable.appendChild(dataRow)
     }
   }
 

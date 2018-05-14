@@ -344,7 +344,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             moveset_data = []
             for data_row in top_counter.moveset_data:
                 moveset_data.append((
-                    self._get_top_counter_url(top_counter),
+                    self._get_top_counter_url(top_counter, data_row[1], data_row[2]),
                     data_row[1],
                     data_row[2],
                     round(data_row[0], 1),
@@ -364,12 +364,12 @@ class BreakpointCalcAPIView(GenericAPIView):
                 )]
         return top_counters
 
-    def _get_top_counter_url(self, top_counter):
+    def _get_top_counter_url(self, top_counter, quick_move, cinematic_move):
         params = urllib.parse.urlencode({
             'attacker': top_counter.counter.slug,
             'attacker_level': 20,
-            'quick_move': slugify(top_counter.moveset_data[0][1]),
-            'cinematic_move': slugify(top_counter.moveset_data[0][2]),
+            'quick_move': slugify(quick_move),
+            'cinematic_move': slugify(cinematic_move),
             'attacker_atk_iv': 15,
             'weather_condition': top_counter.weather_condition_id,
             'defender': top_counter.defender.slug,

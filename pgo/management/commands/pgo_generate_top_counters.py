@@ -24,6 +24,12 @@ UNRELEASED_POKEMON = [
     'smeargle',
     'spinda',
 ]
+GENERATED_WEATHER_CONDITIONS = [
+    'no-weather',
+    'clear',
+    'partly-cloudy',
+]
+
 
 class Command(BaseCommand):
     help = 'Populate the TopCounter model by generating a list of top counters for each defender.'
@@ -37,10 +43,9 @@ class Command(BaseCommand):
             ).order_by('-pgo_attack')[:120]
 
         self.max_cpm = CPM.gyms.last().value
-        defender_cpm_list = [x.value for x in CPM.raids.distinct('value').order_by('value')]
+        defender_cpm_list = [x.value for x in CPM.raids.distinct('value').order_by('value')][:3]
         defender_cpm_list.append(self.max_cpm)
-        weather_conditions = WeatherCondition.objects.all()
-
+        weather_conditions = WeatherCondition.objects.exclude(slug__in=GENERATED_WEATHER_CONDITIONS)
         defenders = Pokemon.objects.exclude(slug__in=UNRELEASED_POKEMON)
         # loop to death
         for weather_condition in weather_conditions:

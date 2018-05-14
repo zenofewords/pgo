@@ -43,6 +43,7 @@ ready(function () {
     weather_condition: breakpointCalcSelectWeatherCondition.value,
     defender: breakpointCalcSelectDefender.value,
     defender_cpm: breakpointCalcSelectDefenderCPM.value,
+    tab: 'breakpoints',
   }
 
   if (breakpointCalcForm.attacker && !(breakpointCalcForm.quick_move && breakpointCalcForm.cinematic_move)) {
@@ -96,21 +97,18 @@ ready(function () {
   breakpointCalcTabBreakpoints.addEventListener('click', function (event) {
     event.preventDefault()
 
-    this.classList.add('breakpoint-calc-selected-tab')
-    breakpointCalcBreakpointsTable.hidden = false
-    breakpointCalcTopCountersTable.hidden = true
-    breakpointCalcTabTopCounters.classList.remove('breakpoint-calc-selected-tab')
+    breakpointCalcForm.tab = 'breakpoints'
+    toggleTab(breakpointCalcForm.tab)
   })
   breakpointCalcTabTopCounters.addEventListener('click', function (event) {
     event.preventDefault()
 
-    this.classList.add('breakpoint-calc-selected-tab')
-    breakpointCalcBreakpointsTable.hidden = true
-    breakpointCalcTopCountersTable.hidden = false
-    breakpointCalcTabBreakpoints.classList.remove('breakpoint-calc-selected-tab')
+    breakpointCalcForm.tab = 'counters'
+    toggleTab(breakpointCalcForm.tab)
   })
 
   function restoreBreakpointCalcForm (data) {
+    toggleTab(data.tab)
     breakpointCalcSelectAttacker.setValueByChoice(String(data.attacker))
     breakpointCalcSelectDefender.setValueByChoice(String(data.defender))
 
@@ -122,6 +120,26 @@ ready(function () {
     filterQueryset(data.attacker)
     breakpointCalcForm = data
     submitBreakpointCalcForm()
+  }
+
+  function toggleTab (currentTab) {
+    if (currentTab === 'breakpoints') {
+      breakpointCalcBreakpointsTable.hidden = false
+      breakpointCalcTopCountersTable.hidden = true
+
+      breakpointCalcTabBreakpoints.classList.add('breakpoint-calc-selected-tab')
+      breakpointCalcTabTopCounters.classList.remove('breakpoint-calc-selected-tab')
+
+      updateBrowserHistory(formatParams(breakpointCalcForm))
+    } else if (currentTab === 'counters') {
+      breakpointCalcBreakpointsTable.hidden = true
+      breakpointCalcTopCountersTable.hidden = false
+
+      breakpointCalcTabTopCounters.classList.add('breakpoint-calc-selected-tab')
+      breakpointCalcTabBreakpoints.classList.remove('breakpoint-calc-selected-tab')
+
+      updateBrowserHistory(formatParams(breakpointCalcForm))
+    }
   }
 
   function filterQueryset (value) {
@@ -194,7 +212,8 @@ ready(function () {
     breakpointCalcInputSubmit.disabled = true
 
     const request = new XMLHttpRequest()
-    const url = window.pgoAPIURLs['breakpoint-calc'] + formatParams(breakpointCalcForm)
+    const getParams = formatParams(breakpointCalcForm)
+    const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
     request.open('GET', url, true)
 
     request.onload = function () {
@@ -205,7 +224,7 @@ ready(function () {
 
         displayBreakpointCalcDetails(json)
         generateTopCountersTable(json.top_counters)
-        updateBrowserHistory()
+        updateBrowserHistory(getParams)
       } else {
         showErrors(json)
       }
@@ -355,17 +374,9 @@ ready(function () {
     breakpointCalcForm['cinematic_move'] = -1
   }
 
-  function updateBrowserHistory () {
+  function updateBrowserHistory (getParams) {
     window.history.pushState(
-      {}, null, '/breakpoint-calc/' +
-      '?attacker=' + breakpointCalcForm.attacker +
-      '&attacker_level=' + breakpointCalcForm.attacker_level +
-      '&quick_move=' + breakpointCalcForm.quick_move +
-      '&cinematic_move=' + breakpointCalcForm.cinematic_move +
-      '&attacker_atk_iv=' + breakpointCalcForm.attacker_atk_iv +
-      '&weather_condition=' + breakpointCalcForm.weather_condition +
-      '&defender=' + breakpointCalcForm.defender +
-      '&defender_cpm=' + breakpointCalcForm.defender_cpm
+      {}, null, '/breakpoint-calc/' + getParams
     )
   }
 

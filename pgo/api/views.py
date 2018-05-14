@@ -374,6 +374,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             'weather_condition': top_counter.weather_condition_id,
             'defender': top_counter.defender.slug,
             'defender_cpm': '{}{}'.format(top_counter.defender_cpm, self.raid_tier),
+            'tab': 'breakpoints',
         })
         return '<a href="{0}?{1}">{2}</a>'.format(
             reverse('pgo:breakpoint-calc'), params, top_counter.counter.name,

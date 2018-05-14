@@ -222,7 +222,7 @@ class BreakpointCalculatorView(CalculatorInitialDataMixin):
                 'WeatherCondition', params.get('weather_condition')),
             'defender': self._get_object_id('Pokemon', params.get('defender')),
             'defender_cpm': str(Decimal(params.get('defender_cpm'))),
-            'tab': slugify(params.get('tab')),
+            'tab': slugify(params.get('tab', 'breakpoints')),
         }
 
 

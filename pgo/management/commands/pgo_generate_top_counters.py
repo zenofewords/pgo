@@ -24,11 +24,6 @@ UNRELEASED_POKEMON = [
     'smeargle',
     'spinda',
 ]
-GENERATED_WEATHER_CONDITIONS = [
-    'no-weather',
-    'clear',
-    'partly-cloudy',
-]
 
 
 class Command(BaseCommand):
@@ -45,8 +40,9 @@ class Command(BaseCommand):
         self.max_cpm = CPM.gyms.last().value
         defender_cpm_list = [x.value for x in CPM.raids.distinct('value').order_by('value')][:3]
         defender_cpm_list.append(self.max_cpm)
-        weather_conditions = WeatherCondition.objects.exclude(slug__in=GENERATED_WEATHER_CONDITIONS)
+        weather_conditions = WeatherCondition.objects.filter(slug='partly-cloudy')
         defenders = Pokemon.objects.exclude(slug__in=UNRELEASED_POKEMON)
+
         # loop to death
         for weather_condition in weather_conditions:
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
@@ -58,7 +54,7 @@ class Command(BaseCommand):
     def _create_top_counters(self, defender, weather_condition_id, boosted_types, defender_cpm):
         for attacker in self.attackers:
             try:
-                tc = TopCounter.objects.get(
+                TopCounter.objects.get(
                     defender_id=defender.pk,
                     defender_cpm=defender_cpm,
                     weather_condition_id=weather_condition_id,

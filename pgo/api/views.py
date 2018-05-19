@@ -4,7 +4,6 @@ import six.moves.urllib as urllib
 
 from collections import OrderedDict
 from decimal import Decimal
-from operator import itemgetter
 
 from rest_framework import response, status, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -324,7 +323,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             defender_id=self.defender.pk,
             defender_cpm=self.defender.cpm,
             weather_condition_id=self.weather_condition.pk
-        ).order_by('-highest_dps')[:12]
+        ).order_by('-highest_dps')[:15]
 
         top_counters = OrderedDict()
         cycle_dps, _ = calculate_weave_damage(self.quick_move, self.cinematic_move)

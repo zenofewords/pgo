@@ -30,7 +30,7 @@ def calculate_weave_damage(qk_move, cc_move, health=0):
 
     # nerf moveset damage for single bar charge moves
     if cc_move.energy_delta == -100:
-        cycle_dps = cycle_dps / 1.07
+        cycle_dps = cycle_dps / 1.06
 
     return cycle_dps, health / cycle_dps
 

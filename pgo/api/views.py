@@ -329,7 +329,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         cycle_dps, _ = calculate_weave_damage(self.quick_move, self.cinematic_move)
         # todo: refactor this nonsense
         for top_counter in top_counters_qs:
-            if round(cycle_dps, 1) >= top_counter.highest_dps:
+            if round(cycle_dps, 1) >= float(top_counter.highest_dps):
                 top_counters['user_{}'.format(self.attacker.name)] = [(
                     '<b>{}</b> (L{:g}, {}A)'.format(
                         self.attacker.name,

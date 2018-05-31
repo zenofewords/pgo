@@ -1,7 +1,7 @@
 import Choices from 'choices.js'
 
 ready(function () {
-  const breakpointCalcSelectAttacker = new Choices(
+  const selectAttacker = new Choices(
     '.breakpoint-calc-select-attacker',
     {
       searchPlaceholderValue: 'Type in the attacker\'s name',
@@ -9,7 +9,7 @@ ready(function () {
       itemSelectText: '',
     }
   )
-  const breakpointCalcSelectDefender = new Choices(
+  const selectDefender = new Choices(
     '.breakpoint-calc-select-defender',
     {
       searchPlaceholderValue: 'Type in the defender\'s name',
@@ -17,32 +17,32 @@ ready(function () {
       itemSelectText: '',
     }
   )
-  const breakpointCalcInputAttackerLevel = document.getElementById('breakpoint-calc-input-attacker-level')
-  const breakpointCalcSelectQuickMove = document.getElementById('breakpoint-calc-select-quick-move')
-  const breakpointCalcSelectCinematicMove = document.getElementById('breakpoint-calc-select-cinematic-move')
-  const breakpointCalcSelectAttackerAtkIv = document.getElementById('breakpoint-calc-select-attacker-atk-iv')
-  const breakpointCalcSelectWeatherCondition = document.getElementById('breakpoint-calc-select-weather-condition')
-  const breakpointCalcSelectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
+  const inputAttackerLevel = document.getElementById('breakpoint-calc-input-attacker-level')
+  const selectAttackerQuickMove = document.getElementById('breakpoint-calc-select-quick-move')
+  const selectAttackerCinematicMove = document.getElementById('breakpoint-calc-select-cinematic-move')
+  const selectAttackerAtkIv = document.getElementById('breakpoint-calc-select-attacker-atk-iv')
+  const selectWeatherCondition = document.getElementById('breakpoint-calc-select-weather-condition')
+  const selectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
 
-  const breakpointCalcInputSubmit = document.getElementById('breakpoint-calc-input-submit')
-  const breakpointCalcMoveEffectivness = document.getElementById('breakpoint-calc-move-effectivness')
-  const breakpointCalcDetailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
-  const breakpointCalcToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
+  const inputSubmit = document.getElementById('breakpoint-calc-input-submit')
+  const moveEffectivness = document.getElementById('breakpoint-calc-move-effectivness')
+  const detailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
+  const inputToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
 
-  const breakpointCalcTabBreakpoints = document.getElementById('breakpoint-calc-breakpoints')
-  const breakpointCalcTabTopCounters = document.getElementById('breakpoint-calc-top-counters')
-  const breakpointCalcBreakpointsTable = document.getElementById('breakpoint-calc-breakpoints-table')
-  const breakpointCalcTopCountersTable = document.getElementById('breakpoint-calc-top-counters-table')
+  const tabBreakpoints = document.getElementById('breakpoint-calc-breakpoints')
+  const tabTopCounters = document.getElementById('breakpoint-calc-top-counters')
+  const breakpointsTable = document.getElementById('breakpoint-calc-breakpoints-table')
+  const topCountersTable = document.getElementById('breakpoint-calc-top-counters-table')
 
   let breakpointCalcForm = {
-    attacker: breakpointCalcSelectAttacker.value,
-    attacker_level: breakpointCalcInputAttackerLevel.value,
-    quick_move: breakpointCalcSelectQuickMove.value,
-    cinematic_move: breakpointCalcSelectCinematicMove.value,
-    attacker_atk_iv: breakpointCalcSelectAttackerAtkIv.value,
-    weather_condition: breakpointCalcSelectWeatherCondition.value,
-    defender: breakpointCalcSelectDefender.value,
-    defender_cpm: breakpointCalcSelectDefenderCPM.value,
+    attacker: selectAttacker.value,
+    attacker_level: inputAttackerLevel.value,
+    quick_move: selectAttackerQuickMove.value,
+    cinematic_move: selectAttackerCinematicMove.value,
+    attacker_atk_iv: selectAttackerAtkIv.value,
+    weather_condition: selectWeatherCondition.value,
+    defender: selectDefender.value,
+    defender_cpm: selectDefenderCPM.value,
     tab: 'breakpoints',
   }
 
@@ -56,37 +56,37 @@ ready(function () {
     restoreBreakpointCalcForm(initialData)
   }
 
-  breakpointCalcSelectAttacker.passedElement.addEventListener('change', function () {
+  selectAttacker.passedElement.addEventListener('change', function () {
     clearMoveInputs()
     filterQueryset(this.value)
     clearError('breakpoint-calc-select-attacker')
 
     breakpointCalcForm.attacker = this.value
   })
-  breakpointCalcInputAttackerLevel.addEventListener('change', function () {
+  inputAttackerLevel.addEventListener('change', function () {
     setValidLevel(this, 'attacker_level')
   })
-  breakpointCalcSelectQuickMove.addEventListener('change', function () {
+  selectAttackerQuickMove.addEventListener('change', function () {
     breakpointCalcForm.quick_move = this.value
   })
-  breakpointCalcSelectCinematicMove.addEventListener('change', function () {
+  selectAttackerCinematicMove.addEventListener('change', function () {
     breakpointCalcForm.cinematic_move = this.value
   })
-  breakpointCalcSelectAttackerAtkIv.addEventListener('change', function () {
+  selectAttackerAtkIv.addEventListener('change', function () {
     breakpointCalcForm.attacker_atk_iv = this.value
   })
-  breakpointCalcSelectWeatherCondition.addEventListener('change', function () {
+  selectWeatherCondition.addEventListener('change', function () {
     breakpointCalcForm.weather_condition = this.value
   })
-  breakpointCalcSelectDefender.passedElement.addEventListener('change', function () {
+  selectDefender.passedElement.addEventListener('change', function () {
     clearError('breakpoint-calc-select-defender')
 
     breakpointCalcForm.defender = this.value
   })
-  breakpointCalcSelectDefenderCPM.addEventListener('change', function () {
+  selectDefenderCPM.addEventListener('change', function () {
     breakpointCalcForm.defender_cpm = this.value
   })
-  breakpointCalcToggleCinematicBreakpoints.addEventListener('click', function (event) {
+  inputToggleCinematicBreakpoints.addEventListener('click', function (event) {
     event.preventDefault()
     toggleCinematicBreakpoints()
   })
@@ -94,13 +94,13 @@ ready(function () {
     event.preventDefault()
     submitBreakpointCalcForm()
   })
-  breakpointCalcTabBreakpoints.addEventListener('click', function (event) {
+  tabBreakpoints.addEventListener('click', function (event) {
     event.preventDefault()
 
     breakpointCalcForm.tab = 'breakpoints'
     toggleTab(breakpointCalcForm.tab)
   })
-  breakpointCalcTabTopCounters.addEventListener('click', function (event) {
+  tabTopCounters.addEventListener('click', function (event) {
     event.preventDefault()
 
     breakpointCalcForm.tab = 'counters'
@@ -109,13 +109,13 @@ ready(function () {
 
   function restoreBreakpointCalcForm (data) {
     toggleTab(data.tab)
-    breakpointCalcSelectAttacker.setValueByChoice(String(data.attacker))
-    breakpointCalcSelectDefender.setValueByChoice(String(data.defender))
+    selectAttacker.setValueByChoice(String(data.attacker))
+    selectDefender.setValueByChoice(String(data.defender))
 
-    breakpointCalcInputAttackerLevel.value = data.attacker_level
-    breakpointCalcSelectAttackerAtkIv.value = data.attacker_atk_iv
-    breakpointCalcSelectWeatherCondition.value = data.weather_condition
-    breakpointCalcSelectDefenderCPM.value = data.defender_cpm
+    inputAttackerLevel.value = data.attacker_level
+    selectAttackerAtkIv.value = data.attacker_atk_iv
+    selectWeatherCondition.value = data.weather_condition
+    selectDefenderCPM.value = data.defender_cpm
 
     filterQueryset(data.attacker)
     breakpointCalcForm = data
@@ -124,19 +124,19 @@ ready(function () {
 
   function toggleTab (currentTab) {
     if (currentTab === 'breakpoints') {
-      breakpointCalcBreakpointsTable.hidden = false
-      breakpointCalcTopCountersTable.hidden = true
+      breakpointsTable.hidden = false
+      topCountersTable.hidden = true
 
-      breakpointCalcTabBreakpoints.classList.add('breakpoint-calc-selected-tab')
-      breakpointCalcTabTopCounters.classList.remove('breakpoint-calc-selected-tab')
+      tabBreakpoints.classList.add('breakpoint-calc-selected-tab')
+      tabTopCounters.classList.remove('breakpoint-calc-selected-tab')
 
       updateBrowserHistory(formatParams(breakpointCalcForm))
     } else if (currentTab === 'counters') {
-      breakpointCalcBreakpointsTable.hidden = true
-      breakpointCalcTopCountersTable.hidden = false
+      breakpointsTable.hidden = true
+      topCountersTable.hidden = false
 
-      breakpointCalcTabTopCounters.classList.add('breakpoint-calc-selected-tab')
-      breakpointCalcTabBreakpoints.classList.remove('breakpoint-calc-selected-tab')
+      tabTopCounters.classList.add('breakpoint-calc-selected-tab')
+      tabBreakpoints.classList.remove('breakpoint-calc-selected-tab')
 
       updateBrowserHistory(formatParams(breakpointCalcForm))
     }
@@ -144,7 +144,7 @@ ready(function () {
 
   function filterQueryset (value) {
     if (parseInt(value) > 0) {
-      breakpointCalcInputSubmit.disabled = true
+      inputSubmit.disabled = true
 
       const request = new XMLHttpRequest()
       request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
@@ -153,16 +153,16 @@ ready(function () {
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
           selectMoves(json.results)
-          breakpointCalcInputSubmit.disabled = false
+          inputSubmit.disabled = false
         }
       }
       request.onerror = function () {
-        breakpointCalcInputSubmit.disabled = false
+        inputSubmit.disabled = false
       }
       request.send()
     } else {
-      breakpointCalcSelectQuickMove.disabled = true
-      breakpointCalcSelectCinematicMove.disabled = true
+      selectAttackerQuickMove.disabled = true
+      selectAttackerCinematicMove.disabled = true
       clearMoveInputs()
     }
   }
@@ -175,8 +175,8 @@ ready(function () {
       const move = moveData.move
 
       if (move.category === 'QK') {
-        breakpointCalcSelectQuickMove.disabled = false
-        breakpointCalcSelectQuickMove.options.add(
+        selectAttackerQuickMove.disabled = false
+        selectAttackerQuickMove.options.add(
           new Option(
             move.name + ' (' + move.power + ')',
             move.id,
@@ -185,8 +185,8 @@ ready(function () {
           )
         )
       } else {
-        breakpointCalcSelectCinematicMove.disabled = false
-        breakpointCalcSelectCinematicMove.options.add(
+        selectAttackerCinematicMove.disabled = false
+        selectAttackerCinematicMove.options.add(
           new Option(
             move.name + ' (' + move.power + ')',
             move.id,
@@ -196,8 +196,8 @@ ready(function () {
         )
       }
     })
-    breakpointCalcForm.quick_move = breakpointCalcSelectQuickMove.value
-    breakpointCalcForm.cinematic_move = breakpointCalcSelectCinematicMove.value
+    breakpointCalcForm.quick_move = selectAttackerQuickMove.value
+    breakpointCalcForm.cinematic_move = selectAttackerCinematicMove.value
   }
 
   function determineSelectedMove (moveId, move, type) {
@@ -209,7 +209,7 @@ ready(function () {
   }
 
   function submitBreakpointCalcForm () {
-    breakpointCalcInputSubmit.disabled = true
+    inputSubmit.disabled = true
 
     const request = new XMLHttpRequest()
     const getParams = formatParams(breakpointCalcForm)
@@ -230,18 +230,18 @@ ready(function () {
       }
     }
     request.send()
-    breakpointCalcInputSubmit.disabled = false
+    inputSubmit.disabled = false
   }
 
   function displayBreakpointCalcDetails (json) {
-    breakpointCalcDetailsTable.hidden = false
+    detailsTable.hidden = false
 
     if (json.breakpoint_details.length < 2) {
-      breakpointCalcToggleCinematicBreakpoints.parentElement.hidden = true
+      inputToggleCinematicBreakpoints.parentElement.hidden = true
     } else {
-      breakpointCalcToggleCinematicBreakpoints.parentElement.hidden = false
+      inputToggleCinematicBreakpoints.parentElement.hidden = false
     }
-    breakpointCalcMoveEffectivness.innerHTML = ''
+    moveEffectivness.innerHTML = ''
     generateBreakpointTable(json.breakpoint_details)
   }
 
@@ -314,31 +314,19 @@ ready(function () {
         dataTable.appendChild(dataRow)
       }
     }
-
-    // temp, remove when all results are generated
-    if (Object.keys(dataset).length < 2) {
-      dataRow = document.createElement('tr')
-      dataCell = document.createElement('td')
-
-      dataCell.setAttribute('colspan', 4)
-      dataCell.innerHTML = 'Results are still being generated, please check back later.'
-
-      dataRow.appendChild(dataCell)
-      dataTable.appendChild(dataRow)
-    }
   }
 
   function toggleCinematicBreakpoints () {
     if (breakpointCalcForm.show_cinematic_breakpoints) {
       delete breakpointCalcForm.show_cinematic_breakpoints
 
-      breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-minus')
-      breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-plus')
+      inputToggleCinematicBreakpoints.classList.remove('glyphicon-minus')
+      inputToggleCinematicBreakpoints.classList.add('glyphicon-plus')
     } else {
       breakpointCalcForm.show_cinematic_breakpoints = true
 
-      breakpointCalcToggleCinematicBreakpoints.classList.remove('glyphicon-plus')
-      breakpointCalcToggleCinematicBreakpoints.classList.add('glyphicon-minus')
+      inputToggleCinematicBreakpoints.classList.remove('glyphicon-plus')
+      inputToggleCinematicBreakpoints.classList.add('glyphicon-minus')
     }
     submitBreakpointCalcForm()
   }
@@ -362,12 +350,12 @@ ready(function () {
   }
 
   function clearMoveInputs () {
-    breakpointCalcSelectQuickMove.innerHTML = ''
-    breakpointCalcSelectQuickMove.append(
+    selectAttackerQuickMove.innerHTML = ''
+    selectAttackerQuickMove.append(
       '<option value="-1" disabled selected>Select quick move</option>'
     )
-    breakpointCalcSelectCinematicMove.innerHTML = ''
-    breakpointCalcSelectCinematicMove.append(
+    selectAttackerCinematicMove.innerHTML = ''
+    selectAttackerCinematicMove.append(
       '<option value="-1" disabled selected>Select cinematic move</option>'
     )
     breakpointCalcForm['quick_move'] = -1

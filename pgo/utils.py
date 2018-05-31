@@ -19,20 +19,20 @@ MAX_IV = 15
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 
 
-def calculate_weave_damage(qk_move, cc_move, health=0):
-    if qk_move.energy_delta > 0:
-        qk_moves_required = (cc_move.energy_delta * - 1) / qk_move.energy_delta
+def calculate_weave_damage(quick_move, cinematic_move):
+    if quick_move.energy_delta > 0:
+        quick_moves_required = (cinematic_move.energy_delta * - 1) / quick_move.energy_delta
     else:
-        qk_moves_required = 0
+        quick_moves_required = 0
     cycle_dps = (
-        qk_moves_required * qk_move.damage_per_hit + cc_move.damage_per_hit) / (
-        (qk_moves_required * qk_move.duration + cc_move.duration) / 1000)
+        quick_moves_required * quick_move.damage_per_hit + cinematic_move.damage_per_hit) / (
+        (quick_moves_required * quick_move.duration + cinematic_move.duration) / 1000)
 
     # nerf moveset damage for single bar charge moves
-    if cc_move.energy_delta == -100:
+    if cinematic_move.energy_delta == -100:
         cycle_dps = cycle_dps / 1.06
 
-    return cycle_dps, health / cycle_dps
+    return cycle_dps
 
 
 def calculate_dph(power, attack_multiplier, stab, weather_boost, effectivness=1.0):

@@ -204,6 +204,7 @@ class RaidTier(models.Model):
     raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM')
     tier = models.PositiveIntegerField(verbose_name='Tier Level')
     tier_stamina = models.PositiveIntegerField(verbose_name='Tier Stamina')
+    battle_duration = models.PositiveIntegerField(default=180)
 
     class Meta:
         verbose_name = 'Raid Tier'

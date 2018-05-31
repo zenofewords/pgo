@@ -9,6 +9,10 @@ ready(function () {
       itemSelectText: '',
     }
   )
+  const inputAttackerLevel = document.getElementById('breakpoint-calc-input-attacker-level')
+  const selectAttackerQuickMove = document.getElementById('breakpoint-calc-select-quick-move')
+  const selectAttackerCinematicMove = document.getElementById('breakpoint-calc-select-cinematic-move')
+  const selectAttackerAtkIv = document.getElementById('breakpoint-calc-select-attacker-atk-iv')
   const selectDefender = new Choices(
     '.breakpoint-calc-select-defender',
     {
@@ -17,14 +21,13 @@ ready(function () {
       itemSelectText: '',
     }
   )
-  const inputAttackerLevel = document.getElementById('breakpoint-calc-input-attacker-level')
-  const selectAttackerQuickMove = document.getElementById('breakpoint-calc-select-quick-move')
-  const selectAttackerCinematicMove = document.getElementById('breakpoint-calc-select-cinematic-move')
-  const selectAttackerAtkIv = document.getElementById('breakpoint-calc-select-attacker-atk-iv')
+  const selectDefenderQuickMove = document.getElementById('breakpoint-calc-select-defender-quick-move')
+  const selectDefenderCinematicMove = document.getElementById('breakpoint-calc-select-defender-cinematic-move')
+
   const selectWeatherCondition = document.getElementById('breakpoint-calc-select-weather-condition')
   const selectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
-
   const inputSubmit = document.getElementById('breakpoint-calc-input-submit')
+
   const moveEffectivness = document.getElementById('breakpoint-calc-move-effectivness')
   const detailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
   const inputToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
@@ -37,16 +40,18 @@ ready(function () {
   let breakpointCalcForm = {
     attacker: selectAttacker.value,
     attacker_level: inputAttackerLevel.value,
-    quick_move: selectAttackerQuickMove.value,
-    cinematic_move: selectAttackerCinematicMove.value,
+    attacker_quick_move: selectAttackerQuickMove.value,
+    attacker_cinematic_move: selectAttackerCinematicMove.value,
     attacker_atk_iv: selectAttackerAtkIv.value,
     weather_condition: selectWeatherCondition.value,
     defender: selectDefender.value,
+    defender_quick_move: selectDefenderQuickMove.value,
+    defender_cinematic_move: selectDefenderCinematicMove.value,
     defender_cpm: selectDefenderCPM.value,
     tab: 'breakpoints',
   }
 
-  if (breakpointCalcForm.attacker && !(breakpointCalcForm.quick_move && breakpointCalcForm.cinematic_move)) {
+  if (breakpointCalcForm.attacker && !(breakpointCalcForm.attacker_quick_move && breakpointCalcForm.attacker_cinematic_move)) {
     const queryDict = {}
     location.search.substr(1).split('&').forEach(function (item) {
       queryDict[item.split('=')[0]] = item.split('=')[1]
@@ -57,8 +62,8 @@ ready(function () {
   }
 
   selectAttacker.passedElement.addEventListener('change', function () {
-    clearMoveInputs()
-    filterQueryset(this.value)
+    clearMoveInputs('attacker')
+    selectPokemonMoves(this.value, 'attacker')
     clearError('breakpoint-calc-select-attacker')
 
     breakpointCalcForm.attacker = this.value
@@ -67,10 +72,16 @@ ready(function () {
     setValidLevel(this, 'attacker_level')
   })
   selectAttackerQuickMove.addEventListener('change', function () {
-    breakpointCalcForm.quick_move = this.value
+    breakpointCalcForm.attacker_quick_move = this.value
   })
   selectAttackerCinematicMove.addEventListener('change', function () {
-    breakpointCalcForm.cinematic_move = this.value
+    breakpointCalcForm.attacker_cinematic_move = this.value
+  })
+  selectDefenderQuickMove.addEventListener('change', function () {
+    breakpointCalcForm.defender_quick_move = this.value
+  })
+  selectDefenderCinematicMove.addEventListener('change', function () {
+    breakpointCalcForm.defender_cinematic_move = this.value
   })
   selectAttackerAtkIv.addEventListener('change', function () {
     breakpointCalcForm.attacker_atk_iv = this.value
@@ -79,6 +90,8 @@ ready(function () {
     breakpointCalcForm.weather_condition = this.value
   })
   selectDefender.passedElement.addEventListener('change', function () {
+    clearMoveInputs('defender')
+    selectPokemonMoves(this.value, 'defender')
     clearError('breakpoint-calc-select-defender')
 
     breakpointCalcForm.defender = this.value
@@ -117,7 +130,8 @@ ready(function () {
     selectWeatherCondition.value = data.weather_condition
     selectDefenderCPM.value = data.defender_cpm
 
-    filterQueryset(data.attacker)
+    selectPokemonMoves(data.attacker, 'attacker')
+    selectPokemonMoves(data.defender, 'defender')
     breakpointCalcForm = data
     submitBreakpointCalcForm()
   }
@@ -142,7 +156,7 @@ ready(function () {
     }
   }
 
-  function filterQueryset (value) {
+  function selectPokemonMoves (value, pokemon) {
     if (parseInt(value) > 0) {
       inputSubmit.disabled = true
 
@@ -152,7 +166,7 @@ ready(function () {
       request.onload = function () {
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
-          selectMoves(json.results)
+          selectMoves(json.results, pokemon)
           inputSubmit.disabled = false
         }
       }
@@ -163,41 +177,51 @@ ready(function () {
     } else {
       selectAttackerQuickMove.disabled = true
       selectAttackerCinematicMove.disabled = true
-      clearMoveInputs()
+      selectDefenderQuickMove.disabled = true
+      selectDefenderCinematicMove.disabled = true
+
+      clearMoveInputs('attacker')
+      clearMoveInputs('defender')
     }
   }
 
-  function selectMoves (data) {
-    const quickMoveId = parseInt(breakpointCalcForm.quick_move)
-    const cinematicMoveId = parseInt(breakpointCalcForm.cinematic_move)
+  function selectMoves (data, pokemon) {
+    const quickMoveSelect = pokemon === 'attacker' ? selectAttackerQuickMove : selectDefenderQuickMove
+    const cinematicMoveSelect = pokemon === 'attacker' ? selectAttackerCinematicMove : selectDefenderCinematicMove
+
+    const quickMoveKey = pokemon + '_quick_move'
+    const cinematicMoveKey = pokemon + '_cinematic_move'
+
+    const quickMoveId = parseInt(breakpointCalcForm[quickMoveKey])
+    const cinematicMoveId = parseInt(breakpointCalcForm[cinematicMoveKey])
 
     data.forEach(function (moveData, i) {
       const move = moveData.move
 
       if (move.category === 'QK') {
-        selectAttackerQuickMove.disabled = false
-        selectAttackerQuickMove.options.add(
+        quickMoveSelect.disabled = false
+        quickMoveSelect.options.add(
           new Option(
             move.name + ' (' + move.power + ')',
             move.id,
             false,
-            determineSelectedMove(quickMoveId, move, 'quick_move')
+            determineSelectedMove(quickMoveId, move, quickMoveKey)
           )
         )
       } else {
-        selectAttackerCinematicMove.disabled = false
-        selectAttackerCinematicMove.options.add(
+        cinematicMoveSelect.disabled = false
+        cinematicMoveSelect.options.add(
           new Option(
             move.name + ' (' + move.power + ')',
             move.id,
             false,
-            determineSelectedMove(cinematicMoveId, move, 'cinematic_move')
+            determineSelectedMove(cinematicMoveId, move, cinematicMoveKey)
           )
         )
       }
     })
-    breakpointCalcForm.quick_move = selectAttackerQuickMove.value
-    breakpointCalcForm.cinematic_move = selectAttackerCinematicMove.value
+    breakpointCalcForm[quickMoveKey] = quickMoveSelect.value
+    breakpointCalcForm[cinematicMoveKey] = cinematicMoveSelect.value
   }
 
   function determineSelectedMove (moveId, move, type) {
@@ -349,17 +373,23 @@ ready(function () {
     input.parentElement.parentElement.classList.remove('error')
   }
 
-  function clearMoveInputs () {
-    selectAttackerQuickMove.innerHTML = ''
-    selectAttackerQuickMove.append(
+  function clearMoveInputs (pokemon) {
+    const quickMoveSelect = pokemon === 'attacker' ? selectAttackerQuickMove : selectDefenderQuickMove
+    const cinematicMoveSelect = pokemon === 'attacker' ? selectAttackerCinematicMove : selectDefenderCinematicMove
+
+    const quickMoveKey = pokemon + '_quick_move'
+    const cinematicMoveKey = pokemon + '_cinematic_move'
+
+    quickMoveSelect.innerHTML = ''
+    quickMoveSelect.append(
       '<option value="-1" disabled selected>Select quick move</option>'
     )
-    selectAttackerCinematicMove.innerHTML = ''
-    selectAttackerCinematicMove.append(
+    cinematicMoveSelect.innerHTML = ''
+    cinematicMoveSelect.append(
       '<option value="-1" disabled selected>Select cinematic move</option>'
     )
-    breakpointCalcForm['quick_move'] = -1
-    breakpointCalcForm['cinematic_move'] = -1
+    breakpointCalcForm[quickMoveKey] = -1
+    breakpointCalcForm[cinematicMoveKey] = -1
   }
 
   function updateBrowserHistory (getParams) {

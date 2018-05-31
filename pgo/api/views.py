@@ -111,8 +111,8 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.attacker.level = data.get('attacker_level')
         self.attacker.cpm_list = cpm_qs.filter(level__gte=self.attacker.level).values(
             'level', 'value', 'total_stardust_cost', 'total_candy_cost')
-        self.quick_move = get_move_data(data.get('quick_move'))
-        self.cinematic_move = get_move_data(data.get('cinematic_move'))
+        self.quick_move = get_move_data(data.get('attacker_quick_move'))
+        self.cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
         self.defender = get_pokemon_data(data.get('defender'))
         self.defender.defense_iv = data.get('defense_iv', MAX_IV)
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])

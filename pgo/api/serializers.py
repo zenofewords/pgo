@@ -57,8 +57,8 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
 class BreakpointCalcSerializer(serializers.Serializer):
     attacker = serializers.IntegerField()
     attacker_level = serializers.FloatField(min_value=1, max_value=40)
-    quick_move = serializers.IntegerField()
-    cinematic_move = serializers.IntegerField()
+    attacker_quick_move = serializers.IntegerField()
+    attacker_cinematic_move = serializers.IntegerField()
     attacker_atk_iv = serializers.IntegerField(min_value=0, max_value=15)
     weather_condition = serializers.IntegerField(required=False)
     defender = serializers.IntegerField()

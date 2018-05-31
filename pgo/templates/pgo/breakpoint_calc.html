@@ -128,10 +128,31 @@
                 </a>
               </th>
               <th>DPS* (%)</th>
-              <th>KO time*</th>
+              <th>
+                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> #
+              </th>
             </tr>
           </thead>
           <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
+        </table>
+        <table id="breakpoint-calc-counters-moveset" class="table">
+          <thead>
+            <tr>
+              <th id="breakpoint-calc-counters-moveset-label" width="18%">Moveset</th>
+              <td id="breakpoint-calc-counters-move" width="37%">
+                <label for="breakpoint-calc-select-defender-quick-move" class="sr-only">Quick move</label>
+                <select id="breakpoint-calc-select-defender-quick-move" class="form-control breakpoint-calc-input" disabled>
+                  <option value="-1" disabled selected>Quick move</option>
+                </select>
+              </td>
+              <td id="breakpoint-calc-counters-move" width="45%">
+                <label for="breakpoint-calc-select-defender-cinematic-move" class="sr-only">Cinematic move</label>
+                <select id="breakpoint-calc-select-defender-cinematic-move" class="form-control breakpoint-calc-input" disabled>
+                  <option value="-1" disabled selected>Cinematic move</option>
+                </select>
+              </td>
+            </tr>
+          </thead>
         </table>
         <table id="breakpoint-calc-top-counters-table" class="table" hidden>
           <thead>

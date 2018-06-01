@@ -245,28 +245,23 @@ ready(() => {
 
       if (move.category === 'QK') {
         quickMoveSelect.disabled = false
-        quickMoveSelect.options.add(
-          new Option(
-            move.name + ' (' + move.power + ')',
-            move.id,
-            false,
-            determineSelectedMove(quickMoveId, move, quickMoveKey)
-          )
-        )
+        quickMoveSelect.options.add(createMoveOption(move, quickMoveId, quickMoveKey, pokemon))
       } else {
         cinematicMoveSelect.disabled = false
-        cinematicMoveSelect.options.add(
-          new Option(
-            move.name + ' (' + move.power + ')',
-            move.id,
-            false,
-            determineSelectedMove(cinematicMoveId, move, cinematicMoveKey)
-          )
-        )
+        cinematicMoveSelect.options.add(createMoveOption(move, cinematicMoveId, cinematicMoveKey, pokemon))
       }
     })
     breakpointCalcForm[quickMoveKey] = quickMoveSelect.value
     breakpointCalcForm[cinematicMoveKey] = cinematicMoveSelect.value
+  }
+
+  const createMoveOption = (move, moveId, moveKey, pokemon) => {
+    return new Option(
+      pokemon === 'attacker' ? move.name + ' (' + move.power + ')' : move.name,
+      move.id,
+      false,
+      determineSelectedMove(moveId, move, moveKey)
+    )
   }
 
   const determineSelectedMove = (moveId, move, type) => {

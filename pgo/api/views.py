@@ -111,10 +111,12 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.attacker.level = data.get('attacker_level')
         self.attacker.cpm_list = cpm_qs.filter(level__gte=self.attacker.level).values(
             'level', 'value', 'total_stardust_cost', 'total_candy_cost')
-        self.quick_move = get_move_data(data.get('attacker_quick_move'))
-        self.cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
+        self.attacker_quick_move = get_move_data(data.get('attacker_quick_move'))
+        self.attacker_cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
         self.defender = get_pokemon_data(data.get('defender'))
         self.defender.defense_iv = data.get('defense_iv', MAX_IV)
+        self.defender_quick_move = get_move_data(data.get('defender_quick_move'))
+        self.defender_cinematic_move = get_move_data(data.get('defender_cinematic_move'))
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])
 
         self.raid_tier = None
@@ -133,12 +135,12 @@ class BreakpointCalcAPIView(GenericAPIView):
         attacker_starting_cpm = self.attacker.cpm_list.first()
 
         self._set_move_stats(attacker_cpm=attacker_starting_cpm['value'])
-        starting_qk_dph = self.quick_move.damage_per_hit
-        starting_cc_dph = self.cinematic_move.damage_per_hit
+        starting_qk_dph = self.attacker_quick_move.damage_per_hit
+        starting_cc_dph = self.attacker_cinematic_move.damage_per_hit
 
         self.perfect_max_dps = calculate_weave_damage(
-            self._get_max_damage_move(self.quick_move, attack_iv=MAX_IV),
-            self._get_max_damage_move(self.cinematic_move, attack_iv=MAX_IV)
+            self._get_max_damage_move(self.attacker_quick_move, attack_iv=MAX_IV),
+            self._get_max_damage_move(self.attacker_cinematic_move, attack_iv=MAX_IV)
         )
 
         self.quick_move_proficiency = []
@@ -149,20 +151,23 @@ class BreakpointCalcAPIView(GenericAPIView):
         self._set_quick_move_proficiency(starting_qk_dph)
         self._set_cinematic_move_proficiency(
             starting_cc_dph,
-            self._get_max_damage_move(self.cinematic_move).damage_per_hit
+            self._get_max_damage_move(self.attacker_cinematic_move).damage_per_hit
         )
         return starting_qk_dph
 
     def _set_move_parameters(self):
-        self.quick_move.stab = is_move_stab(self.quick_move, self.attacker)
-        self.cinematic_move.stab = is_move_stab(self.cinematic_move, self.attacker)
+        self.attacker_quick_move.stab = is_move_stab(self.attacker_quick_move, self.attacker)
+        self.attacker_cinematic_move.stab = is_move_stab(self.attacker_cinematic_move, self.attacker)
 
-        self.quick_move.effectivness = determine_move_effectivness(self.quick_move, self.defender)
-        self.cinematic_move.effectivness = determine_move_effectivness(
-            self.cinematic_move, self.defender)
+        self.attacker_quick_move.effectivness = determine_move_effectivness(
+            self.attacker_quick_move, self.defender)
+        self.attacker_cinematic_move.effectivness = determine_move_effectivness(
+            self.attacker_cinematic_move, self.defender)
 
-        self.quick_move.weather_boosted = self.quick_move.move_type_id in self.boosted_types
-        self.cinematic_move.weather_boosted = self.cinematic_move.move_type_id in self.boosted_types
+        self.attacker_quick_move.weather_boosted = \
+            self.attacker_quick_move.move_type_id in self.boosted_types
+        self.attacker_cinematic_move.weather_boosted = \
+            self.attacker_cinematic_move.move_type_id in self.boosted_types
 
     def _set_defender_health(self):
         stamina = self.defender.pgo_stamina
@@ -173,14 +178,14 @@ class BreakpointCalcAPIView(GenericAPIView):
 
     def _assess_attack_iv(self):
         self._set_move_stats(attack_iv=self.attacker.atk_iv)
-        current_qk_dph = self.quick_move.damage_per_hit
+        current_qk_dph = self.attacker_quick_move.damage_per_hit
         self._set_move_stats(attack_iv=MAX_IV)
 
         params = (
             self.attacker.name,
-            'high enough' if current_qk_dph == self.quick_move.damage_per_hit else 'too low',
-            self.quick_move.name,
-            self.quick_move.damage_per_hit,
+            'high enough' if current_qk_dph == self.attacker_quick_move.damage_per_hit else 'too low',
+            self.attacker_quick_move.name,
+            self.attacker_quick_move.damage_per_hit,
             'tier {} raid boss'.format(self.raid_tier.tier) if self.raid_tier else 'level 40, 15 defense IV',
             self.defender.name,
         )
@@ -189,8 +194,8 @@ class BreakpointCalcAPIView(GenericAPIView):
 
     def _set_move_stats(self, attacker_cpm=None, attack_iv=None):
         self._calculate_attack_multiplier(attacker_cpm, attack_iv)
-        self._set_move_damage(self.quick_move)
-        self._set_move_damage(self.cinematic_move)
+        self._set_move_damage(self.attacker_quick_move)
+        self._set_move_damage(self.attacker_cinematic_move)
 
     def _calculate_attack_multiplier(self, attacker_cpm=None, attack_iv=None):
         if not attacker_cpm:
@@ -231,17 +236,17 @@ class BreakpointCalcAPIView(GenericAPIView):
 
         for cpm in self.attacker.cpm_list:
             self._calculate_attack_multiplier(cpm['value'])
-            self._set_move_damage(self.quick_move)
+            self._set_move_damage(self.attacker_quick_move)
 
-            if current_qk_dph < self.quick_move.damage_per_hit:
+            if current_qk_dph < self.attacker_quick_move.damage_per_hit:
                 self.quick_move_proficiency.append((
-                    self.quick_move.damage_per_hit,
+                    self.attacker_quick_move.damage_per_hit,
                     cpm['level'],
                     cpm['value'],
                     cpm['total_stardust_cost'],
                     cpm['total_candy_cost'],
                 ))
-                current_qk_dph = self.quick_move.damage_per_hit
+                current_qk_dph = self.attacker_quick_move.damage_per_hit
 
     def _set_cinematic_move_proficiency(self, starting_cc_dph, max_cc_dph):
         current_cc_dph = starting_cc_dph
@@ -251,21 +256,21 @@ class BreakpointCalcAPIView(GenericAPIView):
 
         for index, cpm in enumerate(self.attacker.cpm_list):
             self._calculate_attack_multiplier(cpm['value'])
-            self._set_move_damage(self.cinematic_move)
+            self._set_move_damage(self.attacker_cinematic_move)
 
             show_all_cc_breakpoints = (self.show_cinematic_breakpoints
-                and current_cc_dph < self.cinematic_move.damage_per_hit
+                and current_cc_dph < self.attacker_cinematic_move.damage_per_hit
             )
             if ([x for x in self.quick_move_proficiency if cpm['value'] == x[2]]
-                or show_all_cc_breakpoints or self.cinematic_move.damage_per_hit == max_cc_dph):
+                or show_all_cc_breakpoints or self.attacker_cinematic_move.damage_per_hit == max_cc_dph):
                 self.cinematic_move_proficiency.append((
-                    self.cinematic_move.damage_per_hit,
+                    self.attacker_cinematic_move.damage_per_hit,
                     cpm['level'],
                     cpm['value'],
                     cpm['total_stardust_cost'],
                     cpm['total_candy_cost'],
                 ))
-                current_cc_dph = self.cinematic_move.damage_per_hit
+                current_cc_dph = self.attacker_cinematic_move.damage_per_hit
 
     def _get_details_table(self, starting_qk_dph):
         details = []
@@ -280,19 +285,19 @@ class BreakpointCalcAPIView(GenericAPIView):
             if (starting_qk_dph, c[0]) in [(x[2], x[3]) for x in details[1:]]:
                 continue
 
-            self.quick_move.damage_per_hit = starting_qk_dph
-            self.cinematic_move.damage_per_hit = c[0]
+            self.attacker_quick_move.damage_per_hit = starting_qk_dph
+            self.attacker_cinematic_move.damage_per_hit = c[0]
 
-            cycle_dps = calculate_weave_damage(self.quick_move, self.cinematic_move)
+            cycle_dps = calculate_weave_damage(self.attacker_quick_move, self.attacker_cinematic_move)
             details.append(
                 self._get_detail_row(c[1], cycle_dps, self._trainers_required(cycle_dps), c[3], c[4]))
 
         # edge case when there's improvement for quick moves, but not for cinematic
         if len(self.cinematic_move_proficiency) == 0 and len(self.quick_move_proficiency) > 0:
             for q in sorted(self.quick_move_proficiency):
-                self.quick_move.damage_per_hit = q[0]
+                self.attacker_quick_move.damage_per_hit = q[0]
 
-                cycle_dps = calculate_weave_damage(self.quick_move, self.cinematic_move)
+                cycle_dps = calculate_weave_damage(self.attacker_quick_move, self.attacker_cinematic_move)
                 details.append(
                     self._get_detail_row(q[1], cycle_dps, self._trainers_required(cycle_dps), q[3], q[4]))
         return details
@@ -302,7 +307,7 @@ class BreakpointCalcAPIView(GenericAPIView):
 
     def _get_detail_row(self, level, cycle_dps, trainers_required, stardust_cost, candy_cost):
         return ('{:g}'.format(float(level)), self._format_powerup_cost(stardust_cost, candy_cost),
-                self.quick_move.damage_per_hit, self.cinematic_move.damage_per_hit,
+                self.attacker_quick_move.damage_per_hit, self.attacker_cinematic_move.damage_per_hit,
                 self._format_dps(cycle_dps), '{:.2f}'.format(trainers_required))
 
     def _format_powerup_cost(self, stardust_cost, candy_cost):
@@ -327,52 +332,57 @@ class BreakpointCalcAPIView(GenericAPIView):
         ).order_by('-highest_dps')[:15]
 
         top_counters = OrderedDict()
-        cycle_dps = calculate_weave_damage(self.quick_move, self.cinematic_move)
-        # todo: refactor this nonsense
+        rounded_cycle_dps = round(calculate_weave_damage(
+            self.attacker_quick_move, self.attacker_cinematic_move), 1)
+
         for top_counter in top_counters_qs:
-            if round(cycle_dps, 1) >= float(top_counter.highest_dps):
-                top_counters['user_{}'.format(self.attacker.name)] = [(
-                    '<b>{}</b> L{:g}, {}A'.format(
-                        self.attacker.name,
-                        self.attacker.level,
-                        self.attacker.atk_iv,
-                    ),
-                    self.quick_move.name,
-                    self.cinematic_move.name,
-                    round(cycle_dps, 1),
-                )]
+            if rounded_cycle_dps >= float(top_counter.highest_dps):
+                top_counters = self._append_user_pokemon(top_counters, rounded_cycle_dps)
+
             moveset_data = []
             for data_row in top_counter.moveset_data:
                 moveset_data.append((
-                    self._get_top_counter_url(top_counter, data_row[1], data_row[2]),
-                    data_row[1],
-                    data_row[2],
-                    round(data_row[0], 1),
+                    self._get_top_counter_url(
+                        top_counter,
+                        {
+                            'attacker_quick_move': data_row[1],
+                            'attacker_cinematic_move': data_row[2],
+                            'defender_quick_move': self.defender_quick_move,
+                            'defender_cinematic_move': self.defender_cinematic_move
+                        }
+                    ),
+                    data_row[1], data_row[2], round(data_row[0], 1),
                 ))
             top_counters[top_counter.counter.name] = moveset_data
 
         if not 'user_{}'.format(self.attacker.name) in top_counters:
-            top_counters['user_{}'.format(self.attacker.name)] = [(
-                    '<b>{}</b> L{:g}, {}A'.format(
-                        self.attacker.name,
-                        self.attacker.level,
-                        self.attacker.atk_iv,
-                    ),
-                    self.quick_move.name,
-                    self.cinematic_move.name,
-                    round(cycle_dps, 1),
-                )]
+            top_counters = self._append_user_pokemon(top_counters, rounded_cycle_dps)
         return top_counters
 
-    def _get_top_counter_url(self, top_counter, quick_move, cinematic_move):
+    def _append_user_pokemon(self, top_counters, rounded_cycle_dps):
+        top_counters['user_{}'.format(self.attacker.name)] = [(
+            '<b>{}</b> L{:g}, {}A'.format(
+                self.attacker.name,
+                self.attacker.level,
+                self.attacker.atk_iv,
+            ),
+            self.attacker_quick_move.name,
+            self.attacker_cinematic_move.name,
+            rounded_cycle_dps,
+        )]
+        return top_counters
+
+    def _get_top_counter_url(self, top_counter, move_data):
         params = urllib.parse.urlencode({
             'attacker': top_counter.counter.slug,
-            'attacker_level': 20,
-            'quick_move': slugify(quick_move),
-            'cinematic_move': slugify(cinematic_move),
+            'attacker_level': 40,
+            'attacker_quick_move': slugify(move_data['attacker_quick_move']),
+            'attacker_cinematic_move': slugify(move_data['attacker_cinematic_move']),
             'attacker_atk_iv': 15,
             'weather_condition': top_counter.weather_condition_id,
             'defender': top_counter.defender.slug,
+            'defender_quick_move': slugify(move_data['defender_quick_move']),
+            'defender_cinematic_move': slugify(move_data['defender_cinematic_move']),
             'defender_cpm': '{}{}'.format(
                 top_counter.defender_cpm,
                 self.raid_tier.tier if self.raid_tier else 0

@@ -9,6 +9,10 @@ const ready = (runBreakpointCalc) => {
 }
 
 ready(() => {
+  const SUBMITTING = 'submitting'
+  const READY = 'ready'
+  const ERROR = 'error'
+
   const selectAttacker = new Choices(
     '.breakpoint-calc-select-attacker',
     {
@@ -34,7 +38,6 @@ ready(() => {
 
   const selectWeatherCondition = document.getElementById('breakpoint-calc-select-weather-condition')
   const selectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
-  const inputSubmit = document.getElementById('breakpoint-calc-input-submit')
 
   const moveEffectivness = document.getElementById('breakpoint-calc-move-effectivness')
   const detailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
@@ -57,45 +60,63 @@ ready(() => {
     defender_cinematic_move: selectDefenderCinematicMove.value,
     defender_cpm: selectDefenderCPM.value,
     tab: 'breakpoints',
+    status: READY,
   }
 
   selectAttacker.passedElement.addEventListener('change', (event) => {
     clearMoveInputs('attacker')
     selectPokemonMoves(event.currentTarget.value, 'attacker')
-    clearError('breakpoint-calc-select-attacker')
+    clearChoicesFieldError('breakpoint-calc-select-attacker')
 
     breakpointCalcForm.attacker = event.currentTarget.value
   })
   inputAttackerLevel.addEventListener('change', (event) => {
     setValidLevel(event.currentTarget, 'attacker_level')
+    inputAttackerLevel.classList.remove('error')
+
+    submitFormIfValid()
   })
   selectAttackerQuickMove.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_quick_move = event.currentTarget.value
+
+    submitFormIfValid()
   })
   selectAttackerCinematicMove.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_cinematic_move = event.currentTarget.value
+
+    submitFormIfValid()
   })
   selectDefenderQuickMove.addEventListener('change', (event) => {
     breakpointCalcForm.defender_quick_move = event.currentTarget.value
+
+    submitFormIfValid()
   })
   selectDefenderCinematicMove.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cinematic_move = event.currentTarget.value
+
+    submitFormIfValid()
   })
   selectAttackerAtkIv.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_atk_iv = event.currentTarget.value
+
+    submitFormIfValid()
   })
   selectWeatherCondition.addEventListener('change', (event) => {
     breakpointCalcForm.weather_condition = event.currentTarget.value
+
+    submitFormIfValid()
   })
   selectDefender.passedElement.addEventListener('change', (event) => {
     clearMoveInputs('defender')
     selectPokemonMoves(event.currentTarget.value, 'defender')
-    clearError('breakpoint-calc-select-defender')
+    clearChoicesFieldError('breakpoint-calc-select-defender')
 
     breakpointCalcForm.defender = event.currentTarget.value
   })
   selectDefenderCPM.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cpm = event.currentTarget.value
+
+    submitFormIfValid()
   })
   inputToggleCinematicBreakpoints.addEventListener('click', (event) => {
     event.preventDefault()
@@ -118,6 +139,21 @@ ready(() => {
     toggleTab(breakpointCalcForm.tab)
   })
 
+  const submitFormIfValid = () => {
+    if (breakpointCalcForm.status !== SUBMITTING) {
+      let valid = true
+      for (const key in breakpointCalcForm) {
+        if (breakpointCalcForm[key] === undefined || breakpointCalcForm[key] === -1) {
+          valid = false
+        }
+      }
+
+      if (valid) {
+        submitBreakpointCalcForm()
+      }
+    }
+  }
+
   const updateBrowserHistory = (getParams) => {
     window.history.pushState(
       {}, null, '/breakpoint-calc/' + getParams
@@ -125,8 +161,11 @@ ready(() => {
   }
 
   const formatParams = (params) => {
-    return '?' + Object.keys(params).map((key) => {
-      return key + '=' + encodeURIComponent(params[key])
+    const paramsCopy = Object.assign({}, params)
+    delete paramsCopy.status
+
+    return '?' + Object.keys(paramsCopy).map((key) => {
+      return key + '=' + encodeURIComponent(paramsCopy[key])
     }).join('&')
   }
 
@@ -152,8 +191,6 @@ ready(() => {
 
   const selectPokemonMoves = (value, pokemon) => {
     if (parseInt(value) > 0) {
-      inputSubmit.disabled = true
-
       const request = new XMLHttpRequest()
       request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
 
@@ -161,11 +198,10 @@ ready(() => {
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
           selectMoves(json.results, pokemon)
-          inputSubmit.disabled = false
         }
       }
       request.onerror = () => {
-        inputSubmit.disabled = false
+        breakpointCalcForm.status = ERROR
       }
       request.send()
     } else {
@@ -180,28 +216,33 @@ ready(() => {
   }
 
   const submitBreakpointCalcForm = () => {
-    inputSubmit.disabled = true
+    if (breakpointCalcForm.status !== SUBMITTING) {
+      breakpointCalcForm.status = SUBMITTING
 
-    const request = new XMLHttpRequest()
-    const getParams = formatParams(breakpointCalcForm)
-    const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
-    request.open('GET', url, true)
+      const request = new XMLHttpRequest()
+      const getParams = formatParams(breakpointCalcForm)
+      const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
+      request.open('GET', url, true)
 
-    request.onload = () => {
-      const json = JSON.parse(request.responseText)
+      request.onload = () => {
+        const json = JSON.parse(request.responseText)
 
-      if (request.status >= 200 && request.status < 400) {
-        document.getElementById('breakpoint-calc-atk-iv-assessment').innerHTML = json.attack_iv_assessment
+        if (request.status >= 200 && request.status < 400) {
+          document.getElementById('breakpoint-calc-atk-iv-assessment').innerHTML = json.attack_iv_assessment
 
-        displayBreakpointCalcDetails(json)
-        generateTopCountersTable(json.top_counters)
-        updateBrowserHistory(getParams)
-      } else {
-        showErrors(json)
+          displayBreakpointCalcDetails(json)
+          generateTopCountersTable(json.top_counters)
+          updateBrowserHistory(getParams)
+        } else {
+          showErrors(json)
+        }
+        breakpointCalcForm.status = READY
       }
+      request.onerror = () => {
+        breakpointCalcForm.status = ERROR
+      }
+      request.send()
     }
-    request.send()
-    inputSubmit.disabled = false
   }
 
   const restoreBreakpointCalcForm = (data) => {
@@ -216,7 +257,9 @@ ready(() => {
 
     selectPokemonMoves(data.attacker, 'attacker')
     selectPokemonMoves(data.defender, 'defender')
+
     breakpointCalcForm = data
+    breakpointCalcForm.status = READY
     submitBreakpointCalcForm()
   }
 
@@ -253,6 +296,8 @@ ready(() => {
     })
     breakpointCalcForm[quickMoveKey] = quickMoveSelect.value
     breakpointCalcForm[cinematicMoveKey] = cinematicMoveSelect.value
+
+    submitFormIfValid()
   }
 
   const createMoveOption = (move, moveId, moveKey, pokemon) => {
@@ -372,12 +417,16 @@ ready(() => {
 
   const showErrors = (errorObject) => {
     for (let field in errorObject) {
-      const invalidInput = document.getElementsByClassName('breakpoint-calc-select-' + field)[0]
-      invalidInput.parentElement.parentElement.classList.add('error')
+      if (field !== 'attacker_level') {
+        const invalidInput = document.querySelector('.breakpoint-calc-select-' + field)
+        invalidInput.parentElement.parentElement.classList.add('error')
+      } else {
+        document.querySelector('.' + field).classList.add('error')
+      }
     }
   }
 
-  const clearError = (elementName) => {
+  const clearChoicesFieldError = (elementName) => {
     const input = document.getElementsByClassName(elementName)[0]
     input.parentElement.parentElement.classList.remove('error')
   }

@@ -190,7 +190,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.defender.name,
         )
         return 'Your {}\'s <b>attack IV is {}</b> for it to reach the final {} breakpoint ({})\
-                against a {} {}.'.format(*params)
+                against a <b>{} {}</b>.'.format(*params)
 
     def _set_move_stats(self, attacker_cpm=None, attack_iv=None):
         self._calculate_attack_multiplier(attacker_cpm, attack_iv)
@@ -312,9 +312,9 @@ class BreakpointCalcAPIView(GenericAPIView):
 
     def _format_powerup_cost(self, stardust_cost, candy_cost):
         if stardust_cost - self.stardust_cost == 0 and candy_cost - self.candy_cost == 0:
-            return '- / -'
+            return '- | -'
 
-        return '{:g}k / {}'.format(
+        return '{:g}k | {}'.format(
             (stardust_cost - self.stardust_cost) / 1000,
             (candy_cost - self.candy_cost)
         )

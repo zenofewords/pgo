@@ -338,6 +338,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         vulnerable_type_ids = Type.objects.filter(slug__in=vulnerable_types).values_list('pk', flat=True)
 
         minimum_counters = 15
+        resistant_counters = 10
         base_counter_qs = TopCounter.objects.filter(
             defender_id=self.defender.pk,
             defender_cpm=self.defender.cpm,
@@ -355,7 +356,9 @@ class BreakpointCalcAPIView(GenericAPIView):
             highest_dps__lt=base_counter_qs.order_by(
                 '-highest_dps'
             ).first().highest_dps * Decimal('0.6')
-        ).order_by('-score').values_list('pk', flat=True)[:9]
+        ).exclude(
+            counter_hp__lte=100
+        ).order_by('-score').values_list('pk', flat=True)[:resistant_counters]
 
         top_counter_ids = base_counter_qs.exclude(
             id__in=resistant_counter_ids
@@ -389,26 +392,29 @@ class BreakpointCalcAPIView(GenericAPIView):
         return top_counters
 
     def _get_counter_frailty(self, instance):
-        counter_hp = instance.counter_hp
-        multiplier = instance.multiplier
         cinematic_move_dph = self._get_defender_move_dph(
-            self.defender.cinematic_move, multiplier, instance.counter)
+            self.defender.cinematic_move, instance.multiplier, instance.counter)
+        quick_move_dph = self._get_defender_move_dph(
+            self.defender.quick_move, instance.multiplier, instance.counter)
+
+        cycle_damage = (cinematic_move_dph / instance.counter_hp * 100
+            ) + (quick_move_dph / instance.counter_hp * 100) * 3
+
+        fragile_cut_off = 100
+        resilient_cut_off = 55
+        if self.defender.cinematic_move.energy_delta == -50:
+            fragile_cut_off = 60
+            resilient_cut_off = 45
+        elif self.defender.cinematic_move.energy_delta == -33:
+            fragile_cut_off = 55
+            resilient_cut_off = 40
 
         frailty = Frailty.NEUTRAL
-        if cinematic_move_dph > counter_hp:
+        if cycle_damage > fragile_cut_off:
             frailty = Frailty.FRAGILE
-        elif self.defender.cinematic_move.energy_delta == -33 and cinematic_move_dph * 3 > counter_hp:
-            frailty = Frailty.FRAGILE
-        else:
-            quick_move_dph = self._get_defender_move_dph(
-                self.defender.quick_move, multiplier, instance.counter)
+        elif cycle_damage < resilient_cut_off:
+            frailty = Frailty.RESILIENT
 
-            if cinematic_move_dph + quick_move_dph * 2 > counter_hp:
-                frailty = Frailty.FRAGILE
-            elif quick_move_dph * 5 > counter_hp:
-                frailty = Frailty.FRAGILE
-            elif (cinematic_move_dph * 0.25 * 4 + cinematic_move_dph) < counter_hp:
-                frailty = Frailty.RESILIENT
         return frailty
 
     def _get_defender_move_dph(self, move, multiplier, pokemon):

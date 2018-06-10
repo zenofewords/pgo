@@ -355,7 +355,7 @@ ready(() => {
     let dataCell
     const frailtyMap = {
       neutral: '',
-      resilient: '<span class="glyphicon glyphicon-thumbs-up frailty-resilient" aria-hidden="true"></span>',
+      resilient: '<img class="frailty-resilient" src="/static/static/shield.png">',
       fragile: '<span class="glyphicon glyphicon-glass frailty-fragile" aria-hidden="true"></span>',
     }
     dataTable.innerHTML = ''

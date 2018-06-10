@@ -70,10 +70,17 @@
   color: #000;
 }
 .frailty-resilient {
-  color: #000;
+  margin-top: -.3rem;
 }
 .frailty-fragile {
   color: #f00;
+}
+.icon-stardust {
+  margin-left: -.5rem;
+  padding-right: .2rem;
+}
+.icon-candy {
+  padding-left: .4rem;
 }
 .glyphicon {
   top: .2rem;

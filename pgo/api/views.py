@@ -32,6 +32,7 @@ from pgo.utils import (
     is_move_stab,
     CINEMATIC_MOVE_FACTOR,
     MAX_IV,
+    Frailty,
 )
 
 
@@ -85,7 +86,8 @@ class BreakpointCalcAPIView(GenericAPIView):
     serializer_class = BreakpointCalcSerializer
 
     def get(self, request, *args, **kwargs):
-        self.show_cinematic_breakpoints = request.GET.get('show_cinematic_breakpoints')
+        self.current_tab = request.GET.get('tab', 'breakpoints')
+        self.show_cinematic_breakpoints = request.GET.get('show_cinematic_breakpoints', False)
 
         serializer = self.get_serializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
@@ -115,8 +117,8 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.attacker_cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
         self.defender = get_pokemon_data(data.get('defender'))
         self.defender.defense_iv = data.get('defense_iv', MAX_IV)
-        self.defender_quick_move = get_move_data(data.get('defender_quick_move'))
-        self.defender_cinematic_move = get_move_data(data.get('defender_cinematic_move'))
+        self.defender.quick_move = get_move_data(data.get('defender_quick_move'))
+        self.defender.cinematic_move = get_move_data(data.get('defender_cinematic_move'))
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])
 
         self.raid_tier = None
@@ -325,57 +327,103 @@ class BreakpointCalcAPIView(GenericAPIView):
         return '{:g} ({:g}%)'.format(round(cycle_dps, 1), round(dps_percentage, 1))
 
     def _get_top_counters(self):
-        top_counters_qs = TopCounter.objects.filter(
+        if self.current_tab != 'counters':
+            return {}
+
+        move_type = self.defender.cinematic_move.move_type
+        resisted_types = [slugify(x[0]) for x in move_type.feeble + move_type.puny]
+        resisted_type_ids = Type.objects.filter(slug__in=resisted_types).values_list('id', flat=True)
+
+        vulnerable_types = [slugify(x[0]) for x in move_type.strong]
+        vulnerable_type_ids = Type.objects.filter(slug__in=vulnerable_types).values_list('pk', flat=True)
+
+        minimum_counters = 15
+        base_counter_qs = TopCounter.objects.filter(
             defender_id=self.defender.pk,
             defender_cpm=self.defender.cpm,
             weather_condition_id=self.weather_condition.pk
-        ).order_by('-highest_dps')[:15]
+        ).exclude(
+            counter__slug__in=['jirachi', 'celebi']
+        )
+        resistant_counter_ids = base_counter_qs.filter(
+            Q(counter__primary_type_id__in=resisted_type_ids)
+            | Q(counter__secondary_type_id__in=resisted_type_ids)
+        ).exclude(
+            Q(counter__primary_type_id__in=vulnerable_type_ids)
+            | Q(counter__secondary_type_id__in=vulnerable_type_ids)
+        ).exclude(
+            highest_dps__lt=base_counter_qs.order_by(
+                '-highest_dps'
+            ).first().highest_dps * Decimal('0.6')
+        ).order_by('-score').values_list('pk', flat=True)[:9]
+
+        top_counter_ids = base_counter_qs.exclude(
+            id__in=resistant_counter_ids
+        ).order_by(
+            '-score'
+        ).values_list('pk', flat=True)[:minimum_counters - len(resistant_counter_ids)]
+
+        top_counters_qs = TopCounter.objects.filter(
+            id__in=list(resistant_counter_ids) + list(top_counter_ids)
+        ).order_by('-score').select_related('defender', 'counter')
 
         top_counters = OrderedDict()
-        rounded_cycle_dps = round(calculate_weave_damage(
-            self.attacker_quick_move, self.attacker_cinematic_move), 1)
-
         for top_counter in top_counters_qs:
-            if rounded_cycle_dps >= float(top_counter.highest_dps):
-                top_counters = self._append_user_pokemon(top_counters, rounded_cycle_dps)
-
+            frailty = self._get_counter_frailty(top_counter)
             moveset_data = []
-            for data_row in top_counter.moveset_data:
+            for index, data_row in enumerate(top_counter.moveset_data):
                 moveset_data.append((
                     self._get_top_counter_url(
                         top_counter,
                         {
                             'attacker_quick_move': data_row[1],
                             'attacker_cinematic_move': data_row[2],
-                            'defender_quick_move': self.defender_quick_move,
-                            'defender_cinematic_move': self.defender_cinematic_move
-                        }
+                            'defender_quick_move': self.defender.quick_move,
+                            'defender_cinematic_move': self.defender.cinematic_move
+                        },
+                        frailty if index == 0 else '',
                     ),
                     data_row[1], data_row[2], round(data_row[0], 1),
                 ))
             top_counters[top_counter.counter.name] = moveset_data
-
-        if not 'user_{}'.format(self.attacker.name) in top_counters:
-            top_counters = self._append_user_pokemon(top_counters, rounded_cycle_dps)
         return top_counters
 
-    def _append_user_pokemon(self, top_counters, rounded_cycle_dps):
-        top_counters['user_{}'.format(self.attacker.name)] = [(
-            '<b>{}</b> L{:g}, {}A'.format(
-                self.attacker.name,
-                self.attacker.level,
-                self.attacker.atk_iv,
-            ),
-            self.attacker_quick_move.name,
-            self.attacker_cinematic_move.name,
-            rounded_cycle_dps,
-        )]
-        return top_counters
+    def _get_counter_frailty(self, instance):
+        counter_hp = instance.counter_hp
+        multiplier = instance.multiplier
+        cinematic_move_dph = self._get_defender_move_dph(
+            self.defender.cinematic_move, multiplier, instance.counter)
 
-    def _get_top_counter_url(self, top_counter, move_data):
+        frailty = Frailty.NEUTRAL
+        if cinematic_move_dph > counter_hp:
+            frailty = Frailty.FRAGILE
+        elif self.defender.cinematic_move.energy_delta == -33 and cinematic_move_dph * 3 > counter_hp:
+            frailty = Frailty.FRAGILE
+        else:
+            quick_move_dph = self._get_defender_move_dph(
+                self.defender.quick_move, multiplier, instance.counter)
+
+            if cinematic_move_dph + quick_move_dph * 2 > counter_hp:
+                frailty = Frailty.FRAGILE
+            elif quick_move_dph * 5 > counter_hp:
+                frailty = Frailty.FRAGILE
+            elif (cinematic_move_dph * 0.25 * 4 + cinematic_move_dph) < counter_hp:
+                frailty = Frailty.RESILIENT
+        return frailty
+
+    def _get_defender_move_dph(self, move, multiplier, pokemon):
+        return calculate_dph(
+            move.power,
+            multiplier,
+            is_move_stab(move, self.defender),
+            move.move_type_id in self.boosted_types,
+            determine_move_effectivness(move, pokemon)
+        )
+
+    def _get_top_counter_url(self, top_counter, move_data, frailty):
         params = urllib.parse.urlencode({
             'attacker': top_counter.counter.slug,
-            'attacker_level': 40,
+            'attacker_level': 20,
             'attacker_quick_move': slugify(move_data['attacker_quick_move']),
             'attacker_cinematic_move': slugify(move_data['attacker_cinematic_move']),
             'attacker_atk_iv': 15,
@@ -389,8 +437,8 @@ class BreakpointCalcAPIView(GenericAPIView):
             ),
             'tab': 'breakpoints',
         })
-        return '<a href="{0}?{1}">{2}</a>'.format(
-            reverse('pgo:breakpoint-calc'), params, top_counter.counter.name,
+        return '<a href="{0}?{1}">{3} {2}</a>'.format(
+            reverse('pgo:breakpoint-calc'), params, top_counter.counter.name, frailty,
         )
 
 

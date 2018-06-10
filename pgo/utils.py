@@ -19,6 +19,12 @@ MAX_IV = 15
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 
 
+class Frailty(object):
+    NEUTRAL = '{neutral}'
+    RESILIENT = '{resilient}'
+    FRAGILE = '{fragile}'
+
+
 def calculate_weave_damage(quick_move, cinematic_move):
     if quick_move.energy_delta > 0:
         quick_moves_required = (cinematic_move.energy_delta * - 1) / quick_move.energy_delta

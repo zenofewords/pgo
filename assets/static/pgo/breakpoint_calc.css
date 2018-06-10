@@ -66,6 +66,18 @@
 .breakpoint-calc-top-counter-subrow {
   background-color: #f9f9f9;
 }
+.frailty-neutral {
+  color: #000;
+}
+.frailty-resilient {
+  color: #000;
+}
+.frailty-fragile {
+  color: #f00;
+}
+.glyphicon {
+  top: .2rem;
+}
 .error {
   border-radius: .4rem;
   border-bottom: .3rem solid #f00;

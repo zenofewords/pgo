@@ -69,6 +69,7 @@ ready(() => {
     clearChoicesFieldError('breakpoint-calc-select-attacker')
 
     breakpointCalcForm.attacker = event.currentTarget.value
+    submitFormIfValid()
   })
   inputAttackerLevel.addEventListener('change', (event) => {
     setValidLevel(event.currentTarget, 'attacker_level')
@@ -112,6 +113,7 @@ ready(() => {
     clearChoicesFieldError('breakpoint-calc-select-defender')
 
     breakpointCalcForm.defender = event.currentTarget.value
+    submitFormIfValid()
   })
   selectDefenderCPM.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cpm = event.currentTarget.value
@@ -137,6 +139,7 @@ ready(() => {
 
     breakpointCalcForm.tab = 'counters'
     toggleTab(breakpointCalcForm.tab)
+    submitFormIfValid()
   })
 
   const submitFormIfValid = () => {
@@ -229,7 +232,6 @@ ready(() => {
 
         if (request.status >= 200 && request.status < 400) {
           document.getElementById('breakpoint-calc-atk-iv-assessment').innerHTML = json.attack_iv_assessment
-
           displayBreakpointCalcDetails(json)
           generateTopCountersTable(json.top_counters)
           updateBrowserHistory(getParams)
@@ -321,11 +323,12 @@ ready(() => {
     detailsTable.hidden = false
 
     if (json.breakpoint_details.length < 2) {
-      inputToggleCinematicBreakpoints.parentElement.hidden = true
+      inputToggleCinematicBreakpoints.enabled = false
     } else {
-      inputToggleCinematicBreakpoints.parentElement.hidden = false
+      inputToggleCinematicBreakpoints.enabled = true
     }
     moveEffectivness.innerHTML = ''
+
     generateBreakpointTable(json.breakpoint_details)
   }
 
@@ -350,6 +353,11 @@ ready(() => {
     const dataTable = document.getElementById('breakpoint-calc-top-counters-table-body')
     let dataRow
     let dataCell
+    const frailtyMap = {
+      neutral: '',
+      resilient: '<span class="glyphicon glyphicon-thumbs-up frailty-resilient" aria-hidden="true"></span>',
+      fragile: '<span class="glyphicon glyphicon-glass frailty-fragile" aria-hidden="true"></span>',
+    }
     dataTable.innerHTML = ''
 
     for (const [key, data] of Object.entries(dataset)) {
@@ -358,8 +366,9 @@ ready(() => {
 
         for (let j = 0; j < data[i].length; j++) {
           dataCell = document.createElement('td')
-
-          dataCell.innerHTML = data[i][j]
+          dataCell.innerHTML = String(data[i][j]).replace(/\{([^}]+)\}/g, (i, match) => {
+            return frailtyMap[match]
+          })
           dataRow.appendChild(dataCell)
         }
 
@@ -367,7 +376,7 @@ ready(() => {
         if (i > 0) {
           className = 'toggle_' + className + ' breakpoint-calc-top-counter-subrow'
           dataRow.hidden = true
-        } else if (!key.includes('user')) {
+        } else {
           const chevron = document.createElement('span')
           chevron.setAttribute(
             'class', 'glyphicon glyphicon-chevron-down breakpoint-calc-top-counter-chevron')
@@ -403,14 +412,8 @@ ready(() => {
   const toggleCinematicBreakpoints = () => {
     if (breakpointCalcForm.show_cinematic_breakpoints) {
       delete breakpointCalcForm.show_cinematic_breakpoints
-
-      inputToggleCinematicBreakpoints.classList.remove('glyphicon-minus')
-      inputToggleCinematicBreakpoints.classList.add('glyphicon-plus')
     } else {
       breakpointCalcForm.show_cinematic_breakpoints = true
-
-      inputToggleCinematicBreakpoints.classList.remove('glyphicon-plus')
-      inputToggleCinematicBreakpoints.classList.add('glyphicon-minus')
     }
     submitBreakpointCalcForm()
   }

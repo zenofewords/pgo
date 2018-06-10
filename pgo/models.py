@@ -246,7 +246,11 @@ class TopCounter(models.Model):
     weather_condition = models.ForeignKey('pgo.WeatherCondition')
 
     counter = models.ForeignKey('pgo.Pokemon', related_name='counters')
+    counter_hp = models.PositiveIntegerField(blank=True, null=True)
+    score = models.PositiveIntegerField(blank=True, null=True)
     highest_dps = models.DecimalField(verbose_name='Highest DPS', max_digits=4, decimal_places=1)
+    multiplier = models.DecimalField(max_digits=29, decimal_places=27, blank=True, null=True)
+
     moveset_data = JSONField()
 
     class Meta:

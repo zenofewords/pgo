@@ -14,10 +14,13 @@
   padding: .35rem;
 }
 #breakpoint-calc-form {
-  padding-bottom: 1.3rem;
+  padding-bottom: .7rem;
 }
 #breakpoint-calc-input-attacker-level {
   padding-left: .8rem;
+}
+#breakpoint-calc-atk-iv-assessment {
+  margin: 0;
 }
 #breakpoint-calc-header-text {
   text-align: justify;
@@ -28,6 +31,17 @@
 }
 #breakpoint-calc-breakpoint-details-table-body tr:first-child {
   font-weight: 900;
+}
+#breakpoint-calc-counters-moveset {
+  margin-bottom: 0;
+  border-bottom: none !important;
+}
+#breakpoint-calc-counters-move {
+  padding-right: 0;
+}
+#breakpoint-calc-counters-moveset-label {
+  border-bottom: none;
+  vertical-align: middle;
 }
 .breakpoint-calc-move-icon {
   margin-left: -.2rem;
@@ -51,6 +65,25 @@
 }
 .breakpoint-calc-top-counter-subrow {
   background-color: #f9f9f9;
+}
+.frailty-neutral {
+  color: #000;
+}
+.frailty-resilient {
+  margin-top: -.3rem;
+}
+.frailty-fragile {
+  color: #f00;
+}
+.icon-stardust {
+  margin-left: -.5rem;
+  padding-right: .2rem;
+}
+.icon-candy {
+  padding-left: .4rem;
+}
+.glyphicon {
+  top: .2rem;
 }
 .error {
   border-radius: .4rem;

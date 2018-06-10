@@ -1,4 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
+{% load static %}
 {% load render_bundle from webpack_loader %}
 
 
@@ -26,7 +27,7 @@
         </div>
         <div class="col-xs-4 input-padding-left">
           <label for="breakpoint-calc-input-attacker-level" class="sr-only">Attacker level</label>
-          <input id="breakpoint-calc-input-attacker-level" class="form-control breakpoint-calc-input" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
+          <input id="breakpoint-calc-input-attacker-level" class="form-control breakpoint-calc-input attacker_level" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
         </div>
       </div>
       <div class="row">
@@ -84,19 +85,14 @@
           </select>
         </div>
       </div>
-      <div class="row">
-        <div class="col-xs-12">
-          <input id="breakpoint-calc-input-submit" class="btn btn-primary btn-sm" type="submit" name="submit" value="Submit" style="width: 100%;">
-        </div>
-      </div>
     </form>
   </div>
-  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <p id="breakpoint-calc-atk-iv-assessment" class="text-left">
-      The Pokemon GO breakpoint calculator was built to help you find your pokemon's offensive breakpoints and plan your power-ups accordingly.
+  <div id="breakpoint-calc-atk-iv-assessment" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <p class="text-left">
+      The Pokemon GO breakpoint calculator was built to help you find your pokemon's breakpoints and plan power-ups accordingly.
     </p>
     <p id="breakpoint-calc-move-effectivness" class="text-left">
-      Select your pokemon, change the attacks, level, and ATK IV if necessary, then choose what you'll be attacking and hit submit.
+      Selecting an attacker and a defender will auto submit the form. Changing any values will refresh the data.
     </p>
   </div>
 </div>
@@ -116,40 +112,64 @@
           <thead>
             <tr>
               <th>Lvl</th>
-              <th>Dust / candy</th>
+              <th>
+                <img class="icon-stardust" src="{% static 'static/icons/stardust.png' %}">
+                | <img class="icon-candy" src="{% static 'static/icons/candy.png' %}">
+              </th>
               <th class="text-left">
                 <span class="glyphicon glyphicon-flash breakpoint-calc-move-icon" aria-hidden="true"></span>
               </th>
               <th class="text-left">
-                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
-
                 <a href="#">
-                  <span id="breakpoint-calc-toggle-cinematic-breakpoints" class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  <span id="breakpoint-calc-toggle-cinematic-breakpoints" class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
                 </a>
               </th>
-              <th>DPS* (%)</th>
-              <th>KO time*</th>
+              <th>DPS</th>
+              <th>
+                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> #
+              </th>
             </tr>
           </thead>
           <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
         </table>
-        <table id="breakpoint-calc-top-counters-table" class="table" hidden>
-          <thead>
-            <tr>
-              <th width="20%">Pokemon</th>
-              <th width="40%" class="text-left">
-                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
-              </th>
-              <th width="40%" class="text-left">
-                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
-              </th>
-              <th width="10%">DPS*</th>
-            </tr>
-          </thead>
-          <tbody id="breakpoint-calc-top-counters-table-body"></tbody>
-        </table>
+        <div id="breakpoint-calc-top-counters-table" hidden>
+          <table id="breakpoint-calc-counters-moveset" class="table">
+            <thead>
+              <tr>
+                <th id="breakpoint-calc-counters-moveset-label" width="18%">VS</th>
+                <td id="breakpoint-calc-counters-move" width="37%">
+                  <label for="breakpoint-calc-select-defender-quick-move" class="sr-only">Quick move</label>
+                  <select id="breakpoint-calc-select-defender-quick-move" class="form-control breakpoint-calc-input" disabled>
+                    <option value="-1" disabled selected>Quick move</option>
+                  </select>
+                </td>
+                <td id="breakpoint-calc-counters-move" width="45%">
+                  <label for="breakpoint-calc-select-defender-cinematic-move" class="sr-only">Cinematic move</label>
+                  <select id="breakpoint-calc-select-defender-cinematic-move" class="form-control breakpoint-calc-input" disabled>
+                    <option value="-1" disabled selected>Cinematic move</option>
+                  </select>
+                </td>
+              </tr>
+            </thead>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th width="35%">Pokemon</th>
+                <th width="25%" class="text-left">
+                  <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+                </th>
+                <th width="30%" class="text-left">
+                  <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+                </th>
+                <th width="10%">DPS</th>
+              </tr>
+            </thead>
+            <tbody id="breakpoint-calc-top-counters-table-body"></tbody>
+          </table>
+        </div>
         <span class="small">
-          * All calculations are exclusively math based and portray only an approximation of real-world scenarios. For thorough battle simulations visit <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
+          <b>All calculations are purely math based. DPS and the required number of trainers (<span class="glyphicon glyphicon-user" aria-hidden="true"></span> #) are approximated. For high quality battle simulations, visit <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.</b>
         </span>
       </div>
     </div>

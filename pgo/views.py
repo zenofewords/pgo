@@ -215,12 +215,14 @@ class BreakpointCalculatorView(CalculatorInitialDataMixin):
         return {
             'attacker': self._get_object_id('Pokemon', params.get('attacker')),
             'attacker_level': float(params.get('attacker_level')),
-            'quick_move': self._get_object_id('Move', params.get('quick_move')),
-            'cinematic_move': self._get_object_id('Move', params.get('cinematic_move')),
+            'attacker_quick_move': self._get_object_id('Move', params.get('attacker_quick_move')),
+            'attacker_cinematic_move': self._get_object_id('Move', params.get('attacker_cinematic_move')),
             'attacker_atk_iv': int(params.get('attacker_atk_iv')),
             'weather_condition': self._get_object_id(
                 'WeatherCondition', params.get('weather_condition')),
             'defender': self._get_object_id('Pokemon', params.get('defender')),
+            'defender_quick_move': self._get_object_id('Move', params.get('defender_quick_move')),
+            'defender_cinematic_move': self._get_object_id('Move', params.get('defender_cinematic_move')),
             'defender_cpm': str(Decimal(params.get('defender_cpm'))),
             'tab': slugify(params.get('tab', 'breakpoints')),
         }

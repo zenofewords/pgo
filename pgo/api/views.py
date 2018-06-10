@@ -358,21 +358,24 @@ class BreakpointCalcAPIView(GenericAPIView):
             ).first().highest_dps * Decimal('0.6')
         ).exclude(
             counter_hp__lte=100
-        ).order_by('-score').values_list('pk', flat=True)[:resistant_counters]
+        # ).order_by('-score').values_list('pk', flat=True)[:resistant_counters]
+        ).order_by('-highest_dps').values_list('pk', flat=True)[:resistant_counters]
 
         top_counter_ids = base_counter_qs.exclude(
             id__in=resistant_counter_ids
         ).order_by(
-            '-score'
+            # '-score'
+            '-highest_dps'
         ).values_list('pk', flat=True)[:minimum_counters - len(resistant_counter_ids)]
 
         top_counters_qs = TopCounter.objects.filter(
             id__in=list(resistant_counter_ids) + list(top_counter_ids)
-        ).order_by('-score').select_related('defender', 'counter')
+        # ).order_by('-score').select_related('defender', 'counter')
+        ).order_by('-highest_dps').select_related('defender', 'counter')
 
         top_counters = OrderedDict()
         for top_counter in top_counters_qs:
-            frailty = self._get_counter_frailty(top_counter)
+            frailty = '' # self._get_counter_frailty(top_counter)
             moveset_data = []
             for index, data_row in enumerate(top_counter.moveset_data):
                 moveset_data.append((

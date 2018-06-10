@@ -35,7 +35,7 @@ class Command(BaseCommand):
                 pgo_attack__gte=180
             ).exclude(
                 slug__in=UNRELEASED_POKEMON
-            ).filter(slug='alolan-exeggutor').order_by('-pgo_attack')[:120]
+            ).order_by('-pgo_attack')[:120]
 
         self.max_cpm = CPM.gyms.last().value
         defender_cpm_list = [x.value for x in CPM.raids.distinct('value').order_by('-value')]

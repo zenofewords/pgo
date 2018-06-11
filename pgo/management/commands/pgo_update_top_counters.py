@@ -29,9 +29,32 @@ class Command(BaseCommand):
         top_counter.counter_hp = (top_counter.counter.pgo_stamina + MAX_IV) * max_cpm_value
         top_counter.save()
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--attacker',
+            action='append',
+            dest='attackers',
+            default=[],
+            help='Expects a list of attacker slugs (--attacker="slug" --attacker="slug2"',
+        )
+        parser.add_argument(
+            '--defender',
+            action='append',
+            dest='defenders',
+            default=[],
+            help='Expects a list of defender slugs',
+        )
+
     def handle(self, *args, **options):
         max_cpm_value = CPM.objects.get(level=40, raid_cpm=False).value
-        top_counters = TopCounter.objects.select_related('counter', 'defender')
 
-        for top_counter in top_counters:
+        top_counters_qs = TopCounter.objects.select_related('counter', 'defender')
+        attackers = options['attackers']
+        defenders = options['defenders']
+        if attackers:
+            top_counters_qs = top_counters_qs.filter(counter__slug__in=attackers)
+        if defenders:
+            top_counters_qs = top_counters_qs.filter(defender__slug__in=defenders)
+
+        for top_counter in top_counters_qs:
             self._update_top_counter(top_counter, max_cpm_value)

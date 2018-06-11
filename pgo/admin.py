@@ -48,6 +48,10 @@ class PokemonMoveAdmin(admin.ModelAdmin):
     search_fields = (
         'pokemon__slug',
     )
+    raw_id_fields = (
+        'pokemon',
+        'move',
+    )
 
 
 class RaidBossAdmin(admin.ModelAdmin):

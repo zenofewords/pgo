@@ -397,10 +397,11 @@ class BreakpointCalcAPIView(GenericAPIView):
         quick_move_dph = self._get_defender_move_dph(
             self.defender.quick_move, instance.multiplier, instance.counter)
 
-        cycle_damage = (cinematic_move_dph / instance.counter_hp * 100
-            ) + (quick_move_dph / instance.counter_hp * 100) * 3
+        quick_attacks = 2 if self.defender.quick_move.duration > 1000 else 3
+        cycle_damage_percentage = (cinematic_move_dph / instance.counter_hp * 100
+            ) + (quick_move_dph / instance.counter_hp * 100) * quick_attacks
 
-        fragile_cut_off = 100
+        fragile_cut_off = 99
         resilient_cut_off = 60
         if self.defender.cinematic_move.energy_delta == -50:
             fragile_cut_off = 60
@@ -410,9 +411,9 @@ class BreakpointCalcAPIView(GenericAPIView):
             resilient_cut_off = 40
 
         frailty = Frailty.NEUTRAL
-        if cycle_damage > fragile_cut_off:
+        if cycle_damage_percentage > fragile_cut_off:
             frailty = Frailty.FRAGILE
-        elif cycle_damage < resilient_cut_off:
+        elif cycle_damage_percentage < resilient_cut_off:
             frailty = Frailty.RESILIENT
 
         return frailty

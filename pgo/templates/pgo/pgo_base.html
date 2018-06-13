@@ -24,70 +24,9 @@
 {% block footer %}
   <div class="row" style="font-size: 1.2rem; max-width: 85rem; margin-top: 10rem;">
     <div class="col-md-12">
-      <p>Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.</p>
-      <a href="#" id="toggle-changelog" style="text-decoration: none;">
-        <p>Changelog <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></p>
-      </a>
-    </div>
-
-    <div class="col-md-12 changelog" style="display: none;">
-      <ul>
-        <li>3/31/2018</li>
-        <ul>
-          <li>The breakpoint calculator has finally been refreshed</li>
-          <ul>
-            <li>Improved layout and screen space useage</li>
-            <li>Removed the raid/regular toggle button, every target pokemon can now be simulated as any raid boss or L40 defender</li>
-            <li>Added candy amount together with stardust powerup costs</li>
-            <li>Reworked the results table: was using legacy code and layout which predated raids and even gen II!</li>
-            <li>Added support for GET URLs: after you press submit, the link in the browser is updated and can be copied to easily share your results</li>
-          </ul>
-        </ul>
-        <li>3/24/2018</li>
-        <ul>
-          <li>Added the good to go calculator</li>
-        </ul>
-        <li>3/14/2018</li>
-        <ul>
-          <li>Experimenting with css/js compression for faster load times</li>
-        </ul>
-        <li>2/28/2018</li>
-        <ul>
-          <li>Search engine optimisation/UX update</li>
-          <ul>
-            <li>Simplified the URLs (address bar links) by dropping the '/pgo/' segment</li>
-            <li>Added a permanent redirect from the legacy '/pgo*' URLs to the breakpoint calculator homepage</li>
-            <li>Renamed the calculator and updated all text references</li>
-          </ul>
-        </ul>
-        <li>2/9/2018</li>
-        <ul>
-          <li>implemented auto-select for moves</li>
-          <ul>
-            <li>best case scenario: the guess is correct (saves time and effort)</li>
-            <li>worst case: one or both moves have to be reselected (same amount of actions as before)</li>
-          </ul>
-          <li>prepopulated attacker level with level 20</li>
-          <li>fixed ATK IV dropdown not being clickable/tapable at the rightmost edge</li>
-        </ul>
-        <li>1/25/2018</li>
-        <ul>
-          <li>made more UI tweaks (longer form fields look better on windows based OS)</li>
-          <li>added weather boost info for attacks</li>
-          <li>fixed the delay when switching from raid bosses to regular defenders</li>
-        </ul>
-        <li>1/15/2018</li>
-        <ul>
-          <li>fixed attacker level input not displaying placeholder and value on firefox (OSX)</li>
-          <li>added weather boosts</li>
-          <li>redesigned the UI slightly</li>
-        </ul>
-        <li>1/12/2018</li>
-        <ul>
-          <li>updated for gen III</li>
-          <li>moved to a smaller server</li>
-        </ul>
-      </ul>
+      <p>
+        Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.
+      </p>
     </div>
   </div>
   {{ block.super }}
@@ -97,20 +36,4 @@
   {% block generic %}
     {% render_bundle 'lists' attrs='async' %}
   {% endblock generic %}
-
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-      var changelog = document.querySelector('.changelog');
-
-      document.querySelector('#toggle-changelog').addEventListener('click', function (event) {
-        event.preventDefault();
-
-        if (changelog.style.display === '') {
-          changelog.style.display = 'none';
-        } else {
-          changelog.style.display = '';
-        }
-      });
-    }, false);
-  </script>
 {% endblock scripts %}

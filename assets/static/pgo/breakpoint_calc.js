@@ -9,9 +9,15 @@ const ready = (runBreakpointCalc) => {
 }
 
 ready(() => {
-  const SUBMITTING = 'submitting'
-  const READY = 'ready'
-  const ERROR = 'error'
+  const FORM = {
+    SUBMITTING: 'submitting',
+    READY: 'ready',
+    ERROR: 'error',
+  }
+  const TAB = {
+    BREAKPOINTS: 'breakpoints',
+    COUNTERS: 'counters',
+  }
 
   const selectAttacker = new Choices(
     '.breakpoint-calc-select-attacker',
@@ -59,8 +65,9 @@ ready(() => {
     defender_quick_move: selectDefenderQuickMove.value,
     defender_cinematic_move: selectDefenderCinematicMove.value,
     defender_cpm: selectDefenderCPM.value,
-    tab: 'breakpoints',
-    status: READY,
+    tab: TAB.BREAKPOINTS,
+    status: FORM.READY,
+    staleTab: false,
   }
 
   selectAttacker.passedElement.addEventListener('change', (event) => {
@@ -69,42 +76,38 @@ ready(() => {
     clearChoicesFieldError('breakpoint-calc-select-attacker')
 
     breakpointCalcForm.attacker = event.currentTarget.value
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   inputAttackerLevel.addEventListener('change', (event) => {
     setValidLevel(event.currentTarget, 'attacker_level')
     inputAttackerLevel.classList.remove('error')
 
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   selectAttackerQuickMove.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_quick_move = event.currentTarget.value
 
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   selectAttackerCinematicMove.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_cinematic_move = event.currentTarget.value
 
-    submitFormIfValid()
-  })
-  selectDefenderQuickMove.addEventListener('change', (event) => {
-    breakpointCalcForm.defender_quick_move = event.currentTarget.value
-
-    submitFormIfValid()
-  })
-  selectDefenderCinematicMove.addEventListener('change', (event) => {
-    breakpointCalcForm.defender_cinematic_move = event.currentTarget.value
-
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   selectAttackerAtkIv.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_atk_iv = event.currentTarget.value
 
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   selectWeatherCondition.addEventListener('change', (event) => {
     breakpointCalcForm.weather_condition = event.currentTarget.value
 
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   selectDefender.passedElement.addEventListener('change', (event) => {
@@ -113,37 +116,51 @@ ready(() => {
     clearChoicesFieldError('breakpoint-calc-select-defender')
 
     breakpointCalcForm.defender = event.currentTarget.value
+    breakpointCalcForm.staleTab = true
+    submitFormIfValid()
+  })
+  selectDefenderQuickMove.addEventListener('change', (event) => {
+    breakpointCalcForm.defender_quick_move = event.currentTarget.value
+
+    breakpointCalcForm.staleTab = true
+    submitFormIfValid()
+  })
+  selectDefenderCinematicMove.addEventListener('change', (event) => {
+    breakpointCalcForm.defender_cinematic_move = event.currentTarget.value
+
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   selectDefenderCPM.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cpm = event.currentTarget.value
 
+    breakpointCalcForm.staleTab = true
     submitFormIfValid()
   })
   inputToggleCinematicBreakpoints.addEventListener('click', (event) => {
     event.preventDefault()
     toggleCinematicBreakpoints()
   })
-  document.getElementById('breakpoint-calc-form').addEventListener('submit', (event) => {
-    event.preventDefault()
-    submitBreakpointCalcForm()
-  })
   tabBreakpoints.addEventListener('click', (event) => {
     event.preventDefault()
 
-    breakpointCalcForm.tab = 'breakpoints'
+    breakpointCalcForm.tab = TAB.BREAKPOINTS
     toggleTab(breakpointCalcForm.tab)
   })
   tabTopCounters.addEventListener('click', (event) => {
     event.preventDefault()
 
-    breakpointCalcForm.tab = 'counters'
+    breakpointCalcForm.tab = TAB.COUNTERS
     toggleTab(breakpointCalcForm.tab)
-    submitFormIfValid()
+
+    if (breakpointCalcForm.staleTab) {
+      breakpointCalcForm.staleTab = false
+      submitFormIfValid()
+    }
   })
 
   const submitFormIfValid = () => {
-    if (breakpointCalcForm.status !== SUBMITTING) {
+    if (breakpointCalcForm.status !== FORM.SUBMITTING) {
       let valid = true
       for (const key in breakpointCalcForm) {
         if (breakpointCalcForm[key] === undefined || breakpointCalcForm[key] === -1) {
@@ -166,6 +183,7 @@ ready(() => {
   const formatParams = (params) => {
     const paramsCopy = Object.assign({}, params)
     delete paramsCopy.status
+    delete paramsCopy.staleTab
 
     return '?' + Object.keys(paramsCopy).map((key) => {
       return key + '=' + encodeURIComponent(paramsCopy[key])
@@ -173,7 +191,7 @@ ready(() => {
   }
 
   const toggleTab = (currentTab) => {
-    if (currentTab === 'breakpoints') {
+    if (currentTab === TAB.BREAKPOINTS) {
       breakpointsTable.hidden = false
       topCountersTable.hidden = true
 
@@ -181,7 +199,7 @@ ready(() => {
       tabTopCounters.classList.remove('breakpoint-calc-selected-tab')
 
       updateBrowserHistory(formatParams(breakpointCalcForm))
-    } else if (currentTab === 'counters') {
+    } else if (currentTab === TAB.COUNTERS) {
       breakpointsTable.hidden = true
       topCountersTable.hidden = false
 
@@ -204,7 +222,7 @@ ready(() => {
         }
       }
       request.onerror = () => {
-        breakpointCalcForm.status = ERROR
+        breakpointCalcForm.status = FORM.ERROR
       }
       request.send()
     } else {
@@ -219,8 +237,8 @@ ready(() => {
   }
 
   const submitBreakpointCalcForm = () => {
-    if (breakpointCalcForm.status !== SUBMITTING) {
-      breakpointCalcForm.status = SUBMITTING
+    if (breakpointCalcForm.status !== FORM.SUBMITTING) {
+      breakpointCalcForm.status = FORM.SUBMITTING
 
       const request = new XMLHttpRequest()
       const getParams = formatParams(breakpointCalcForm)
@@ -238,10 +256,14 @@ ready(() => {
         } else {
           showErrors(json)
         }
-        breakpointCalcForm.status = READY
+        breakpointCalcForm.status = FORM.READY
+
+        if (breakpointCalcForm.tab === TAB.COUNTERS) {
+          breakpointCalcForm.staleTab = false
+        }
       }
       request.onerror = () => {
-        breakpointCalcForm.status = ERROR
+        breakpointCalcForm.status = FORM.ERROR
       }
       request.send()
     }
@@ -261,7 +283,7 @@ ready(() => {
     selectPokemonMoves(data.defender, 'defender')
 
     breakpointCalcForm = data
-    breakpointCalcForm.status = READY
+    breakpointCalcForm.status = FORM.READY
     submitBreakpointCalcForm()
   }
 

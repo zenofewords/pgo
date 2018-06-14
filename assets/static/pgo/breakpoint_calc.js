@@ -139,6 +139,8 @@ ready(() => {
   })
   inputToggleCinematicBreakpoints.addEventListener('click', (event) => {
     event.preventDefault()
+
+    breakpointCalcForm.staleTab = true
     toggleCinematicBreakpoints()
   })
   tabBreakpoints.addEventListener('click', (event) => {

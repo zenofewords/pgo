@@ -283,6 +283,7 @@ ready(() => {
     selectPokemonMoves(data.defender, 'defender')
 
     breakpointCalcForm = data
+    breakpointCalcForm.staleTab = true
     breakpointCalcForm.status = FORM.READY
     submitBreakpointCalcForm()
   }
@@ -377,7 +378,7 @@ ready(() => {
     let dataCell
     const frailtyMap = {
       neutral: '',
-      resilient: '<img class="frailty-resilient" src="/static/static/icons/shield.png">',
+      resilient: '<img class="frailty-resilient" src="/static/static/icons/shield2.png">',
       fragile: '<span class="glyphicon glyphicon-glass frailty-fragile" aria-hidden="true"></span>',
     }
     dataTable.innerHTML = ''

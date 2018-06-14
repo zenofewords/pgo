@@ -65,18 +65,34 @@
 .breakpoint-calc-top-counter-subrow {
   background-color: #f9f9f9;
 }
-.frailty-neutral {
-  color: #000;
-}
 .frailty-resilient {
   margin-top: -.3rem;
 }
 .frailty-fragile {
+  margin-left: .09rem;
   color: #f00;
 }
 .icon-stardust {
   margin-left: -.5rem;
   padding-right: .2rem;
+}
+table#breakpoint-calc-breakpoints-table tr th:first-child,
+table#breakpoint-calc-breakpoints-table tr td:first-child {
+  padding-left: .7rem;
+}
+table#breakpoint-calc-counters-moveset tr th:first-child {
+  padding-left: .3rem;
+}
+table#top-counters-table tr th {
+  padding-left: .3rem;
+  padding-right: 0;
+}
+table#top-counters-table tr td {
+  padding-left: .1rem;
+  padding-right: 0;
+}
+table#top-counters-table tr td:last-child {
+  padding-right: 0;
 }
 .icon-candy {
   padding-left: .4rem;

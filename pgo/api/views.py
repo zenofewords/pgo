@@ -28,6 +28,7 @@ from pgo.utils import (
     calculate_weave_damage,
     get_pokemon_data,
     get_move_data,
+    get_top_counter_qs,
     determine_move_effectivness,
     is_move_stab,
     CINEMATIC_MOVE_FACTOR,
@@ -330,51 +331,17 @@ class BreakpointCalcAPIView(GenericAPIView):
         if self.current_tab != 'counters':
             return {}
 
-        move_type = self.defender.cinematic_move.move_type
-        resisted_types = [slugify(x[0]) for x in move_type.feeble + move_type.puny]
-        resisted_type_ids = Type.objects.filter(slug__in=resisted_types).values_list('id', flat=True)
-
-        vulnerable_types = [slugify(x[0]) for x in move_type.strong]
-        vulnerable_type_ids = Type.objects.filter(slug__in=vulnerable_types).values_list('pk', flat=True)
-
-        minimum_counters = 15
-        resistant_counters = 10
-        base_counter_qs = TopCounter.objects.filter(
-            defender_id=self.defender.pk,
-            defender_cpm=self.defender.cpm,
-            weather_condition_id=self.weather_condition.pk
-        ).exclude(
-            counter__slug__in=['jirachi', 'celebi']
-        )
-        resistant_counter_ids = base_counter_qs.filter(
-            Q(counter__primary_type_id__in=resisted_type_ids)
-            | Q(counter__secondary_type_id__in=resisted_type_ids)
-        ).exclude(
-            Q(counter__primary_type_id__in=vulnerable_type_ids)
-            | Q(counter__secondary_type_id__in=vulnerable_type_ids)
-        ).exclude(
-            highest_dps__lt=base_counter_qs.order_by(
-                '-highest_dps'
-            ).first().highest_dps * Decimal('0.6')
-        ).exclude(
-            counter_hp__lte=100
-        ).order_by('-score').values_list('pk', flat=True)[:resistant_counters]
-
-        top_counter_ids = base_counter_qs.exclude(
-            id__in=resistant_counter_ids
-        ).order_by(
-            '-score'
-        ).values_list('pk', flat=True)[:minimum_counters - len(resistant_counter_ids)]
-
-        top_counters_qs = TopCounter.objects.filter(
-            id__in=list(resistant_counter_ids) + list(top_counter_ids)
-        ).order_by('-score').select_related('defender', 'counter')
-
         top_counters = OrderedDict()
-        for top_counter in top_counters_qs:
+        for top_counter in get_top_counter_qs(self.defender, self.weather_condition):
             frailty = self._get_counter_frailty(top_counter)
+
             moveset_data = []
             for index, data_row in enumerate(top_counter.moveset_data):
+                DPS = round(data_row[0], 1)
+
+                if index > 1 and DPS <= top_counter.highest_dps * Decimal('0.9'):
+                    break
+
                 moveset_data.append((
                     self._get_top_counter_url(
                         top_counter,
@@ -386,7 +353,7 @@ class BreakpointCalcAPIView(GenericAPIView):
                         },
                         frailty if index == 0 else '',
                     ),
-                    data_row[1], data_row[2], round(data_row[0], 1),
+                    data_row[1], data_row[2], DPS,
                 ))
             top_counters[top_counter.counter.name] = moveset_data
         return top_counters

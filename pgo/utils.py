@@ -133,14 +133,17 @@ def get_top_counter_qs(defender, weather_condition_id):
     base_counter_qs = TopCounter.objects.filter(
         defender_id=defender.pk,
         defender_cpm=defender.cpm,
-        weather_condition_id=weather_condition_id
     ).exclude(
         counter__slug__in=['jirachi', 'celebi']
     )
-    max_dps = base_counter_qs.aggregate(Max('highest_dps'))['highest_dps__max']
+    max_neutral_dps = base_counter_qs.filter(
+        weather_condition_id=8
+    ).aggregate(Max('highest_dps'))['highest_dps__max']
 
     # exclude if without resitance to c move and stats below treshold
-    return base_counter_qs.exclude(
+    return base_counter_qs.filter(
+        weather_condition_id=weather_condition_id
+    ).exclude(
         (
             ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids)
             & (
@@ -150,7 +153,7 @@ def get_top_counter_qs(defender, weather_condition_id):
                 ) | Q(counter__secondary_type__isnull=True)
             )
         ) & (
-            Q(highest_dps__lte=max_dps * Decimal('0.7'))
+            Q(highest_dps__lte=max_neutral_dps * Decimal('0.7'))
             & Q(counter__pgo_attack__lte=210)
             & Q(counter__pgo_defense__lte=190)
         )
@@ -159,13 +162,13 @@ def get_top_counter_qs(defender, weather_condition_id):
         (
             Q(counter__primary_type_id__in=cinematic_vulnerable_type_ids)
             & Q(counter__secondary_type_id__in=cinematic_vulnerable_type_ids)
-        ) & Q(highest_dps__lte=max_dps * Decimal('0.9'))
+        ) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.9'))
     # double weak to q move, DPS and HP below treshold
     ).exclude(
         (
             Q(counter__primary_type_id__in=quick_vulnerable_type_ids)
             & Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
-        ) & (Q(highest_dps__lte=max_dps * Decimal('0.8')) & Q(counter_hp__lte=180))
+        ) & (Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')) & Q(counter_hp__lte=180))
     # weak to both q and c, doesn't resist c move, DPS below treshold
     ).exclude(
         (
@@ -180,7 +183,7 @@ def get_top_counter_qs(defender, weather_condition_id):
                 ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids)
                 & ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
             )
-        ) & Q(highest_dps__lte=max_dps * Decimal('0.8'))
+        ) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8'))
     # weak to c move without resistance, DPS and HP below treshold
     ).exclude(
         ((
@@ -195,7 +198,7 @@ def get_top_counter_qs(defender, weather_condition_id):
                     ) | Q(counter__secondary_type__isnull=True)
                 )
             ) & (
-                (Q(highest_dps__lte=max_dps * Decimal('0.8')) & Q(counter_hp__lte=180))
+                (Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')) & Q(counter_hp__lte=180))
             )
         )
     # weak to q move, DPS and HP below treshold
@@ -203,7 +206,7 @@ def get_top_counter_qs(defender, weather_condition_id):
         (
             Q(counter__primary_type_id__in=quick_vulnerable_type_ids)
             | Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
-        ) & (Q(highest_dps__lte=max_dps * Decimal('0.7')) & Q(counter_hp__lte=170))
+        ) & (Q(highest_dps__lte=max_neutral_dps * Decimal('0.7')) & Q(counter_hp__lte=170))
     # doesn't resist either move, stats below treshold
     ).exclude(
         (
@@ -225,11 +228,11 @@ def get_top_counter_qs(defender, weather_condition_id):
         ) & (
             (Q(counter_hp__lte=120) & Q(counter__pgo_defense__lte=185))
             | (Q(counter_hp__lte=130) & Q(counter__pgo_defense__lte=150))
-            | (Q(counter_hp__lte=130) & Q(highest_dps__lte=max_dps * Decimal('0.8')))
+            | (Q(counter_hp__lte=130) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')))
             | (
                 (Q(counter__pgo_defense__lte=150)
                 | Q(counter_hp__lte=150))
-                & Q(highest_dps__lte=max_dps * Decimal('0.8'))
+                & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8'))
             )
         )
     # HP below treshold and doesn't resist q move

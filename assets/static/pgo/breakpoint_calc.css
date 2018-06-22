@@ -109,6 +109,17 @@ table#top-counters-table tr td:last-child {
   text-align: justify;
   font-size: 1.3rem;
 }
+#faq-legend-link {
+  text-align: center;
+  text-decoration: none;
+}
+#faq-legend-content {
+  text-align: justify;
+}
+#faq-legend-content ul {
+  list-style-type: none;
+  padding-left: 0;
+}
 
 /* fixing the hideous select input "gloss" in safari */
 select {

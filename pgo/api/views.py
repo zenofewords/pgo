@@ -1,6 +1,7 @@
 from __future__ import division, unicode_literals
 
 import six.moves.urllib as urllib
+import logging
 
 from collections import OrderedDict
 from decimal import Decimal
@@ -35,6 +36,7 @@ from pgo.utils import (
     MAX_IV,
     Frailty,
 )
+logger = logging.getLogger(__name__)
 
 
 class MoveViewSet(viewsets.ModelViewSet):
@@ -98,8 +100,17 @@ class BreakpointCalcAPIView(GenericAPIView):
         self._set_defender_health()
         self._set_move_stats(self.attacker.cpm_list.first()['value'], self.attacker.atk_iv)
 
+        try:
+            top_counters = self._get_top_counters()
+        except AttributeError as e:
+            top_counters = {}
+            logger.error('Missing top counter for: {}, {}, {}'.format(
+                self.defender.name, self.defender.cpm, self.weather_condition.name,
+                self.defender.quick_move, self.defender.cinematic_move)
+            )
+
         data = {
-            'top_counters': self._get_top_counters(),
+            'top_counters': top_counters,
             'attack_iv_assessment': self._assess_attack_iv(),
             'breakpoint_details': self._get_details_table(self._process_data()),
         }

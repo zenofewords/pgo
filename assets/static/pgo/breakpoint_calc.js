@@ -53,6 +53,8 @@ ready(() => {
   const tabTopCounters = document.getElementById('breakpoint-calc-top-counters')
   const breakpointsTable = document.getElementById('breakpoint-calc-breakpoints-table')
   const topCountersTable = document.getElementById('breakpoint-calc-top-counters-table')
+  const ivAssessment = document.getElementById('breakpoint-calc-atk-iv-assessment')
+  const faqLegend = document.getElementById('faq-legend-content')
 
   let breakpointCalcForm = {
     attacker: selectAttacker.value,
@@ -148,16 +150,34 @@ ready(() => {
 
     breakpointCalcForm.tab = TAB.BREAKPOINTS
     toggleTab(breakpointCalcForm.tab)
+    toggleElementsByTab(TAB.BREAKPOINTS)
   })
   tabTopCounters.addEventListener('click', (event) => {
     event.preventDefault()
 
     breakpointCalcForm.tab = TAB.COUNTERS
     toggleTab(breakpointCalcForm.tab)
+    toggleElementsByTab(TAB.COUNTERS)
 
     if (breakpointCalcForm.staleTab) {
       breakpointCalcForm.staleTab = false
       submitFormIfValid()
+    }
+  })
+  document.getElementById('faq-legend-link').addEventListener('click', (event) => {
+    event.preventDefault()
+
+    faqLegend.hidden = !faqLegend.hidden
+    const faqLegendChevrons = event.currentTarget.getElementsByClassName('faq-legend-chevron')
+
+    for (var i = 0; i < faqLegendChevrons.length; i++) {
+      if (faqLegendChevrons[i].classList.contains('glyphicon-chevron-down')) {
+        faqLegendChevrons[i].classList.remove('glyphicon-chevron-down')
+        faqLegendChevrons[i].classList.add('glyphicon-chevron-up')
+      } else {
+        faqLegendChevrons[i].classList.remove('glyphicon-chevron-up')
+        faqLegendChevrons[i].classList.add('glyphicon-chevron-down')
+      }
     }
   })
 
@@ -212,6 +232,28 @@ ready(() => {
     }
   }
 
+  const toggleElementsByTab = (tab) => {
+    if (tab === TAB.COUNTERS) {
+      selectAttacker.disable()
+
+      inputAttackerLevel.disabled = true
+      selectAttackerQuickMove.disabled = true
+      selectAttackerCinematicMove.disabled = true
+      selectAttackerAtkIv.disabled = true
+
+      ivAssessment.hidden = true
+    } else {
+      selectAttacker.enable()
+
+      inputAttackerLevel.disabled = false
+      selectAttackerQuickMove.disabled = false
+      selectAttackerCinematicMove.disabled = false
+      selectAttackerAtkIv.disabled = false
+
+      ivAssessment.hidden = false
+    }
+  }
+
   const selectPokemonMoves = (value, pokemon) => {
     if (parseInt(value) > 0) {
       const request = new XMLHttpRequest()
@@ -251,7 +293,7 @@ ready(() => {
         const json = JSON.parse(request.responseText)
 
         if (request.status >= 200 && request.status < 400) {
-          document.getElementById('breakpoint-calc-atk-iv-assessment').innerHTML = json.attack_iv_assessment
+          ivAssessment.innerHTML = json.attack_iv_assessment
           displayBreakpointCalcDetails(json)
           generateTopCountersTable(json.top_counters)
           updateBrowserHistory(getParams)
@@ -262,6 +304,7 @@ ready(() => {
 
         if (breakpointCalcForm.tab === TAB.COUNTERS) {
           breakpointCalcForm.staleTab = false
+          toggleElementsByTab(TAB.COUNTERS)
         }
       }
       request.onerror = () => {
@@ -385,51 +428,62 @@ ready(() => {
     }
     dataTable.innerHTML = ''
 
-    for (const [key, data] of Object.entries(dataset)) {
-      for (let i = 0; i < data.length; i++) {
-        dataRow = document.createElement('tr')
+    if (Object.entries(dataset).length === 0) {
+      dataRow = document.createElement('tr')
+      dataCell = document.createElement('td')
 
-        for (let j = 0; j < data[i].length; j++) {
-          dataCell = document.createElement('td')
-          dataCell.innerHTML = String(data[i][j]).replace(/\{([^}]+)\}/g, (i, match) => {
-            return frailtyMap[match]
-          })
-          dataRow.appendChild(dataCell)
-        }
+      dataCell.innerHTML = 'Looks like the data for this pokemon is missing. The error has been logged and will be fixed soon.'
+      dataCell.colSpan = '4'
+      dataRow.appendChild(dataCell)
 
-        let className = key.toLowerCase()
-        if (i > 0) {
-          className = 'toggle_' + className + ' breakpoint-calc-top-counter-subrow'
-          dataRow.hidden = true
-        } else {
-          const chevron = document.createElement('span')
-          chevron.setAttribute(
-            'class', 'glyphicon glyphicon-chevron-down breakpoint-calc-top-counter-chevron')
-          chevron.setAttribute('aria-hidden', true)
+      dataTable.appendChild(dataRow)
+    } else {
+      for (const [key, data] of Object.entries(dataset)) {
+        for (let i = 0; i < data.length; i++) {
+          dataRow = document.createElement('tr')
 
-          const href = document.createElement('a')
-          href.setAttribute('class', 'breakpoint-calc-toggle-chevron')
-          href.onclick = () => {
-            if (chevron.classList.contains('glyphicon-chevron-down')) {
-              chevron.classList.remove('glyphicon-chevron-down')
-              chevron.classList.add('glyphicon-chevron-up')
-            } else {
-              chevron.classList.remove('glyphicon-chevron-up')
-              chevron.classList.add('glyphicon-chevron-down')
-            }
-
-            const elements = document.getElementsByClassName('toggle_' + className)
-            for (var i = 0; i < elements.length; i++) {
-              elements[i].hidden = !elements[i].hidden
-            }
+          for (let j = 0; j < data[i].length; j++) {
+            dataCell = document.createElement('td')
+            dataCell.innerHTML = String(data[i][j]).replace(/\{([^}]+)\}/g, (i, match) => {
+              return frailtyMap[match]
+            })
+            dataRow.appendChild(dataCell)
           }
 
-          href.appendChild(chevron)
-          dataCell.appendChild(href)
-        }
-        dataRow.setAttribute('class', className)
+          let className = key.toLowerCase()
+          if (i > 0) {
+            className = 'toggle_' + className + ' breakpoint-calc-top-counter-subrow'
+            dataRow.hidden = true
+          } else {
+            const chevron = document.createElement('span')
+            chevron.setAttribute(
+              'class', 'glyphicon glyphicon-chevron-down breakpoint-calc-top-counter-chevron')
+            chevron.setAttribute('aria-hidden', true)
 
-        dataTable.appendChild(dataRow)
+            const href = document.createElement('a')
+            href.setAttribute('class', 'breakpoint-calc-toggle-chevron')
+            href.onclick = () => {
+              if (chevron.classList.contains('glyphicon-chevron-down')) {
+                chevron.classList.remove('glyphicon-chevron-down')
+                chevron.classList.add('glyphicon-chevron-up')
+              } else {
+                chevron.classList.remove('glyphicon-chevron-up')
+                chevron.classList.add('glyphicon-chevron-down')
+              }
+
+              const elements = document.getElementsByClassName('toggle_' + className)
+              for (var i = 0; i < elements.length; i++) {
+                elements[i].hidden = !elements[i].hidden
+              }
+            }
+
+            href.appendChild(chevron)
+            dataCell.appendChild(href)
+          }
+          dataRow.setAttribute('class', className)
+
+          dataTable.appendChild(dataRow)
+        }
       }
     }
   }

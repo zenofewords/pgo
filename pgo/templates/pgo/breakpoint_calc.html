@@ -155,7 +155,7 @@
           <table id="top-counters-table" class="table">
             <thead>
               <tr>
-                <th width="29%">Pokemon</th>
+                <th width="29%">Level 40</th>
                 <th width="31%" class="text-left">
                   <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
                 </th>
@@ -168,8 +168,108 @@
             <tbody id="breakpoint-calc-top-counters-table-body"></tbody>
           </table>
         </div>
+        <div class="faq-legend-wrapper">
+          <a id="faq-legend-link" href="#">
+            <h5>
+              <span class="glyphicon glyphicon-chevron-down faq-legend-chevron" aria-hidden="true"></span>
+                FAQ / legend
+              <span class="glyphicon glyphicon-chevron-down faq-legend-chevron" aria-hidden="true"></span>
+            </h5>
+          </a>
+          <hr>
+          <div id="faq-legend-content" hidden>
+            <p>
+              <strong>Breakpoints</strong> - due to rounding in the damage formula, damage dealt in PGo isn't linear
+            </p>
+            <p>
+              Instead, there are certain points for combinations of attacker and defender level, IVs, and moves, where the damage per hit of the move is, sometimes significantly, increased.
+            </p>
+            <ul>
+              <li>
+                <p>
+                  <strong>Lvl</strong> - your pokemon's current level and levels at which breakpoints occur
+                </p>
+              </li>
+              <li>
+                <p>
+                  <img src="{% static 'static/icons/stardust.png' %}"> - stardust required to level up from current level to breakpoint (<em>k</em> stands for thousand)
+                </p>
+              </li>
+              <li>
+                <p>
+                  <img src="{% static 'static/icons/candy.png' %}"> - candy required to level up from current level to breakpoint
+                </p>
+              </li>
+              <li>
+                <p>
+                  <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> - quick move's damage per hit
+                </p>
+                <p>
+                   Unlike charge move breakpoints, quick move breakpoints are usually highly impactful.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span> - charge move's damage per hit
+                </p>
+                <p>
+                  You can toggle the button to display all charge move breakpoints.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <strong>DPS</strong> - stands for damage per second
+                </p>
+                <p>
+                  The percentages in brackets are relative to a perfect, maxed specimen of the selected pokemon.
+                </p>
+                <p>
+                  DPS is calculated using the damage formula, factoring in the charge up, and use, of charge moves translated into "cycles" which are then divided by the duration of the moves required to perform a single cycle.
+                </p>
+              </li>
+              <li>
+                <p>
+                  <span class="glyphicon glyphicon-user" aria-hidden="true"></span> # - the aproximated number of trainers required to win the raid
+                </p>
+                <p>
+                  Assumes that every trainer is using the exact, selected pokemon. This metric should not be relied upon when attempting to shortman raids, it's here to help figure out by how much the pokemon is improved when hitting breakpoints.
+                </p>
+              </li>
+            </ul>
+
+            <hr>
+            <p>
+              <strong>Top Counters</strong> - a quick reference list of pokemon which counter the selected defender
+            </p>
+            <p>It features "perfect" level 40 counters ordered by stats, but with a strong preference for high damage. The list is dynamic and will often suggest different attackers based on the defender's moves and the selected weather.</p>
+            <ul>
+              <li>
+                <p>
+                  <span class="glyphicon glyphicon-glass frailty-fragile" aria-hidden="true"></span> - indicates frailty
+                </p>
+                <p>
+                  The pokemon will succumb to the defender's moves very quickly, but is still included in the list for its potential to deal damage.
+                </p>
+                <p>
+                  Glass cannon counters are best used in the battle party's first slot and ideally have multi-bar charge moves to be able to do enough before the defender's charged move knocks them out.</li>
+                </p>
+              <li>
+                <p>
+                  <img class="frailty-resilient" src={% static 'static/icons/shield2.png' %}> - indicates resilience
+                </p>
+                <p>
+                  The pokemon either has very high defensive stats and / or resists the defender's moves which makes it a durable fighter.
+                </p>
+                <p>
+                   Tanky pokemon usually do less damage than glass cannons. However, if a pokemon's DPS is high in addition to it receiving the shield icon, it's an exceptional pick for the selected raid.
+                </p>
+              </li>
+            </ul>
+            <hr>
+          </div>
+        </div>
         <p class="disclaimer">
-          All calculations are purely math based. DPS and the required number of trainers (<span class="glyphicon glyphicon-user" aria-hidden="true"></span> #) are approximated. For high quality battle simulations, visit <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
+          All calculations are purely math based. DPS and the required number of trainers are approximated. For high quality battle simulations, visit <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
         </p>
       </div>
     </div>

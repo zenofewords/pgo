@@ -104,7 +104,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             top_counters = self._get_top_counters()
         except (AttributeError, TypeError) as e:
             top_counters = {}
-            logger.error('Missing top counter for: {}, {}, {}'.format(
+            logger.error('Missing top counter for: {}, {}, {}, {}, {}'.format(
                 self.defender.name, self.defender.cpm, self.weather_condition.name,
                 self.defender.quick_move, self.defender.cinematic_move)
             )
@@ -344,7 +344,13 @@ class BreakpointCalcAPIView(GenericAPIView):
 
         top_counters = OrderedDict()
         for top_counter in get_top_counter_qs(self.defender, self.weather_condition):
-            frailty = self._get_counter_frailty(top_counter)
+            try:
+                frailty = self._get_counter_frailty(top_counter)
+            except Exception as e:
+                logger.error('Couldn\'t get frailty: {}'.format(
+                    top_counter.pk, self.defender.name, self.weather_condition
+                ))
+                frailty = ''
 
             moveset_data = []
             for index, data_row in enumerate(top_counter.moveset_data):

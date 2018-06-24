@@ -102,7 +102,7 @@ class BreakpointCalcAPIView(GenericAPIView):
 
         try:
             top_counters = self._get_top_counters()
-        except AttributeError as e:
+        except (AttributeError, TypeError) as e:
             top_counters = {}
             logger.error('Missing top counter for: {}, {}, {}'.format(
                 self.defender.name, self.defender.cpm, self.weather_condition.name,

@@ -2,7 +2,7 @@
   padding: 0;
 }
 .good-to-go-results-subcategory-header, .good-to-go-results-header {
-  padding: .3rem .8rem;
+  padding: .3rem 0 .3rem .8rem;
   border-left: .1rem solid #5bc0de;
   border-bottom: .1rem solid #5bc0de;
   cursor: pointer;
@@ -44,6 +44,10 @@
 #good-to-go-summary-text {
   margin: 0;
   text-align: justify;
+}
+
+#good-to-go-summary-text p {
+  margin-bottom: 0;
 }
 
 /* fixing the hideous select input "gloss" in safari */

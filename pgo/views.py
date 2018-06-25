@@ -239,7 +239,7 @@ class GoodToGoView(CalculatorInitialDataMixin):
             'cinematic_move': self._get_object_id('Move', params.get('cinematic_move')),
             'weather_condition': self._get_object_id(
                 'WeatherCondition', params.get('weather_condition')),
-            'current_raid_bosses': bool(params.get('current_raid_bosses') == 'true'),
-            'past_raid_bosses': bool(params.get('past_raid_bosses') == 'true'),
+            'tier_3_5_raid_bosses': bool(params.get('tier_3_5_raid_bosses') == 'true'),
+            'tier_1_2_raid_bosses': bool(params.get('tier_1_2_raid_bosses') == 'true'),
             'relevant_defenders': bool(params.get('relevant_defenders') == 'true'),
         }

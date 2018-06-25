@@ -261,6 +261,10 @@ ready(() => {
     goodToGoResults.innerHTML = ''
     goodToGoResults.appendChild(document.createElement('hr'))
 
+    if (data.tier_3_5_raid_bosses.length === 0 && data.tier_1_2_raid_bosses.length === 0) {
+      goodToGoResults.innerHTML = 'Please select at least one option (tier 3-5, tier 1-2).'
+    }
+
     if (data.tier_3_5_raid_bosses.length > 0) {
       renderResultSubcategory(goodToGoResults, data.tier_3_5_raid_bosses)
     }

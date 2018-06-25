@@ -73,6 +73,6 @@ class GoodToGoSerializer(serializers.Serializer):
     cinematic_move = serializers.IntegerField()
     attack_iv = serializers.IntegerField(min_value=0, max_value=15)
     weather_condition = serializers.IntegerField(required=False)
-    current_raid_bosses = serializers.BooleanField(required=False)
-    past_raid_bosses = serializers.BooleanField(required=False)
+    tier_3_5_raid_bosses = serializers.BooleanField(required=False)
+    tier_1_2_raid_bosses = serializers.BooleanField(required=False)
     relevant_defenders = serializers.BooleanField(required=False)

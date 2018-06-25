@@ -5,6 +5,7 @@ import logging
 
 from collections import OrderedDict
 from decimal import Decimal
+from operator import itemgetter
 
 from rest_framework import response, status, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -452,12 +453,18 @@ class GoodToGoAPIView(GenericAPIView):
             'weather_condition')).types_boosted.values_list('pk', flat=True))
         self.attack_iv = data.get('attack_iv')
 
-        self.current_raid_bosses = RaidBoss.objects.filter(
-            Q(status=RaidBossStatus.CURRENT) | Q(status=RaidBossStatus.ANTICIPATED)
-        ).order_by('-raid_tier', '-pokemon__slug') if data.get('current_raid_bosses') else []
+        self.tier_3_5_raid_bosses = RaidBoss.objects.filter(
+            raid_tier__tier__in=[3, 4, 5]
+        ).exclude(
+            status=''
+        ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_3_5_raid_bosses') else []
 
-        self.past_raid_bosses = RaidBoss.objects.filter(status=RaidBossStatus.PAST).order_by(
-            '-raid_tier', '-pokemon__slug') if data.get('past_raid_bosses') else []
+        self.tier_1_2_raid_bosses = RaidBoss.objects.filter(
+            raid_tier__tier__in=[1, 2]
+        ).exclude(
+            status=''
+        ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_1_2_raid_bosses') else []
+
         # todo devise a better metric for relevant defenders
         self.relevant_defenders = Pokemon.objects.filter(
             maximum_cp__gte=2000) if data.get('relevant_defenders') else []
@@ -470,39 +477,43 @@ class GoodToGoAPIView(GenericAPIView):
         total_breakpoints_reached = 0
 
         self.matchup_data = OrderedDict()
-        for defender in self.current_raid_bosses:
+        for defender in self.tier_3_5_raid_bosses:
             self._get_breakpoint_data(defender)
 
-        current = []
+        tier_3_5 = []
         for key, value in self.matchup_data.items():
             breakpoints_reached = sum(
                 [1 if x['final_breakpoint_reached'] is True else 0 for x in value])
 
-            current.append({
+            tier_3_5.append({
                 'tier': key,
                 'quick_move': self.quick_move.name,
                 'final_breakpoints_reached': breakpoints_reached,
                 'total_breakpoints': len(value),
-                'matchups': [x for x in value],
+                'matchups': [x for x in sorted(
+                    value, key=itemgetter('final_breakpoint_reached'), reverse=True)
+                ],
             })
             total_breakpoints += len(value)
             total_breakpoints_reached += breakpoints_reached
 
         self.matchup_data = OrderedDict()
-        for defender in self.past_raid_bosses:
+        for defender in self.tier_1_2_raid_bosses:
             self._get_breakpoint_data(defender)
 
-        past = []
+        tier_1_2 = []
         for key, value in self.matchup_data.items():
             breakpoints_reached = sum(
                 [1 if x['final_breakpoint_reached'] is True else 0 for x in value])
 
-            past.append({
+            tier_1_2.append({
                 'tier': key,
                 'quick_move': self.quick_move.name,
                 'final_breakpoints_reached': breakpoints_reached,
                 'total_breakpoints': len(value),
-                'matchups': [x for x in value],
+                'matchups': [x for x in sorted(
+                    value, key=itemgetter('final_breakpoint_reached'), reverse=True)
+                ],
             })
             total_breakpoints += len(value)
             total_breakpoints_reached += breakpoints_reached
@@ -510,8 +521,8 @@ class GoodToGoAPIView(GenericAPIView):
         # for defender in self.relevant_defenders:
         #     self._get_breakpoint_data(defender)
         return {
-            'current': current,
-            'past': past,
+            'tier_3_5_raid_bosses': tier_3_5,
+            'tier_1_2_raid_bosses': tier_1_2,
             'summary': self._get_summary(total_breakpoints_reached, total_breakpoints)
         }
 
@@ -544,10 +555,7 @@ class GoodToGoAPIView(GenericAPIView):
 
     def _get_summary(self, total_breakpoints_reached, total_breakpoints):
         return '''
-            <p>
-            Your {} can reach the final {} breakpoint in <b>{} out of the {}</b> tested matchups.
-            </p>
-            <p>You can review the details below.</p>
+            <p>Your {} can reach the final {} breakpoint in <b>{} / {}</b> tested matchups.</p>
             '''.format(
             self.attacker.name, self.quick_move.name, total_breakpoints_reached, total_breakpoints
         )

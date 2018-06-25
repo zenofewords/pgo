@@ -38,6 +38,10 @@ class RaidBossStatus:
         (PAST, 'Past'),
     )
 
+class PokemonManager(models.Manager):
+    def get_queryset(self):
+        return super(PokemonManager, self).get_queryset().filter(implemented=True)
+
 
 class Pokemon(DefaultModelMixin, NameMixin):
     number = models.CharField(max_length=5)
@@ -59,6 +63,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
     maximum_cp = models.DecimalField(verbose_name='Combat Power',
         max_digits=7, decimal_places=2, blank=True, null=True)
     legendary = models.BooleanField(default=False)
+    implemented = models.BooleanField(default=True)
 
     attack = models.IntegerField(blank=True, null=True)
     special_attack = models.IntegerField(blank=True, null=True)
@@ -66,6 +71,8 @@ class Pokemon(DefaultModelMixin, NameMixin):
     special_defense = models.IntegerField(blank=True, null=True)
     stamina = models.IntegerField(blank=True, null=True)
     speed = models.IntegerField(blank=True, null=True)
+
+    objects = PokemonManager()
 
     class Meta:
         verbose_name = 'Pokemon'
@@ -218,6 +225,7 @@ class RaidTier(models.Model):
 class RaidBoss(models.Model):
     pokemon = models.ForeignKey('pgo.Pokemon', verbose_name='Pokemon')
     raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier')
+    # todo rework to official / simulated
     status = models.CharField(max_length=20, choices=RaidBossStatus.CHOICES, blank=True)
 
     class Meta:

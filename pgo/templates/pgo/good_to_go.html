@@ -11,98 +11,86 @@
 {% endblock %}
 
 {% block content %}
-  <div class="row" style="max-width: 86rem; min-height:">
-    <div class="good-to-go-form-wrapper col-md-5" style="height: 25.4rem;">
-      <span class="glyphicon glyphicon-hourglass" aria-hidden="true" style="margin: 1rem;"></span>One moment, please...
-    </div>
-    <div class="good-to-go-form-wrapper col-md-5" style="padding-bottom: 1rem;" hidden>
-      <form id="good-to-go-form">
-        <div class="row">
-          <div class="col-xs-12">
-            <select id="good-to-go-select-attacker" tabindex="1">
-              <option value="-1" disabled selected>Select attacker</option>
-              {% for data in pokemon_data %}
-                <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
-              {% endfor %}
-            </select>
-          </div>
+  <div class="row" style="max-width: 90rem;">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 form-wrapper" style="max-width: 45rem; padding-bottom: 1rem;">
+      <div class="row">
+        <div class="col-xs-8 input-padding-right">
+          <label for="choices-single-default" class="sr-only">Select attacker</label>
+          <select class="form-control good-to-go-select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
+            <option value="-1" placeholder disabled selected>Select attacker</option>
+            {% for data in pokemon_data %}
+              <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
+            {% endfor %}
+          </select>
         </div>
-
-        <div class="row">
-          <div class="col-xs-12">
-            <select id="good-to-go-select-quick-move" tabindex="2">
-              <option value="-1" disabled selected>Quick move</option>
-            </select>
-          </div>
+        <div class="col-xs-4 input-padding-left">
+          <label for="good-to-go-select-atk-iv" class="sr-only">Attacker ATK IV</label>
+          <select id="good-to-go-select-atk-iv" class="form-control good-to-go-input">
+            <option value="-1" selected disabled>? ATK</option>
+            {% for n in attack_iv_range %}
+              <option value="{{ n }}">{{ n }} ATK</option>
+            {% endfor %}
+          </select>
         </div>
+      </div>
 
-        <div class="row">
-          <div class="col-xs-12">
-            <select id="good-to-go-select-cinematic-move" tabindex="3" disabled>
-              <option value="-1" disabled selected>Cinematic move</option>
-            </select>
-          </div>
+      <div class="row">
+        <div class="col-xs-6 input-padding-right">
+          <label for="good-to-go-select-quick-move" class="sr-only">Quick move</label>
+          <select id="good-to-go-select-quick-move" class="form-control good-to-go-input" disabled>
+            <option value="-1" disabled selected>Quick move</option>
+          </select>
         </div>
-
-        <div class="row good-to-go-atk-iv-weather-wrapper">
-          <div class="col-xs-6">
-            <select id="good-to-go-select-atk-iv" tabindex="4">
-              {% for n in attack_iv_range %}
-                <option value="{{ n }}">{{ n }} ATK</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="col-xs-6">
-            <div class="good-to-go-weather-condition-wrapper">
-              <select id="good-to-go-select-weather-condition" tabindex="5">
-                {% for data in weather_condition_data %}
-                  <option value="{{ data.0 }}">{{ data.1 }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
+        <div class="col-xs-6 input-padding-left">
+          <label for="good-to-go-select-cinematic-move" class="sr-only">Cinematic move</label>
+          <select id="good-to-go-select-cinematic-move" class="form-control good-to-go-input" disabled>
+            <option value="-1" disabled selected>Cinematic move</option>
+          </select>
         </div>
+      </div>
 
-        <div class="row">
-          <div class="col-xs-12">
-            <input type="checkbox" id="current_raid_bosses" checked hidden>
-            <button id="toggle_current_raid_bosses" type="button" class="btn btn-success good-to-go-checkbox-button" tabindex="5">
-              Current and anticipated raid bosses
-            </button>
-          </div>
-          <div class="col-xs-12">
-            <input type="checkbox" id="past_raid_bosses" hidden>
-            <button id="toggle_past_raid_bosses" type="button" class="btn btn-default good-to-go-checkbox-button" tabindex="6">
-              Past raid bosses
-            </button>
-            <input type="checkbox" id="relevant_defenders" hidden>
-            <button id="toggle_relevant_defenders" type="button" class="btn btn-default good-to-go-checkbox-button" tabindex="7" disabled>
-              Relevant defenders
-            </button>
-          </div>
+      <div class="row">
+        <div class="col-xs-6 input-padding-right">
+          <label for="good-to-go-select-weather-condition" class="sr-only">Weather condition</label>
+          <select id="good-to-go-select-weather-condition" class="form-control good-to-go-input">
+            {% for data in weather_condition_data %}
+              <option value="{{ data.0 }}">{{ data.1 }}</option>
+            {% endfor %}
+          </select>
         </div>
+        <div class="col-xs-6 input-padding-left">
+          <input type="checkbox" id="tier-3-5-raid-bosses" checked hidden>
+          <button id="toggle-tier-3-5-raid-bosses" type="button" class="btn btn-info form-control good-to-go-input">
+            Tier 3-5 bosses
+          </button>
+        </div>
+      </div>
 
-        <input id="good_to_go_submit" type="submit" value="Submit" class="submit-button btn btn-primary" tabindex="10">
-      </form>
-    </div>
-    <div class="col-md-7" style="max-width: 50rem; font-size: 1.4rem; margin: .3rem 0 5rem 0; text-align: justify;">
-      <div style="padding: .3rem .7rem">
-        <p>
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> This feature is in beta, expect significant additions to come soon.
-        </p>
-        <div class="good-to-go-summary-text">
-          <p>
-            Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the final quick move breakpoint for all selected matchups.
-          </p>
-          <p>
-            Select your pokemon and its ATK IV, adjust the moves if necessary, then choose what you want to check against.
-          </p>
+      <div class="row">
+        <div class="col-xs-6 input-padding-right">
+          <input type="checkbox" id="tier-1-2-raid-bosses" hidden>
+          <button id="toggle-tier-1-2-raid-bosses" type="button" class="btn btn-default form-control good-to-go-input">
+            Tier 1-2 bosses
+          </button>
+        </div>
+        <div class="col-xs-6 input-padding-left">
+          <input type="checkbox" id="relevant-defenders" hidden>
+          <button id="toggle-relevant-defenders" type="button" class="btn btn-default form-control good-to-go-input" disabled>
+            Relevant defenders
+          </button>
         </div>
       </div>
     </div>
+    <div id="good-to-go-summary-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6 good-to-go-info">
+      <p>
+        Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the final quick move breakpoint for all selected matchups.
+      </p>
+      <p>
+        Selecting an attacker and its ATK IV will auto submit the form. Changing any value will refresh the data.
+      </p>
+    </div>
   </div>
-  <div class="row">
+  <div class="row" style="max-width: 90rem;">
     <div class="col-xs-12">
       <div id="good-to-go-results" class="good-to-go-results" hidden></div>
     </div>

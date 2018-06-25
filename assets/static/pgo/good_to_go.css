@@ -1,59 +1,100 @@
-.good-to-go-checkbox-button {
-  margin: .3rem;
-  padding: .3rem .9rem .3rem .8rem;
-  min-width: 13rem;
-}
-#toggle_current_raid_bosses {
-  width: 28rem;
-}
-.good-to-go-atk-iv-weather-wrapper {
-  max-width: 27rem;
-}
-.good-to-go-weather-condition-wrapper {
-  margin: 0 0 0 -3.5rem;
-}
-.good-to-go-results {
-  max-width: 82rem;
+#toggle-tier-3-5-raid-bosses, #toggle-tier-1-2-raid-bosses, #toggle-relevant-defenders {
+  padding: 0;
 }
 .good-to-go-results-subcategory-header, .good-to-go-results-header {
   padding: .3rem .8rem;
-  border-left: .1rem solid #2e6da4;
-  border-bottom: .1rem solid #2e6da4;
-}
-.good-to-go-results-header {
-  margin-left: 1rem;
-}
-.good-to-go-single-result {
-  margin-left: 1rem;
-  padding: .4rem;
-}
-.good-to-go-results-subcategory-header, .good-to-go-results-header {
+  border-left: .1rem solid #5bc0de;
+  border-bottom: .1rem solid #5bc0de;
   cursor: pointer;
 }
-.good-to-go-green {
+.good-to-go-single-result {
+  margin-left: -.7rem;
+  padding: 0;
+}
+.good-to-go-ok-indicator {
+  padding: 0 1rem;
   color: green;
-  padding: 0 .5rem 0 0;
 }
-.good-to-go-red {
+.good-to-go-warning-indicator {
+  padding: 0 1rem;
   color: red;
-  padding: 0 .5rem 0 0;
-}
-.submit-button {
-  width: 28rem;
-  margin: 0.3rem;
 }
 .error {
   border-radius: .3rem;
   box-shadow:inset 0 0 0 .2rem #f00;
 }
-.select2-container {
-  margin: .3rem;
+
+
+/* todo extract common styles (shared between bpcalc and gtg) */
+.input-padding-right {
+  padding-right: .3rem;
+  padding-bottom: .6rem;
 }
 
-#select2-good-to-go-select-attacker-container,
-#select2-good-to-go-select-quick-move-container,
-#select2-good-to-go-select-cinematic-move-container,
-#select2-good-to-go-select-atk-iv-container,
-#select2-good-to-go-select-weather-condition-container {
-  margin-top: -.1rem;
+.input-padding-left {
+  padding-left: .3rem;
+  padding-bottom: .6rem;
+}
+
+.good-to-go-input {
+  height: 28px;
+  padding: .35rem;
+}
+
+#good-to-go-summary-text {
+  margin: 0;
+  text-align: justify;
+}
+
+/* fixing the hideous select input "gloss" in safari */
+select {
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSIgdmlld0JveD0iMCAwIDQuOTUgMTAiPg0KICA8cGF0aCBkPSJNMS40MSA0LjY3bDEuMDctMS40OSAxLjA2IDEuNDlIMS40MXptMi4xMy42NkwyLjQ4IDYuODIgMS40MSA1LjMzaDIuMTN6Ii8+DQo8L3N2Zz4=
+    ) no-repeat 100% 50% !important;
+  background-size: 2.5rem 2.5rem !important;
+  -webkit-appearance:none !important;
+  -moz-appearance:none !important;
+  -ms-appearance:none !important;
+  padding: 0 0 .1rem .8rem !important;
+}
+select::-ms-expand {
+  display: none;
+}
+select:disabled {
+  background-color: #eee !important;
+}
+
+/* choices.js CSS overrides */
+.choices__inner {
+  background-color: #fff;
+  padding: 0 4px;
+  border: 1px solid #aaa;
+
+  height: 28px;
+  min-height: 28px;
+}
+
+.choices__list--dropdown .choices__list {
+  max-height: 200px;
+}
+
+.choices__item--selectable {
+  margin: -1px 0 0 0;
+}
+
+.choices__list--dropdown .choices__item {
+  position: relative;
+  padding: 8px;
+  font-size: 13px;
+}
+
+.choices[data-type*=select-one] .choices__input {
+  font-size: 14px;
+  padding: 8px;
+}
+
+.choices:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+          box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
 }

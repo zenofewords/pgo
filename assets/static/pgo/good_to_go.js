@@ -27,6 +27,7 @@ ready(() => {
   const selectAttackerCinematicMove = document.getElementById('good-to-go-select-cinematic-move')
   const selectAttackerAtkIv = document.getElementById('good-to-go-select-atk-iv')
   const selectWeatherCondition = document.getElementById('good-to-go-select-weather-condition')
+  const selectFriendshipBoost = document.getElementById('good-to-go-select-friendship-boost')
 
   const tier35BossesButton = document.getElementById('toggle-tier-3-5-raid-bosses')
   const tier35BossesCheckbox = document.getElementById('tier-3-5-raid-bosses')
@@ -44,6 +45,7 @@ ready(() => {
     quick_move: selectAttackerQuickMove.value,
     cinematic_move: selectAttackerCinematicMove.value,
     weather_condition: selectWeatherCondition.value,
+    friendship_boost: selectFriendshipBoost.value,
     tier_3_5_raid_bosses: tier35BossesCheckbox.checked,
     tier_1_2_raid_bosses: tier12BossesCheckbox.checked,
     relevant_defenders: relevantDefendersCheckbox.checked,
@@ -73,6 +75,11 @@ ready(() => {
   })
   selectWeatherCondition.addEventListener('change', (event) => {
     goodToGoForm.weather_condition = event.currentTarget.value
+
+    submitFormIfValid()
+  })
+  selectFriendshipBoost.addEventListener('change', (event) => {
+    goodToGoForm.friendship_boost = event.currentTarget.value
 
     submitFormIfValid()
   })
@@ -384,6 +391,7 @@ ready(() => {
 
     selectAttackerAtkIv.value = data.attack_iv
     selectWeatherCondition.value = data.weather_condition
+    selectFriendshipBoost.value = data.friendship_boost
 
     selectPokemonMoves(data.attacker, 'attacker')
     selectPokemonMoves(data.defender, 'defender')

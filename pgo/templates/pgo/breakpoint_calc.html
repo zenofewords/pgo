@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-6 input-padding-right">
+        <div class="col-xs-4 input-padding-right">
           <label for="breakpoint-calc-select-attacker-atk-iv" class="sr-only">Attacker ATK IV</label>
           <select id="breakpoint-calc-select-attacker-atk-iv" class="form-control breakpoint-calc-input">
             {% for n in attack_iv_range %}
@@ -53,11 +53,19 @@
             {% endfor %}
           </select>
         </div>
-        <div class="col-xs-6 input-padding-left">
+        <div class="col-xs-4 input-padding-right input-padding-left">
           <label for="breakpoint-calc-select-weather-condition" class="sr-only">Weather condition</label>
           <select id="breakpoint-calc-select-weather-condition" class="form-control breakpoint-calc-input">
             {% for data in weather_condition_data %}
               <option value="{{ data.0 }}">{{ data.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-xs-4 input-padding-left">
+          <label for="breakpoint-calc-select-friendship-boost" class="sr-only">Friendship boost</label>
+          <select id="breakpoint-calc-select-friendship-boost" class="form-control breakpoint-calc-input">
+            {% for friend in friendship %}
+              <option value="{{ friend.damage_boost }}">{{ friend.level }}</option>
             {% endfor %}
           </select>
         </div>

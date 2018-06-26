@@ -61,6 +61,7 @@ class BreakpointCalcSerializer(serializers.Serializer):
     attacker_cinematic_move = serializers.IntegerField()
     attacker_atk_iv = serializers.IntegerField(min_value=0, max_value=15)
     weather_condition = serializers.IntegerField(required=False)
+    friendship_boost = serializers.DecimalField(required=False, max_digits=3, decimal_places=2)
     defender = serializers.IntegerField()
     defender_quick_move = serializers.IntegerField()
     defender_cinematic_move = serializers.IntegerField()

@@ -43,6 +43,7 @@ ready(() => {
   const selectDefenderCinematicMove = document.getElementById('breakpoint-calc-select-defender-cinematic-move')
 
   const selectWeatherCondition = document.getElementById('breakpoint-calc-select-weather-condition')
+  const selectFriendShipBoost = document.getElementById('breakpoint-calc-select-friendship-boost')
   const selectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
 
   const moveEffectivness = document.getElementById('breakpoint-calc-move-effectivness')
@@ -63,6 +64,7 @@ ready(() => {
     attacker_cinematic_move: selectAttackerCinematicMove.value,
     attacker_atk_iv: selectAttackerAtkIv.value,
     weather_condition: selectWeatherCondition.value,
+    friendship_boost: selectFriendShipBoost.value,
     defender: selectDefender.value,
     defender_quick_move: selectDefenderQuickMove.value,
     defender_cinematic_move: selectDefenderCinematicMove.value,
@@ -108,6 +110,12 @@ ready(() => {
   })
   selectWeatherCondition.addEventListener('change', (event) => {
     breakpointCalcForm.weather_condition = event.currentTarget.value
+
+    breakpointCalcForm.staleTab = true
+    submitFormIfValid()
+  })
+  selectFriendShipBoost.addEventListener('change', (event) => {
+    breakpointCalcForm.friendship_boost = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
     submitFormIfValid()
@@ -322,6 +330,7 @@ ready(() => {
     inputAttackerLevel.value = data.attacker_level
     selectAttackerAtkIv.value = data.attacker_atk_iv
     selectWeatherCondition.value = data.weather_condition
+    selectFriendShipBoost.value = data.friendship_boost
     selectDefenderCPM.value = data.defender_cpm
 
     selectPokemonMoves(data.attacker, 'attacker')

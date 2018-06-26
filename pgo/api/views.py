@@ -134,6 +134,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.defender.cinematic_move = get_move_data(data.get('defender_cinematic_move'))
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])
 
+        self.friendship_boost = data.get('friendship_boost', 1.00)
         self.raid_tier = None
         raid_tier = int(data.get('defender_cpm')[11:12])
         if raid_tier:
@@ -228,7 +229,8 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.attack_multiplier,
             move.stab,
             move.weather_boosted,
-            move.effectivness
+            move.effectivness,
+            self.friendship_boost
         )
 
     def _get_max_damage_move(self, move, attack_iv=None):

@@ -4,6 +4,7 @@ from django.contrib import admin
 
 from pgo.models import (
     CPM,
+    Friendship,
     Move,
     Moveset,
     Pokemon,
@@ -67,6 +68,7 @@ class RaidBossAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CPM)
+admin.site.register(Friendship)
 admin.site.register(Move, MoveAdmin)
 admin.site.register(Moveset, MovesetAdmin)
 admin.site.register(Pokemon, PokemonAdmin)

@@ -13,7 +13,7 @@ from django.views.generic import (
 )
 
 from pgo.models import (
-    CPM, Pokemon, Move, Moveset, RaidTier, Type, WeatherCondition, DEFAULT_ORDER,
+    CPM, Friendship, Pokemon, Move, Moveset, RaidTier, Type, WeatherCondition, DEFAULT_ORDER,
 )
 
 
@@ -192,6 +192,7 @@ class CalculatorInitialDataMixin(TemplateView):
             'pokemon_data': Pokemon.objects.values_list('id', 'name', 'pgo_attack', 'pgo_defense'),
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.values_list('id', 'name'),
+            'friendship': Friendship.objects.all(),
             'defender_cpm_data': defender_cpm_data,
             'initial_data': self.initial_data,
         }
@@ -220,6 +221,7 @@ class BreakpointCalculatorView(CalculatorInitialDataMixin):
             'attacker_atk_iv': int(params.get('attacker_atk_iv')),
             'weather_condition': self._get_object_id(
                 'WeatherCondition', params.get('weather_condition')),
+            'friendship_boost': str(params.get('friendship_boost')),
             'defender': self._get_object_id('Pokemon', params.get('defender')),
             'defender_quick_move': self._get_object_id('Move', params.get('defender_quick_move')),
             'defender_cinematic_move': self._get_object_id('Move', params.get('defender_cinematic_move')),
@@ -239,6 +241,7 @@ class GoodToGoView(CalculatorInitialDataMixin):
             'cinematic_move': self._get_object_id('Move', params.get('cinematic_move')),
             'weather_condition': self._get_object_id(
                 'WeatherCondition', params.get('weather_condition')),
+            'friendship_boost': str(params.get('friendship_boost')),
             'tier_3_5_raid_bosses': bool(params.get('tier_3_5_raid_bosses') == 'true'),
             'tier_1_2_raid_bosses': bool(params.get('tier_1_2_raid_bosses') == 'true'),
             'relevant_defenders': bool(params.get('relevant_defenders') == 'true'),

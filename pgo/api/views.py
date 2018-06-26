@@ -134,6 +134,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.defender.cinematic_move = get_move_data(data.get('defender_cinematic_move'))
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])
 
+        self.friendship_boost = data.get('friendship_boost', 1.00)
         self.raid_tier = None
         raid_tier = int(data.get('defender_cpm')[11:12])
         if raid_tier:
@@ -228,7 +229,8 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.attack_multiplier,
             move.stab,
             move.weather_boosted,
-            move.effectivness
+            move.effectivness,
+            self.friendship_boost
         )
 
     def _get_max_damage_move(self, move, attack_iv=None):
@@ -452,6 +454,7 @@ class GoodToGoAPIView(GenericAPIView):
         self.boosted_types = list(get_object_or_404(WeatherCondition, pk=data.get(
             'weather_condition')).types_boosted.values_list('pk', flat=True))
         self.attack_iv = data.get('attack_iv')
+        self.friendship_boost = data.get('friendship_boost', 1.00)
 
         self.tier_3_5_raid_bosses = RaidBoss.objects.filter(
             raid_tier__tier__in=[3, 4, 5]
@@ -533,11 +536,15 @@ class GoodToGoAPIView(GenericAPIView):
         max_multiplier = self._get_attack_multiplier(MAX_IV, defender)
 
         max_damage_per_hit = calculate_dph(
-            self.quick_move.power, max_multiplier, stab, weather_boosted, effectivness)
+            self.quick_move.power, max_multiplier, stab,
+            weather_boosted, effectivness, self.friendship_boost
+        )
 
         actual_multiplier = self._get_attack_multiplier(self.attack_iv, defender)
         actual_damage_per_hit = calculate_dph(
-            self.quick_move.power, actual_multiplier, stab, weather_boosted, effectivness)
+            self.quick_move.power, actual_multiplier, stab,
+            weather_boosted, effectivness, self.friendship_boost
+        )
 
         tier = defender.raid_tier.tier
         matchup_stats = {

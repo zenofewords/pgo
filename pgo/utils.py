@@ -43,7 +43,7 @@ def calculate_weave_damage(quick_move, cinematic_move):
     return cycle_dps
 
 
-def calculate_dph(power, attack_multiplier, stab, weather_boost, effectivness=1.0):
+def calculate_dph(power, attack_multiplier, stab, weather_boost, effectivness=1.0, friendship_boost=1.0):
 
     def _get_stab(stab):
         return STAB_SCALAR if stab else NEUTRAL_SCALAR
@@ -51,9 +51,9 @@ def calculate_dph(power, attack_multiplier, stab, weather_boost, effectivness=1.
     def _get_weather_boost(weather_boost):
         return WEATHER_BOOST_SCALAR if weather_boost else NEUTRAL_SCALAR
 
-    return int(
-        floor(0.5 * power * float(attack_multiplier) * _get_stab(
-            stab) * float(effectivness) * _get_weather_boost(weather_boost))
+    return int(floor(
+        0.5 * power * float(attack_multiplier) * _get_stab(stab) * float(effectivness)
+        * _get_weather_boost(weather_boost) * float(friendship_boost))
     ) + 1
 
 

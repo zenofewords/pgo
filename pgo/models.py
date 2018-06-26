@@ -38,6 +38,7 @@ class RaidBossStatus:
         (PAST, 'Past'),
     )
 
+
 class PokemonManager(models.Manager):
     def get_queryset(self):
         return super(PokemonManager, self).get_queryset().filter(implemented=True)
@@ -263,3 +264,17 @@ class TopCounter(models.Model):
 
     class Meta:
         unique_together = ('defender', 'defender_cpm', 'weather_condition', 'counter',)
+
+
+class Friendship(models.Model):
+    level = models.CharField(max_length=9)
+    damage_boost = models.DecimalField(max_digits=3, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'Friendship'
+        verbose_name_plural = 'Friendship'
+        ordering = ('damage_boost',)
+        unique_together = ('level', 'damage_boost',)
+
+    def __str__(self):
+        return self.level

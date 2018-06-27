@@ -248,6 +248,7 @@ ready(() => {
       selectAttackerQuickMove.disabled = true
       selectAttackerCinematicMove.disabled = true
       selectAttackerAtkIv.disabled = true
+      selectFriendShipBoost.disabled = true
 
       ivAssessment.hidden = true
     } else {
@@ -257,6 +258,7 @@ ready(() => {
       selectAttackerQuickMove.disabled = false
       selectAttackerCinematicMove.disabled = false
       selectAttackerAtkIv.disabled = false
+      selectFriendShipBoost.disabled = false
 
       ivAssessment.hidden = false
     }

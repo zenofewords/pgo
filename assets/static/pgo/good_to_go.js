@@ -257,6 +257,7 @@ ready(() => {
     selectAttackerQuickMove.disabled = submitting
     selectAttackerAtkIv.disabled = submitting
     selectWeatherCondition.disabled = submitting
+    selectFriendshipBoost.disabled = submitting
     tier35BossesButton.disabled = submitting
     tier35BossesCheckbox.disabled = submitting
     tier12BossesButton.disabled = submitting

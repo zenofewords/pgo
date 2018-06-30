@@ -422,6 +422,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             'attacker_cinematic_move': slugify(move_data['attacker_cinematic_move']),
             'attacker_atk_iv': 15,
             'weather_condition': top_counter.weather_condition_id,
+            'friendship_boost': self.friendship_boost,
             'defender': top_counter.defender.slug,
             'defender_quick_move': slugify(move_data['defender_quick_move']),
             'defender_cinematic_move': slugify(move_data['defender_cinematic_move']),

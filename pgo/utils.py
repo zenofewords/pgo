@@ -226,7 +226,11 @@ def get_top_counter_qs(defender, weather_condition_id):
                 ) | Q(counter__secondary_type__isnull=True)
             )
         ) & (
-            (Q(counter_hp__lte=120) & Q(counter__pgo_defense__lte=185))
+            (
+                Q(counter_hp__lte=120)
+                & Q(counter__pgo_defense__lte=185)
+                & Q(highest_dps__lte=max_neutral_dps * Decimal('0.97'))
+            )
             | (Q(counter_hp__lte=130) & Q(counter__pgo_defense__lte=150))
             | (Q(counter_hp__lte=130) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')))
             | (

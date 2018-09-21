@@ -184,7 +184,7 @@ class CalculatorInitialDataMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CalculatorInitialDataMixin, self).get_context_data(**kwargs)
         defender_cpm_data = (
-            list(RaidTier.objects.values_list('tier', 'raid_cpm__value')) +
+            list(RaidTier.objects.order_by('order').values_list('tier', 'raid_cpm__value')) +
             list(CPM.objects.filter(level=40, raid_cpm=False).values_list('level', 'value'))
         )
 

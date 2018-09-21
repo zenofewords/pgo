@@ -208,7 +208,7 @@ class CPM(models.Model):
         return 'l{0}: \t{1} {2}'.format(self.level, self.value, raid)
 
 
-class RaidTier(models.Model):
+class RaidTier(OrderMixin):
     raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM')
     tier = models.PositiveIntegerField(verbose_name='Tier Level')
     tier_stamina = models.PositiveIntegerField(verbose_name='Tier Stamina')

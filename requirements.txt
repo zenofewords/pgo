@@ -1,5 +1,4 @@
 blessings==1.6
-bpython==0.16
 curtsies==0.2.11
 dj-database-url==0.4.2
 Django==1.11.1

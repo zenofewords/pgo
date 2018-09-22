@@ -457,11 +457,11 @@ class GoodToGoAPIView(GenericAPIView):
         self.attack_iv = data.get('attack_iv')
         self.friendship_boost = data.get('friendship_boost', 1.00)
 
-        self.tier_3_5_raid_bosses = RaidBoss.objects.filter(
-            raid_tier__tier__in=[3, 4, 5]
+        self.tier_3_6_raid_bosses = RaidBoss.objects.filter(
+            raid_tier__tier__in=[3, 4, 5, 6]
         ).exclude(
             status=''
-        ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_3_5_raid_bosses') else []
+        ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_3_6_raid_bosses') else []
 
         self.tier_1_2_raid_bosses = RaidBoss.objects.filter(
             raid_tier__tier__in=[1, 2]
@@ -475,21 +475,20 @@ class GoodToGoAPIView(GenericAPIView):
 
         self.max_cpm_value = CPM.gyms.last().value
 
-    # TODO DRY THIS
     def _process_data(self):
         total_breakpoints = 0
         total_breakpoints_reached = 0
 
         self.matchup_data = OrderedDict()
-        for defender in self.tier_3_5_raid_bosses:
+        for defender in self.tier_3_6_raid_bosses:
             self._get_breakpoint_data(defender)
 
-        tier_3_5 = []
+        tier_3_6 = []
         for key, value in self.matchup_data.items():
             breakpoints_reached = sum(
                 [1 if x['final_breakpoint_reached'] is True else 0 for x in value])
 
-            tier_3_5.append({
+            tier_3_6.append({
                 'tier': key,
                 'quick_move': self.quick_move.name,
                 'final_breakpoints_reached': breakpoints_reached,
@@ -525,7 +524,7 @@ class GoodToGoAPIView(GenericAPIView):
         # for defender in self.relevant_defenders:
         #     self._get_breakpoint_data(defender)
         return {
-            'tier_3_5_raid_bosses': tier_3_5,
+            'tier_3_6_raid_bosses': tier_3_6,
             'tier_1_2_raid_bosses': tier_1_2,
             'summary': self._get_summary(total_breakpoints_reached, total_breakpoints)
         }

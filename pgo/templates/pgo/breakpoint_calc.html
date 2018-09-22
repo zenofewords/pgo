@@ -27,19 +27,19 @@
         </div>
         <div class="col-xs-4 input-padding-left">
           <label for="breakpoint-calc-input-attacker-level" class="sr-only">Attacker level</label>
-          <input id="breakpoint-calc-input-attacker-level" class="form-control breakpoint-calc-input attacker_level" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
+          <input id="breakpoint-calc-input-attacker-level" class="form-control input-height attacker_level" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
         </div>
       </div>
       <div class="row">
         <div class="col-xs-6 input-padding-right">
           <label for="breakpoint-calc-select-quick-move" class="sr-only">Quick move</label>
-          <select id="breakpoint-calc-select-quick-move" class="form-control breakpoint-calc-input" disabled>
+          <select id="breakpoint-calc-select-quick-move" class="form-control input-height" disabled>
             <option value="-1" disabled selected>Quick move</option>
           </select>
         </div>
         <div class="col-xs-6 input-padding-left">
           <label for="breakpoint-calc-select-cinematic-move" class="sr-only">Cinematic move</label>
-          <select id="breakpoint-calc-select-cinematic-move" class="form-control breakpoint-calc-input" disabled>
+          <select id="breakpoint-calc-select-cinematic-move" class="form-control input-height" disabled>
             <option value="-1" disabled selected>Cinematic move</option>
           </select>
         </div>
@@ -47,7 +47,7 @@
       <div class="row">
         <div class="col-xs-4 input-padding-right">
           <label for="breakpoint-calc-select-attacker-atk-iv" class="sr-only">Attacker ATK IV</label>
-          <select id="breakpoint-calc-select-attacker-atk-iv" class="form-control breakpoint-calc-input">
+          <select id="breakpoint-calc-select-attacker-atk-iv" class="form-control input-height">
             {% for n in attack_iv_range %}
               <option value="{{ n }}">{{ n }} ATK</option>
             {% endfor %}
@@ -55,7 +55,7 @@
         </div>
         <div class="col-xs-4 input-padding-right input-padding-left">
           <label for="breakpoint-calc-select-weather-condition" class="sr-only">Weather condition</label>
-          <select id="breakpoint-calc-select-weather-condition" class="form-control breakpoint-calc-input">
+          <select id="breakpoint-calc-select-weather-condition" class="form-control input-height">
             {% for data in weather_condition_data %}
               <option value="{{ data.0 }}">{{ data.1 }}</option>
             {% endfor %}
@@ -63,7 +63,7 @@
         </div>
         <div class="col-xs-4 input-padding-left">
           <label for="breakpoint-calc-select-friendship-boost" class="sr-only">Friendship boost</label>
-          <select id="breakpoint-calc-select-friendship-boost" class="form-control breakpoint-calc-input">
+          <select id="breakpoint-calc-select-friendship-boost" class="form-control input-height">
             {% for friend in friendship %}
               <option value="{{ friend.damage_boost }}">{{ friend.level }}</option>
             {% endfor %}
@@ -82,12 +82,12 @@
         </div>
         <div class="col-xs-4 input-padding-left">
           <label for="breakpoint-calc-select-defender-tier" class="sr-only">Defender tier / level</label>
-          <select id="breakpoint-calc-select-defender-tier" class="form-control breakpoint-calc-input">
+          <select id="breakpoint-calc-select-defender-tier" class="form-control input-height">
             {% for data in defender_cpm_data %}
                 {% if forloop.last %}
                   <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
                 {% else %}
-                  <option value="{{ data.1 }}{{ data.0 }}">T{{ data.0 }}</option>
+                  <option value="{{ data.1 }}{{ data.0 }}" {% if data.0 == 5 %}selected{% endif %}>T{{ data.0 }}</option>
                 {% endif %}
             {% endfor %}
           </select>
@@ -147,13 +147,13 @@
                 <th id="breakpoint-calc-counters-moveset-label" width="18%">VS</th>
                 <td id="breakpoint-calc-counters-move" width="37%">
                   <label for="breakpoint-calc-select-defender-quick-move" class="sr-only">Quick move</label>
-                  <select id="breakpoint-calc-select-defender-quick-move" class="form-control breakpoint-calc-input" disabled>
+                  <select id="breakpoint-calc-select-defender-quick-move" class="form-control input-height" disabled>
                     <option value="-1" disabled selected>Quick move</option>
                   </select>
                 </td>
                 <td id="breakpoint-calc-counters-move" width="45%">
                   <label for="breakpoint-calc-select-defender-cinematic-move" class="sr-only">Cinematic move</label>
-                  <select id="breakpoint-calc-select-defender-cinematic-move" class="form-control breakpoint-calc-input" disabled>
+                  <select id="breakpoint-calc-select-defender-cinematic-move" class="form-control input-height" disabled>
                     <option value="-1" disabled selected>Cinematic move</option>
                   </select>
                 </td>

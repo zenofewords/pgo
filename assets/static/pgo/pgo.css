@@ -6,12 +6,12 @@
   padding-left: .3rem;
   padding-bottom: .6rem;
 }
-.text-margin-top {
-  margin-top: 2rem;
-}
-.breakpoint-calc-input {
+.input-height {
   height: 28px;
   padding: .35rem;
+}
+.text-margin-top {
+  margin-top: 2rem;
 }
 #breakpoint-calc-input-attacker-level {
   padding-left: .8rem;
@@ -20,8 +20,8 @@
   margin: 0;
   text-align: justify;
 }
-#breakpoint-calc-header-text {
-  text-align: justify;
+#breakpoint-calc-atk-iv-assessment p {
+  margin-top: 0;
 }
 #breakpoint-calc-breakpoint-details-table table {
   border-top: .1rem solid #cacaca;
@@ -75,6 +75,12 @@
   margin-left: -.5rem;
   padding-right: .2rem;
 }
+.icon-candy {
+  padding-left: .4rem;
+}
+.glyphicon {
+  top: .2rem;
+}
 table#breakpoint-calc-breakpoints-table tr th:first-child,
 table#breakpoint-calc-breakpoints-table tr td:first-child {
   padding-left: .7rem;
@@ -93,12 +99,6 @@ table#top-counters-table tr td {
 table#top-counters-table tr td:last-child {
   padding-right: 0;
 }
-.icon-candy {
-  padding-left: .4rem;
-}
-.glyphicon {
-  top: .2rem;
-}
 .error {
   border-radius: .4rem;
   border-bottom: .3rem solid #f00;
@@ -109,6 +109,7 @@ table#top-counters-table tr td:last-child {
   font-size: 1.3rem;
 }
 #faq-legend-link {
+  font-size: 1.8rem;
   text-align: center;
   text-decoration: none;
 }
@@ -118,6 +119,39 @@ table#top-counters-table tr td:last-child {
 #faq-legend-content ul {
   list-style-type: none;
   padding-left: 0;
+}
+
+/* good to go specific */
+#toggle-tier-3-6-raid-bosses,
+#toggle-tier-1-2-raid-bosses,
+#toggle-relevant-defenders {
+  padding: 0;
+}
+.good-to-go-results-subcategory-header,
+.good-to-go-results-header {
+  padding: .3rem 0 .3rem .8rem;
+  border-left: .1rem solid #5bc0de;
+  border-bottom: .1rem solid #5bc0de;
+  cursor: pointer;
+}
+.good-to-go-single-result {
+  margin-left: -.7rem;
+  padding: 0;
+}
+.good-to-go-ok-indicator {
+  padding: 0 1rem;
+  color: green;
+}
+.good-to-go-warning-indicator {
+  padding: 0 1rem;
+  color: red;
+}
+#good-to-go-summary-text {
+  margin: 0;
+  text-align: justify;
+}
+#good-to-go-summary-text p {
+  margin-top: 0;
 }
 
 /* fixing the hideous select input "gloss" in safari */
@@ -137,35 +171,32 @@ select:disabled {
   background-color: #eee !important;
 }
 
-/* choices.js CSS overrides */
+/* choices.js overrides */
 .choices__inner {
   background-color: #fff;
   padding: 0 4px;
   border: 1px solid #aaa;
-
   height: 28px;
   min-height: 28px;
 }
-
-.choices__list--dropdown .choices__list {
-  max-height: 200px;
-}
-
 .choices__item--selectable {
   margin: -1px 0 0 0;
 }
-
-.choices__list--dropdown .choices__item {
+.choices__list--dropdown
+.choices__list {
+  max-height: 200px;
+}
+.choices__list--dropdown
+.choices__item {
   position: relative;
   padding: 8px;
   font-size: 13px;
 }
-
-.choices[data-type*=select-one] .choices__input {
+.choices[data-type*=select-one]
+.choices__input {
   font-size: 14px;
   padding: 8px;
 }
-
 .choices:focus {
   border-color: #66afe9;
   outline: 0;

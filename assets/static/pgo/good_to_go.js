@@ -29,8 +29,8 @@ ready(() => {
   const selectWeatherCondition = document.getElementById('good-to-go-select-weather-condition')
   const selectFriendshipBoost = document.getElementById('good-to-go-select-friendship-boost')
 
-  const tier35BossesButton = document.getElementById('toggle-tier-3-5-raid-bosses')
-  const tier35BossesCheckbox = document.getElementById('tier-3-5-raid-bosses')
+  const tier36BossesButton = document.getElementById('toggle-tier-3-6-raid-bosses')
+  const tier36BossesCheckbox = document.getElementById('tier-3-6-raid-bosses')
   const tier12BossesButton = document.getElementById('toggle-tier-1-2-raid-bosses')
   const tier12BossesCheckbox = document.getElementById('tier-1-2-raid-bosses')
   const relevantDefendersButton = document.getElementById('toggle-relevant-defenders')
@@ -46,7 +46,7 @@ ready(() => {
     cinematic_move: selectAttackerCinematicMove.value,
     weather_condition: selectWeatherCondition.value,
     friendship_boost: selectFriendshipBoost.value,
-    tier_3_5_raid_bosses: tier35BossesCheckbox.checked,
+    tier_3_6_raid_bosses: tier36BossesCheckbox.checked,
     tier_1_2_raid_bosses: tier12BossesCheckbox.checked,
     relevant_defenders: relevantDefendersCheckbox.checked,
   }
@@ -83,11 +83,11 @@ ready(() => {
 
     submitFormIfValid()
   })
-  tier35BossesButton.addEventListener('click', (event) => {
+  tier36BossesButton.addEventListener('click', (event) => {
     event.preventDefault()
 
-    toggleButtonCheckbox(tier35BossesButton, tier35BossesCheckbox)
-    goodToGoForm.tier_3_5_raid_bosses = tier35BossesCheckbox.checked
+    toggleButtonCheckbox(tier36BossesButton, tier36BossesCheckbox)
+    goodToGoForm.tier_3_6_raid_bosses = tier36BossesCheckbox.checked
 
     submitFormIfValid()
   })
@@ -258,8 +258,8 @@ ready(() => {
     selectAttackerAtkIv.disabled = submitting
     selectWeatherCondition.disabled = submitting
     selectFriendshipBoost.disabled = submitting
-    tier35BossesButton.disabled = submitting
-    tier35BossesCheckbox.disabled = submitting
+    tier36BossesButton.disabled = submitting
+    tier36BossesCheckbox.disabled = submitting
     tier12BossesButton.disabled = submitting
     tier12BossesCheckbox.disabled = submitting
   }
@@ -269,12 +269,12 @@ ready(() => {
     goodToGoResults.innerHTML = ''
     goodToGoResults.appendChild(document.createElement('hr'))
 
-    if (data.tier_3_5_raid_bosses.length === 0 && data.tier_1_2_raid_bosses.length === 0) {
-      goodToGoResults.innerHTML = 'Please select at least one option (tier 3-5, tier 1-2).'
+    if (data.tier_3_6_raid_bosses.length === 0 && data.tier_1_2_raid_bosses.length === 0) {
+      goodToGoResults.innerHTML = 'Please select at least one option (tier 3-6, tier 1-2).'
     }
 
-    if (data.tier_3_5_raid_bosses.length > 0) {
-      renderResultSubcategory(goodToGoResults, data.tier_3_5_raid_bosses)
+    if (data.tier_3_6_raid_bosses.length > 0) {
+      renderResultSubcategory(goodToGoResults, data.tier_3_6_raid_bosses)
     }
     if (data.tier_1_2_raid_bosses.length > 0) {
       renderResultSubcategory(goodToGoResults, data.tier_1_2_raid_bosses)
@@ -367,8 +367,8 @@ ready(() => {
   }
 
   const restoreCheckboxButtons = (data) => {
-    tier35BossesCheckbox.checked = data.tier_3_5_raid_bosses
-    toggleButtonClass(tier35BossesButton, data.tier_3_5_raid_bosses)
+    tier36BossesCheckbox.checked = data.tier_3_6_raid_bosses
+    toggleButtonClass(tier36BossesButton, data.tier_3_6_raid_bosses)
 
     tier12BossesCheckbox.checked = data.tier_1_2_raid_bosses
     toggleButtonClass(tier12BossesButton, data.tier_1_2_raid_bosses)

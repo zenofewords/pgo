@@ -75,6 +75,6 @@ class GoodToGoSerializer(serializers.Serializer):
     attack_iv = serializers.IntegerField(min_value=0, max_value=15)
     weather_condition = serializers.IntegerField(required=False)
     friendship_boost = serializers.DecimalField(required=False, max_digits=3, decimal_places=2)
-    tier_3_5_raid_bosses = serializers.BooleanField(required=False)
+    tier_3_6_raid_bosses = serializers.BooleanField(required=False)
     tier_1_2_raid_bosses = serializers.BooleanField(required=False)
     relevant_defenders = serializers.BooleanField(required=False)

@@ -25,7 +25,7 @@
         </div>
         <div class="col-xs-4 input-padding-left">
           <label for="good-to-go-select-atk-iv" class="sr-only">Attacker ATK IV</label>
-          <select id="good-to-go-select-atk-iv" class="form-control good-to-go-input">
+          <select id="good-to-go-select-atk-iv" class="form-control input-height">
             <option value="-1" selected disabled>? ATK</option>
             {% for n in attack_iv_range %}
               <option value="{{ n }}">{{ n }} ATK</option>
@@ -37,13 +37,13 @@
       <div class="row">
         <div class="col-xs-6 input-padding-right">
           <label for="good-to-go-select-quick-move" class="sr-only">Quick move</label>
-          <select id="good-to-go-select-quick-move" class="form-control good-to-go-input" disabled>
+          <select id="good-to-go-select-quick-move" class="form-control input-height" disabled>
             <option value="-1" disabled selected>Quick move</option>
           </select>
         </div>
         <div class="col-xs-6 input-padding-left">
           <label for="good-to-go-select-cinematic-move" class="sr-only">Cinematic move</label>
-          <select id="good-to-go-select-cinematic-move" class="form-control good-to-go-input" disabled>
+          <select id="good-to-go-select-cinematic-move" class="form-control input-height" disabled>
             <option value="-1" disabled selected>Cinematic move</option>
           </select>
         </div>
@@ -52,7 +52,7 @@
       <div class="row">
         <div class="col-xs-6 input-padding-right">
           <label for="good-to-go-select-friendship-boost" class="sr-only">Friendship boost</label>
-          <select id="good-to-go-select-friendship-boost" class="form-control good-to-go-input">
+          <select id="good-to-go-select-friendship-boost" class="form-control input-height">
             {% for friend in friendship %}
               <option value="{{ friend.damage_boost }}">{{ friend.level }}</option>
             {% endfor %}
@@ -60,7 +60,7 @@
         </div>
         <div class="col-xs-6 input-padding-left">
           <label for="good-to-go-select-weather-condition" class="sr-only">Weather condition</label>
-          <select id="good-to-go-select-weather-condition" class="form-control good-to-go-input">
+          <select id="good-to-go-select-weather-condition" class="form-control input-height">
             {% for data in weather_condition_data %}
               <option value="{{ data.0 }}">{{ data.1 }}</option>
             {% endfor %}
@@ -71,19 +71,19 @@
       <div class="row">
         <div class="col-xs-4 input-padding-right">
           <input type="checkbox" id="tier-3-5-raid-bosses" checked hidden>
-          <button id="toggle-tier-3-5-raid-bosses" type="button" class="btn btn-info form-control good-to-go-input">
+          <button id="toggle-tier-3-5-raid-bosses" type="button" class="btn btn-info form-control input-height">
             T3-5 bosses
           </button>
         </div>
         <div class="col-xs-4 input-padding-right input-padding-left">
           <input type="checkbox" id="tier-1-2-raid-bosses" hidden>
-          <button id="toggle-tier-1-2-raid-bosses" type="button" class="btn btn-default form-control good-to-go-input">
+          <button id="toggle-tier-1-2-raid-bosses" type="button" class="btn btn-default form-control input-height">
             T1-2 bosses
           </button>
         </div>
         <div class="col-xs-4 input-padding-left">
           <input type="checkbox" id="relevant-defenders" hidden>
-          <button id="toggle-relevant-defenders" type="button" class="btn btn-default form-control good-to-go-input" disabled>
+          <button id="toggle-relevant-defenders" type="button" class="btn btn-default form-control input-height" disabled>
             Gyms
           </button>
         </div>

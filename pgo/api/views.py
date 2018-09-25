@@ -458,15 +458,11 @@ class GoodToGoAPIView(GenericAPIView):
         self.friendship_boost = data.get('friendship_boost', 1.00)
 
         self.tier_3_6_raid_bosses = RaidBoss.objects.filter(
-            raid_tier__tier__in=[3, 4, 5, 6]
-        ).exclude(
-            status=''
+            status=RaidBossStatus.OFFICIAL, raid_tier__tier__in=[3, 4, 5, 6]
         ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_3_6_raid_bosses') else []
 
         self.tier_1_2_raid_bosses = RaidBoss.objects.filter(
-            raid_tier__tier__in=[1, 2]
-        ).exclude(
-            status=''
+            status=RaidBossStatus.OFFICIAL, raid_tier__tier__in=[1, 2]
         ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_1_2_raid_bosses') else []
 
         # todo devise a better metric for relevant defenders

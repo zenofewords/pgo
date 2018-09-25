@@ -26,16 +26,12 @@ class MoveCategory:
 
 
 class RaidBossStatus:
-    ANTICIPATED = 'anticipated'
-    CURRENT = 'current'
-    EXCLUSIVE = 'exclusive'
-    PAST = 'past'
+    OFFICIAL = 'official'
+    SIMULATED = 'simulated'
 
     CHOICES = (
-        (ANTICIPATED, 'Anticipated'),
-        (CURRENT, 'Current'),
-        (EXCLUSIVE, 'Exclusive'),
-        (PAST, 'Past'),
+        (OFFICIAL, 'Official'),
+        (SIMULATED, 'Simulated'),
     )
 
 
@@ -226,7 +222,6 @@ class RaidTier(models.Model):
 class RaidBoss(models.Model):
     pokemon = models.ForeignKey('pgo.Pokemon', verbose_name='Pokemon')
     raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier')
-    # todo rework to official / simulated
     status = models.CharField(max_length=20, choices=RaidBossStatus.CHOICES, blank=True)
 
     class Meta:

@@ -1,8 +1,6 @@
 var webpack = require('webpack')
 var BundleTracker = require('webpack-bundle-tracker')
 var config = require('./webpack.base.config.js')
-var CompressionPlugin = require("compression-webpack-plugin")
-
 
 config.output.path = require('path').resolve('./assets/bundles')
 config.output.publicPath = 'http://localhost:3000/assets/bundles/'

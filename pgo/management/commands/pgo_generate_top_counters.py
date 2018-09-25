@@ -7,14 +7,13 @@ from operator import itemgetter
 from django.core.management.base import BaseCommand
 
 from pgo.models import (
-    CPM, Pokemon, RaidBoss, TopCounter, WeatherCondition,
+    CPM, Pokemon, RaidBoss, RaidBossStatus, TopCounter, WeatherCondition,
 )
 from pgo.utils import (
     calculate_dph, calculate_weave_damage, determine_move_effectivness, is_move_stab,
 )
 UNRELEASED_POKEMON = [
     'clamperl',
-    'deoxys',
     'gorebyss',
     'huntail',
     'kacleon',
@@ -23,8 +22,6 @@ UNRELEASED_POKEMON = [
     'shedinja',
     'smeargle',
     'spinda',
-    'jirachi',
-    'celebi',
 ]
 
 
@@ -43,43 +40,38 @@ class Command(BaseCommand):
                 ).order_by('-pgo_attack')[:120]
 
         self.max_cpm = CPM.gyms.last().value
-        defender_cpm_list = [x.value for x in CPM.raids.distinct('value').order_by('-value')]
-        defender_cpm_list.append(self.max_cpm)
         weather_conditions = WeatherCondition.objects.all()
-
-        if self.options['defenders']:
-            defenders = Pokemon.objects.filter(slug__in=self.options['defenders'])
-        else:
-            defenders = Pokemon.objects.exclude(slug__in=UNRELEASED_POKEMON)
+        raid_boss_qs = RaidBoss.objects.filter(status=RaidBossStatus.OFFICIAL)
 
         # loop to death
-        for cpm in defender_cpm_list:
-            for weather_condition in weather_conditions:
-                boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
+        for weather_condition in weather_conditions:
+            boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
 
-                for defender in defenders:
-                    self._create_top_counters(defender, weather_condition.pk, boosted_types, cpm)
+            for raid_boss in raid_boss_qs:
+                self._create_top_counters(raid_boss, weather_condition.pk, boosted_types)
 
-    def _create_top_counters(self, defender, weather_condition_id, boosted_types, defender_cpm):
+    def _create_top_counters(self, raid_boss, weather_condition_id, boosted_types):
+        print ('defender', raid_boss.pokemon.name)
+        print (raid_boss.raid_tier.raid_cpm.value)
         for attacker in self.attackers:
             try:
                 tc = TopCounter.objects.get(
-                    defender_id=defender.pk,
-                    defender_cpm=defender_cpm,
+                    defender_id=raid_boss.pokemon.pk,
+                    defender_cpm=raid_boss.raid_tier.raid_cpm.value,
                     weather_condition_id=weather_condition_id,
                     counter_id=attacker.pk,
                 )
             except TopCounter.DoesNotExist as e:
                 tc = TopCounter(
-                    defender_id=defender.pk,
-                    defender_cpm=defender_cpm,
+                    defender_id=raid_boss.pokemon.pk,
+                    defender_cpm=raid_boss.raid_tier.raid_cpm.value,
                     weather_condition_id=weather_condition_id,
                     counter_id=attacker.pk,
                 )
 
             multiplier = (
                 ((attacker.pgo_attack + 15) * self.max_cpm) /
-                ((defender.pgo_defense + 15) * defender_cpm)
+                ((raid_boss.pokemon.pgo_defense + 15) * raid_boss.raid_tier.raid_cpm.value)
             )
             quick_move_options = self.options['quick_moves']
             quick_moves = (
@@ -96,7 +88,7 @@ class Command(BaseCommand):
             for quick_move in quick_moves:
                 for cinematic_move in cinematic_moves:
                     dps = self._calculate_dps(
-                        multiplier, boosted_types, attacker, defender, quick_move, cinematic_move)
+                        multiplier, boosted_types, attacker, raid_boss.pokemon, quick_move, cinematic_move)
                     moveset_data.append((dps, quick_move.name, cinematic_move.name,))
 
             moveset_data.sort(key=itemgetter(0), reverse=True)
@@ -129,13 +121,6 @@ class Command(BaseCommand):
             dest='attackers',
             default=[],
             help='Expects a list of attacker slugs (--attacker="slug" --attacker="slug2"',
-        )
-        parser.add_argument(
-            '--defender',
-            action='append',
-            dest='defenders',
-            default=[],
-            help='Expects a list of defender slugs',
         )
         parser.add_argument(
             '--quick_move',

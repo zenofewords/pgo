@@ -110,8 +110,10 @@ class BreakpointCalcAPIView(GenericAPIView):
                 self.defender.quick_move, self.defender.cinematic_move)
             )
 
+        official_raid_boss = self._check_raid_boss()
         data = {
-            'top_counters': top_counters,
+            'raid_boss_check': official_raid_boss,
+            'top_counters': top_counters if official_raid_boss[0] else {},
             'attack_iv_assessment': self._assess_attack_iv(),
             'breakpoint_details': self._get_details_table(self._process_data()),
         }
@@ -435,6 +437,18 @@ class BreakpointCalcAPIView(GenericAPIView):
         return '<a href="{0}?{1}">{3} {2}</a>'.format(
             reverse('pgo:breakpoint-calc'), params, top_counter.counter.name, frailty,
         )
+
+    def _check_raid_boss(self):
+        official_raid_boss = RaidBoss.objects.filter(
+            pokemon_id=self.defender.id, status=RaidBossStatus.OFFICIAL).first()
+
+        if not official_raid_boss:
+            return False, ''
+
+        if official_raid_boss and (official_raid_boss.raid_tier != self.raid_tier):
+            return False, '{0} is a <b>tier {1} raid boss</b>. Switch to T{1} to enable Top counters.'.format(
+                self.defender.name, official_raid_boss.raid_tier.tier)
+        return True, ''
 
 
 class GoodToGoAPIView(GenericAPIView):

@@ -304,7 +304,16 @@ ready(() => {
 
         if (request.status >= 200 && request.status < 400) {
           ivAssessment.innerHTML = json.attack_iv_assessment
+
+          if (json.raid_boss_check[0]) {
+            moveEffectivness.innerHTML = ''
+            tabTopCounters.disabled = false
+          } else {
+            tabTopCounters.disabled = true
+            moveEffectivness.innerHTML = json.raid_boss_check[1]
+          }
           displayBreakpointCalcDetails(json)
+
           generateTopCountersTable(json.top_counters)
           updateBrowserHistory(getParams)
         } else {
@@ -406,7 +415,6 @@ ready(() => {
     } else {
       inputToggleCinematicBreakpoints.enabled = true
     }
-    moveEffectivness.innerHTML = ''
 
     generateBreakpointTable(json.breakpoint_details)
   }
@@ -443,7 +451,7 @@ ready(() => {
       dataRow = document.createElement('tr')
       dataCell = document.createElement('td')
 
-      dataCell.innerHTML = 'Looks like the data for this pokemon is missing. The error has been logged and will be fixed soon.'
+      dataCell.innerHTML = 'Nothing to show here.'
       dataCell.colSpan = '4'
       dataRow.appendChild(dataCell)
 

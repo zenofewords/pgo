@@ -41,7 +41,10 @@ class Command(BaseCommand):
 
         self.max_cpm = CPM.gyms.last().value
         weather_conditions = WeatherCondition.objects.all()
+
         raid_boss_qs = RaidBoss.objects.filter(status=RaidBossStatus.OFFICIAL)
+        if self.options['defenders']:
+            raid_boss_qs = raid_boss_qs.filter(pokemon__slug__in=self.options['defenders'])
 
         # loop to death
         for weather_condition in weather_conditions:
@@ -51,8 +54,6 @@ class Command(BaseCommand):
                 self._create_top_counters(raid_boss, weather_condition.pk, boosted_types)
 
     def _create_top_counters(self, raid_boss, weather_condition_id, boosted_types):
-        print ('defender', raid_boss.pokemon.name)
-        print (raid_boss.raid_tier.raid_cpm.value)
         for attacker in self.attackers:
             try:
                 tc = TopCounter.objects.get(
@@ -121,6 +122,13 @@ class Command(BaseCommand):
             dest='attackers',
             default=[],
             help='Expects a list of attacker slugs (--attacker="slug" --attacker="slug2"',
+        )
+        parser.add_argument(
+            '--defender',
+            action='append',
+            dest='defenders',
+            default=[],
+            help='Expects a list of defender slugs (--defender="slug" --defender="slug2"',
         )
         parser.add_argument(
             '--quick_move',

@@ -303,14 +303,14 @@ ready(() => {
         const json = JSON.parse(request.responseText)
 
         if (request.status >= 200 && request.status < 400) {
+          ivAssessment.innerHTML = ''
           ivAssessment.innerHTML = json.attack_iv_assessment
 
           if (json.raid_boss_check[0]) {
-            moveEffectivness.innerHTML = ''
             tabTopCounters.disabled = false
           } else {
             tabTopCounters.disabled = true
-            moveEffectivness.innerHTML = json.raid_boss_check[1]
+            ivAssessment.innerHTML += '<p>' + json.raid_boss_check[1] + '</p>'
           }
           displayBreakpointCalcDetails(json)
 

@@ -101,19 +101,10 @@ class BreakpointCalcAPIView(GenericAPIView):
         self._set_defender_health()
         self._set_move_stats(self.attacker.cpm_list.first()['value'], self.attacker.atk_iv)
 
-        try:
-            top_counters = self._get_top_counters()
-        except (AttributeError, TypeError) as e:
-            top_counters = {}
-            logger.error('Missing top counter for: {}, {}, {}, {}, {}'.format(
-                self.defender.name, self.defender.cpm, self.weather_condition.name,
-                self.defender.quick_move, self.defender.cinematic_move)
-            )
-
         official_raid_boss = self._check_raid_boss()
         data = {
             'raid_boss_check': official_raid_boss,
-            'top_counters': top_counters if official_raid_boss[0] else {},
+            'top_counters': self._get_top_counters() if official_raid_boss[0] else {},
             'attack_iv_assessment': self._assess_attack_iv(),
             'breakpoint_details': self._get_details_table(self._process_data()),
         }
@@ -344,6 +335,17 @@ class BreakpointCalcAPIView(GenericAPIView):
         return '{:g} ({:g}%)'.format(round(cycle_dps, 1), round(dps_percentage, 1))
 
     def _get_top_counters(self):
+        try:
+            top_counters = self._get_top_counters_data()
+        except (AttributeError, TypeError) as e:
+            top_counters = {}
+            logger.error('Missing top counter for: {}, {}, {}, {}, {}'.format(
+                self.defender.name, self.defender.cpm, self.weather_condition.name,
+                self.defender.quick_move, self.defender.cinematic_move)
+            )
+        return top_counters
+
+    def _get_top_counters_data(self):
         if self.current_tab != 'counters':
             return {}
 

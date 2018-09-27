@@ -17,11 +17,12 @@
   padding-left: .8rem;
 }
 #breakpoint-calc-atk-iv-assessment {
-  margin: 0 0 2rem 0;
+  margin: 0 0 1.5rem 0;
   text-align: justify;
 }
-#breakpoint-calc-atk-iv-assessment p {
-  margin-bottom: 0;
+#breakpoint-calc-move-effectivness {
+  margin: 0 0 1.5rem 0;
+  text-align: justify;
 }
 #breakpoint-calc-breakpoint-details-table table {
   border-top: .1rem solid #cacaca;

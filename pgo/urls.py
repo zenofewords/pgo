@@ -3,9 +3,7 @@ from __future__ import unicode_literals
 from django.conf.urls import url
 
 from pgo.views import (
-    PokemonDetailView, PokemonListView, MoveDetailView, MoveListView, MovesetDetailView,
-    MovesetListView, TypeDetailView, TypeListView, BreakpointCalculatorView,
-    BreakpointCalcRedirectView, GoodToGoView,
+    BreakpointCalculatorView, BreakpointCalcRedirectView, GoodToGoView,
 )
 
 

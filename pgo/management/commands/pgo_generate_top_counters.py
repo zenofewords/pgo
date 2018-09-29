@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-from decimal import Decimal, InvalidOperation
-from math import pow, sqrt
 from operator import itemgetter
 
 from django.core.management.base import BaseCommand
@@ -33,11 +31,11 @@ class Command(BaseCommand):
             self.attackers = Pokemon.objects.filter(slug__in=self.options['attackers'])
         else:
             self.attackers = Pokemon.objects.filter(
-                    pgo_stamina__gte=100,
-                    pgo_attack__gte=180
-                ).exclude(
-                    slug__in=UNRELEASED_POKEMON
-                ).order_by('-pgo_attack')[:120]
+                pgo_stamina__gte=100,
+                pgo_attack__gte=180
+            ).exclude(
+                slug__in=UNRELEASED_POKEMON
+            ).order_by('-pgo_attack')[:120]
 
         self.max_cpm = CPM.gyms.last().value
         weather_conditions = WeatherCondition.objects.all()
@@ -89,7 +87,9 @@ class Command(BaseCommand):
             for quick_move in quick_moves:
                 for cinematic_move in cinematic_moves:
                     dps = self._calculate_dps(
-                        multiplier, boosted_types, attacker, raid_boss.pokemon, quick_move, cinematic_move)
+                        multiplier, boosted_types, attacker,
+                        raid_boss.pokemon, quick_move, cinematic_move
+                    )
                     moveset_data.append((dps, quick_move.name, cinematic_move.name,))
 
             moveset_data.sort(key=itemgetter(0), reverse=True)

@@ -22,7 +22,6 @@ from pgo.api.serializers import (
 )
 from pgo.models import (
     CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, RaidTier, WeatherCondition, RaidBossStatus,
-    TopCounter,
 )
 from pgo.utils import (
     calculate_dph,
@@ -33,7 +32,6 @@ from pgo.utils import (
     get_top_counter_qs,
     determine_move_effectivness,
     is_move_stab,
-    CINEMATIC_MOVE_FACTOR,
     MAX_IV,
     Frailty,
 )
@@ -165,8 +163,10 @@ class BreakpointCalcAPIView(GenericAPIView):
         return starting_qk_dph
 
     def _set_move_parameters(self):
-        self.attacker_quick_move.stab = is_move_stab(self.attacker_quick_move, self.attacker)
-        self.attacker_cinematic_move.stab = is_move_stab(self.attacker_cinematic_move, self.attacker)
+        self.attacker_quick_move.stab = is_move_stab(
+            self.attacker_quick_move, self.attacker)
+        self.attacker_cinematic_move.stab = is_move_stab(
+            self.attacker_cinematic_move, self.attacker)
 
         self.attacker_quick_move.effectivness = determine_move_effectivness(
             self.attacker_quick_move, self.defender)
@@ -190,12 +190,14 @@ class BreakpointCalcAPIView(GenericAPIView):
         current_qk_dph = self.attacker_quick_move.damage_per_hit
         self._set_move_stats(attack_iv=MAX_IV)
 
+        dph_match = current_qk_dph == self.attacker_quick_move.damage_per_hit
         params = (
             self.attacker.name,
-            'high enough' if current_qk_dph == self.attacker_quick_move.damage_per_hit else 'too low',
+            'high enough' if dph_match else 'too low',
             self.attacker_quick_move.name,
             self.attacker_quick_move.damage_per_hit,
-            'tier {} raid boss'.format(self.raid_tier.tier) if self.raid_tier else 'level 40, 15 defense IV',
+            'tier {} raid boss'.format(
+                self.raid_tier.tier) if self.raid_tier else 'level 40, 15 defense IV',
             self.defender.name,
         )
         return 'Your {}\'s <b>attack IV is {}</b> for it to reach the final {} breakpoint ({})\
@@ -268,11 +270,15 @@ class BreakpointCalcAPIView(GenericAPIView):
             self._calculate_attack_multiplier(cpm['value'])
             self._set_move_damage(self.attacker_cinematic_move)
 
-            show_all_cc_breakpoints = (self.show_cinematic_breakpoints
-                and current_cc_dph < self.attacker_cinematic_move.damage_per_hit
+            show_all_cc_breakpoints = (
+                self.show_cinematic_breakpoints and
+                current_cc_dph < self.attacker_cinematic_move.damage_per_hit
             )
-            if ([x for x in self.quick_move_proficiency if cpm['value'] == x[2]]
-                or show_all_cc_breakpoints or self.attacker_cinematic_move.damage_per_hit == max_cc_dph):
+            if (
+                [x for x in self.quick_move_proficiency if cpm['value'] == x[2]] or
+                show_all_cc_breakpoints or
+                self.attacker_cinematic_move.damage_per_hit == max_cc_dph
+            ):
                 self.cinematic_move_proficiency.append((
                     self.attacker_cinematic_move.damage_per_hit,
                     cpm['level'],
@@ -298,18 +304,22 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.attacker_quick_move.damage_per_hit = starting_qk_dph
             self.attacker_cinematic_move.damage_per_hit = c[0]
 
-            cycle_dps = calculate_weave_damage(self.attacker_quick_move, self.attacker_cinematic_move)
-            details.append(
-                self._get_detail_row(c[1], cycle_dps, self._trainers_required(cycle_dps), c[3], c[4]))
+            cycle_dps = calculate_weave_damage(
+                self.attacker_quick_move, self.attacker_cinematic_move)
+            details.append(self._get_detail_row(
+                c[1], cycle_dps,
+                self._trainers_required(cycle_dps), c[3], c[4]))
 
         # edge case when there's improvement for quick moves, but not for cinematic
         if len(self.cinematic_move_proficiency) == 0 and len(self.quick_move_proficiency) > 0:
             for q in sorted(self.quick_move_proficiency):
                 self.attacker_quick_move.damage_per_hit = q[0]
 
-                cycle_dps = calculate_weave_damage(self.attacker_quick_move, self.attacker_cinematic_move)
-                details.append(
-                    self._get_detail_row(q[1], cycle_dps, self._trainers_required(cycle_dps), q[3], q[4]))
+                cycle_dps = calculate_weave_damage(
+                    self.attacker_quick_move, self.attacker_cinematic_move)
+                details.append(self._get_detail_row(
+                    q[1], cycle_dps,
+                    self._trainers_required(cycle_dps), q[3], q[4]))
         return details
 
     def _trainers_required(self, cycle_dps):
@@ -317,7 +327,8 @@ class BreakpointCalcAPIView(GenericAPIView):
 
     def _get_detail_row(self, level, cycle_dps, trainers_required, stardust_cost, candy_cost):
         return ('{:g}'.format(float(level)), self._format_powerup_cost(stardust_cost, candy_cost),
-                self.attacker_quick_move.damage_per_hit, self.attacker_cinematic_move.damage_per_hit,
+                self.attacker_quick_move.damage_per_hit,
+                self.attacker_cinematic_move.damage_per_hit,
                 self._format_dps(cycle_dps), '{:.2f}'.format(trainers_required))
 
     def _format_powerup_cost(self, stardust_cost, candy_cost):
@@ -389,8 +400,9 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.defender.quick_move, instance.multiplier, instance.counter)
 
         quick_attacks = 2 if self.defender.quick_move.duration > 1000 else 3
-        cycle_damage_percentage = (cinematic_move_dph / instance.counter_hp * 100
-            ) + (quick_move_dph / instance.counter_hp * 100) * quick_attacks
+        cycle_damage_percentage = (
+            cinematic_move_dph / instance.counter_hp * 100
+        ) + (quick_move_dph / instance.counter_hp * 100) * quick_attacks
 
         fragile_cut_off = 99
         resilient_cut_off = 60
@@ -448,7 +460,9 @@ class BreakpointCalcAPIView(GenericAPIView):
             return False, ''
 
         if official_raid_boss and (official_raid_boss.raid_tier != self.raid_tier):
-            return False, '{0} is a <b>tier {1} raid boss</b>. Switch to T{1} to enable Top counters.'.format(
+            return False, '''
+                {0} is a <b>tier {1} raid boss</b>.
+                Switch to T{1} to enable Top counters.'''.format(
                 self.defender.name, official_raid_boss.raid_tier.tier)
         return True, ''
 

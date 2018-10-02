@@ -45,7 +45,10 @@ class MoveViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if 'pokemon-id' in self.request.GET:
-            query = int(self.request.GET.get('pokemon-id', 0))
+            try:
+                query = int(self.request.GET.get('pokemon-id', 0))
+            except ValueError:
+                query = 0
 
             if query != 0:
                 self.serializer_class = PokemonMoveSerializer
@@ -63,11 +66,15 @@ class PokemonViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if 'raid-boss-tier-group' in self.request.GET:
-            raid_tier_ids = RaidBoss.objects.filter(
-                raid_tier=self.request.GET.get('raid-boss-tier-group')
-            ).values_list('pokemon__id', flat=True)
+            try:
+                raid_tier_ids = RaidBoss.objects.filter(
+                    raid_tier=self.request.GET.get('raid-boss-tier-group')
+                ).values_list('pokemon__id', flat=True)
 
-            return self.queryset.filter(id__in=raid_tier_ids).order_by('name')
+                return self.queryset.filter(id__in=raid_tier_ids).order_by('name')
+            except ValueError:
+                pass
+
         return super(PokemonViewSet, self).get_queryset()
 
 

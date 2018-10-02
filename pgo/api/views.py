@@ -26,7 +26,7 @@ from pgo.models import (
 from pgo.utils import (
     calculate_dph,
     calculate_defender_health,
-    calculate_weave_damage,
+    calculate_cycle_dps,
     get_pokemon_data,
     get_move_data,
     get_top_counter_qs,
@@ -49,13 +49,7 @@ class MoveViewSet(viewsets.ModelViewSet):
 
             if query != 0:
                 self.serializer_class = PokemonMoveSerializer
-                return PokemonMove.objects.filter(
-                    Q(pokemon_id=query) &
-                    (
-                        Q(move__quick_moves_pokemon__id=query) |
-                        Q(move__cinematic_moves_pokemon__id=query)
-                    )
-                )
+                return PokemonMove.objects.filter(pokemon_id=query)
             else:
                 return []
         else:
@@ -145,7 +139,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         starting_qk_dph = self.attacker_quick_move.damage_per_hit
         starting_cc_dph = self.attacker_cinematic_move.damage_per_hit
 
-        self.perfect_max_dps = calculate_weave_damage(
+        self.perfect_max_dps = calculate_cycle_dps(
             self._get_max_damage_move(self.attacker_quick_move, attack_iv=MAX_IV),
             self._get_max_damage_move(self.attacker_cinematic_move, attack_iv=MAX_IV)
         )
@@ -304,7 +298,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.attacker_quick_move.damage_per_hit = starting_qk_dph
             self.attacker_cinematic_move.damage_per_hit = c[0]
 
-            cycle_dps = calculate_weave_damage(
+            cycle_dps = calculate_cycle_dps(
                 self.attacker_quick_move, self.attacker_cinematic_move)
             details.append(self._get_detail_row(
                 c[1], cycle_dps,
@@ -315,7 +309,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             for q in sorted(self.quick_move_proficiency):
                 self.attacker_quick_move.damage_per_hit = q[0]
 
-                cycle_dps = calculate_weave_damage(
+                cycle_dps = calculate_cycle_dps(
                     self.attacker_quick_move, self.attacker_cinematic_move)
                 details.append(self._get_detail_row(
                     q[1], cycle_dps,

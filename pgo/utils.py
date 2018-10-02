@@ -25,7 +25,7 @@ class Frailty(object):
     FRAGILE = '{fragile}'
 
 
-def calculate_weave_damage(quick_move, cinematic_move):
+def calculate_cycle_dps(quick_move, cinematic_move):
     if quick_move.energy_delta > 0:
         quick_moves_required = (cinematic_move.energy_delta * - 1) / quick_move.energy_delta
     else:

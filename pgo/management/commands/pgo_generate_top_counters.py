@@ -8,7 +8,7 @@ from pgo.models import (
     CPM, Pokemon, RaidBoss, RaidBossStatus, TopCounter, WeatherCondition,
 )
 from pgo.utils import (
-    calculate_dph, calculate_weave_damage, determine_move_effectivness, is_move_stab,
+    calculate_dph, calculate_cycle_dps, determine_move_effectivness, is_move_stab,
 )
 UNRELEASED_POKEMON = [
     'clamperl',
@@ -113,7 +113,7 @@ class Command(BaseCommand):
             cinematic_move.move_type_id in boosted_types,
             determine_move_effectivness(cinematic_move, defender)
         )
-        return calculate_weave_damage(quick_move, cinematic_move)
+        return calculate_cycle_dps(quick_move, cinematic_move)
 
     def add_arguments(self, parser):
         parser.add_argument(

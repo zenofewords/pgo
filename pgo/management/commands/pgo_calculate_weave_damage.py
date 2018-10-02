@@ -11,7 +11,7 @@ from pgo.models import (
     Moveset,
 )
 from pgo.utils import (
-    calculate_weave_damage,
+    calculate_cycle_dps,
     NEUTRAL_SCALAR,
     STAB_SCALAR,
 )
@@ -23,7 +23,7 @@ IV = 15
 class Command(BaseCommand):
     help = 'Calculate and store DPS details for all currently listed pokemon.'
 
-    def _calculate_weave_damage(self, attack, qk_move, cc_move, stab):
+    def _calculate_cycle_dps(self, attack, qk_move, cc_move, stab):
         weave_damage = {}
 
         for level in LEVELS:
@@ -33,7 +33,7 @@ class Command(BaseCommand):
             cc_move.damage_per_hit = self._calculate_dph(
                 cc_move.power, base_attack, self._get_stab(stab[1]))
 
-            cycle_dps = calculate_weave_damage(qk_move, cc_move)
+            cycle_dps = calculate_cycle_dps(qk_move, cc_move)
 
             weave_damage[level] = cycle_dps * 100
         return weave_damage
@@ -76,7 +76,7 @@ class Command(BaseCommand):
 
                     if moveset:
                         moveset.weave_damage = sorted(
-                            self._calculate_weave_damage(
+                            self._calculate_cycle_dps(
                                 pokemon.pgo_attack,
                                 quick_move,
                                 cinematic_move,

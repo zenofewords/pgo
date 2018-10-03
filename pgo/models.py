@@ -9,12 +9,6 @@ from zenofewords.mixins import (
     OrderMixin,
 )
 
-DEFAULT_ORDER = {
-    'Pokemon': ('number',),
-    'Move': ('-category', 'name',),
-    'Moveset': ('pokemon__name', '-weave_damage',),
-}
-
 
 class MoveCategory:
     QK = 'QK'
@@ -42,23 +36,23 @@ class PokemonManager(models.Manager):
 
 class Pokemon(DefaultModelMixin, NameMixin):
     number = models.CharField(max_length=5)
-    primary_type = models.ForeignKey('pgo.Type',
-        related_name='primary_types', blank=True, null=True)
-    secondary_type = models.ForeignKey('pgo.Type',
-        related_name='secondary_types', blank=True, null=True)
-    quick_moves = models.ManyToManyField('pgo.Move', blank=True,
-        related_name='quick_moves_pokemon')
-    cinematic_moves = models.ManyToManyField('pgo.Move', blank=True,
-        related_name='cinematic_moves_pokemon')
+    primary_type = models.ForeignKey(
+        'pgo.Type', related_name='primary_types', blank=True, null=True)
+    secondary_type = models.ForeignKey(
+        'pgo.Type', related_name='secondary_types', blank=True, null=True)
+    quick_moves = models.ManyToManyField(
+        'pgo.PokemonMove', blank=True, related_name='quick_moves_pokemon')
+    cinematic_moves = models.ManyToManyField(
+        'pgo.PokemonMove', blank=True, related_name='cinematic_moves_pokemon')
 
-    pgo_attack = models.IntegerField(verbose_name='PGo Attack',
-        blank=True, null=True)
-    pgo_defense = models.IntegerField(verbose_name='PGo Defense',
-        blank=True, null=True)
-    pgo_stamina = models.IntegerField(verbose_name='PGo Stamina',
-        blank=True, null=True)
-    maximum_cp = models.DecimalField(verbose_name='Combat Power',
-        max_digits=7, decimal_places=2, blank=True, null=True)
+    pgo_attack = models.IntegerField(
+        verbose_name='PGo Attack', blank=True, null=True)
+    pgo_defense = models.IntegerField(
+        verbose_name='PGo Defense', blank=True, null=True)
+    pgo_stamina = models.IntegerField(
+        verbose_name='PGo Stamina', blank=True, null=True)
+    maximum_cp = models.DecimalField(
+        verbose_name='Combat Power', max_digits=7, decimal_places=2, blank=True, null=True)
     legendary = models.BooleanField(default=False)
     implemented = models.BooleanField(default=True)
 
@@ -74,7 +68,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
     class Meta:
         verbose_name = 'Pokemon'
         verbose_name_plural = 'Pokemon'
-        ordering = DEFAULT_ORDER['Pokemon']
+        ordering = ('-number',)
 
     def __unicode__(self):
         return '{0} ({1})'.format(self.name, self.number)
@@ -123,13 +117,10 @@ class Move(DefaultModelMixin, NameMixin):
     damage_window_start = models.IntegerField(blank=True, null=True)
     damage_window_end = models.IntegerField(blank=True, null=True)
 
-    dps = models.DecimalField(verbose_name='DPS',
-        max_digits=3, decimal_places=1, blank=True, null=True)
-    eps = models.DecimalField(verbose_name='EPS',
-        max_digits=3, decimal_places=1, blank=True, null=True)
-
-    class Meta:
-        ordering = DEFAULT_ORDER['Move']
+    dps = models.DecimalField(
+        verbose_name='DPS', max_digits=3, decimal_places=1, blank=True, null=True)
+    eps = models.DecimalField(
+        verbose_name='EPS', max_digits=3, decimal_places=1, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -163,7 +154,6 @@ class Moveset(DefaultModelMixin):
     weave_damage = JSONField(blank=True, null=True)
 
     class Meta:
-        ordering = DEFAULT_ORDER['Moveset']
         unique_together = ('pokemon', 'key',)
 
     def __str__(self):

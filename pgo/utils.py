@@ -15,8 +15,6 @@ IMMUNE = 0.51
 NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
 WEATHER_BOOST_SCALAR = 1.2
-TIMEOUT = 99000
-CINEMATIC_MOVE_FACTOR = 1.1
 MAX_IV = 15
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
 
@@ -27,7 +25,7 @@ class Frailty(object):
     FRAGILE = '{fragile}'
 
 
-def calculate_weave_damage(quick_move, cinematic_move):
+def calculate_cycle_dps(quick_move, cinematic_move):
     if quick_move.energy_delta > 0:
         quick_moves_required = (cinematic_move.energy_delta * - 1) / quick_move.energy_delta
     else:
@@ -43,7 +41,8 @@ def calculate_weave_damage(quick_move, cinematic_move):
     return cycle_dps
 
 
-def calculate_dph(power, attack_multiplier, stab, weather_boost, effectivness=1.0, friendship_boost=1.0):
+def calculate_dph(
+        power, attack_multiplier, stab, weather_boost, effectivness=1.0, friendship_boost=1.0):
 
     def _get_stab(stab):
         return STAB_SCALAR if stab else NEUTRAL_SCALAR
@@ -52,8 +51,8 @@ def calculate_dph(power, attack_multiplier, stab, weather_boost, effectivness=1.
         return WEATHER_BOOST_SCALAR if weather_boost else NEUTRAL_SCALAR
 
     return int(floor(
-        0.5 * power * float(attack_multiplier) * _get_stab(stab) * float(effectivness)
-        * _get_weather_boost(weather_boost) * float(friendship_boost))
+        0.5 * power * float(attack_multiplier) * _get_stab(stab) * float(effectivness) *
+        _get_weather_boost(weather_boost) * float(friendship_boost))
     ) + 1
 
 
@@ -145,108 +144,96 @@ def get_top_counter_qs(defender, weather_condition_id):
         weather_condition_id=weather_condition_id
     ).exclude(
         (
-            ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids)
-            & (
+            ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids) & (
                 (
-                    Q(counter__secondary_type__isnull=False)
-                    & ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
+                    Q(counter__secondary_type__isnull=False) &
+                    ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
                 ) | Q(counter__secondary_type__isnull=True)
             )
         ) & (
-            Q(highest_dps__lte=max_neutral_dps * Decimal('0.7'))
-            & Q(counter__pgo_attack__lte=210)
-            & Q(counter__pgo_defense__lte=190)
+            Q(highest_dps__lte=max_neutral_dps * Decimal('0.7')) &
+            Q(counter__pgo_attack__lte=210) &
+            Q(counter__pgo_defense__lte=190)
         )
-    # double weak to c move and DPS below treshold
-    ).exclude(
+    ).exclude(  # double weak to c move and DPS below treshold
         (
-            Q(counter__primary_type_id__in=cinematic_vulnerable_type_ids)
-            & Q(counter__secondary_type_id__in=cinematic_vulnerable_type_ids)
+            Q(counter__primary_type_id__in=cinematic_vulnerable_type_ids) &
+            Q(counter__secondary_type_id__in=cinematic_vulnerable_type_ids)
         ) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.9'))
-    # double weak to q move, DPS and HP below treshold
-    ).exclude(
+    ).exclude(  # double weak to q move, DPS and HP below treshold
         (
-            Q(counter__primary_type_id__in=quick_vulnerable_type_ids)
-            & Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
+            Q(counter__primary_type_id__in=quick_vulnerable_type_ids) &
+            Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
         ) & (Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')) & Q(counter_hp__lte=180))
-    # weak to both q and c, doesn't resist c move, DPS below treshold
-    ).exclude(
+    ).exclude(  # weak to both q and c, doesn't resist c move, DPS below treshold
         (
-            Q(counter__primary_type_id__in=quick_vulnerable_type_ids)
-            | Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
+            Q(counter__primary_type_id__in=quick_vulnerable_type_ids) |
+            Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
         ) &
         (
             (
-                Q(counter__primary_type_id__in=cinematic_vulnerable_type_ids)
-                | Q(counter__secondary_type_id__in=cinematic_vulnerable_type_ids)
+                Q(counter__primary_type_id__in=cinematic_vulnerable_type_ids) |
+                Q(counter__secondary_type_id__in=cinematic_vulnerable_type_ids)
             ) & (
-                ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids)
-                & ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
+                ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids) &
+                ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
             )
         ) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8'))
-    # weak to c move without resistance, DPS and HP below treshold
-    ).exclude(
+    ).exclude(  # weak to c move without resistance, DPS and HP below treshold
         ((
-            Q(counter__primary_type_id__in=cinematic_vulnerable_type_ids)
-            | Q(counter__secondary_type_id__in=cinematic_vulnerable_type_ids)
-            ) & (
-                ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids)
-                & (
-                    (
-                        Q(counter__secondary_type__isnull=False)
-                        & ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
-                    ) | Q(counter__secondary_type__isnull=True)
-                )
-            ) & (
-                (Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')) & Q(counter_hp__lte=180))
-            )
-        )
-    # weak to q move, DPS and HP below treshold
-    ).exclude(
-        (
-            Q(counter__primary_type_id__in=quick_vulnerable_type_ids)
-            | Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
-        ) & (Q(highest_dps__lte=max_neutral_dps * Decimal('0.7')) & Q(counter_hp__lte=170))
-    # doesn't resist either move, stats below treshold
-    ).exclude(
-        (
-            ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids)
-            & (
+            Q(counter__primary_type_id__in=cinematic_vulnerable_type_ids) |
+            Q(counter__secondary_type_id__in=cinematic_vulnerable_type_ids)
+        ) & (
+            ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids) & (
                 (
-                    Q(counter__secondary_type__isnull=False)
-                    & ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
+                    Q(counter__secondary_type__isnull=False) &
+                    ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
+                ) | Q(counter__secondary_type__isnull=True)
+            )
+        ) & (Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')) & Q(counter_hp__lte=180)))
+    ).exclude(  # weak to q move, DPS and HP below treshold
+        (
+            Q(counter__primary_type_id__in=quick_vulnerable_type_ids) |
+            Q(counter__secondary_type_id__in=quick_vulnerable_type_ids)
+        ) & (Q(highest_dps__lte=max_neutral_dps * Decimal('0.7')) & Q(counter_hp__lte=170))
+    ).exclude(  # doesn't resist either move, stats below treshold
+        (
+            ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids) & (
+                (
+                    Q(counter__secondary_type__isnull=False) &
+                    ~Q(counter__secondary_type_id__in=cinematic_resisted_type_ids)
                 ) | Q(counter__secondary_type__isnull=True)
             )
         ) & (
-            ~Q(counter__primary_type_id__in=quick_resisted_type_ids)
-            & (
+            ~Q(counter__primary_type_id__in=quick_resisted_type_ids) & (
                 (
-                    Q(counter__secondary_type__isnull=False)
-                    & ~Q(counter__secondary_type_id__in=quick_resisted_type_ids)
+                    Q(counter__secondary_type__isnull=False) &
+                    ~Q(counter__secondary_type_id__in=quick_resisted_type_ids)
                 ) | Q(counter__secondary_type__isnull=True)
             )
         ) & (
             (
-                Q(counter_hp__lte=120)
-                & Q(counter__pgo_defense__lte=185)
-                & Q(highest_dps__lte=max_neutral_dps * Decimal('0.97'))
-            )
-            | (Q(counter_hp__lte=130) & Q(counter__pgo_defense__lte=150))
-            | (Q(counter_hp__lte=130) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8')))
-            | (
-                (Q(counter__pgo_defense__lte=150)
-                | Q(counter_hp__lte=150))
-                & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8'))
+                Q(counter_hp__lte=120) &
+                Q(counter__pgo_defense__lte=185) &
+                Q(highest_dps__lte=max_neutral_dps * Decimal('0.97'))
+            ) | (
+                Q(counter_hp__lte=130) & Q(counter__pgo_defense__lte=150)
+            ) | (
+                Q(counter_hp__lte=130) &
+                Q(highest_dps__lte=max_neutral_dps * Decimal('0.8'))
+            ) | (
+                (
+                    Q(counter__pgo_defense__lte=150) |
+                    Q(counter_hp__lte=150)
+                ) & Q(highest_dps__lte=max_neutral_dps * Decimal('0.8'))
             )
         )
-    # HP below treshold and doesn't resist q move
-    ).exclude(
+    ).exclude(  # HP below treshold and doesn't resist q move
         (
-            ~Q(counter__primary_type_id__in=quick_resisted_type_ids)
-            & (
+            ~Q(counter__primary_type_id__in=quick_resisted_type_ids) & (
                 (
-                    Q(counter__secondary_type__isnull=False)
-                    & ~Q(counter__secondary_type_id__in=quick_resisted_type_ids)
+                    Q(counter__secondary_type__isnull=False) &
+                    ~Q(counter__secondary_type_id__in=quick_resisted_type_ids)
                 ) | Q(counter__secondary_type__isnull=True)
             )
         ) & Q(counter_hp__lte=100)

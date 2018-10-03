@@ -43,6 +43,9 @@ class PokemonAdmin(admin.ModelAdmin):
     search_fields = (
         'number', 'name',
     )
+    raw_id_fields = (
+        'quick_moves', 'cinematic_moves',
+    )
 
 
 class PokemonMoveAdmin(admin.ModelAdmin):

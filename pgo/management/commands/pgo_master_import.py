@@ -128,8 +128,8 @@ class Command(BaseCommand):
             for data in type_data_and_scalars:
                 for second_type_slug, scalar in data.items():
                     second_type = Type.objects.get(slug=second_type_slug)
-                    self.get_or_create_type_advantage(first_type, second_type,
-                        TypeEffectivnessScalar.objects.get(scalar=scalar))
+                    self.get_or_create_type_advantage(
+                        first_type, second_type, TypeEffectivnessScalar.objects.get(scalar=scalar))
 
     def _process_pokemon(self, pokemon_data):
         # existing_movesets = Moveset.objects.all()
@@ -145,9 +145,9 @@ class Command(BaseCommand):
                 if 'slug' in detail:
                     slug = detail['slug']
                     if slug == 'nidoran-female':
-                        slug = unicode('nidoran♀')
+                        slug = 'nidoran♀'
                     if slug == 'nidoran-male':
-                        slug = unicode('nidoran♂')
+                        slug = 'nidoran♂'
 
                     name = slug.capitalize()
                     if slug == 'mr-mime':

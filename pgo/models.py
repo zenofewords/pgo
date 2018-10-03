@@ -68,6 +68,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
     class Meta:
         verbose_name = 'Pokemon'
         verbose_name_plural = 'Pokemon'
+        ordering = ('-number',)
 
     def __unicode__(self):
         return '{0} ({1})'.format(self.name, self.number)

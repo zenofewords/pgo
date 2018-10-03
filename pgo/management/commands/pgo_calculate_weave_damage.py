@@ -53,8 +53,8 @@ class Command(BaseCommand):
 
     def _get_moveset(self, pokemon, quick_move, cinematic_move):
         return Moveset.objects.filter(
-            pokemon_id=pokemon.pk,
-            key='{} - {}'.format(quick_move, cinematic_move)
+            pokemon=pokemon,
+            key='{} - {}'.format(quick_move.name, cinematic_move.name)
         ).first()
 
     def handle(self, *args, **options):
@@ -66,20 +66,20 @@ class Command(BaseCommand):
         for pokemon in Pokemon.objects.all():
             for quick_move in pokemon.quick_moves.all():
                 stab = [False, False]
-                stab[0] = self._is_stab(pokemon, quick_move.move_type)
+                stab[0] = self._is_stab(pokemon, quick_move.move.move_type)
 
                 for cinematic_move in pokemon.cinematic_moves.all():
-                    stab[1] = self._is_stab(pokemon, cinematic_move.move_type)
+                    stab[1] = self._is_stab(pokemon, cinematic_move.move.move_type)
 
                     moveset = self._get_moveset(
-                        pokemon, quick_move, cinematic_move)
+                        pokemon, quick_move.move, cinematic_move.move)
 
                     if moveset:
                         moveset.weave_damage = sorted(
                             self._calculate_cycle_dps(
                                 pokemon.pgo_attack,
-                                quick_move,
-                                cinematic_move,
+                                quick_move.move,
+                                cinematic_move.move,
                                 stab
                             ).items())
                         moveset.save()

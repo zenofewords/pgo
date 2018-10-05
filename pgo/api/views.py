@@ -103,7 +103,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         official_raid_boss = self._check_raid_boss()
         data = {
             'raid_boss_check': official_raid_boss,
-            'top_counters': self._get_top_counters() if official_raid_boss[0] else {},
+            'top_counters': self._get_top_counters(),
             'attack_iv_assessment': self._assess_attack_iv(),
             'breakpoint_details': self._get_details_table(self._process_data()),
         }

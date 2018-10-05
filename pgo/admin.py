@@ -37,11 +37,11 @@ class MovesetAdmin(admin.ModelAdmin):
 
 class PokemonAdmin(admin.ModelAdmin):
     list_display = (
-        'number', 'name', 'primary_type', 'secondary_type', 'pgo_stamina',
+        'number', 'name', 'generation', 'primary_type', 'secondary_type', 'pgo_stamina',
         'pgo_attack', 'pgo_defense', 'maximum_cp',
     )
     search_fields = (
-        'number', 'name',
+        'number', 'name', 'generation',
     )
     raw_id_fields = (
         'quick_moves', 'cinematic_moves',

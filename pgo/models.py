@@ -29,6 +29,28 @@ class RaidBossStatus:
     )
 
 
+class Generation:
+    I = 'I'
+    II = 'II'
+    III = 'III'
+    IV = 'IV'
+    V = 'V'
+    VI = 'VI'
+    VII = 'VII'
+    VIII = 'VIII'
+
+    CHOICES = (
+        (I, 'I'),
+        (II, 'II'),
+        (III, 'III'),
+        (IV, 'IV'),
+        (V, 'V'),
+        (VI, 'VI'),
+        (VII, 'VII'),
+        (VIII, 'VIII'),
+    )
+
+
 class PokemonManager(models.Manager):
     def get_queryset(self):
         return super(PokemonManager, self).get_queryset().filter(implemented=True)
@@ -54,6 +76,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
     maximum_cp = models.DecimalField(
         verbose_name='Combat Power', max_digits=7, decimal_places=2, blank=True, null=True)
     legendary = models.BooleanField(default=False)
+    generation = models.CharField(max_length=5, choices=Generation.CHOICES, blank=True)
     implemented = models.BooleanField(default=True)
 
     attack = models.IntegerField(blank=True, null=True)
@@ -68,7 +91,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
     class Meta:
         verbose_name = 'Pokemon'
         verbose_name_plural = 'Pokemon'
-        ordering = ('-number',)
+        ordering = ('number',)
 
     def __unicode__(self):
         return '{0} ({1})'.format(self.name, self.number)

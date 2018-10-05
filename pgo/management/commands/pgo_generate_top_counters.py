@@ -5,7 +5,7 @@ from operator import itemgetter
 from django.core.management.base import BaseCommand
 
 from pgo.models import (
-    CPM, Pokemon, RaidBoss, RaidBossStatus, TopCounter, WeatherCondition,
+    CPM, Pokemon, RaidBoss, RaidBossStatus, TopCounter, WeatherCondition, Generation,
 )
 from pgo.utils import (
     calculate_dph, calculate_cycle_dps, determine_move_effectivness, is_move_stab,
@@ -27,15 +27,18 @@ class Command(BaseCommand):
     help = 'Populate the TopCounter model by generating a list of top counters for each defender.'
 
     def _execute(self):
+        pokemon_qs = Pokemon.objects.filter(
+            generation__in=[Generation.I, Generation.II, Generation.III])
+
         if self.options['attackers']:
-            self.attackers = Pokemon.objects.filter(slug__in=self.options['attackers'])
+            self.attackers = pokemon_qs.filter(slug__in=self.options['attackers'])
         else:
-            self.attackers = Pokemon.objects.filter(
+            self.attackers = pokemon_qs.filter(
                 pgo_stamina__gte=100,
                 pgo_attack__gte=180
             ).exclude(
                 slug__in=UNRELEASED_POKEMON
-            ).order_by('-pgo_attack')[:120]
+            ).order_by('-pgo_attack')[:1]
 
         self.max_cpm = CPM.gyms.last().value
         weather_conditions = WeatherCondition.objects.all()
@@ -49,48 +52,58 @@ class Command(BaseCommand):
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
 
             for raid_boss in raid_boss_qs:
-                self._create_top_counters(raid_boss, weather_condition.pk, boosted_types)
+                self._create_top_counters(
+                    raid_boss.pokemon,
+                    weather_condition.pk,
+                    boosted_types,
+                    raid_boss.raid_tier.raid_cpm.value
+                )
 
-    def _create_top_counters(self, raid_boss, weather_condition_id, boosted_types):
+            for pokemon in pokemon_qs:
+                self._create_top_counters(
+                    pokemon, weather_condition.pk, boosted_types, self.max_cpm)
+
+    def _create_top_counters(self, pokemon, weather_condition_id, boosted_types, cpm):
         for attacker in self.attackers:
             try:
                 tc = TopCounter.objects.get(
-                    defender_id=raid_boss.pokemon.pk,
-                    defender_cpm=raid_boss.raid_tier.raid_cpm.value,
+                    defender_id=pokemon.pk,
+                    defender_cpm=cpm,
                     weather_condition_id=weather_condition_id,
                     counter_id=attacker.pk,
                 )
             except TopCounter.DoesNotExist as e:
                 tc = TopCounter(
-                    defender_id=raid_boss.pokemon.pk,
-                    defender_cpm=raid_boss.raid_tier.raid_cpm.value,
+                    defender_id=pokemon.pk,
+                    defender_cpm=cpm,
                     weather_condition_id=weather_condition_id,
                     counter_id=attacker.pk,
                 )
 
             multiplier = (
                 ((attacker.pgo_attack + 15) * self.max_cpm) /
-                ((raid_boss.pokemon.pgo_defense + 15) * raid_boss.raid_tier.raid_cpm.value)
+                ((pokemon.pgo_defense + 15) * cpm)
             )
             quick_move_options = self.options['quick_moves']
-            quick_moves = (
+            pokemon_quick_moves = (
                 attacker.quick_moves.filter(slug__in=quick_move_options)
                 if quick_move_options else attacker.quick_moves.all()
             )
             cinematic_move_options = self.options['cinematic_moves']
-            cinematic_moves = (
+            pokemon_cinematic_moves = (
                 attacker.cinematic_moves.filter(slug__in=cinematic_move_options)
                 if cinematic_move_options else attacker.cinematic_moves.all()
             )
 
             moveset_data = []
-            for quick_move in quick_moves:
-                for cinematic_move in cinematic_moves:
+            for pokemon_quick_move in pokemon_quick_moves:
+                for pokemon_cinematic_move in pokemon_cinematic_moves:
                     dps = self._calculate_dps(
                         multiplier, boosted_types, attacker,
-                        raid_boss.pokemon, quick_move, cinematic_move
+                        pokemon, pokemon_quick_move.move, pokemon_cinematic_move.move
                     )
-                    moveset_data.append((dps, quick_move.name, cinematic_move.name,))
+                    moveset_data.append(
+                        (dps, pokemon_quick_move.move.name, pokemon_cinematic_move.move.name,))
 
             moveset_data.sort(key=itemgetter(0), reverse=True)
             tc.highest_dps = moveset_data[0][0]

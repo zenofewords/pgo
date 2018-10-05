@@ -50,8 +50,6 @@ def update_raid_boss_status(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('pgo', '0001_initial'), ('pgo', '0002_auto_20170629_1039'), ('pgo', '0003_auto_20170730_1159'), ('pgo', '0004_auto_20170815_1151'), ('pgo', '0005_auto_20170819_1226'), ('pgo', '0006_auto_20170819_1228'), ('pgo', '0007_auto_20170819_1351'), ('pgo', '0008_cpm_powerup_cost'), ('pgo', '0009_cpm_total_powerup_cost'), ('pgo', '0010_auto_20171023_1935'), ('pgo', '0011_weathercondition'), ('pgo', '0012_auto_20180209_1627'), ('pgo', '0013_auto_20180311_1840'), ('pgo', '0014_raidboss_status'), ('pgo', '0015_auto_20180330_2143'), ('pgo', '0016_auto_20180513_1135'), ('pgo', '0017_raidtier_battle_duration'), ('pgo', '0018_auto_20180609_1320'), ('pgo', '0019_pokemon_implemented'), ('pgo', '0020_auto_20180626_1911'), ('pgo', '0021_raidtier_order'), ('pgo', '0021_auto_20180923_1658'), ('pgo', '0022_merge_20180926_2005')]
-
     initial = True
 
     dependencies = [

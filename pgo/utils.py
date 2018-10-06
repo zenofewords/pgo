@@ -106,7 +106,7 @@ def is_move_stab(move, pokemon):
     )
 
 
-def get_top_counter_qs(defender, weather_condition_id):
+def get_top_counter_qs(defender, weather_condition_id, defender_cpm):
     quick_move_type = defender.quick_move.move_type
     quick_move_resistance = quick_move_type.puny + quick_move_type.feeble
     quick_resisted_types = [slugify(x[0]) for x in quick_move_resistance]
@@ -131,7 +131,7 @@ def get_top_counter_qs(defender, weather_condition_id):
 
     base_counter_qs = TopCounter.objects.filter(
         defender_id=defender.pk,
-        defender_cpm=defender.cpm,
+        defender_cpm=defender_cpm,
     ).exclude(
         counter__slug__in=['jirachi', 'celebi']
     )

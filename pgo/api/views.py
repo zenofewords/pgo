@@ -100,9 +100,9 @@ class BreakpointCalcAPIView(GenericAPIView):
         self._set_defender_health()
         self._set_move_stats(self.attacker.cpm_list.first()['value'], self.attacker.atk_iv)
 
-        official_raid_boss = self._check_raid_boss()
+        self.official_raid_boss = self._check_raid_boss()
         data = {
-            'raid_boss_check': official_raid_boss,
+            'raid_boss_check': self.official_raid_boss,
             'top_counters': self._get_top_counters(),
             'attack_iv_assessment': self._assess_attack_iv(),
             'breakpoint_details': self._get_details_table(self._process_data()),
@@ -349,6 +349,7 @@ class BreakpointCalcAPIView(GenericAPIView):
     def _get_top_counters(self):
         try:
             top_counters = self._get_top_counters_data()
+            print (top_counters)
         except (AttributeError, TypeError) as e:
             top_counters = {}
             logger.error('Missing top counter for: {}, {}, {}, {}, {}'.format(
@@ -361,8 +362,12 @@ class BreakpointCalcAPIView(GenericAPIView):
         if self.current_tab != 'counters':
             return {}
 
+        defender_cpm = self.max_cpm_value
+        if self.official_raid_boss[0]:
+            defender_cpm = self.defender.cpm
+
         top_counters = OrderedDict()
-        for top_counter in get_top_counter_qs(self.defender, self.weather_condition):
+        for top_counter in get_top_counter_qs(self.defender, self.weather_condition, defender_cpm):
             try:
                 frailty = self._get_counter_frailty(top_counter)
             except Exception as e:
@@ -454,17 +459,17 @@ class BreakpointCalcAPIView(GenericAPIView):
         )
 
     def _check_raid_boss(self):
-        official_raid_boss = RaidBoss.objects.filter(
+        self.official_raid_boss = RaidBoss.objects.filter(
             pokemon_id=self.defender.id, status=RaidBossStatus.OFFICIAL).first()
 
-        if not official_raid_boss:
+        if not self.official_raid_boss:
             return False, ''
 
-        if official_raid_boss and (official_raid_boss.raid_tier != self.raid_tier):
+        if self.official_raid_boss and (self.official_raid_boss.raid_tier != self.raid_tier):
             return False, '''
                 {0} is a <b>tier {1} raid boss</b>.
-                Switch to T{1} to enable Top counters.'''.format(
-                self.defender.name, official_raid_boss.raid_tier.tier)
+                Switch to T{1} to view tier specific counters.'''.format(
+                self.defender.name, self.official_raid_boss.raid_tier.tier)
         return True, ''
 
 

@@ -38,7 +38,7 @@ class Command(BaseCommand):
                 pgo_attack__gte=180
             ).exclude(
                 slug__in=UNRELEASED_POKEMON
-            ).order_by('-pgo_attack')[:1]
+            ).order_by('-pgo_attack')[:120]
 
         self.max_cpm = CPM.gyms.last().value
         weather_conditions = WeatherCondition.objects.all()

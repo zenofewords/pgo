@@ -349,7 +349,6 @@ class BreakpointCalcAPIView(GenericAPIView):
     def _get_top_counters(self):
         try:
             top_counters = self._get_top_counters_data()
-            print (top_counters)
         except (AttributeError, TypeError) as e:
             top_counters = {}
             logger.error('Missing top counter for: {}, {}, {}, {}, {}'.format(

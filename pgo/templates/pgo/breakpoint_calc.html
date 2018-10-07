@@ -84,11 +84,11 @@
           <label for="breakpoint-calc-select-defender-tier" class="sr-only">Defender tier / level</label>
           <select id="breakpoint-calc-select-defender-tier" class="form-control input-height">
             {% for data in defender_cpm_data %}
-                {% if forloop.last %}
-                  <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
-                {% else %}
-                  <option value="{{ data.1 }}{{ data.0 }}" {% if data.0 == 5 %}selected{% endif %}>T{{ data.0 }}</option>
-                {% endif %}
+              {% if forloop.last %}
+                <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
+              {% else %}
+                <option value="{{ data.1 }}{{ data.0 }}" {% if data.0 == 5 %}selected{% endif %}>T{{ data.0 }}</option>
+              {% endif %}
             {% endfor %}
           </select>
         </div>
@@ -245,7 +245,7 @@
             <p>
               <strong>Top Counters</strong> - a quick reference list of pokemon which counter the selected defender
             </p>
-            <p>It features "perfect" level 40 counters ordered by stats, but with a strong preference for high damage. The list is dynamic and will often suggest different attackers based on the defender's moves and the selected weather.</p>
+            <p>It features "perfect" level 40 counters ordered by stats, but with a strong preference for high damage. The list is dynamic and will often suggest different attackers based on the defender's moves and the selected weather. The counters are pitted against level 40 pokemon, unless the defender can be a raid boss, where you are given the option of selecting a tier for more accurate results.</p>
             <ul>
               <li>
                 <p>

@@ -38,7 +38,7 @@ class Command(BaseCommand):
                 pgo_attack__gte=180
             ).exclude(
                 slug__in=UNRELEASED_POKEMON
-            ).order_by('-pgo_attack')[:1]
+            ).order_by('-pgo_attack')[:120]
 
         self.max_cpm = CPM.gyms.last().value
         weather_conditions = WeatherCondition.objects.all()
@@ -51,13 +51,14 @@ class Command(BaseCommand):
         for weather_condition in weather_conditions:
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
 
-            for raid_boss in raid_boss_qs:
-                self._create_top_counters(
-                    raid_boss.pokemon,
-                    weather_condition.pk,
-                    boosted_types,
-                    raid_boss.raid_tier.raid_cpm.value
-                )
+            if self.options['raid_bosses']:
+                for raid_boss in raid_boss_qs:
+                    self._create_top_counters(
+                        raid_boss.pokemon,
+                        weather_condition.pk,
+                        boosted_types,
+                        raid_boss.raid_tier.raid_cpm.value
+                    )
 
             for pokemon in pokemon_qs:
                 self._create_top_counters(
@@ -156,6 +157,12 @@ class Command(BaseCommand):
             dest='cinematic_moves',
             default=[],
             help='Expects a list of cinematic move slugs',
+        )
+        parser.add_argument(
+            '--raid_bosses',
+            dest='raid_bosses',
+            default=True,
+            help='To skip raid bosses (--raid_bosses='')'
         )
 
     def handle(self, *args, **options):

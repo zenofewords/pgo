@@ -307,9 +307,7 @@ ready(() => {
 
           if (json.raid_boss_check[0]) {
             moveEffectivness.innerHTML = ''
-            tabTopCounters.disabled = false
           } else {
-            tabTopCounters.disabled = true
             moveEffectivness.innerHTML = json.raid_boss_check[1]
           }
           displayBreakpointCalcDetails(json)

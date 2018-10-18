@@ -379,7 +379,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             for index, data_row in enumerate(top_counter.moveset_data):
                 DPS = round(data_row[0], 1)
 
-                if index > 1 and DPS <= top_counter.highest_dps * Decimal('0.9'):
+                if index > 7:
                     break
 
                 moveset_data.append((

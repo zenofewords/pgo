@@ -23,3 +23,8 @@ class NavigationItem(DefaultModelMixin, NameMixin, OrderMixin):
 
     def __str__(self):
         return self.name if self.name else self.slug
+
+
+class SiteNotification(DefaultModelMixin, NameMixin):
+    active = models.BooleanField()
+    message = models.CharField(max_length=1024)

@@ -3,6 +3,7 @@ from django.contrib import admin
 from zenofewords.models import (
     Navigation,
     NavigationItem,
+    SiteNotification,
 )
 
 
@@ -20,3 +21,4 @@ class NavigationItemAdmin(admin.ModelAdmin):
 
 admin.site.register(Navigation, NavigationAdmin)
 admin.site.register(NavigationItem, NavigationItemAdmin)
+admin.site.register(SiteNotification)

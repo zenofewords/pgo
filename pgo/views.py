@@ -13,6 +13,8 @@ from pgo.models import (
     CPM, Friendship, Pokemon, Move, RaidTier, WeatherCondition,
 )
 
+from zenofewords.models import SiteNotification
+
 
 class BreakpointCalcRedirectView(RedirectView):
     permanent = True
@@ -42,6 +44,7 @@ class CalculatorInitialDataMixin(TemplateView):
             'friendship': Friendship.objects.all(),
             'defender_cpm_data': defender_cpm_data,
             'initial_data': self.initial_data,
+            'site_notifications': SiteNotification.objects.all(),
         }
         context.update(data)
         return context

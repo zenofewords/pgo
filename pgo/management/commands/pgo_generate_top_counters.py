@@ -47,7 +47,9 @@ class Command(BaseCommand):
         if self.options['defenders']:
             raid_boss_qs = raid_boss_qs.filter(pokemon__slug__in=self.options['defenders'])
 
-        # loop to death
+        # exception to create top counters for giratina
+        self.attackers = list(self.attackers) + list(Pokemon.objects.filter(slug__startswith='giratina'))
+
         for weather_condition in weather_conditions:
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
 
@@ -60,9 +62,9 @@ class Command(BaseCommand):
                         raid_boss.raid_tier.raid_cpm.value
                     )
 
-            for pokemon in pokemon_qs:
-                self._create_top_counters(
-                    pokemon, weather_condition.pk, boosted_types, self.max_cpm)
+            # for pokemon in pokemon_qs:
+            #     self._create_top_counters(
+            #         pokemon, weather_condition.pk, boosted_types, self.max_cpm)
 
     def _create_top_counters(self, pokemon, weather_condition_id, boosted_types, cpm):
         for attacker in self.attackers:

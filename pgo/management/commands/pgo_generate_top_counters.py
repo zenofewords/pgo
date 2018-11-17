@@ -10,25 +10,12 @@ from pgo.models import (
 from pgo.utils import (
     calculate_dph, calculate_cycle_dps, determine_move_effectivness, is_move_stab,
 )
-UNRELEASED_POKEMON = [
-    'clamperl',
-    'gorebyss',
-    'huntail',
-    'kacleon',
-    'nincada',
-    'ninjask',
-    'shedinja',
-    'smeargle',
-    'spinda',
-]
-
 
 class Command(BaseCommand):
     help = 'Populate the TopCounter model by generating a list of top counters for each defender.'
 
     def _execute(self):
-        pokemon_qs = Pokemon.objects.filter(
-            generation__in=[Generation.I, Generation.II, Generation.III])
+        pokemon_qs = Pokemon.objects.all()
 
         if self.options['attackers']:
             self.attackers = pokemon_qs.filter(slug__in=self.options['attackers'])
@@ -36,8 +23,6 @@ class Command(BaseCommand):
             self.attackers = pokemon_qs.filter(
                 pgo_stamina__gte=100,
                 pgo_attack__gte=180
-            ).exclude(
-                slug__in=UNRELEASED_POKEMON
             ).order_by('-pgo_attack')[:120]
 
         self.max_cpm = CPM.gyms.last().value
@@ -46,9 +31,6 @@ class Command(BaseCommand):
         raid_boss_qs = RaidBoss.objects.filter(status=RaidBossStatus.OFFICIAL)
         if self.options['defenders']:
             raid_boss_qs = raid_boss_qs.filter(pokemon__slug__in=self.options['defenders'])
-
-        # exception to create top counters for giratina
-        self.attackers = list(self.attackers) + list(Pokemon.objects.filter(slug__startswith='giratina'))
 
         for weather_condition in weather_conditions:
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)

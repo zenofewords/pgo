@@ -175,10 +175,10 @@ class Command(BaseCommand):
                         pokemon.secondary_type = pokemon_types[1]
                     pokemon.primary_type = pokemon_types[0]
 
-                # if 'stats' in detail:
-                #     pokemon.pgo_stamina = detail['stats'][0]['stamina']
-                #     pokemon.pgo_attack = detail['stats'][1]['attack']
-                #     pokemon.pgo_defense = detail['stats'][2]['defense']
+                if 'stats' in detail:
+                    pokemon.pgo_stamina = detail['stats'][0]['stamina']
+                    pokemon.pgo_attack = detail['stats'][1]['attack']
+                    pokemon.pgo_defense = detail['stats'][2]['defense']
 
             pokemon.save()
 
@@ -293,7 +293,7 @@ class Command(BaseCommand):
         parser.add_argument('path', nargs='?', type=str)
 
     def handle(self, *args, **options):
-        path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/game_master_9_11_2018')
+        path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/game_master_genIV')
         file_path = options.get('path') if options.get('path') else path
 
         Type.objects.get_or_create(slug='dark', defaults={'name': 'Dark'})
@@ -439,5 +439,5 @@ class Command(BaseCommand):
         # self._process_cpm(cpm_data)
         # self._map_type_effectivness()
 
-        self._process_moves(move_data)
+        # self._process_moves(move_data)
         self._process_pokemon(pokemon_data)

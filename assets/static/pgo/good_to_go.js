@@ -19,7 +19,7 @@ ready(() => {
     '.good-to-go-select-attacker',
     {
       searchPlaceholderValue: 'Type in the attacker\'s name',
-      searchResultLimit: 3,
+      searchResultLimit: 5,
       itemSelectText: '',
     }
   )
@@ -132,7 +132,7 @@ ready(() => {
       request.onload = () => {
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
-          selectMoves(json.results)
+          selectMoves(json)
         }
       }
       request.onerror = () => {

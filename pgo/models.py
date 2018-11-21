@@ -96,7 +96,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
         verbose_name_plural = 'Pokemon'
         ordering = ('number',)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0} ({1})'.format(self.name, self.number)
 
 

@@ -15,5 +15,5 @@ class Card(DefaultModelMixin):
         ('TRA', 'Trainer'),
         ('ENE', 'Energy'),
     )
-    deck = models.ForeignKey('tcg.deck')
+    deck = models.ForeignKey('tcg.deck', on_delete=models.deletion.CASCADE)
     card_type = models.CharField(max_length=3, choices=CARD_TYPES)

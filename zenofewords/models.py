@@ -16,7 +16,7 @@ class Navigation(DefaultModelMixin, NameMixin):
 
 
 class NavigationItem(DefaultModelMixin, NameMixin, OrderMixin):
-    navigation = models.ForeignKey('zenofewords.Navigation')
+    navigation = models.ForeignKey('zenofewords.Navigation', on_delete=models.deletion.CASCADE)
 
     class Meta:
         ordering = ('order', 'slug', )

@@ -23,7 +23,7 @@ ready(() => {
     '.breakpoint-calc-select-attacker',
     {
       searchPlaceholderValue: 'Type in the attacker\'s name',
-      searchResultLimit: 3,
+      searchResultLimit: 5,
       itemSelectText: '',
     }
   )
@@ -35,7 +35,7 @@ ready(() => {
     '.breakpoint-calc-select-defender',
     {
       searchPlaceholderValue: 'Type in the defender\'s name',
-      searchResultLimit: 3,
+      searchResultLimit: 5,
       itemSelectText: '',
     }
   )
@@ -249,6 +249,7 @@ ready(() => {
       selectAttackerCinematicMove.disabled = true
       selectAttackerAtkIv.disabled = true
       selectFriendShipBoost.disabled = true
+      selectDefenderCPM.disabled = true
 
       ivAssessment.hidden = true
     } else {
@@ -259,6 +260,7 @@ ready(() => {
       selectAttackerCinematicMove.disabled = false
       selectAttackerAtkIv.disabled = false
       selectFriendShipBoost.disabled = false
+      selectDefenderCPM.disabled = false
 
       ivAssessment.hidden = false
     }
@@ -272,7 +274,7 @@ ready(() => {
       request.onload = () => {
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
-          selectMoves(json.results, pokemon)
+          selectMoves(json, pokemon)
         }
       }
       request.onerror = () => {
@@ -303,15 +305,10 @@ ready(() => {
         const json = JSON.parse(request.responseText)
 
         if (request.status >= 200 && request.status < 400) {
+          moveEffectivness.innerHTML = ''
           ivAssessment.innerHTML = json.attack_iv_assessment
 
-          if (json.raid_boss_check[0]) {
-            moveEffectivness.innerHTML = ''
-          } else {
-            moveEffectivness.innerHTML = json.raid_boss_check[1]
-          }
           displayBreakpointCalcDetails(json)
-
           generateTopCountersTable(json.top_counters)
           updateBrowserHistory(getParams)
         } else {

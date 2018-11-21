@@ -11,7 +11,7 @@ from rest_framework import response, status, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.generics import GenericAPIView
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils.text import slugify
@@ -100,9 +100,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         self._set_defender_health()
         self._set_move_stats(self.attacker.cpm_list.first()['value'], self.attacker.atk_iv)
 
-        self.official_raid_boss = self._check_raid_boss()
         data = {
-            'raid_boss_check': self.official_raid_boss,
             'top_counters': self._get_top_counters(),
             'attack_iv_assessment': self._assess_attack_iv(),
             'breakpoint_details': self._get_details_table(self._process_data()),
@@ -361,12 +359,8 @@ class BreakpointCalcAPIView(GenericAPIView):
         if self.current_tab != 'counters':
             return {}
 
-        defender_cpm = self.max_cpm_value
-        if self.official_raid_boss[0]:
-            defender_cpm = self.defender.cpm
-
         top_counters = OrderedDict()
-        for top_counter in get_top_counter_qs(self.defender, self.weather_condition, defender_cpm):
+        for top_counter in get_top_counter_qs(self.defender, self.weather_condition):
             try:
                 frailty = self._get_counter_frailty(top_counter)
             except Exception as e:
@@ -448,7 +442,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             'defender_quick_move': slugify(move_data['defender_quick_move']),
             'defender_cinematic_move': slugify(move_data['defender_cinematic_move']),
             'defender_cpm': '{}{}'.format(
-                top_counter.defender_cpm,
+                self.defender.cpm,
                 self.raid_tier.tier if self.raid_tier else 0
             ),
             'tab': 'breakpoints',
@@ -456,20 +450,6 @@ class BreakpointCalcAPIView(GenericAPIView):
         return '<a href="{0}?{1}">{3} {2}</a>'.format(
             reverse('pgo:breakpoint-calc'), params, top_counter.counter.name, frailty,
         )
-
-    def _check_raid_boss(self):
-        self.official_raid_boss = RaidBoss.objects.filter(
-            pokemon_id=self.defender.id, status=RaidBossStatus.OFFICIAL).first()
-
-        if not self.official_raid_boss:
-            return False, ''
-
-        if self.official_raid_boss and (self.official_raid_boss.raid_tier != self.raid_tier):
-            return False, '''
-                {0} is a <b>tier {1} raid boss</b>.
-                Switch to T{1} to view tier specific counters.'''.format(
-                self.defender.name, self.official_raid_boss.raid_tier.tier)
-        return True, ''
 
 
 class GoodToGoAPIView(GenericAPIView):

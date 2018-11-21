@@ -55,13 +55,16 @@ class PokemonManager(models.Manager):
     def get_queryset(self):
         return super(PokemonManager, self).get_queryset().filter(implemented=True)
 
+    def include_uninmplemented(self):
+        return super().get_queryset()
+
 
 class Pokemon(DefaultModelMixin, NameMixin):
     number = models.CharField(max_length=5)
-    primary_type = models.ForeignKey(
-        'pgo.Type', related_name='primary_types', blank=True, null=True)
-    secondary_type = models.ForeignKey(
-        'pgo.Type', related_name='secondary_types', blank=True, null=True)
+    primary_type = models.ForeignKey('pgo.Type', related_name='primary_types',
+        blank=True, null=True, on_delete=models.deletion.CASCADE)
+    secondary_type = models.ForeignKey('pgo.Type', related_name='secondary_types',
+        blank=True, null=True, on_delete=models.deletion.CASCADE)
     quick_moves = models.ManyToManyField(
         'pgo.PokemonMove', blank=True, related_name='quick_moves_pokemon')
     cinematic_moves = models.ManyToManyField(
@@ -113,10 +116,10 @@ class Type(DefaultModelMixin, NameMixin, OrderMixin):
 
 
 class TypeEffectivness(models.Model):
-    type_offense = models.ForeignKey('pgo.Type', related_name='type_offense')
-    type_defense = models.ForeignKey('pgo.Type', related_name='type_defense')
+    type_offense = models.ForeignKey('pgo.Type', related_name='type_offense', on_delete=models.deletion.CASCADE)
+    type_defense = models.ForeignKey('pgo.Type', related_name='type_defense', on_delete=models.deletion.CASCADE)
     relation = models.CharField(max_length=30, blank=True)
-    effectivness = models.ForeignKey('pgo.TypeEffectivnessScalar')
+    effectivness = models.ForeignKey('pgo.TypeEffectivnessScalar', on_delete=models.deletion.CASCADE)
 
     def __str__(self):
         return '{0}: {1}'.format(self.relation, self.effectivness)
@@ -131,7 +134,7 @@ class TypeEffectivnessScalar(NameMixin):
 
 class Move(DefaultModelMixin, NameMixin):
     category = models.CharField(max_length=2, choices=MoveCategory.CHOICES)
-    move_type = models.ForeignKey('pgo.Type', blank=True, null=True)
+    move_type = models.ForeignKey('pgo.Type', blank=True, null=True, on_delete=models.deletion.CASCADE)
 
     power = models.IntegerField(blank=True, default=0)
     energy_delta = models.IntegerField(blank=True, default=0)
@@ -150,8 +153,8 @@ class Move(DefaultModelMixin, NameMixin):
 
 
 class PokemonMove(DefaultModelMixin):
-    pokemon = models.ForeignKey('pgo.Pokemon')
-    move = models.ForeignKey('pgo.Move')
+    pokemon = models.ForeignKey('pgo.Pokemon', on_delete=models.deletion.CASCADE)
+    move = models.ForeignKey('pgo.Move', on_delete=models.deletion.CASCADE)
 
     legacy = models.BooleanField(default=False)
     stab = models.BooleanField(default=False)
@@ -166,11 +169,11 @@ class PokemonMove(DefaultModelMixin):
 
 
 class Moveset(DefaultModelMixin):
-    pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True)
+    pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True, on_delete=models.deletion.CASCADE)
     quick_move = models.ForeignKey(
-        'pgo.PokemonMove', blank=True, null=True, related_name='quick_moves')
+        'pgo.PokemonMove', blank=True, null=True, related_name='quick_moves', on_delete=models.deletion.CASCADE)
     cinematic_move = models.ForeignKey(
-        'pgo.PokemonMove', blank=True, null=True, related_name='cinematic_moves')
+        'pgo.PokemonMove', blank=True, null=True, related_name='cinematic_moves', on_delete=models.deletion.CASCADE)
     key = models.CharField(max_length=50, blank=True)
 
     legacy = models.BooleanField(default=False)
@@ -218,7 +221,7 @@ class CPM(models.Model):
 
 
 class RaidTier(OrderMixin):
-    raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM')
+    raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM', on_delete=models.deletion.CASCADE)
     tier = models.PositiveIntegerField(verbose_name='Tier Level')
     tier_stamina = models.PositiveIntegerField(verbose_name='Tier Stamina')
     battle_duration = models.PositiveIntegerField(default=180)
@@ -233,8 +236,8 @@ class RaidTier(OrderMixin):
 
 
 class RaidBoss(models.Model):
-    pokemon = models.ForeignKey('pgo.Pokemon', verbose_name='Pokemon')
-    raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier')
+    pokemon = models.ForeignKey('pgo.Pokemon', verbose_name='Pokemon', on_delete=models.deletion.CASCADE)
+    raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier', on_delete=models.deletion.CASCADE)
     status = models.CharField(max_length=20, choices=RaidBossStatus.CHOICES, blank=True)
 
     class Meta:
@@ -258,11 +261,10 @@ class WeatherCondition(DefaultModelMixin, NameMixin, OrderMixin):
 
 
 class TopCounter(models.Model):
-    defender = models.ForeignKey('pgo.Pokemon', related_name='defenders')
-    defender_cpm = models.DecimalField(max_digits=10, decimal_places=9)
-    weather_condition = models.ForeignKey('pgo.WeatherCondition')
+    defender = models.ForeignKey('pgo.Pokemon', related_name='defenders', on_delete=models.deletion.CASCADE)
+    weather_condition = models.ForeignKey('pgo.WeatherCondition', on_delete=models.deletion.CASCADE)
 
-    counter = models.ForeignKey('pgo.Pokemon', related_name='counters')
+    counter = models.ForeignKey('pgo.Pokemon', related_name='counters', on_delete=models.deletion.CASCADE)
     counter_hp = models.PositiveIntegerField(blank=True, null=True)
     score = models.PositiveIntegerField(blank=True, null=True)
     highest_dps = models.DecimalField(verbose_name='Highest DPS', max_digits=4, decimal_places=1)
@@ -271,7 +273,7 @@ class TopCounter(models.Model):
     moveset_data = JSONField()
 
     class Meta:
-        unique_together = ('defender', 'defender_cpm', 'weather_condition', 'counter',)
+        unique_together = ('defender', 'weather_condition', 'counter',)
 
 
 class Friendship(models.Model):

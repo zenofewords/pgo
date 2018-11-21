@@ -6,7 +6,7 @@ from pgo.views import (
     BreakpointCalculatorView, BreakpointCalcRedirectView, GoodToGoView,
 )
 
-
+app_name = 'pgo'
 urlpatterns = (
     url(r'^pgo', BreakpointCalcRedirectView.as_view(), name='breakpoint-calc-redirect'),
     url(r'^breakpoint-calc/$', BreakpointCalculatorView.as_view(), name='breakpoint-calc'),

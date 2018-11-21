@@ -196,7 +196,7 @@ class Command(BaseCommand):
 
     def _create_top_counters(self, pokemon, weather_condition_id, boosted_types):
         for attacker in self.attackers:
-            tc, _ = TopCounter.objects.get_or_create(
+            tc, created = TopCounter.objects.get_or_create(
                 defender_id=pokemon.pk,
                 weather_condition_id=weather_condition_id,
                 counter_id=attacker.pk,
@@ -205,6 +205,9 @@ class Command(BaseCommand):
                     'moveset_data': {},
                 }
             )
+
+            if not created and not self.options['update']:
+                return
 
             multiplier = (attacker.pgo_attack + 15) / (pokemon.pgo_defense + 15)
             quick_move_options = self.options['quick_moves']
@@ -228,8 +231,6 @@ class Command(BaseCommand):
                     moveset_data.append(
                         (dps, pokemon_quick_move.move.name, pokemon_cinematic_move.move.name,))
 
-            print(attacker.name, pokemon.name)
-            print(moveset_data[0])
             moveset_data.sort(key=itemgetter(0), reverse=True)
             tc.highest_dps = moveset_data[0][0]
             tc.moveset_data = moveset_data
@@ -287,6 +288,12 @@ class Command(BaseCommand):
             dest='raid_bosses',
             default=True,
             help='To skip raid bosses (--raid_bosses='')'
+        )
+        parser.add_argument(
+            '--update',
+            dest='update',
+            default=False,
+            help='Update existing top counters (--update=True)'
         )
 
     def handle(self, *args, **options):

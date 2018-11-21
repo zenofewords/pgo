@@ -24,8 +24,8 @@ class Command(BaseCommand):
         TopCounter.objects.filter(pk=top_counter.pk).update(
             score=int(offensive_score * defensive_score),
             multiplier=(
-                ((top_counter.defender.pgo_attack + MAX_IV) * top_counter.defender_cpm) /
-                ((top_counter.counter.pgo_defense + MAX_IV) * max_cpm_value)
+                ((top_counter.defender.pgo_attack + MAX_IV)) /
+                ((top_counter.counter.pgo_defense + MAX_IV))
             ),
             counter_hp=(top_counter.counter.pgo_stamina + MAX_IV) * max_cpm_value
         )

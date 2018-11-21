@@ -5,7 +5,7 @@ from django.db import models
 
 
 class DefaultModelMixin(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.deletion.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
 

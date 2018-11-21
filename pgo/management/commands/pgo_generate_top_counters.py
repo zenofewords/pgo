@@ -11,11 +11,165 @@ from pgo.utils import (
     calculate_dph, calculate_cycle_dps, determine_move_effectivness, is_move_stab,
 )
 
+DEFENDER_LIST = [
+    'blissey',
+    'lugia',
+    'cresselia',
+    'giratina-altered',
+    'giratina',
+    'chansey',
+    'regirock',
+    'regice',
+    'arceus-water',
+    'arceus-steel',
+    'arceus-rock',
+    'arceus-psychic',
+    'arceus-poison',
+    'arceus-ice',
+    'arceus-ground',
+    'arceus-grass',
+    'arceus-ghost',
+    'arceus-flying',
+    'arceus-fire',
+    'arceus-fighting',
+    'arceus-fairy',
+    'arceus-electric',
+    'arceus-dragon',
+    'arceus-dark',
+    'arceus-bug',
+    'arceus',
+    'snorlax',
+    'registeel',
+    'giratina-origin',
+    'suicune',
+    'ho-oh',
+    'umbreon',
+    'steelix',
+    'uxie',
+    'articuno',
+    'lapras',
+    'rhyperior',
+    'milotic',
+    'shaymin-land',
+    'shaymin',
+    'mew',
+    'manaphy',
+    'jirachi',
+    'celebi',
+    'slaking',
+    'latias',
+    'kyogre',
+    'groudon',
+    'tyranitar',
+    'regigigas',
+    'garchomp',
+    'relicanth',
+    'hippowdon',
+    'deoxys-defense',
+    'vaporeon',
+    'heatran',
+    'bastiodon',
+    'aggron',
+    'lickilicky',
+    'metagross',
+    'dialga',
+    'togekiss',
+    'entei',
+    'probopass',
+    'walrein',
+    'miltank',
+    'tangrowth',
+    'dragonite',
+    'palkia',
+    'torterra',
+    'wobbuffet',
+    'raikou',
+    'mesprit',
+    'latios',
+    'gliscor',
+    'gyarados',
+    'muk-alola',
+    'muk',
+    'rhydon',
+    'tentacruel',
+    'swampert',
+    'mewtwo',
+    'blastoise',
+    'slowking',
+    'slowbro',
+    'cradily',
+    'kangaskhan',
+    'meganium',
+    'zapdos',
+    'donphan',
+    'hypno',
+    'poliwrath',
+    'golem-alola',
+    'golem',
+    'moltres',
+    'shaymin-sky',
+    'feraligatr',
+    'forretress',
+    'politoed',
+    'skarmory',
+    'mantine',
+    'lanturn',
+    'empoleon',
+    'dewgong',
+    'altaria',
+    'tropius',
+    'salamence',
+    'rayquaza',
+    'venusaur',
+    'nidoqueen',
+    'swalot',
+    'grumpig',
+    'leafeon',
+    'porygon2',
+    'bronzong',
+    'claydol',
+    'mamoswine',
+    'sandslash-alola',
+    'magnezone',
+    'crobat',
+    'kingdra',
+    'noctowl',
+    'cloyster',
+    'clefable',
+    'ampharos',
+    'torkoal',
+    'gastrodon-west-sea',
+    'gastrodon-east-sea',
+    'gastrodon',
+    'drapion',
+    'omastar',
+    'hariyama',
+    'arcanine',
+    'azumarill',
+    'ninetales-alola',
+    'whiscash',
+    'darkrai',
+    'heracross',
+    'bellossom',
+    'shuckle',
+    'ninetales',
+    'munchlax',
+    'ludicolo',
+    'glaceon',
+    'tauros',
+    'jumpluff',
+    'exeggutor-alola',
+    'gardevoir',
+    'gallade',
+]
+
+
 class Command(BaseCommand):
     help = 'Populate the TopCounter model by generating a list of top counters for each defender.'
 
     def _execute(self):
         pokemon_qs = Pokemon.objects.all()
+        defenders_qs = Pokemon.objects.include_uninmplemented().filter(slug__in=DEFENDER_LIST)
 
         if self.options['attackers']:
             self.attackers = pokemon_qs.filter(slug__in=self.options['attackers'])
@@ -25,7 +179,6 @@ class Command(BaseCommand):
                 pgo_attack__gte=180
             ).order_by('-pgo_attack')[:120]
 
-        self.max_cpm = CPM.gyms.last().value
         weather_conditions = WeatherCondition.objects.all()
 
         raid_boss_qs = RaidBoss.objects.filter(status=RaidBossStatus.OFFICIAL)
@@ -35,40 +188,25 @@ class Command(BaseCommand):
         for weather_condition in weather_conditions:
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
 
-            if self.options['raid_bosses']:
-                for raid_boss in raid_boss_qs:
-                    self._create_top_counters(
-                        raid_boss.pokemon,
-                        weather_condition.pk,
-                        boosted_types,
-                        raid_boss.raid_tier.raid_cpm.value
-                    )
+            for raid_boss in raid_boss_qs:
+                self._create_top_counters(raid_boss.pokemon, weather_condition.pk, boosted_types)
 
-            # for pokemon in pokemon_qs:
-            #     self._create_top_counters(
-            #         pokemon, weather_condition.pk, boosted_types, self.max_cpm)
+            for pokemon in defenders_qs:
+                self._create_top_counters(pokemon, weather_condition.pk, boosted_types)
 
-    def _create_top_counters(self, pokemon, weather_condition_id, boosted_types, cpm):
+    def _create_top_counters(self, pokemon, weather_condition_id, boosted_types):
         for attacker in self.attackers:
-            try:
-                tc = TopCounter.objects.get(
-                    defender_id=pokemon.pk,
-                    defender_cpm=cpm,
-                    weather_condition_id=weather_condition_id,
-                    counter_id=attacker.pk,
-                )
-            except TopCounter.DoesNotExist as e:
-                tc = TopCounter(
-                    defender_id=pokemon.pk,
-                    defender_cpm=cpm,
-                    weather_condition_id=weather_condition_id,
-                    counter_id=attacker.pk,
-                )
-
-            multiplier = (
-                ((attacker.pgo_attack + 15) * self.max_cpm) /
-                ((pokemon.pgo_defense + 15) * cpm)
+            tc, _ = TopCounter.objects.get_or_create(
+                defender_id=pokemon.pk,
+                weather_condition_id=weather_condition_id,
+                counter_id=attacker.pk,
+                defaults={
+                    'highest_dps': 0,
+                    'moveset_data': {},
+                }
             )
+
+            multiplier = (attacker.pgo_attack + 15) / (pokemon.pgo_defense + 15)
             quick_move_options = self.options['quick_moves']
             pokemon_quick_moves = (
                 attacker.quick_moves.filter(slug__in=quick_move_options)
@@ -90,6 +228,8 @@ class Command(BaseCommand):
                     moveset_data.append(
                         (dps, pokemon_quick_move.move.name, pokemon_cinematic_move.move.name,))
 
+            print(attacker.name, pokemon.name)
+            print(moveset_data[0])
             moveset_data.sort(key=itemgetter(0), reverse=True)
             tc.highest_dps = moveset_data[0][0]
             tc.moveset_data = moveset_data

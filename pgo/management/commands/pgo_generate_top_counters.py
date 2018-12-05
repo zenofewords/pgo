@@ -184,6 +184,7 @@ class Command(BaseCommand):
         raid_boss_qs = RaidBoss.objects.filter(status=RaidBossStatus.OFFICIAL)
         if self.options['defenders']:
             raid_boss_qs = raid_boss_qs.filter(pokemon__slug__in=self.options['defenders'])
+            defenders_qs = defenders_qs.filter(pokemon__slug__in=self.options['defenders'])
 
         for weather_condition in weather_conditions:
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
@@ -194,10 +195,10 @@ class Command(BaseCommand):
             for pokemon in defenders_qs:
                 self._create_top_counters(pokemon, weather_condition.pk, boosted_types)
 
-    def _create_top_counters(self, pokemon, weather_condition_id, boosted_types):
+    def _create_top_counters(self, defender, weather_condition_id, boosted_types):
         for attacker in self.attackers:
             tc, created = TopCounter.objects.get_or_create(
-                defender_id=pokemon.pk,
+                defender_id=defender.pk,
                 weather_condition_id=weather_condition_id,
                 counter_id=attacker.pk,
                 defaults={
@@ -207,9 +208,9 @@ class Command(BaseCommand):
             )
 
             if not created and not self.options['update']:
-                return
+                continue
 
-            multiplier = (attacker.pgo_attack + 15) / (pokemon.pgo_defense + 15)
+            multiplier = (attacker.pgo_attack + 15) / (defender.pgo_defense + 15)
             quick_move_options = self.options['quick_moves']
             pokemon_quick_moves = (
                 attacker.quick_moves.filter(slug__in=quick_move_options)
@@ -226,7 +227,7 @@ class Command(BaseCommand):
                 for pokemon_cinematic_move in pokemon_cinematic_moves:
                     dps = self._calculate_dps(
                         multiplier, boosted_types, attacker,
-                        pokemon, pokemon_quick_move.move, pokemon_cinematic_move.move
+                        defender, pokemon_quick_move.move, pokemon_cinematic_move.move
                     )
                     moveset_data.append(
                         (dps, pokemon_quick_move.move.name, pokemon_cinematic_move.move.name,))

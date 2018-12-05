@@ -132,16 +132,15 @@ def get_top_counter_qs(defender, weather_condition_id):
     base_counter_qs = TopCounter.objects.filter(
         defender_id=defender.pk
     ).exclude(
-        counter__slug__in=['jirachi', 'celebi']
+        counter__slug__in=['jirachi',]
     )
     max_neutral_dps = base_counter_qs.filter(
         weather_condition_id=8
     ).aggregate(Max('highest_dps'))['highest_dps__max']
 
-    # exclude if without resitance to c move and stats below treshold
     return base_counter_qs.filter(
         weather_condition_id=weather_condition_id
-    ).exclude(
+    ).exclude( # exclude if without resitance to c move and stats below treshold
         (
             ~Q(counter__primary_type_id__in=cinematic_resisted_type_ids) & (
                 (
@@ -236,4 +235,4 @@ def get_top_counter_qs(defender, weather_condition_id):
                 ) | Q(counter__secondary_type__isnull=True)
             )
         ) & Q(counter_hp__lte=100)
-    ).order_by('-score')[:18]
+    ).order_by('-score')[:20]

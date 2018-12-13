@@ -364,8 +364,8 @@ class BreakpointCalcAPIView(GenericAPIView):
             try:
                 frailty = self._get_counter_frailty(top_counter)
             except Exception as e:
-                logger.error('Couldn\'t get frailty: {}'.format(
-                    top_counter.pk, self.defender.name, self.weather_condition
+                logger.error('Couldn\'t get frailty: {} {} {} ({})'.format(
+                    top_counter.pk, self.defender.name, self.weather_condition, e
                 ))
                 frailty = ''
 

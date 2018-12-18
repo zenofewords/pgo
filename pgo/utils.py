@@ -234,5 +234,5 @@ def get_top_counter_qs(defender, weather_condition_id):
                     ~Q(counter__secondary_type_id__in=quick_resisted_type_ids)
                 ) | Q(counter__secondary_type__isnull=True)
             )
-        ) & Q(counter_hp__lte=100)
+        ) & Q(counter_hp__lte=98)
     ).order_by('-score')[:20]

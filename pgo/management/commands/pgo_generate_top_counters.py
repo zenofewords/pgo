@@ -184,7 +184,7 @@ class Command(BaseCommand):
         raid_boss_qs = RaidBoss.objects.filter(status=RaidBossStatus.OFFICIAL)
         if self.options['defenders']:
             raid_boss_qs = raid_boss_qs.filter(pokemon__slug__in=self.options['defenders'])
-            defenders_qs = defenders_qs.filter(pokemon__slug__in=self.options['defenders'])
+            defenders_qs = defenders_qs.filter(slug__in=self.options['defenders'])
 
         for weather_condition in weather_conditions:
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)

@@ -1,0 +1,87 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block title %}
+  {{ block.super }} - Pokemon
+{% endblock title %}
+
+{% block meta_description %}
+  <meta name="description" content="A list of all pokemon with their PGo stats.">
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 1rem;">
+      <div class="table-responsive">
+        <table class="table">
+          <tr>
+            <th>
+              <a href="?ordering={% if ordering == 'number' %}-{% endif %}number">
+                #
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == 'slug' %}-{% endif %}slug">
+                Name
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == 'primary_type' %}-{% endif %}primary_type">
+                P. type
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == 'secondary_type' %}-{% endif %}secondary_type">
+                S. type
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack">
+                Attack
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense">
+                Defense
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina">
+                Stamina
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp">
+                MaxCP
+              </a>
+            </th>
+          </tr>
+          {% for pokemon in pokemon_list %}
+            <tr>
+              <td>{{ pokemon.number }}</td>
+              <td>{{ pokemon.name }}</td>
+              <td>
+                <span class="type-label type-{{ pokemon.primary_type.slug }}">
+                  {{ pokemon.primary_type }}
+                </span>
+              </td>
+              <td>
+                <span class="type-label type-{{ pokemon.secondary_type.slug }}">
+                  {{ pokemon.secondary_type|default:"" }}
+                </span>
+              </td>
+              <td>{{ pokemon.pgo_attack }}</td>
+              <td>{{ pokemon.pgo_defense }}</td>
+              <td>{{ pokemon.pgo_stamina }}</td>
+              <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block pagination %}
+  {{ block.super }}
+{% endblock pagination %}

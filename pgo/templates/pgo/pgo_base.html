@@ -22,18 +22,17 @@
 {% endblock header %}
 
 {% block footer %}
-  <div class="row" style="font-size: 1.2rem; max-width: 85rem; margin-top: 10rem;">
+  <div class="row" style="font-size: 1.2rem; max-width: 85rem; margin-top: 1rem;">
     <div class="col-md-12">
-      <span>
-        Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.
-      </span>
+      Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.
+      <br>
+      {{ block.super }}
     </div>
   </div>
-  {{ block.super }}
 {% endblock footer %}
 
 {% block scripts %}
   {% block generic %}
-    {% render_bundle 'lists' attrs='async' %}
+    {% render_bundle 'default' attrs='async' %}
   {% endblock generic %}
 {% endblock scripts %}

@@ -1,9 +1,72 @@
+.type-label {
+  color: #fff;
+  padding: .5rem;
+  border-radius: .5rem;
+}
+.type-bug {
+  background-color: rgba(148, 194, 46, .7);
+}
+.type-dark {
+  background-color: rgba(94, 90, 107, .7);
+}
+.type-dragon {
+  background-color: rgba(9, 108, 193, .7);
+}
+.type-electric {
+  background-color: rgba(245, 212, 73, .7);
+}
+.type-fairy {
+  background-color: rgba(238, 146, 229, .7);
+}
+.type-fighting {
+  background-color: rgba(209, 65, 101, .7);
+}
+.type-fire {
+  background-color: rgba(254, 161, 83, .7);
+}
+.type-flying {
+  background-color: rgba(143, 169, 222, .7);
+}
+.type-ghost {
+  background-color: rgba(92, 108, 183, .7);
+}
+.type-grass {
+  background-color: rgba(96, 188, 91, .7);
+}
+.type-ground {
+  background-color: rgba(217, 121, 71, .7);
+}
+.type-ice {
+  background-color: rgba(121, 209, 197, .7);
+}
+.type-normal {
+  background-color: rgba(145, 154, 161, .7);
+}
+.type-poison {
+  background-color: rgba(169, 101, 200, .7);
+}
+.type-psychic {
+  background-color: rgba(250, 126, 126, .7);
+}
+.type-rock {
+  background-color: rgba(201, 187, 140, .7);
+}
+.type-steel {
+  background-color: rgba(85, 146, 164, .7);
+}
+.type-water {
+  background-color: rgba(85, 155, 217, .7);
+}
+
 .input-padding-right {
   padding-right: .3rem;
   padding-bottom: .6rem;
 }
 .input-padding-left {
   padding-left: .3rem;
+  padding-bottom: .6rem;
+}
+.input-padding-bottom {
   padding-bottom: .6rem;
 }
 .input-height {

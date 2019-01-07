@@ -8,6 +8,8 @@ module.exports = {
   entry: {
     breakpointCalc: '../assets/static/breakpointCalc',
     goodToGo: '../assets/static/goodToGo',
+    pvp: '../assets/static/pvp',
+    default: '../assets/static/default',
   },
 
   output: {

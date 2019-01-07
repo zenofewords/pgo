@@ -9,8 +9,14 @@ from django.views.generic import (
     TemplateView, RedirectView,
 )
 
+from pgo.mixins import ListViewOrderingMixin
 from pgo.models import (
-    CPM, Friendship, Pokemon, Move, RaidTier, WeatherCondition,
+    CPM,
+    Friendship,
+    Move,
+    Pokemon,
+    RaidTier,
+    WeatherCondition,
 )
 
 from zenofewords.models import SiteNotification
@@ -100,3 +106,33 @@ class GoodToGoView(CalculatorInitialDataMixin):
             'tier_1_2_raid_bosses': bool(params.get('tier_1_2_raid_bosses') == 'true'),
             'relevant_defenders': bool(params.get('relevant_defenders') == 'true'),
         }
+
+
+class PvPView(TemplateView):
+    template_name = 'pgo/pvp.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pokemon_list'] = Pokemon.objects.select_related('primary_type', 'secondary_type')
+        return context
+
+
+class PokemonListView(ListViewOrderingMixin):
+    template_name = 'pgo/pokemon_list.html'
+    model = Pokemon
+    default_ordering = ('number', 'name',)
+    ordering_fields = (
+        'number', 'slug', 'primary_type', 'secondary_type',
+        'pgo_attack', 'pgo_defense', 'pgo_stamina', 'maximum_cp'
+    )
+
+
+class MoveListView(ListViewOrderingMixin):
+    template_name = 'pgo/move_list.html'
+    model = Move
+    default_ordering = '-category'
+    ordering_fields = (
+        'slug', 'category', 'move_type', 'power', 'energy_delta', 'duration',
+        'damage_window_start', 'damage_window_end', 'dps', 'eps',
+        'pvp_power', 'pvp_energy_delta', 'pvp_duration', 'dpt', 'ept', 'dpe',
+    )

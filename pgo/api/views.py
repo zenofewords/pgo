@@ -8,7 +8,7 @@ from decimal import Decimal
 from operator import itemgetter
 
 from rest_framework import response, status, viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.generics import GenericAPIView
 
 from django.urls import reverse
@@ -18,7 +18,7 @@ from django.utils.text import slugify
 
 from pgo.api.serializers import (
     BreakpointCalcSerializer, PokemonMoveSerializer, MoveSerializer,
-    PokemonSerializer, TypeSerializer, GoodToGoSerializer,
+    PokemonSimpleSerializer, PokemonSerializer, TypeSerializer, GoodToGoSerializer,
 )
 from pgo.models import (
     CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, RaidTier, WeatherCondition, RaidBossStatus,
@@ -61,7 +61,7 @@ class MoveViewSet(viewsets.ModelViewSet):
 
 class PokemonViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = Pokemon.objects.all()
+    queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
     serializer_class = PokemonSerializer
 
     def get_queryset(self):
@@ -71,7 +71,11 @@ class PokemonViewSet(viewsets.ModelViewSet):
                     raid_tier=self.request.GET.get('raid-boss-tier-group')
                 ).values_list('pokemon__id', flat=True)
 
-                return self.queryset.filter(id__in=raid_tier_ids).order_by('name')
+                return self.queryset.filter(
+                    id__in=raid_tier_ids
+                ).select_related(
+                    'primary_type', 'secondary_type'
+                ).order_by('name')
             except ValueError:
                 pass
 
@@ -82,6 +86,12 @@ class TypeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
+
+
+class PokemonSimpleViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
+    serializer_class = PokemonSimpleSerializer
 
 
 class BreakpointCalcAPIView(GenericAPIView):

@@ -111,11 +111,6 @@ class GoodToGoView(CalculatorInitialDataMixin):
 class PvPView(TemplateView):
     template_name = 'pgo/pvp.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['pokemon_list'] = Pokemon.objects.select_related('primary_type', 'secondary_type')
-        return context
-
 
 class PokemonListView(ListViewOrderingMixin):
     template_name = 'pgo/pokemon_list.html'

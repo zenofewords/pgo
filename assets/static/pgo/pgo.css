@@ -221,6 +221,64 @@ table#top-counters-table tr td:last-child {
   margin-top: 0;
 }
 
+
+/* Pv3P specific */
+.pvp-slot-button-wrapper {
+  padding-bottom: 1.2rem;
+}
+.pvp-menu-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+.pvp-slot-button {
+  border-radius: 3rem;
+  margin-right: .7rem;
+  padding: 1.1rem 0;
+  width: 4.5rem;
+}
+.focused-slot {
+  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, 8)
+}
+.empty-slot {
+  background: #ccc;
+}
+.pvp-menu-button {
+  position: relative;
+  margin-left: 1.1rem;
+  padding: 1.1rem 0;
+  height: 4.5rem;
+  width: 4.5rem;
+}
+.pvp-evolve-cp-header {
+  font-size: 1.8rem;
+  position: absolute;
+  top: .5rem;
+  left: 22%;
+}
+.pvp-evolve-cp-label {
+  font-size: 1.2rem;
+  position: absolute;
+  left: .4rem;
+  bottom: 0;
+}
+.pvp-iv-calc-header {
+  font-size: 1.8rem;
+  position: absolute;
+  top: .5rem;
+  left: 32%;
+}
+.pvp-iv-calc-label {
+  font-size: 1.2rem;
+  position: absolute;
+  left: 1.05rem;
+  bottom: 0;
+}
+.pvp-summary p {
+  margin-top: 0;
+  text-align: justify;
+}
+
+
 /* fixing the hideous select input "gloss" in safari */
 select {
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSIgdmlld0JveD0iMCAwIDQuOTUgMTAiPg0KICA8cGF0aCBkPSJNMS40MSA0LjY3bDEuMDctMS40OSAxLjA2IDEuNDlIMS40MXptMi4xMy42NkwyLjQ4IDYuODIgMS40MSA1LjMzaDIuMTN6Ii8+DQo8L3N2Zz4=

@@ -1,0 +1,90 @@
+{% extends 'pgo/pgo_base.html' %}
+{% load render_bundle from webpack_loader %}
+
+
+{% block title %}
+  {{ block.super }} - PvP
+{% endblock title %}
+
+{% block meta_description %}
+  <meta name="description" content="The Pv3P is a set of tools made to help you create balanced teams for each PvP league.">
+{% endblock %}
+
+{% block content %}
+  <div class="row" style="max-width: 90rem;">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="max-width: 45rem; padding-bottom: 1rem;">
+      <div class="row">
+        <div class="col-xs-7 pvp-slot-button-wrapper">
+          <input id="pvp-pokemon-slot-1" class="btn pvp-slot-button empty-slot" type="button" value="P1" />
+          <input id="pvp-pokemon-slot-2" class="btn pvp-slot-button empty-slot" type="button" value="P2" />
+          <input id="pvp-pokemon-slot-3" class="btn pvp-slot-button empty-slot" type="button" value="P3" />
+        </div>
+        <div class="col-xs-5 pvp-menu-button-wrapper">
+          <button id="pvp-evolve-cp" class="btn btn-info pvp-menu-button" value="CP">
+            <span class="pvp-evolve-cp-header">CP</span>
+            <span class="pvp-evolve-cp-label">evolve</span>
+          </button>
+          <button id="pvp-iv-calc" class="btn btn-info pvp-menu-button" value="IV">
+            <span class="pvp-iv-calc-header">IV</span>
+            <span class="pvp-iv-calc-label">calc</span>
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 input-padding-bottom">
+          <label for="choices-single-default" class="sr-only">Select pokemon</label>
+          <select class="form-control pvp-select-pokemon" data-trigger name="choices-single-default" id="choices-single-default">
+            <option value="-1" placeholder disabled selected>Select pokemon</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 pvp-summary">
+      <p>
+        The player vs player party planner is a set of tools made to help you create powerful and balanced pokemon teams.
+      </p>
+      <p>
+        Start by selecting up to 3 pokemon which will then be placed into slots above the search bar. Pressing each slot will bring the selected pokemon into focus, displaying detailed information about its battling capabilities.
+      </p>
+      <p>
+        When all slots are full, you can change the content of the one which is currently in focus by searching for another pokemon.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 1rem; text-align: justify">
+      <div id="pvp-pokemon-wrapper-1">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 1rem; text-align: justify">
+      <div id="pvp-pokemon-wrapper-2">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 1rem; text-align: justify">
+      <div id="pvp-pokemon-wrapper-3">
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block scripts %}
+  {% render_bundle 'pvp' attrs='async' %}
+  {{ block.super }}
+
+  {% block generic %}
+  {% endblock generic %}
+
+  <script type="text/javascript">
+    var initialData = {{ initial_data|safe }}
+
+    window.pgoAPIURLs = {
+      'pokemon-list': "{% url 'api-pgo:pokemon-list' %}",
+      'simple-pokemon-list': "{% url 'api-pgo:simple-pokemon-list' %}",
+    };
+  </script>
+{% endblock scripts %}

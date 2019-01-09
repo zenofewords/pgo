@@ -76,6 +76,9 @@
 .text-margin-bottom {
   margin-bottom: 2rem;
 }
+
+
+/* breakpoint calc specific */
 #breakpoint-calc-input-attacker-level {
   padding-left: .8rem;
 }
@@ -269,6 +272,18 @@ select:disabled {
 }
 
 /* general */
-.copyright {
+html, body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+.content {
+  flex: 1 0 auto;
+}
+.footer {
+  flex-shrink: 0;
+  padding: 1rem 0;
   font-size: 1.2rem;
 }

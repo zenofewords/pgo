@@ -78,6 +78,10 @@ class Pokemon(DefaultModelMixin, NameMixin):
         verbose_name='PGo Stamina', blank=True, null=True)
     maximum_cp = models.DecimalField(
         verbose_name='Combat Power', max_digits=7, decimal_places=2, blank=True, null=True)
+
+    compound_resistance = JSONField(blank=True, null=True)
+    compound_weakness = JSONField(blank=True, null=True)
+
     legendary = models.BooleanField(default=False)
     generation = models.CharField(max_length=5, choices=Generation.CHOICES, blank=True)
     implemented = models.BooleanField(default=True)

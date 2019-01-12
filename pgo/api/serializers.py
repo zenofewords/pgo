@@ -9,7 +9,7 @@ class TypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Type
         fields = (
-            'id', 'name', 'strong', 'feeble', 'resistant', 'weak', 'immune', 'puny',
+            'id', 'name', 'slug', 'strong', 'feeble', 'resistant', 'weak', 'immune', 'puny',
         )
 
 
@@ -51,6 +51,7 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'id', 'number', 'name', 'primary_type', 'secondary_type',
             'pgo_attack', 'pgo_defense', 'pgo_stamina', 'maximum_cp',
+            'compound_resistance', 'compound_weakness',
         )
 
 

@@ -1,7 +1,11 @@
 .type-label {
   color: #fff;
-  padding: .5rem;
+  padding: .5rem .5rem .4rem .5rem;
   border-radius: .5rem;
+  font-size: 1.4rem;
+}
+.type-label-small {
+  font-size: 1.2rem;
 }
 .type-bug {
   background-color: rgba(148, 194, 46, .7);
@@ -223,8 +227,8 @@ table#top-counters-table tr td:last-child {
 
 
 /* Pv3P specific */
-.pvp-slot-button-wrapper {
-  padding-bottom: 1.2rem;
+.pvp-button-wrapper {
+  padding: .5rem 0 1.5rem 0;
 }
 .pvp-menu-button-wrapper {
   display: flex;
@@ -232,22 +236,27 @@ table#top-counters-table tr td:last-child {
 }
 .pvp-slot-button {
   border-radius: 3rem;
-  margin-right: .7rem;
-  padding: 1.1rem 0;
+  margin-right: .69rem;
+  padding: 1.15rem 0;
   width: 4.5rem;
 }
+.pvp-slot-button:last-child {
+  margin-right: 0;
+}
 .focused-slot {
-  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, 8)
+  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, .8)
 }
 .empty-slot {
   background: #ccc;
 }
 .pvp-menu-button {
   position: relative;
-  margin-left: 1.1rem;
   padding: 1.1rem 0;
   height: 4.5rem;
   width: 4.5rem;
+}
+.pvp-menu-button:last-child {
+  margin-left: 1.1rem;
 }
 .pvp-evolve-cp-header {
   font-size: 1.8rem;
@@ -273,9 +282,66 @@ table#top-counters-table tr td:last-child {
   left: 1.05rem;
   bottom: 0;
 }
-.pvp-summary p {
-  margin-top: 0;
+.pvp-help p {
+  margin: 0 0 1rem 0;
   text-align: justify;
+}
+.pvp-help hr {
+  margin: 0 0 1rem 0;
+}
+.pvp-pokemon-wrapper {
+  box-shadow: 0.1rem 0.2rem 0.6rem rgba(0,0,0, .5);
+  border-radius: .3rem;
+  padding: 1.1rem .7rem .5rem .7rem;
+  margin: 0 0 1rem 0;
+}
+.pvp-pokemon-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+.pvp-pokemon-header p:first-child {
+  font-size: 1.7rem;
+  margin: -.8rem 0 0 0;
+}
+.pvp-pokemon-header p:last-child {
+  position: absolute;
+  top: 17%;
+  left: .4%;
+  font-size: .9rem;
+}
+.pvp-pokemon-header span:last-child {
+  margin: 0 0 0 .5rem;
+}
+.pvp-compound-resistance {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.pvp-compound-resistance li {
+  margin: .4rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+.pvp-compound-resistance li span:first-child {
+  padding: 0 3rem 0 0;
+}
+.pvp-compound-weakness {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.pvp-compound-weakness li {
+  margin: .4rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+.pvp-compound-weakness li span:last-child {
+  padding: 0 0 0 3rem;
+}
+.pvp-pokemon-type-effectivness-wrapper {
+  display: flex;
+  justify-content: space-between;
 }
 
 

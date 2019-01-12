@@ -12,9 +12,17 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="padding-bottom: 1rem;">
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
       <div class="row">
-        <div class="col-xs-7 pvp-slot-button-wrapper">
+        <div class="col-xs-12 input-padding-bottom">
+          <label for="choices-single-default" class="sr-only">Select pokemon</label>
+          <select class="form-control pvp-select-pokemon" data-trigger name="choices-single-default" id="choices-single-default">
+            <option value="-1" placeholder disabled selected>Select pokemon</option>
+          </select>
+        </div>
+      </div>
+      <div class="row pvp-button-wrapper">
+        <div class="col-xs-7">
           <input id="pvp-pokemon-slot-1" class="btn pvp-slot-button empty-slot" type="button" value="P1" />
           <input id="pvp-pokemon-slot-2" class="btn pvp-slot-button empty-slot" type="button" value="P2" />
           <input id="pvp-pokemon-slot-3" class="btn pvp-slot-button empty-slot" type="button" value="P3" />
@@ -30,21 +38,13 @@
           </button>
         </div>
       </div>
-      <div class="row">
-        <div class="col-xs-12 input-padding-bottom">
-          <label for="choices-single-default" class="sr-only">Select pokemon</label>
-          <select class="form-control pvp-select-pokemon" data-trigger name="choices-single-default" id="choices-single-default">
-            <option value="-1" placeholder disabled selected>Select pokemon</option>
-          </select>
-        </div>
-      </div>
     </div>
     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 pvp-help">
       <p>
         The player vs player party planner is a set of tools made to help you create powerful, but balanced pokemon teams.
       </p>
       <p>
-        Start by selecting up to 3 pokemon which will then be placed into slots above the search bar. Pressing each slot will bring the selected pokemon into focus, displaying detailed information about its battling capabilities.
+        Start by selecting up to 3 pokemon which will then be placed into slots below the search bar. Pressing each slot will bring the selected pokemon into focus, displaying detailed information about its battling capabilities.
       </p>
       <p>
         When all slots are full, you can change the content of the one which is currently in focus by searching for another pokemon.

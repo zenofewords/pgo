@@ -187,13 +187,16 @@ class Command(BaseCommand):
             defenders_qs = defenders_qs.filter(slug__in=self.options['defenders'])
 
         for weather_condition in weather_conditions:
+            print('Started for {}'.format(weather_condition.name))
             boosted_types = weather_condition.types_boosted.values_list('pk', flat=True)
 
             for raid_boss in raid_boss_qs:
                 self._create_top_counters(raid_boss.pokemon, weather_condition.pk, boosted_types)
+                print('Created for raid boss {}'.format(raid_boss.pokemon.name))
 
             for pokemon in defenders_qs:
                 self._create_top_counters(pokemon, weather_condition.pk, boosted_types)
+                print('Created for {}'.format(pokemon.name))
 
     def _create_top_counters(self, defender, weather_condition_id, boosted_types):
         for attacker in self.attackers:

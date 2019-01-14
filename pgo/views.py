@@ -146,7 +146,7 @@ class MoveDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'data': Move.objects.values_list('pk', 'name'),
+            'data': Move.objects.values_list('slug', 'name'),
             'pokemon_moves': PokemonMove.objects.filter(
                 move_id=self.object.pk
             ).select_related(

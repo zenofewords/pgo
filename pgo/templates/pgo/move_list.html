@@ -1,0 +1,140 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block title %}
+  {{ block.super }} - Moves
+{% endblock title %}
+
+{% block meta_description %}
+  <meta name="description" content="A list of all moves in PGo with stats.">
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="table-responsive">
+        <table class="table">
+          <tr class="move-detail">
+            <td class="search-move-wrapper">
+              <label for="choices-single-default" class="sr-only">
+                Find move
+              </label>
+              <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+                <option value="-1" placeholder disabled selected>
+                  Find move
+                </option>
+                {% for row in data %}
+                  <option value="{{ row.0 }}">
+                    {{ row.1 }}
+                  </option>
+                {% endfor %}
+              </select>
+            </td>
+            <th>
+              <a href="?ordering={% if ordering == 'category' %}-{% endif %}category">
+                Category
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == 'move_type' %}-{% endif %}move_type">
+                Type
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-power' %}{% else %}-{% endif %}power">
+                Power
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-energy_delta' %}{% else %}-{% endif %}energy_delta">
+                Energy
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == 'duration' %}-{% endif %}duration">
+                Duration
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-dps' %}{% else %}-{% endif %}dps">
+                DPS
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-eps' %}{% else %}-{% endif %}eps">
+                EPS
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-pvp_power' %}{% else %}-{% endif %}pvp_power">
+                PvP Power
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-pvp_energy_delta' %}{% else %}-{% endif %}pvp_energy_delta">
+                PvP Energy
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-pvp_duration' %}{% else %}-{% endif %}pvp_duration">
+                PvP Duration
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-dpt' %}{% else %}-{% endif %}dpt">
+                DPT
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-ept' %}{% else %}-{% endif %}ept">
+                EPT
+              </a>
+            </th>
+            <th>
+              <a href="?ordering={% if ordering == '-dpe' %}{% else %}-{% endif %}dpe">
+                DPE
+              </a>
+            </th>
+          </tr>
+
+          {% for move in move_list %}
+            <tr>
+              <td>
+                <a href="{% url 'pgo:move-detail' move.pk %}">
+                  {{ move.name }}
+                </a>
+              </td>
+              <td>{{ move.get_category_display }}</td>
+              <td>
+                <span class="type-label type-{{ move.move_type.slug }}">
+                  {{ move.move_type }}
+                </span>
+              </td>
+              <td>{{ move.power }}</td>
+              <td>{{ move.energy_delta }}</td>
+              <td>{{ move.duration }}</td>
+              <td>{{ move.dps }}</td>
+              <td>{{ move.eps }}</td>
+              <td>{{ move.pvp_power }}</td>
+              <td>{{ move.pvp_energy_delta }}</td>
+              <td>{{ move.pvp_duration }} turns</td>
+              <td>{{ move.dpt|default:"0" }}</td>
+              <td>{{ move.ept|default:"0" }}</td>
+              <td>{{ move.dpe|default:"0" }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block scripts %}
+  {{ block.super }}
+
+  <script type="text/javascript">
+    window.pgoURLs = {
+      'list-url': "{% url 'pgo:move-list' %}",
+    };
+  </script>
+{% endblock scripts %}

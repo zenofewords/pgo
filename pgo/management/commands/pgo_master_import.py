@@ -240,6 +240,31 @@ class Command(BaseCommand):
             if move.move_type_id and move.power:
                 move.save()
 
+    def _process_pvp_moves(self, pvp_move_data):
+        for pvp_move in pvp_move_data:
+            slug = pvp_move[0]
+
+            if slug in ['scald-blastoise', 'hydro-pump-blastoise', 'water-gun-blastoise']:
+                continue
+
+            power = int(float(pvp_move[1]))
+            duration = int(pvp_move[2])
+            energy_delta = int(pvp_move[3]) if pvp_move[3] else 0
+
+            pvp_move_data = {
+                'pvp_power': power,
+                'pvp_duration': duration,
+                'pvp_energy_delta': energy_delta,
+                'dpt': Decimal(power / duration if duration > 0 else 0),
+                'ept': Decimal(energy_delta / duration if duration > 0 else 0),
+                'dpe': Decimal(power / abs(energy_delta) if abs(energy_delta) > 0 else 0) if energy_delta < 0 else 0,
+            }
+
+            if slug == 'hidden-power':
+                Move.objects.filter(slug__startswith=slug).update(**pvp_move_data)
+            else:
+                Move.objects.filter(slug=slug).update(**pvp_move_data)
+
     # def _map_type_effectivness(self):
     #     types = Type.objects.all()
     #     se = TypeEffectivnessScalar.objects.get(slug='super-effective').scalar
@@ -289,6 +314,15 @@ class Command(BaseCommand):
     def _next(self, csv_object, slice_start=None, slice_end=None):
         return next(csv_object)[0][slice_start:slice_end].strip()
 
+    def _next_clean_string(self, csv_object):
+        return re.sub(r'[^A-Za-z_,]+', '', str(next(csv_object)).lower())
+
+    def _next_clean_numeric(self, csv_object):
+        return re.sub(r'[^0-9.-]+', '', str(next(csv_object)))
+
+    def _clean_numeric(self, line):
+        return re.sub(r'[^0-9.-]+', '', str(line))
+
     def add_arguments(self, parser):
         parser.add_argument('path', nargs='?', type=str)
 
@@ -304,6 +338,7 @@ class Command(BaseCommand):
         # type_data = {}
         pokemon_data = {}
         move_data = {}
+        pvp_move_data = []
 
         with open(file_path) as csvfile:
             csv_object = csv.reader(csvfile)
@@ -326,7 +361,6 @@ class Command(BaseCommand):
 
                 if 'templateId": "V' in row[0]:
                     template_id = '#{0}'.format(row[0][21:24])
-
 
                     if 'pokemonSettings' in self._next(csv_object):
                         # name
@@ -370,7 +404,7 @@ class Command(BaseCommand):
                         # moves
                         quick = []
                         cinematic = []
-                        next_line = re.sub(r'[^A-Za-z_,]+', '', str(next(csv_object)).lower())
+                        next_line = self._next_clean_string(csv_object)
                         while 'moves' in next_line:
                             if 'quickmoves' in next_line:
                                 quick_moves = next_line[10:-1].split(',')
@@ -382,7 +416,7 @@ class Command(BaseCommand):
 
                                 for cm in charge_moves:
                                     cinematic.append(cm)
-                            next_line = re.sub(r'[^A-Za-z_,]+', '', str(next(csv_object)).lower())
+                            next_line = self._next_clean_string(csv_object)
 
                         moves = {
                             'quick': quick,
@@ -435,9 +469,65 @@ class Command(BaseCommand):
                                 'energy_delta': self._next(csv_object, 21).replace(',', '')})
                         move_data[move_slug] = data
 
+                # pvp moves
+                # "templateId": "COMBAT_V0250_MOVE_VOLT_SWITCH_FAST",
+                # "combatMove": {
+                #   "uniqueId": "VOLT_SWITCH_FAST",
+                #   "type": "POKEMON_TYPE_ELECTRIC",
+                #   "power": 12.0,
+                #   "vfxName": "volt_switch_fast",
+                #   "durationTurns": 4,
+                #   "energyDelta": 10
+
+                # "templateId": "COMBAT_V0013_MOVE_WRAP",
+                # "combatMove": {
+                #   "uniqueId": "WRAP",
+                #   "type": "POKEMON_TYPE_NORMAL",
+                #   "power": 60.0,
+                #   "vfxName": "wrap",
+                #   "energyDelta": -45
+                # }
+                pvp_move = []
+                if '"templateId": "COMBAT_V' in row[0]:
+                    next(csv_object)
+                    next_line = self._next_clean_string(csv_object)
+                    move_slug = next_line[8:].replace('_', '-').replace(',', '')
+                    next(csv_object)
+
+                    pvp_move.append(move_slug.replace('-fast', ''))
+                    next_line = next(csv_object)
+
+                    if 'power' in str(next_line):
+                        power = self._clean_numeric(next_line)
+                        pvp_move.append(power)
+
+                        # skip vfx
+                        next(csv_object)
+                    else:
+                        pvp_move.append(0)
+
+                    next_line = next(csv_object)
+                    if 'fast' in move_slug and 'energyDelta' in str(next_line):
+                        pvp_move.append(1)
+
+                        energy_delta = self._clean_numeric(next_line)
+                        pvp_move.append(energy_delta)
+                    else:
+                        value = self._clean_numeric(next_line)
+                        if int(value) < 0:
+                            pvp_move.append(0)
+                            pvp_move.append(value)
+                        else:
+                            duration_turns = self._clean_numeric(next_line)
+                            pvp_move.append(int(duration_turns) + 1)
+                            energy_delta = self._next_clean_numeric(csv_object)
+                            pvp_move.append(energy_delta)
+                    pvp_move_data.append(pvp_move)
+
         # self._process_type_advantages(type_data)
         # self._process_cpm(cpm_data)
         # self._map_type_effectivness()
 
-        # self._process_moves(move_data)
-        self._process_pokemon(pokemon_data)
+        self._process_moves(move_data)
+        self._process_pvp_moves(pvp_move_data)
+        # self._process_pokemon(pokemon_data)

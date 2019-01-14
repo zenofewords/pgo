@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="row" style="max-width: 90rem;">
+<div class="row">
   {% if site_notifications %}
     <div class="col-xs-12">
       {% for notification in site_notifications %}
@@ -23,7 +23,7 @@
       {% endfor %}
     </div>
   {% endif %}
-  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="max-width: 45rem; padding-bottom: 1rem;">
+  <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" style="padding-bottom: 1rem;">
     <form id="breakpoint-calc-form">
       <div class="row">
         <div class="col-xs-8 input-padding-right">
@@ -114,7 +114,7 @@
     </p>
   </div>
 </div>
-<div class="row" style="max-width: 90rem;">
+<div class="row">
   <div class="col-xs-12">
     <div class="text-left">
       <div id="breakpoint-calc-breakpoint-details-table" hidden>

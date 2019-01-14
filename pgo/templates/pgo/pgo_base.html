@@ -1,6 +1,5 @@
 {% extends 'zenofewords/base.html' %}
 {% load zenofewords_tags %}
-{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
@@ -22,18 +21,11 @@
 {% endblock header %}
 
 {% block footer %}
-  <div class="row" style="font-size: 1.2rem; max-width: 85rem; margin-top: 10rem;">
-    <div class="col-md-12">
-      <span>
-        Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.
-      </span>
+  <div class="row">
+    <div class="col-xs-12">
+      Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.
+      <br>
+      {{ block.super }}
     </div>
   </div>
-  {{ block.super }}
 {% endblock footer %}
-
-{% block scripts %}
-  {% block generic %}
-    {% render_bundle 'lists' attrs='async' %}
-  {% endblock generic %}
-{% endblock scripts %}

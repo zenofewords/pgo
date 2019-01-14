@@ -1,5 +1,7 @@
 {% load zenofewords_tags %}
 {% load static %}
+{% load render_bundle from webpack_loader %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,8 +13,8 @@
         {% endblock title %}
       </title>
       <link rel="shortcut icon" href="{% static 'static/favicon.ico' %}">
-      <link rel="stylesheet" href="{% static 'static/css/bootstrap.min.css' %}">
-      <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous"> -->
+      <!-- <link rel="stylesheet" href="{% static 'static/css/bootstrap.min.css' %}"> -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
 
       {% google_tag_manager %}
       <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,21 +24,73 @@
   {% block body %}
     <body>
       {% google_noscript_tag_manager %}
-      <div class="container">
+      <div class="container content">
         {% block header %}
         {% endblock header %}
 
         {% block content %}
         {% endblock content %}
 
-        {% block footer %}
-          <span class="copyright">
-            &copy; {% now 'Y' %} Dominik Zen
-          </span>
-        {% endblock footer %}
-      </div>
+        {% block pagination %}
+          {% if is_paginated %}
+            <ul class="pagination">
+              {% if page_obj.has_previous %}
+                <li>
+                  <a href="?page={{ page_obj.previous_page_number }}&amp;ordering={{ ordering }}">
+                    <span class="glyphicon glyphicon-chevron-left faq-legend-chevron" aria-hidden="true"></span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span class="glyphicon glyphicon-chevron-left faq-legend-chevron" aria-hidden="true"></span>
+                </li>
+              {% endif %}
 
+              {% for page_number in paginator.page_range %}
+                {% if page_obj.number == page_number %}
+                  <li class="active">
+                    <span>{{ page_number }}</span>
+                  </li>
+                {% else %}
+                  <li>
+                    <a href="?page={{ page_number }}&amp;ordering={{ ordering }}">{{ page_number }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if page_obj.has_next %}
+                <li>
+                  <a href="?page={{ page_obj.next_page_number }}&amp;ordering={{ ordering }}">
+                    <span class="glyphicon glyphicon-chevron-right faq-legend-chevron" aria-hidden="true"></span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span class="glyphicon glyphicon-chevron-right faq-legend-chevron" aria-hidden="true"></span>
+                </li>
+              {% endif %}
+              <li>
+                <a id="back-to-top" href="#">
+                  <span class="glyphicon glyphicon-chevron-up faq-legend-chevron" aria-hidden="true"></span>
+                </a>
+              </li>
+            </ul>
+          {% endif %}
+        {% endblock pagination %}
+      </div>
+      <div class="container">
+        <div class="footer">
+          {% block footer %}
+            <span>
+              &copy; {% now 'Y' %} Dominik Zen
+            </span>
+          {% endblock footer %}
+        </div>
+      </div>
       {% block scripts %}
+        {% block generic %}
+          {% render_bundle 'default' attrs='async' %}
+        {% endblock generic %}
       {% endblock scripts %}
     </body>
   {% endblock body %}

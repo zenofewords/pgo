@@ -1,0 +1,18 @@
+{% extends 'pgo/pgo_base.html' %}
+
+
+{% block title %}
+  {{ block.super }} - {{ object.name }}
+{% endblock title %}
+
+{% block meta_description %}
+  <meta name="description" content="The Pokemon detail page.">
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      {{ object.name }}
+    </div>
+  </div>
+{% endblock content %}

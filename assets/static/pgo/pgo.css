@@ -1,9 +1,76 @@
+.type-label {
+  color: #fff;
+  padding: .5rem .5rem .4rem .5rem;
+  border-radius: .5rem;
+  font-size: 1.4rem;
+}
+.type-label-small {
+  font-size: 1.2rem;
+}
+.type-bug {
+  background-color: rgba(148, 194, 46, .7);
+}
+.type-dark {
+  background-color: rgba(94, 90, 107, .7);
+}
+.type-dragon {
+  background-color: rgba(9, 108, 193, .7);
+}
+.type-electric {
+  background-color: rgba(245, 212, 73, .7);
+}
+.type-fairy {
+  background-color: rgba(238, 146, 229, .7);
+}
+.type-fighting {
+  background-color: rgba(209, 65, 101, .7);
+}
+.type-fire {
+  background-color: rgba(254, 161, 83, .7);
+}
+.type-flying {
+  background-color: rgba(143, 169, 222, .7);
+}
+.type-ghost {
+  background-color: rgba(92, 108, 183, .7);
+}
+.type-grass {
+  background-color: rgba(96, 188, 91, .7);
+}
+.type-ground {
+  background-color: rgba(217, 121, 71, .7);
+}
+.type-ice {
+  background-color: rgba(121, 209, 197, .7);
+}
+.type-normal {
+  background-color: rgba(145, 154, 161, .7);
+}
+.type-poison {
+  background-color: rgba(169, 101, 200, .7);
+}
+.type-psychic {
+  background-color: rgba(250, 126, 126, .7);
+}
+.type-rock {
+  background-color: rgba(201, 187, 140, .7);
+}
+.type-steel {
+  background-color: rgba(85, 146, 164, .7);
+}
+.type-water {
+  background-color: rgba(85, 155, 217, .7);
+}
+
 .input-padding-right {
   padding-right: .3rem;
   padding-bottom: .6rem;
 }
 .input-padding-left {
   padding-left: .3rem;
+  padding-bottom: .6rem;
+}
+.input-padding-bottom {
   padding-bottom: .6rem;
 }
 .input-height {
@@ -13,6 +80,9 @@
 .text-margin-bottom {
   margin-bottom: 2rem;
 }
+
+
+/* breakpoint calc specific */
 #breakpoint-calc-input-attacker-level {
   padding-left: .8rem;
 }
@@ -155,6 +225,126 @@ table#top-counters-table tr td:last-child {
   margin-top: 0;
 }
 
+
+/* Pv3P specific */
+.pvp-button-wrapper {
+  padding: .5rem 0 1.5rem 0;
+}
+.pvp-menu-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+.pvp-slot-button {
+  border-radius: 3rem;
+  margin-right: .69rem;
+  padding: 1.15rem 0;
+  width: 4.5rem;
+}
+.pvp-slot-button:last-child {
+  margin-right: 0;
+}
+.focused-slot {
+  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, .5)
+}
+.empty-slot {
+  background: #ccc;
+}
+.pvp-menu-button {
+  position: relative;
+  padding: 1.1rem 0;
+  height: 4.5rem;
+  width: 4.5rem;
+}
+.pvp-menu-button:last-child {
+  margin-left: 1.1rem;
+}
+.pvp-evolve-cp-header {
+  font-size: 1.8rem;
+  position: absolute;
+  top: .5rem;
+  left: 22%;
+}
+.pvp-evolve-cp-label {
+  font-size: 1.2rem;
+  position: absolute;
+  left: .4rem;
+  bottom: 0;
+}
+.pvp-iv-calc-header {
+  font-size: 1.8rem;
+  position: absolute;
+  top: .5rem;
+  left: 32%;
+}
+.pvp-iv-calc-label {
+  font-size: 1.2rem;
+  position: absolute;
+  left: 1.05rem;
+  bottom: 0;
+}
+.pvp-help p {
+  margin: 0 0 1rem 0;
+  text-align: justify;
+}
+.pvp-help hr {
+  margin: 0 0 1rem 0;
+}
+.pvp-pokemon-wrapper {
+  box-shadow: 0.1rem 0.2rem 0.6rem rgba(0,0,0, .5);
+  border-radius: .3rem;
+  padding: 1.1rem .7rem .5rem .7rem;
+  margin: 0 0 1rem 0;
+}
+.pvp-pokemon-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+.pvp-pokemon-header p:first-child {
+  font-size: 1.7rem;
+  margin: -.8rem 0 0 0;
+}
+.pvp-pokemon-header p:last-child {
+  position: absolute;
+  top: 17%;
+  left: .4%;
+  font-size: .9rem;
+}
+.pvp-pokemon-header span:last-child {
+  margin: 0 0 0 .5rem;
+}
+.pvp-compound-resistance {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.pvp-compound-resistance li {
+  margin: .4rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+.pvp-compound-resistance li span:first-child {
+  padding: 0 3rem 0 0;
+}
+.pvp-compound-weakness {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.pvp-compound-weakness li {
+  margin: .4rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+.pvp-compound-weakness li span:last-child {
+  padding: 0 0 0 3rem;
+}
+.pvp-pokemon-type-effectivness-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+
 /* fixing the hideous select input "gloss" in safari */
 select {
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSIgdmlld0JveD0iMCAwIDQuOTUgMTAiPg0KICA8cGF0aCBkPSJNMS40MSA0LjY3bDEuMDctMS40OSAxLjA2IDEuNDlIMS40MXptMi4xMy42NkwyLjQ4IDYuODIgMS40MSA1LjMzaDIuMTN6Ii8+DQo8L3N2Zz4=
@@ -206,6 +396,30 @@ select:disabled {
 }
 
 /* general */
-.copyright {
+html, body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+.content {
+  flex: 1 0 auto;
+}
+.footer {
+  flex-shrink: 0;
+  padding: 1rem 0;
   font-size: 1.2rem;
+}
+.pagination {
+  padding: 0;
+}
+.pagination span.glyphicon {
+  margin: -.2rem 0 0 0;
+}
+.search-pokemon-wrapper .choices {
+  margin: -.35rem 0 0 -.85rem;
+}
+.search-move-wrapper .choices {
+  margin: -.35rem 0 0 -.7rem;
 }

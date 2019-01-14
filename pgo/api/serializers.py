@@ -9,7 +9,7 @@ class TypeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Type
         fields = (
-            'id', 'name', 'strong', 'feeble', 'resistant', 'weak', 'immune', 'puny',
+            'id', 'name', 'slug', 'strong', 'feeble', 'resistant', 'weak', 'immune', 'puny',
         )
 
 
@@ -51,7 +51,30 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'id', 'number', 'name', 'primary_type', 'secondary_type',
             'pgo_attack', 'pgo_defense', 'pgo_stamina', 'maximum_cp',
+            'compound_resistance', 'compound_weakness',
         )
+
+
+class PokemonSimpleSerializer(serializers.Serializer):
+    value = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Pokemon
+        fields = (
+            'value', 'label',
+        )
+
+    def get_value(self, obj):
+        # choices.js bug causes crashes when working with integer values
+        return str(obj.pk)
+
+    def get_label(self, obj):
+        label = '{} | {}'.format(obj.name, obj.primary_type.name)
+
+        if obj.secondary_type:
+            label = '{} / {}'.format(label, obj.secondary_type.name)
+        return '{} | {} CP'.format(label, int(obj.maximum_cp))
 
 
 class BreakpointCalcSerializer(serializers.Serializer):

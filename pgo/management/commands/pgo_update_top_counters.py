@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
         self.max_cpm_value = CPM.objects.get(level=40, raid_cpm=False).value
 
-        partition_by = 50000
+        partition_by = 30000
         top_counter_count = TopCounter.objects.count()
         n_partitions = ceil(top_counter_count / partition_by)
 
@@ -64,3 +64,4 @@ class Command(BaseCommand):
         while n < n_partitions:
             self._partition_update_top_counters(top_counters_qs[n * partition_by:(n + 1) * partition_by])
             n += 1
+            print('Updated {}/{}'.format(partition_by * n, top_counter_count))

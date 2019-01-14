@@ -76,8 +76,6 @@
   {% endblock generic %}
 
   <script type="text/javascript">
-    var initialData = {{ initial_data|safe }}
-
     window.pgoAPIURLs = {
       'pokemon-list': "{% url 'api-pgo:pokemon-list' %}",
       'simple-pokemon-list': "{% url 'api-pgo:simple-pokemon-list' %}",

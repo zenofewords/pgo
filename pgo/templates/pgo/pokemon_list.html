@@ -11,7 +11,7 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-bottom: 1rem;">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <div class="table-responsive">
         <table class="table">
           <tr>
@@ -20,11 +20,21 @@
                 #
               </a>
             </th>
-            <th>
-              <a href="?ordering={% if ordering == 'slug' %}-{% endif %}slug">
-                Name
-              </a>
-            </th>
+            <td class="search-pokemon-wrapper">
+              <label for="choices-single-default" class="sr-only">
+                Search pokemon
+              </label>
+              <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+                <option value="-1" placeholder disabled selected>
+                  Search pokemon
+                </option>
+                {% for row in data %}
+                  <option value="{{ row.0 }}">
+                    {{ row.1 }}
+                  </option>
+                {% endfor %}
+              </select>
+            </td>
             <th>
               <a href="?ordering={% if ordering == 'primary_type' %}-{% endif %}primary_type">
                 P. type
@@ -82,6 +92,12 @@
   </div>
 {% endblock content %}
 
-{% block pagination %}
+{% block scripts %}
   {{ block.super }}
-{% endblock pagination %}
+
+  <script type="text/javascript">
+    window.pgoURLs = {
+      'pokemon-list': "{% url 'pgo:pokemon-list' %}",
+    };
+  </script>
+{% endblock scripts %}

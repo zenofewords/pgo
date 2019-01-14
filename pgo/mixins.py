@@ -2,7 +2,7 @@ from django.views.generic.list import ListView
 
 
 class ListViewOrderingMixin(ListView):
-    paginate_by = 220
+    paginate_by = 150
 
     def get_ordering(self):
         default = self.default_ordering
@@ -14,5 +14,8 @@ class ListViewOrderingMixin(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ordering'] = self.get_ordering()
+        context.update({
+            'ordering': self.get_ordering(),
+            'data': self.object_list.values_list('pk', 'name'),
+        })
         return context

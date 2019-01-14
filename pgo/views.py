@@ -6,7 +6,9 @@ from decimal import Decimal, InvalidOperation, getcontext
 from django.apps import apps
 from django.utils.text import slugify
 from django.views.generic import (
-    TemplateView, RedirectView,
+    DetailView,
+    RedirectView,
+    TemplateView,
 )
 
 from pgo.mixins import ListViewOrderingMixin
@@ -15,6 +17,7 @@ from pgo.models import (
     Friendship,
     Move,
     Pokemon,
+    PokemonMove,
     RaidTier,
     WeatherCondition,
 )
@@ -125,9 +128,31 @@ class PokemonListView(ListViewOrderingMixin):
 class MoveListView(ListViewOrderingMixin):
     template_name = 'pgo/move_list.html'
     model = Move
-    default_ordering = '-category'
+    default_ordering = ('-category', 'name',)
     ordering_fields = (
         'slug', 'category', 'move_type', 'power', 'energy_delta', 'duration',
         'damage_window_start', 'damage_window_end', 'dps', 'eps',
         'pvp_power', 'pvp_energy_delta', 'pvp_duration', 'dpt', 'ept', 'dpe',
     )
+
+
+class PokemonDetailView(DetailView):
+    model = Pokemon
+
+
+class MoveDetailView(DetailView):
+    model = Move
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'data': Move.objects.values_list('pk', 'name'),
+            'pokemon_moves': PokemonMove.objects.filter(
+                move_id=self.object.pk
+            ).select_related(
+                'pokemon__primary_type',
+            ).order_by(
+                '-pokemon__maximum_cp',
+            ),
+        })
+        return context

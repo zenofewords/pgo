@@ -244,7 +244,7 @@ table#top-counters-table tr td:last-child {
   margin-right: 0;
 }
 .focused-slot {
-  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, .8)
+  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, .5)
 }
 .empty-slot {
   background: #ccc;
@@ -410,4 +410,16 @@ body {
   flex-shrink: 0;
   padding: 1rem 0;
   font-size: 1.2rem;
+}
+.pagination {
+  padding: 0;
+}
+.pagination span.glyphicon {
+  margin: -.2rem 0 0 0;
+}
+.search-pokemon-wrapper .choices {
+  margin: -.35rem 0 0 -.85rem;
+}
+.search-move-wrapper .choices {
+  margin: -.35rem 0 0 -.7rem;
 }

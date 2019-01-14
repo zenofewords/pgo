@@ -12,148 +12,146 @@
 {% block content %}
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="table-responsive">
-        <table class="table">
-          <tr class="move-detail">
-            <td class="search-move-wrapper">
-              <label for="choices-single-default" class="sr-only">
+      <table class="table">
+        <tr class="move-detail">
+          <td class="search-move-wrapper">
+            <label for="choices-single-default" class="sr-only">
+              Find move
+            </label>
+            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+              <option value="-1" placeholder disabled selected>
                 Find move
-              </label>
-              <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
-                <option value="-1" placeholder disabled selected>
-                  Find move
+              </option>
+              {% for row in data %}
+                <option value="{{ row.0 }}">
+                  {{ row.1 }}
                 </option>
-                {% for row in data %}
-                  <option value="{{ row.0 }}">
-                    {{ row.1 }}
-                  </option>
-                {% endfor %}
-              </select>
-            </td>
-            <th>
-              Category
-            </th>
-            <th>
-              Type
-            </th>
-            <th>
-              Power
-            </th>
-            <th>
-              Energy
-            </th>
-            <th>
-              Duration
-            </th>
-            <th>
-              DPS
-            </th>
-            <th>
-              EPS
-            </th>
-            <th>
-              PvP Power
-            </th>
-            <th>
-              PvP Energy
-            </th>
-            <th>
-              PvP Duration
-            </th>
-            <th>
-              DPT
-            </th>
-            <th>
-              EPT
-            </th>
-            <th>
-              DPE
+              {% endfor %}
+            </select>
+          </td>
+          <th>
+            Category
+          </th>
+          <th>
+            Type
+          </th>
+          <th>
+            Power
+          </th>
+          <th>
+            Energy
+          </th>
+          <th>
+            Duration
+          </th>
+          <th>
+            DPS
+          </th>
+          <th>
+            EPS
+          </th>
+          <th>
+            PvP Power
+          </th>
+          <th>
+            PvP Energy
+          </th>
+          <th>
+            PvP Duration
+          </th>
+          <th>
+            DPT
+          </th>
+          <th>
+            EPT
+          </th>
+          <th>
+            DPE
+          </th>
+        </tr>
+        <tr>
+          <td>{{ move.name }}</td>
+          <td>{{ move.get_category_display }}</td>
+          <td>
+            <span class="type-label type-{{ move.move_type.slug }}">
+              {{ move.move_type }}
+            </span>
+          </td>
+          <td>{{ move.power }}</td>
+          <td>{{ move.energy_delta }}</td>
+          <td>{{ move.duration }}</td>
+          <td>{{ move.dps }}</td>
+          <td>{{ move.eps }}</td>
+          <td>{{ move.pvp_power }}</td>
+          <td>{{ move.pvp_energy_delta }}</td>
+          <td>{{ move.pvp_duration }} turns</td>
+          <td>{{ move.dpt|default:"0" }}</td>
+          <td>{{ move.ept|default:"0" }}</td>
+          <td>{{ move.dpe|default:"0" }}</td>
+        </tr>
+        <tr>
+          <td colspan="14">
+            <a href="{% url 'pgo:move-list' %}">
+              Back to moves
+            </a>
+          </td>
+        </tr>
+
+        <table class="table">
+          <tr>
+            <th colspan="8">
+              List of pokemon which learn {{ move.name }}
             </th>
           </tr>
           <tr>
-            <td>{{ move.name }}</td>
-            <td>{{ move.get_category_display }}</td>
-            <td>
-              <span class="type-label type-{{ move.move_type.slug }}">
-                {{ move.move_type }}
-              </span>
-            </td>
-            <td>{{ move.power }}</td>
-            <td>{{ move.energy_delta }}</td>
-            <td>{{ move.duration }}</td>
-            <td>{{ move.dps }}</td>
-            <td>{{ move.eps }}</td>
-            <td>{{ move.pvp_power }}</td>
-            <td>{{ move.pvp_energy_delta }}</td>
-            <td>{{ move.pvp_duration }} turns</td>
-            <td>{{ move.dpt|default:"0" }}</td>
-            <td>{{ move.ept|default:"0" }}</td>
-            <td>{{ move.dpe|default:"0" }}</td>
-          </tr>
-          <tr>
-            <td colspan="14">
-              <a href="{% url 'pgo:move-list' %}">
-                Back to moves
-              </a>
-            </td>
+            <th>
+              #
+            </th>
+            <th>
+              Name
+            </th>
+            <th>
+              P. type
+            </th>
+            <th>
+              S. type
+            </th>
+            <th>
+              Attack
+            </th>
+            <th>
+              Defense
+            </th>
+            <th>
+              Stamina
+            </th>
+            <th>
+              MaxCP
+            </th>
           </tr>
 
-          <table class="table">
+          {% for pokemon_move in pokemon_moves %}
             <tr>
-              <th colspan="8">
-                List of pokemon which learn {{ move.name }}
-              </th>
+              <td>{{ pokemon_move.pokemon.number }}</td>
+              <td>{{ pokemon_move.pokemon.name }}</td>
+              <td>
+                <span class="type-label type-{{ pokemon_move.pokemon.primary_type.slug }}">
+                  {{ pokemon_move.pokemon.primary_type }}
+                </span>
+              </td>
+              <td>
+                <span class="type-label type-{{ pokemon_move.pokemon.secondary_type.slug }}">
+                  {{ pokemon_move.pokemon.secondary_type|default:"" }}
+                </span>
+              </td>
+              <td>{{ pokemon_move.pokemon.pgo_attack }}</td>
+              <td>{{ pokemon_move.pokemon.pgo_defense }}</td>
+              <td>{{ pokemon_move.pokemon.pgo_stamina }}</td>
+              <td>{{ pokemon_move.pokemon.maximum_cp|floatformat:"0" }}</td>
             </tr>
-            <tr>
-              <th>
-                #
-              </th>
-              <th>
-                Name
-              </th>
-              <th>
-                P. type
-              </th>
-              <th>
-                S. type
-              </th>
-              <th>
-                Attack
-              </th>
-              <th>
-                Defense
-              </th>
-              <th>
-                Stamina
-              </th>
-              <th>
-                MaxCP
-              </th>
-            </tr>
-
-            {% for pokemon_move in pokemon_moves %}
-              <tr>
-                <td>{{ pokemon_move.pokemon.number }}</td>
-                <td>{{ pokemon_move.pokemon.name }}</td>
-                <td>
-                  <span class="type-label type-{{ pokemon_move.pokemon.primary_type.slug }}">
-                    {{ pokemon_move.pokemon.primary_type }}
-                  </span>
-                </td>
-                <td>
-                  <span class="type-label type-{{ pokemon_move.pokemon.secondary_type.slug }}">
-                    {{ pokemon_move.pokemon.secondary_type|default:"" }}
-                  </span>
-                </td>
-                <td>{{ pokemon_move.pokemon.pgo_attack }}</td>
-                <td>{{ pokemon_move.pokemon.pgo_defense }}</td>
-                <td>{{ pokemon_move.pokemon.pgo_stamina }}</td>
-                <td>{{ pokemon_move.pokemon.maximum_cp|floatformat:"0" }}</td>
-              </tr>
-            {% endfor %}
-          </table>
+          {% endfor %}
         </table>
-      </div>
+      </table>
     </div>
   </div>
 {% endblock content %}

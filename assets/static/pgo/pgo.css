@@ -299,6 +299,7 @@ table#top-counters-table tr td:last-child {
   position: relative;
   display: flex;
   justify-content: space-between;
+  margin: 0 0 1rem 0;
 }
 .pvp-pokemon-header p:first-child {
   font-size: 1.7rem;
@@ -306,7 +307,7 @@ table#top-counters-table tr td:last-child {
 }
 .pvp-pokemon-header p:last-child {
   position: absolute;
-  top: 17%;
+  top: 65%;
   left: .4%;
   font-size: .9rem;
 }

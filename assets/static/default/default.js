@@ -20,12 +20,4 @@ ready(() => {
   searchInput.passedElement.addEventListener('change', (event) => {
     window.location = `${window.pgoURLs['list-url']}${event.currentTarget.value}`
   })
-
-  const backToTop = document.getElementById('back-to-top')
-  if (backToTop) {
-    backToTop.addEventListener('click', (event) => {
-      event.preventDefault()
-      window.scroll(0, 0)
-    })
-  }
 })

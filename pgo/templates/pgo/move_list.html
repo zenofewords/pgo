@@ -99,7 +99,7 @@
         {% for move in move_list %}
           <tr>
             <td>
-              <a href="{% url 'pgo:move-detail' move.pk %}">
+              <a href="{% url 'pgo:move-detail' move.slug %}">
                 {{ move.name }}
               </a>
             </td>

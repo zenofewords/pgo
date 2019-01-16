@@ -92,12 +92,35 @@
         <tr>
           <td colspan="14">
             <a href="{% url 'pgo:move-list' %}">
-              Back to moves
+              &lt; moves
             </a>
           </td>
         </tr>
+      </table>
 
-        <table class="table">
+      <div class="table-wrapper">
+        <table class="table stacked-small-table">
+          <tr>
+            <th colspan="2">Effectivness</th>
+          </tr>
+          <tr>
+            <th>Type</th>
+            <th>x</th>
+          </tr>
+          {% for type, value in effectivness %}
+            <tr>
+              <td>
+                <span class="type-label type-{{ type|lower }}">
+                  {{ type }}
+                </span>
+              </td>
+              <td>
+                {% widthratio value 1 100 %}%
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+        <table class="table stacked-xlarge-table">
           <tr>
             <th colspan="8">
               List of pokemon which learn {{ move.name }}
@@ -131,27 +154,33 @@
           </tr>
 
           {% for pokemon_move in pokemon_moves %}
-            <tr>
-              <td>{{ pokemon_move.pokemon.number }}</td>
-              <td>{{ pokemon_move.pokemon.name }}</td>
-              <td>
-                <span class="type-label type-{{ pokemon_move.pokemon.primary_type.slug }}">
-                  {{ pokemon_move.pokemon.primary_type }}
-                </span>
-              </td>
-              <td>
-                <span class="type-label type-{{ pokemon_move.pokemon.secondary_type.slug }}">
-                  {{ pokemon_move.pokemon.secondary_type|default:"" }}
-                </span>
-              </td>
-              <td>{{ pokemon_move.pokemon.pgo_attack }}</td>
-              <td>{{ pokemon_move.pokemon.pgo_defense }}</td>
-              <td>{{ pokemon_move.pokemon.pgo_stamina }}</td>
-              <td>{{ pokemon_move.pokemon.maximum_cp|floatformat:"0" }}</td>
-            </tr>
+            {% with pokemon_move.pokemon as pokemon %}
+              <tr>
+                <td>{{ pokemon.number }}</td>
+                <td>
+                  <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
+                    {{ pokemon.name }}
+                  </a>
+                </td>
+                <td>
+                  <span class="type-label type-{{ pokemon.primary_type.slug }}">
+                    {{ pokemon.primary_type }}
+                  </span>
+                </td>
+                <td>
+                  <span class="type-label type-{{ pokemon.secondary_type.slug }}">
+                    {{ pokemon.secondary_type|default:"" }}
+                  </span>
+                </td>
+                <td>{{ pokemon.pgo_attack }}</td>
+                <td>{{ pokemon.pgo_defense }}</td>
+                <td>{{ pokemon.pgo_stamina }}</td>
+                <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
+              </tr>
+            {% endwith %}
           {% endfor %}
         </table>
-      </table>
+      </div>
     </div>
   </div>
 {% endblock content %}

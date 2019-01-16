@@ -68,7 +68,11 @@
         {% for pokemon in pokemon_list %}
           <tr>
             <td>{{ pokemon.number }}</td>
-            <td>{{ pokemon.name }}</td>
+            <td>
+              <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
+                {{ pokemon.name }}
+              </a>
+            </td>
             <td>
               <span class="type-label type-{{ pokemon.primary_type.slug }}">
                 {{ pokemon.primary_type }}

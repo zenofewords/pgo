@@ -1,6 +1,6 @@
 .type-label {
-  color: #fff;
-  padding: .5rem .5rem .4rem .5rem;
+  color: #333;
+  padding: .6rem .6rem .5rem .6rem;
   border-radius: .5rem;
   font-size: 1.4rem;
 }
@@ -423,4 +423,23 @@ body {
 }
 .search-move-wrapper .choices {
   margin: -.35rem 0 0 -.8rem;
+}
+.stacked-xlarge-table {
+  width: 90%;
+  float: left;
+}
+.stacked-large-table {
+  width: 40%;
+  float: left;
+}
+.stacked-medium-table {
+  width: 30%;
+  float: left;
+}
+.stacked-small-table {
+  width: 15%;
+  float: left;
+}
+.table-wrapper {
+  display: flex;
 }

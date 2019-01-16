@@ -1,6 +1,6 @@
 .type-label {
-  color: #fff;
-  padding: .5rem .5rem .4rem .5rem;
+  color: #333;
+  padding: .6rem .6rem .5rem .6rem;
   border-radius: .5rem;
   font-size: 1.4rem;
 }
@@ -299,6 +299,7 @@ table#top-counters-table tr td:last-child {
   position: relative;
   display: flex;
   justify-content: space-between;
+  margin: 0 0 1rem 0;
 }
 .pvp-pokemon-header p:first-child {
   font-size: 1.7rem;
@@ -306,7 +307,7 @@ table#top-counters-table tr td:last-child {
 }
 .pvp-pokemon-header p:last-child {
   position: absolute;
-  top: 17%;
+  top: 65%;
   left: .4%;
   font-size: .9rem;
 }
@@ -421,5 +422,24 @@ body {
   margin: -.35rem 0 0 -.85rem;
 }
 .search-move-wrapper .choices {
-  margin: -.35rem 0 0 -.7rem;
+  margin: -.35rem 0 0 -.8rem;
+}
+.stacked-xlarge-table {
+  width: 90%;
+  float: left;
+}
+.stacked-large-table {
+  width: 40%;
+  float: left;
+}
+.stacked-medium-table {
+  width: 30%;
+  float: left;
+}
+.stacked-small-table {
+  width: 15%;
+  float: left;
+}
+.table-wrapper {
+  display: flex;
 }

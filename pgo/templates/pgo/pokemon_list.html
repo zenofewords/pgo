@@ -12,82 +12,84 @@
 {% block content %}
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <div class="table-responsive">
-        <table class="table">
-          <tr>
-            <th>
-              <a href="?ordering={% if ordering == 'number' %}-{% endif %}number">
-                #
-              </a>
-            </th>
-            <td class="search-pokemon-wrapper">
-              <label for="choices-single-default" class="sr-only">
-                Search pokemon
-              </label>
-              <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
-                <option value="-1" placeholder disabled selected>
-                  Search pokemon
+      <table class="table">
+        <tr>
+          <th>
+            <a href="?ordering={% if ordering == 'number' %}-{% endif %}number">
+              #
+            </a>
+          </th>
+          <td class="search-pokemon-wrapper">
+            <label for="choices-single-default" class="sr-only">
+              Find pokemon
+            </label>
+            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+              <option value="-1" placeholder disabled selected>
+                Find pokemon
+              </option>
+              {% for row in data %}
+                <option value="{{ row.0 }}">
+                  {{ row.1 }}
                 </option>
-                {% for row in data %}
-                  <option value="{{ row.0 }}">
-                    {{ row.1 }}
-                  </option>
-                {% endfor %}
-              </select>
+              {% endfor %}
+            </select>
+          </td>
+          <th>
+            <a href="?ordering={% if ordering == 'primary_type' %}-{% endif %}primary_type">
+              P. type
+            </a>
+          </th>
+          <th>
+            <a href="?ordering={% if ordering == 'secondary_type' %}-{% endif %}secondary_type">
+              S. type
+            </a>
+          </th>
+          <th>
+            <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack">
+              Attack
+            </a>
+          </th>
+          <th>
+            <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense">
+              Defense
+            </a>
+          </th>
+          <th>
+            <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina">
+              Stamina
+            </a>
+          </th>
+          <th>
+            <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp">
+              MaxCP
+            </a>
+          </th>
+        </tr>
+        {% for pokemon in pokemon_list %}
+          <tr>
+            <td>{{ pokemon.number }}</td>
+            <td>
+              <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
+                {{ pokemon.name }}
+              </a>
             </td>
-            <th>
-              <a href="?ordering={% if ordering == 'primary_type' %}-{% endif %}primary_type">
-                P. type
-              </a>
-            </th>
-            <th>
-              <a href="?ordering={% if ordering == 'secondary_type' %}-{% endif %}secondary_type">
-                S. type
-              </a>
-            </th>
-            <th>
-              <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack">
-                Attack
-              </a>
-            </th>
-            <th>
-              <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense">
-                Defense
-              </a>
-            </th>
-            <th>
-              <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina">
-                Stamina
-              </a>
-            </th>
-            <th>
-              <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp">
-                MaxCP
-              </a>
-            </th>
+            <td>
+              <span class="type-label type-{{ pokemon.primary_type.slug }}">
+                {{ pokemon.primary_type }}
+              </span>
+            </td>
+            <td>
+              <span class="type-label type-{{ pokemon.secondary_type.slug }}">
+                {{ pokemon.secondary_type|default:"" }}
+              </span>
+            </td>
+            <td>{{ pokemon.pgo_attack }}</td>
+            <td>{{ pokemon.pgo_defense }}</td>
+            <td>{{ pokemon.pgo_stamina }}</td>
+            <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
           </tr>
-          {% for pokemon in pokemon_list %}
-            <tr>
-              <td>{{ pokemon.number }}</td>
-              <td>{{ pokemon.name }}</td>
-              <td>
-                <span class="type-label type-{{ pokemon.primary_type.slug }}">
-                  {{ pokemon.primary_type }}
-                </span>
-              </td>
-              <td>
-                <span class="type-label type-{{ pokemon.secondary_type.slug }}">
-                  {{ pokemon.secondary_type|default:"" }}
-                </span>
-              </td>
-              <td>{{ pokemon.pgo_attack }}</td>
-              <td>{{ pokemon.pgo_defense }}</td>
-              <td>{{ pokemon.pgo_stamina }}</td>
-              <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
-            </tr>
-          {% endfor %}
-        </table>
-      </div>
+        {% endfor %}
+      </table>
     </div>
   </div>
 {% endblock content %}
@@ -97,7 +99,7 @@
 
   <script type="text/javascript">
     window.pgoURLs = {
-      'pokemon-list': "{% url 'pgo:pokemon-list' %}",
+      'list-url': "{% url 'pgo:pokemon-list' %}",
     };
   </script>
 {% endblock scripts %}

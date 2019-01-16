@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 from decimal import Decimal, InvalidOperation, getcontext
+from math import pow, sqrt, floor
 
 from django.apps import apps
 from django.utils.text import slugify
@@ -16,6 +17,7 @@ from pgo.models import (
     CPM,
     Friendship,
     Move,
+    Moveset,
     Pokemon,
     PokemonMove,
     RaidTier,
@@ -139,18 +141,60 @@ class MoveListView(ListViewOrderingMixin):
 class PokemonDetailView(DetailView):
     model = Pokemon
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cpm_qs = CPM.objects.filter(
+            raid_cpm=False,
+            level__in=[1, 15, 20, 25, 30, 35, 40]
+        )
+        moveset_qs = Moveset.objects.filter(
+            pokemon_id=self.object.pk
+        )
+        context.update({
+            'data': Pokemon.objects.values_list('slug', 'name'),
+            'pokemon_stats': [(
+                int(x.level),
+                floor(x.value * (self.object.pgo_attack + 15)),
+                floor(x.value * (self.object.pgo_defense + 15)),
+                floor(x.value * (self.object.pgo_stamina + 15)),
+                self._calculate_cp(float(x.value)),
+            ) for x in cpm_qs.order_by('-level')],
+            'movesets': Moveset.objects.filter(
+                pokemon_id=self.object.pk
+            ).order_by('-weave_damage__4'),
+            'pokemon_moves': PokemonMove.objects.filter(
+                pokemon_id=self.object.pk
+            ).select_related(
+                'move__move_type',
+            ).order_by(
+                '-move__category', '-score',
+            ),
+        })
+        return context
+
+    def _calculate_cp(self, value):
+        return floor(
+            (self.object.pgo_attack + 15)
+            * sqrt(self.object.pgo_defense + 15)
+            * sqrt(self.object.pgo_stamina + 15)
+            * pow(value, 2) / 10.0
+        )
 
 class MoveDetailView(DetailView):
     model = Move
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        move_type = self.object.move_type
+        effectivness = move_type.strong + move_type.feeble + move_type.puny
         context.update({
-            'data': Move.objects.values_list('pk', 'name'),
+            'data': Move.objects.values_list('slug', 'name'),
+            'effectivness': effectivness,
             'pokemon_moves': PokemonMove.objects.filter(
                 move_id=self.object.pk
             ).select_related(
                 'pokemon__primary_type',
+                'pokemon__secondary_type',
             ).order_by(
                 '-pokemon__maximum_cp',
             ),

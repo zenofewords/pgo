@@ -21,8 +21,8 @@ urlpatterns = (
     path('pv3p/', PvPView.as_view(), name='pvp'),
 
     path('pokemon/<slug:slug>', PokemonDetailView.as_view(), name='pokemon-detail'),
-    path('moves/<slug:slug>', MoveDetailView.as_view(), name='move-detail'),
     path('pokemon/', PokemonListView.as_view(), name='pokemon-list'),
+    path('moves/<slug:slug>', MoveDetailView.as_view(), name='move-detail'),
     path('moves/', MoveListView.as_view(), name='move-list'),
 
     path('', BreakpointCalculatorView.as_view(), name='breakpoint-calc'),

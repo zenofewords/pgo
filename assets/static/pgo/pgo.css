@@ -1,10 +1,18 @@
+#type-label-wrapper {
+  padding: .4rem .6rem
+}
 .type-label {
   color: #333;
-  padding: .6rem .6rem .5rem .6rem;
+  padding: .4rem .8rem;
   border-radius: .5rem;
   font-size: 1.4rem;
+  width: 7rem;
+  text-align: center;
 }
 .type-label-small {
+  color: #333;
+  padding: .6rem .6rem .5rem;
+  border-radius: .5rem;
   font-size: 1.2rem;
 }
 .type-bug {
@@ -244,7 +252,7 @@ table#top-counters-table tr td:last-child {
   margin-right: 0;
 }
 .focused-slot {
-  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, .5)
+  box-shadow: .2rem .3rem .3rem rgba(150, 150, 150, .6)
 }
 .empty-slot {
   background: #ccc;
@@ -290,9 +298,9 @@ table#top-counters-table tr td:last-child {
   margin: 0 0 1rem 0;
 }
 .pvp-pokemon-wrapper {
-  box-shadow: 0.1rem 0.2rem 0.6rem rgba(0,0,0, .5);
+  box-shadow: 0.1rem 0.2rem 0.6rem rgba(0,0,0, .3);
   border-radius: .3rem;
-  padding: 1.1rem .7rem .5rem .7rem;
+  padding: 1.5rem 1rem 1rem 1rem;
   margin: 0 0 1rem 0;
 }
 .pvp-pokemon-header {
@@ -300,6 +308,8 @@ table#top-counters-table tr td:last-child {
   display: flex;
   justify-content: space-between;
   margin: 0 0 1rem 0;
+  padding: 0 0 1rem 0;
+  border-bottom: .1rem solid rgba(150, 150, 150, .3);
 }
 .pvp-pokemon-header p:first-child {
   font-size: 1.7rem;
@@ -307,9 +317,9 @@ table#top-counters-table tr td:last-child {
 }
 .pvp-pokemon-header p:last-child {
   position: absolute;
-  top: 65%;
+  top: 45%;
   left: .4%;
-  font-size: .9rem;
+  font-size: 1rem;
 }
 .pvp-pokemon-header span:last-child {
   margin: 0 0 0 .5rem;

@@ -235,7 +235,7 @@ ready(() => {
 
     for (const [key, value] of Object.entries(data.compound_resistance)) {
       let resistance = document.createElement('li')
-      resistance.classList.add(...[`type-${key.toLowerCase()}`, 'type-label', 'type-label-small'])
+      resistance.classList.add(...[`type-${key.toLowerCase()}`, 'type-label-small'])
       let label = document.createElement('span')
       label.innerHTML = `${key}`
       let percentage = document.createElement('span')
@@ -248,7 +248,7 @@ ready(() => {
 
     for (const [key, value] of Object.entries(data.compound_weakness)) {
       let resistance = document.createElement('li')
-      resistance.classList.add(...[`type-${key.toLowerCase()}`, 'type-label', 'type-label-small'])
+      resistance.classList.add(...[`type-${key.toLowerCase()}`, 'type-label-small'])
       let label = document.createElement('span')
       label.innerHTML = `${key}`
       let percentage = document.createElement('span')

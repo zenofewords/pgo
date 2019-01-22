@@ -73,15 +73,15 @@
                 {{ pokemon.name }}
               </a>
             </td>
-            <td>
-              <span class="type-label type-{{ pokemon.primary_type.slug }}">
+            <td id="type-label-wrapper">
+              <div class="type-label type-{{ pokemon.primary_type.slug }}">
                 {{ pokemon.primary_type }}
-              </span>
+              </div>
             </td>
-            <td>
-              <span class="type-label type-{{ pokemon.secondary_type.slug }}">
+            <td id="type-label-wrapper">
+              <div class="type-label type-{{ pokemon.secondary_type.slug }}">
                 {{ pokemon.secondary_type|default:"" }}
-              </span>
+              </div>
             </td>
             <td>{{ pokemon.pgo_attack }}</td>
             <td>{{ pokemon.pgo_defense }}</td>

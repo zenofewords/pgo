@@ -126,6 +126,9 @@ def get_move_data(id):
 
 
 def determine_move_effectivness(move_type, pokemon):
+    if isinstance(pokemon, RaidBoss):
+        pokemon = pokemon.pokemon
+
     effectivness = 1.0
     if pokemon.compound_resistance.get(move_type.name):
         effectivness = pokemon.compound_resistance[move_type.name]

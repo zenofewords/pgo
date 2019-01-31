@@ -72,10 +72,10 @@
         <tr>
           <td>{{ move.name }}</td>
           <td>{{ move.get_category_display }}</td>
-          <td>
-            <span class="type-label type-{{ move.move_type.slug }}">
+          <td id="type-label-wrapper">
+            <div class="type-label type-{{ move.move_type.slug }}">
               {{ move.move_type }}
-            </span>
+            </div>
           </td>
           <td>{{ move.power }}</td>
           <td>{{ move.energy_delta }}</td>
@@ -109,10 +109,10 @@
           </tr>
           {% for type, value in effectivness %}
             <tr>
-              <td>
-                <span class="type-label type-{{ type|lower }}">
+              <td id="type-label-wrapper">
+                <div class="type-label type-{{ type|lower }}">
                   {{ type }}
-                </span>
+                </div>
               </td>
               <td>
                 {% widthratio value 1 100 %}%
@@ -162,15 +162,15 @@
                     {{ pokemon.name }}
                   </a>
                 </td>
-                <td>
-                  <span class="type-label type-{{ pokemon.primary_type.slug }}">
+                <td id="type-label-wrapper">
+                  <div class="type-label type-{{ pokemon.primary_type.slug }}">
                     {{ pokemon.primary_type }}
-                  </span>
+                  </div>
                 </td>
-                <td>
-                  <span class="type-label type-{{ pokemon.secondary_type.slug }}">
+                <td id="type-label-wrapper">
+                  <div class="type-label type-{{ pokemon.secondary_type.slug }}">
                     {{ pokemon.secondary_type|default:"" }}
-                  </span>
+                  </div>
                 </td>
                 <td>{{ pokemon.pgo_attack }}</td>
                 <td>{{ pokemon.pgo_defense }}</td>

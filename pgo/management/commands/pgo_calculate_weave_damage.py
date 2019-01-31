@@ -35,14 +35,14 @@ class Command(BaseCommand):
 
             cycle_dps = calculate_cycle_dps(qk_move, cc_move)
 
-            weave_damage[level] = cycle_dps * 100
+            weave_damage[level] = cycle_dps
         return weave_damage
 
     def _get_base_attack(self, attack, level):
         return float((attack + IV) * CPM.gyms.get(level=level).value)
 
     def _calculate_dph(self, power, attack, stab):
-        return floor(0.5 * power * (attack / self.defender_defense) * stab) + 1
+        return floor(0.5 * power * attack * stab) + 1
 
     def _get_stab(self, stab):
         return STAB_SCALAR if stab else NEUTRAL_SCALAR
@@ -58,11 +58,6 @@ class Command(BaseCommand):
         ).first()
 
     def handle(self, *args, **options):
-        avg_def = Pokemon.objects.filter(
-            legendary=False).aggregate(avg=Avg('pgo_defense'))
-        max_cpm = CPM.objects.aggregate(max=Max('value'))
-        self.defender_defense = (avg_def['avg'] + IV) * float(max_cpm['max'])
-
         for pokemon in Pokemon.objects.all():
             for quick_move in pokemon.quick_moves.all():
                 stab = [False, False]

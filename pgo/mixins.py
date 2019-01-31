@@ -16,6 +16,6 @@ class ListViewOrderingMixin(ListView):
         context = super().get_context_data(**kwargs)
         context.update({
             'ordering': self.get_ordering(),
-            'data': self.object_list.values_list('slug', 'name'),
+            'data': self.object_list.values_list(*self.values_list_args),
         })
         return context

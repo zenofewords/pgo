@@ -104,10 +104,10 @@
               </a>
             </td>
             <td>{{ move.get_category_display }}</td>
-            <td>
-              <span class="type-label type-{{ move.move_type.slug }}">
+            <td id="type-label-wrapper">
+              <div class="type-label type-{{ move.move_type.slug }}">
                 {{ move.move_type }}
-              </span>
+              </div>
             </td>
             <td>{{ move.power }}</td>
             <td>{{ move.energy_delta }}</td>

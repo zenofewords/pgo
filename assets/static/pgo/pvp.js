@@ -192,7 +192,6 @@ ready(() => {
   }
 
   const renderPokemon = (element, data) => {
-    console.log(data)
     element.innerHTML = ''
 
     // extract name

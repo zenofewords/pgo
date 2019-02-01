@@ -52,11 +52,8 @@ class Generation:
 
 
 class PokemonManager(models.Manager):
-    def get_queryset(self):
-        return super(PokemonManager, self).get_queryset().filter(implemented=True)
-
-    def include_uninmplemented(self):
-        return super().get_queryset()
+    def implemented(self):
+        return super().get_queryset().filter(implemented=True)
 
 
 class Pokemon(DefaultModelMixin, NameMixin):
@@ -275,22 +272,6 @@ class WeatherCondition(DefaultModelMixin, NameMixin, OrderMixin):
 
     def __str__(self):
         return self.name
-
-
-class TopCounter(models.Model):
-    defender = models.ForeignKey('pgo.Pokemon', related_name='defenders', on_delete=models.deletion.CASCADE)
-    weather_condition = models.ForeignKey('pgo.WeatherCondition', on_delete=models.deletion.CASCADE)
-
-    counter = models.ForeignKey('pgo.Pokemon', related_name='counters', on_delete=models.deletion.CASCADE)
-    counter_hp = models.PositiveIntegerField(blank=True, null=True)
-    score = models.PositiveIntegerField(blank=True, null=True)
-    highest_dps = models.DecimalField(verbose_name='Highest DPS', max_digits=4, decimal_places=1)
-    multiplier = models.DecimalField(max_digits=29, decimal_places=27, blank=True, null=True)
-
-    moveset_data = JSONField()
-
-    class Meta:
-        unique_together = ('defender', 'weather_condition', 'counter',)
 
 
 class Friendship(models.Model):

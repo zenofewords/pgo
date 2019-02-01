@@ -7,7 +7,7 @@ from django.db.models import Q, Max
 from django.http import Http404
 from django.utils.text import slugify
 
-from pgo.models import Move, Pokemon, RaidBoss, TopCounter, Type, TypeEffectivness
+from pgo.models import Move, Pokemon, RaidBoss, Type, TypeEffectivness
 
 SUPER_EFFECTIVE_SCALAR = 1.4
 NOT_VERY_EFFECTIVE_SCALAR = 0.714
@@ -17,39 +17,6 @@ STAB_SCALAR = 1.2
 WEATHER_BOOST_SCALAR = 1.2
 MAX_IV = 15
 DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
-UNRELEASED_POKEMON = [
-    'arceus-steel',
-    'arceus-fairy',
-    'arceus-grass',
-    'arceus-fighting',
-    'arceus-psychic',
-    'arceus-ground',
-    'arceus-ice',
-    'arceus',
-    'arceus-poison',
-    'arceus-electric',
-    'arceus-rock',
-    'arceus-flying',
-    'arceus-water',
-    'arceus-fire',
-    'arceus-dark',
-    'arceus-bug',
-    'arceus-dragon',
-    'shaymin-sky',
-    'shaymin-land',
-    'shaymin',
-    'regigigas',
-    'rotom-frost',
-    'rotom-heat',
-    'rotom-mow',
-    'rotom-wash',
-    'dialga',
-    'garchomp',
-    'jirachi',
-    'rampardos',
-    'darkrai',
-    'giratina-origin',
-]
 
 
 class Frailty(object):
@@ -149,11 +116,9 @@ def get_top_counter_qs(defender):
     defender_resistance = [x.lower() for x in defender.compound_resistance.keys()]
     defender_qk_move_type = defender.quick_move.move_type
     defender_cm_move_type = defender.cinematic_move.move_type
-    queryset = Pokemon.objects.filter(
+    queryset = Pokemon.objects.implemented().filter(
         stat_product__gte=500,
         pgo_attack__gte=170
-    ).exclude(
-        slug__in=UNRELEASED_POKEMON
     )
 
     qs_id_list = []

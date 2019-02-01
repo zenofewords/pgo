@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import csv
 import re
 
@@ -8,6 +5,7 @@ from decimal import Decimal
 from math import sqrt, pow
 
 from django.conf import settings
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
@@ -60,12 +58,6 @@ class Command(BaseCommand):
         Build the CPM, Pokemon, Move and Type models, parsed from the .csv source file.
     '''
 
-    # def get_or_create_cpm(self, value, level):
-    #     obj, created = CPM.gyms.get_or_create(
-    #         level=level,
-    #         defaults={'value': value}
-    #     )
-
     def get_or_create_type(self, slug):
         if slug != '':
             obj, created = Type.objects.get_or_create(
@@ -73,26 +65,6 @@ class Command(BaseCommand):
                 defaults={'name': slug.capitalize()}
             )
             return obj
-
-    def get_or_create_type_effectivness_scalar(self, name, scalar):
-        obj, created = TypeEffectivnessScalar.objects.get_or_create(
-            slug=slugify(name),
-            defaults={'scalar': Decimal(scalar), 'name': name}
-        )
-
-    def get_or_create_type_advantage(self, first_type, second_type, effectivness):
-        relation = '{0}:{1}'.format(first_type.slug, second_type.slug)
-
-        obj, created = TypeEffectivness.objects.get_or_create(
-            relation=relation,
-            defaults={
-                'type_offense': first_type,
-                'type_defense': second_type,
-                'effectivness': effectivness,
-            }
-        )
-        obj.effectivness = effectivness
-        obj.save()
 
     def get_or_create_pokemon(self, number, slug):
         obj, created = Pokemon.objects.get_or_create(number=number, slug=slug)
@@ -117,32 +89,6 @@ class Command(BaseCommand):
             }
         )
         return obj
-
-    # def _process_cpm(self, cpm):
-    #     previous_value = None
-    #     for cp_m in [(y, x + 1) for x, y in enumerate(cpm)]:
-    #         value = cp_m[0]
-    #         level = cp_m[1]
-    #         self.get_or_create_cpm(value, level)
-
-    #         if previous_value:
-    #             halflevel_value = \
-    #                 sqrt((pow(previous_value, 2) + pow(value, 2)) / 2.0)
-    #             self.get_or_create_cpm(halflevel_value, level - 0.5)
-    #             previous_value = None
-
-    #         previous_value = value
-
-    # def _process_type_advantages(self, type_and_scalar_data):
-    #     for first_type_slug, type_data_and_scalars in type_and_scalar_data.items():
-
-    #         first_type = Type.objects.get(slug=first_type_slug)
-
-    #         for data in type_data_and_scalars:
-    #             for second_type_slug, scalar in data.items():
-    #                 second_type = Type.objects.get(slug=second_type_slug)
-    #                 self.get_or_create_type_advantage(
-    #                     first_type, second_type, TypeEffectivnessScalar.objects.get(scalar=scalar))
 
     def _process_pokemon(self, pokemon_data):
         new_movesets = []
@@ -179,7 +125,6 @@ class Command(BaseCommand):
                     pokemon.pgo_stamina = detail['stats'][0]['stamina']
                     pokemon.pgo_attack = detail['stats'][1]['attack']
                     pokemon.pgo_defense = detail['stats'][2]['defense']
-
             pokemon.save()
 
             for detail in data:
@@ -213,7 +158,6 @@ class Command(BaseCommand):
                             'cinematic_move': cinematic_move,
                         }
                     ))
-
             pokemon.save()
 
     def _process_moves(self, move_data):
@@ -265,52 +209,6 @@ class Command(BaseCommand):
             else:
                 Move.objects.filter(slug=slug).update(**pvp_move_data)
 
-    # def _map_type_effectivness(self):
-    #     types = Type.objects.all()
-    #     se = TypeEffectivnessScalar.objects.get(slug='super-effective').scalar
-    #     nve = TypeEffectivnessScalar.objects.get(slug='not-very-effective').scalar
-    #     imn = TypeEffectivnessScalar.objects.get(slug='immune').scalar
-
-    #     for _type in types:
-    #         type_offense_strong = []
-    #         type_offense_feeble = []
-    #         type_offense_puny = []
-    #         type_defense_resistant = []
-    #         type_defense_weak = []
-    #         type_defense_immune = []
-
-    #         for type_e in _type.type_offense.all():
-    #             scalar = type_e.effectivness.scalar
-    #             if scalar == se:
-    #                 type_offense_strong.append((type_e.type_defense, scalar))
-    #             if scalar == nve:
-    #                 type_offense_feeble.append((type_e.type_defense, scalar))
-    #             if scalar == imn:
-    #                 type_offense_puny.append((type_e.type_defense, scalar))
-    #         for type_e in _type.type_defense.all():
-    #             scalar = type_e.effectivness.scalar
-    #             if scalar == nve:
-    #                 type_defense_resistant.append((type_e.type_offense, scalar))
-    #             if scalar == se:
-    #                 type_defense_weak.append((type_e.type_offense, scalar))
-    #             if scalar == imn:
-    #                 type_defense_immune.append((type_e.type_offense, scalar))
-
-    #         type_offense_strong.sort(key=lambda x: x[0].name)
-    #         type_offense_feeble.sort(key=lambda x: x[0].name)
-    #         type_defense_resistant.sort(key=lambda x: x[0].name)
-    #         type_defense_weak.sort(key=lambda x: x[0].name)
-    #         type_offense_puny.sort(key=lambda x: x[0].name)
-    #         type_defense_immune.sort(key=lambda x: x[0].name)
-
-    #         _type.strong = [(x[0].name, float(x[1])) for x in type_offense_strong]
-    #         _type.feeble = [(x[0].name, float(x[1])) for x in type_offense_feeble]
-    #         _type.puny = [(x[0].name, float(x[1])) for x in type_offense_puny]
-    #         _type.resistant = [(x[0].name, float(x[1])) for x in type_defense_resistant]
-    #         _type.weak = [(x[0].name, float(x[1])) for x in type_defense_weak]
-    #         _type.immune = [(x[0].name, float(x[1])) for x in type_defense_immune]
-    #         _type.save()
-
     def _next(self, csv_object, slice_start=None, slice_end=None):
         return next(csv_object)[0][slice_start:slice_end].strip()
 
@@ -330,12 +228,6 @@ class Command(BaseCommand):
         path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/game_master_genIV')
         file_path = options.get('path') if options.get('path') else path
 
-        Type.objects.get_or_create(slug='dark', defaults={'name': 'Dark'})
-        for name, scalar in TYPE_EFFECTIVNESS.items():
-            self.get_or_create_type_effectivness_scalar(name, scalar)
-
-        # cpm_data = []
-        # type_data = {}
         pokemon_data = {}
         move_data = {}
         pvp_move_data = []
@@ -344,32 +236,17 @@ class Command(BaseCommand):
             csv_object = csv.reader(csvfile)
 
             for row in csv_object:
-                # if 'templateId": "POKEMON_TYPE' in row[0]:
-                #     key = slugify(row[0][32:].replace('"', ''))
-                #     type_data[key] = ''
-                #     self._next(csv_object)
-
-                #     type_data_scalars = []
-                #     effectivness_array = self._next(csv_object, 23).replace(']', '').split(',', 18)
-
-                #     for n in range(1, 19):
-                #         effectivness_scalar = effectivness_array[n - 1]
-
-                #         type_data_scalars.append(
-                #             {TYPE_IMPORT_ORDER[n - 1]: effectivness_scalar})
-                #     type_data[key] = type_data_scalars
-
                 if 'templateId": "V' in row[0]:
-                    template_id = '#{0}'.format(row[0][21:24])
+                    template_id = '#{0}'.format(row[0][23:26])
 
                     if 'pokemonSettings' in self._next(csv_object):
                         # name
                         data = []
-                        name_string = row[0][33:-1].lower().replace('_', '-')
-                        pokemon_id = slugify(self._next(csv_object, 16).replace('_', '-'))
+                        name_string = row[0][35:-1].lower().replace('_', '-')
 
-                        if 'deoxys' == name_string:
+                        if 'giratina' == name_string or 'deoxys' == name_string:
                             continue
+                        pokemon_id = slugify(self._next_clean_string(csv_object).replace('_', '-')[9:])
 
                         if name_string != pokemon_id:
                             if len(pokemon_id) > len(name_string):
@@ -384,8 +261,8 @@ class Command(BaseCommand):
                         # types
                         data.append({
                             'pokemon_types': (
-                                self._next(csv_object, 28).replace('",', ''),
-                                self._next(csv_object, 29).replace('",', '')
+                                self._next(csv_object, 30).replace('"', '').lower(),
+                                self._next(csv_object, 31).replace('"', '').lower()
                             )
                         })
 
@@ -394,9 +271,9 @@ class Command(BaseCommand):
                         # stats
                         data.append({
                             'stats': (
-                                {'stamina': self._next(csv_object, 23).replace(',', '')},
-                                {'attack': self._next(csv_object, 22).replace(',', '')},
-                                {'defense': self._next(csv_object, 23).replace(',', '')}
+                                {'stamina': self._next_clean_numeric(csv_object)},
+                                {'attack': self._next_clean_numeric(csv_object)},
+                                {'defense': self._next_clean_numeric(csv_object)}
                             )
                         })
                         self._next(csv_object)
@@ -405,18 +282,20 @@ class Command(BaseCommand):
                         quick = []
                         cinematic = []
                         next_line = self._next_clean_string(csv_object)
-                        while 'moves' in next_line:
-                            if 'quickmoves' in next_line:
-                                quick_moves = next_line[10:-1].split(',')
 
-                                for qm in quick_moves:
-                                    quick.append(qm.replace('_fast', ''))
-                            if 'cinematicmoves' in next_line:
-                                charge_moves = next_line[14:-1].split(',')
+                        while 'quickmoves' in next_line:
+                            move = self._next_clean_string(csv_object)
+                            if 'fast' in move:
+                                quick.append(move.replace('_fast', '').replace(',', ''))
+                            else:
+                                next_line = self._next_clean_string(csv_object)
 
-                                for cm in charge_moves:
-                                    cinematic.append(cm)
-                            next_line = self._next_clean_string(csv_object)
+                        while 'cinematicmoves' in next_line:
+                            move = self._next_clean_string(csv_object).replace(',', '')
+                            if move:
+                                cinematic.append(move)
+                            else:
+                                next_line = self._next_clean_string(csv_object)
 
                         moves = {
                             'quick': quick,
@@ -427,13 +306,10 @@ class Command(BaseCommand):
                         while 'animation_time' in self._next(csv_object):
                             pass
 
-                        if 'rarity' in self._next(csv_object):
-                            data.append({'legendary': True})
                         pokemon_data[name_string] = data
                     else:
                         data = []
-                        move_slug = slugify(
-                            self._next(csv_object, 17).replace('_', '-'))
+                        move_slug = slugify(self._next_clean_string(csv_object).replace('_', '-')[10:])
                         category = 'CC'
                         if 'blastoise' in move_slug:
                             continue
@@ -447,46 +323,27 @@ class Command(BaseCommand):
                         data.append({'category': category})
                         # move type
                         data.append(
-                            {'move_type': slugify(self._next(csv_object, 35))})
+                            {'move_type': slugify(self._next_clean_string(csv_object)[24:])})
                         # power
-
                         if move_slug not in ['transform', 'splash', 'yawn']:
-                            data.append({'power': self._next(csv_object, 15).replace(',', '')})
+                            data.append({'power': self._next_clean_numeric(csv_object)})
 
                         while 'vfxName' not in self._next(csv_object):
                             pass
 
                         # durations & delta
                         data.append({
-                            'duration': self._next(csv_object, 20).replace(',', '')})
+                            'duration': self._next_clean_numeric(csv_object)})
                         data.append({
-                            'damage_window_start': self._next(csv_object, 29).replace(',', '')})
+                            'damage_window_start': self._next_clean_numeric(csv_object)})
                         data.append({
-                            'damage_window_end': self._next(csv_object, 27).replace(',', '')})
+                            'damage_window_end': self._next_clean_numeric(csv_object)})
 
                         if move_slug not in ['transform', 'struggle']:
                             data.append({
-                                'energy_delta': self._next(csv_object, 21).replace(',', '')})
+                                'energy_delta': self._next_clean_numeric(csv_object)})
                         move_data[move_slug] = data
 
-                # pvp moves
-                # "templateId": "COMBAT_V0250_MOVE_VOLT_SWITCH_FAST",
-                # "combatMove": {
-                #   "uniqueId": "VOLT_SWITCH_FAST",
-                #   "type": "POKEMON_TYPE_ELECTRIC",
-                #   "power": 12.0,
-                #   "vfxName": "volt_switch_fast",
-                #   "durationTurns": 4,
-                #   "energyDelta": 10
-
-                # "templateId": "COMBAT_V0013_MOVE_WRAP",
-                # "combatMove": {
-                #   "uniqueId": "WRAP",
-                #   "type": "POKEMON_TYPE_NORMAL",
-                #   "power": 60.0,
-                #   "vfxName": "wrap",
-                #   "energyDelta": -45
-                # }
                 pvp_move = []
                 if '"templateId": "COMBAT_V' in row[0]:
                     next(csv_object)
@@ -524,10 +381,20 @@ class Command(BaseCommand):
                             pvp_move.append(energy_delta)
                     pvp_move_data.append(pvp_move)
 
-        # self._process_type_advantages(type_data)
-        # self._process_cpm(cpm_data)
-        # self._map_type_effectivness()
-
         self._process_moves(move_data)
+        print('moves processed')
         self._process_pvp_moves(pvp_move_data)
-        # self._process_pokemon(pokemon_data)
+        print('pvp moves processed')
+        self._process_pokemon(pokemon_data)
+        print('pokemon processed')
+
+        call_command('pgo_calculate_cp')
+        print('cp processed')
+        call_command('pgo_compound_weakness_resistance')
+        print('weakness and resistance processed')
+        call_command('pgo_calculate_move_stats')
+        print('move stats processed')
+        call_command('pgo_calculate_weave_damage')
+        print('moveset weave processed')
+        call_command('pgo_populate_pokemon_moves')
+        print('move scores processed')

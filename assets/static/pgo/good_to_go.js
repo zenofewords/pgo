@@ -9,7 +9,7 @@ const ready = (runGoodToGo) => {
 }
 
 ready(() => {
-  const FORM = {
+  const FORM_STATE = {
     SUBMITTING: 'submitting',
     READY: 'ready',
     ERROR: 'error',
@@ -49,6 +49,7 @@ ready(() => {
     tier_3_6_raid_bosses: tier36BossesCheckbox.checked,
     tier_1_2_raid_bosses: tier12BossesCheckbox.checked,
     relevant_defenders: relevantDefendersCheckbox.checked,
+    status: FORM_STATE.READY,
   }
 
   selectAttacker.passedElement.addEventListener('change', (event) => {
@@ -108,20 +109,49 @@ ready(() => {
     // submitFormIfValid()
   })
 
-  const clearMoveInputs = () => {
-    const quickMoveSelect = selectAttackerQuickMove
-    const cinematicMoveSelect = selectAttackerCinematicMove
+  // functions
+  const initialFetch = () => {
+    return new Promise(resolve => {
+      if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
+        goodToGoForm.status = FORM_STATE.SUBMITTING
+        toggleLoading()
 
-    quickMoveSelect.innerHTML = ''
-    quickMoveSelect.append(
-      '<option value="-1" disabled selected>Select quick move</option>'
-    )
-    cinematicMoveSelect.innerHTML = ''
-    cinematicMoveSelect.append(
-      '<option value="-1" disabled selected>Select cinematic move</option>'
-    )
-    goodToGoForm['quick_move'] = -1
-    goodToGoForm['cinematic_move'] = -1
+        selectAttacker.ajax((callback) => {
+          fetch(window.pgoAPIURLs['simple-pokemon-list']).then((response) => {
+            response.json().then((data) => {
+              callback(data, 'value', 'label')
+            }).then(() => {
+              goodToGoForm.status = FORM_STATE.READY
+              toggleLoading()
+              resolve()
+            })
+          }).catch((error) => {
+            console.log(error)
+            goodToGoForm.status = FORM_STATE.ERROR
+            toggleLoading()
+            resolve()
+          })
+        })
+      }
+    })
+  }
+
+  const clearMoveInputs = () => {
+    if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
+      const quickMoveSelect = selectAttackerQuickMove
+      const cinematicMoveSelect = selectAttackerCinematicMove
+
+      quickMoveSelect.innerHTML = ''
+      quickMoveSelect.append(
+        '<option value="-1" disabled selected>Select quick move</option>'
+      )
+      cinematicMoveSelect.innerHTML = ''
+      cinematicMoveSelect.append(
+        '<option value="-1" disabled selected>Select cinematic move</option>'
+      )
+      goodToGoForm['quick_move'] = -1
+      goodToGoForm['cinematic_move'] = -1
+    }
   }
 
   const selectPokemonMoves = (value) => {
@@ -136,7 +166,7 @@ ready(() => {
         }
       }
       request.onerror = () => {
-        goodToGoForm.status = FORM.ERROR
+        goodToGoForm.status = FORM_STATE.ERROR
       }
       request.send()
     } else {
@@ -161,7 +191,7 @@ ready(() => {
       const move = moveData.move
 
       if (move.category === 'QK') {
-        if (goodToGoForm.status !== FORM.SUBMITTING) {
+        if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
           quickMoveSelect.disabled = false
         }
         quickMoveSelect.options.add(createMoveOption(move, quickMoveId, quickMoveKey))
@@ -206,7 +236,7 @@ ready(() => {
   }
 
   const submitFormIfValid = () => {
-    if (goodToGoForm.status !== FORM.SUBMITTING) {
+    if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
       let valid = true
       for (const key in goodToGoForm) {
         const value = String(goodToGoForm[key])
@@ -222,8 +252,8 @@ ready(() => {
   }
 
   const submitGoodToGoForm = () => {
-    if (goodToGoForm.status !== FORM.SUBMITTING) {
-      goodToGoForm.status = FORM.SUBMITTING
+    if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
+      goodToGoForm.status = FORM_STATE.SUBMITTING
       toggleLoading()
 
       const request = new XMLHttpRequest()
@@ -237,13 +267,13 @@ ready(() => {
         if (request.status >= 200 && request.status < 400) {
           updateBrowserHistory(getParams)
         }
-        goodToGoForm.status = FORM.READY
+        goodToGoForm.status = FORM_STATE.READY
 
         toggleLoading()
         renderResults(json)
       }
       request.onerror = () => {
-        goodToGoForm.status = FORM.ERROR
+        goodToGoForm.status = FORM_STATE.ERROR
         goodToGoSummary.innerHTML = 'Looks like something broke, please let me know if simply refreshing the page does not help.'
       }
       request.send()
@@ -251,10 +281,10 @@ ready(() => {
   }
 
   const toggleLoading = () => {
-    const submitting = goodToGoForm.status === FORM.SUBMITTING
+    const submitting = goodToGoForm.status === FORM_STATE.SUBMITTING
     submitting ? selectAttacker.disable() : selectAttacker.enable()
 
-    selectAttackerQuickMove.disabled = submitting
+    selectAttackerQuickMove.disabled = submitting || selectAttackerQuickMove.value < 0
     selectAttackerAtkIv.disabled = submitting
     selectWeatherCondition.disabled = submitting
     selectFriendshipBoost.disabled = submitting
@@ -388,19 +418,21 @@ ready(() => {
   }
 
   const restoreGoodToGoForm = (data) => {
-    selectAttacker.setValueByChoice(String(data.attacker))
+    initialFetch().then(() => {
+      selectAttacker.setValueByChoice(String(data.attacker))
 
-    selectAttackerAtkIv.value = data.attack_iv
-    selectWeatherCondition.value = data.weather_condition
-    selectFriendshipBoost.value = data.friendship_boost
+      selectAttackerAtkIv.value = data.attack_iv
+      selectWeatherCondition.value = data.weather_condition
+      selectFriendshipBoost.value = data.friendship_boost
 
-    selectPokemonMoves(data.attacker, 'attacker')
-    selectPokemonMoves(data.defender, 'defender')
-    restoreCheckboxButtons(data)
+      selectPokemonMoves(data.attacker, 'attacker')
+      selectPokemonMoves(data.defender, 'defender')
+      restoreCheckboxButtons(data)
 
-    goodToGoForm = data
-    goodToGoForm.status = FORM.READY
-    submitGoodToGoForm()
+      goodToGoForm = data
+      goodToGoForm.status = FORM_STATE.READY
+      submitGoodToGoForm()
+    })
   }
 
   if (goodToGoForm.attacker && !(goodToGoForm.attacker_quick_move && goodToGoForm.attacker_cinematic_move)) {
@@ -412,4 +444,6 @@ ready(() => {
   } else if (Object.keys(initialData).length > 0) {
     restoreGoodToGoForm(initialData)
   }
+
+  initialFetch()
 })

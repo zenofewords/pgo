@@ -127,7 +127,8 @@ def get_top_counter_qs(defender):
     s_id_list = list(queryset.filter(
         Q(
             quick_moves__move__move_type__slug__in=defender_weakness,
-            cinematic_moves__move__move_type__slug__in=defender_weakness)
+            cinematic_moves__move__move_type__slug__in=defender_weakness
+        )
             & Q(compound_resistance__icontains=defender_qk_move_type)
             & Q(compound_resistance__icontains=defender_cm_move_type)
         ).distinct().values_list(
@@ -229,8 +230,13 @@ def get_top_counter_qs(defender):
     # strong pokemon with a charge or quick move that is SE against the defender
     h_id_list = list(queryset.filter(
             Q(
-                pgo_attack__gte=190,
-                stat_product__gte=600) &
+                Q(
+                    pgo_attack__gte=190,
+                    stat_product__gte=600
+                ) | Q(
+                    pgo_attack__gte=250,
+                    stat_product__gte=550
+                )) &
             Q(
                 Q(cinematic_moves__move__move_type__slug__in=defender_weakness) |
                 Q(quick_moves__move__move_type__slug__in=defender_weakness)

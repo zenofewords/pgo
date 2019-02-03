@@ -57,32 +57,32 @@ ready(() => {
     selectPokemonMoves(event.currentTarget.value)
 
     goodToGoForm.attacker = event.currentTarget.value
-    submitFormIfValid()
+    submitGoodToGoForm()
   })
   selectAttackerAtkIv.addEventListener('change', (event) => {
     goodToGoForm.attack_iv = event.currentTarget.value
 
-    submitFormIfValid()
+    submitGoodToGoForm().then(() => selectAttackerAtkIv.focus())
   })
   selectAttackerQuickMove.addEventListener('change', (event) => {
     goodToGoForm.quick_move = event.currentTarget.value
 
-    submitFormIfValid()
+    submitGoodToGoForm().then(() => selectAttackerQuickMove.focus())
   })
   selectAttackerCinematicMove.addEventListener('change', (event) => {
     goodToGoForm.cinematic_move = event.currentTarget.value
 
-    submitFormIfValid()
+    submitGoodToGoForm().then(() => selectAttackerCinematicMove.focus())
   })
   selectWeatherCondition.addEventListener('change', (event) => {
     goodToGoForm.weather_condition = event.currentTarget.value
 
-    submitFormIfValid()
+    submitGoodToGoForm().then(() => selectWeatherCondition.focus())
   })
   selectFriendshipBoost.addEventListener('change', (event) => {
     goodToGoForm.friendship_boost = event.currentTarget.value
 
-    submitFormIfValid()
+    submitGoodToGoForm().then(() => selectFriendshipBoost.focus())
   })
   tier36BossesButton.addEventListener('click', (event) => {
     event.preventDefault()
@@ -90,7 +90,7 @@ ready(() => {
     toggleButtonCheckbox(tier36BossesButton, tier36BossesCheckbox)
     goodToGoForm.tier_3_6_raid_bosses = tier36BossesCheckbox.checked
 
-    submitFormIfValid()
+    submitGoodToGoForm().then(() => tier36BossesButton.focus())
   })
   tier12BossesButton.addEventListener('click', (event) => {
     event.preventDefault()
@@ -98,7 +98,7 @@ ready(() => {
     toggleButtonCheckbox(tier12BossesButton, tier12BossesCheckbox)
     goodToGoForm.tier_1_2_raid_bosses = tier12BossesCheckbox.checked
 
-    submitFormIfValid()
+    submitGoodToGoForm().then(() => tier12BossesButton.focus())
   })
   relevantDefendersButton.addEventListener('click', (event) => {
     // event.preventDefault()
@@ -106,12 +106,12 @@ ready(() => {
     // toggleButtonCheckbox(relevantDefendersButton, relevantDefendersCheckbox)
     // goodToGoForm.relevant_defenders = relevantDefendersCheckbox.checked
 
-    // submitFormIfValid()
+    // submitGoodToGoForm().then(() => relevantDefendersButton.focus())()
   })
 
   // functions
   const initialFetch = () => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
         goodToGoForm.status = FORM_STATE.SUBMITTING
         toggleLoading()
@@ -125,10 +125,9 @@ ready(() => {
               toggleLoading()
               resolve()
             })
-          }).catch((error) => {
-            console.log(error)
+          }).catch(() => {
             goodToGoForm.status = FORM_STATE.ERROR
-            toggleLoading()
+            showErrors()
             resolve()
           })
         })
@@ -160,9 +159,14 @@ ready(() => {
       request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
 
       request.onload = () => {
+        if (request.status >= 500) {
+          showErrors()
+        }
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
           selectMoves(json)
+        } else {
+          showErrors()
         }
       }
       request.onerror = () => {
@@ -203,7 +207,7 @@ ready(() => {
     goodToGoForm[quickMoveKey] = quickMoveSelect.value
     goodToGoForm[cinematicMoveKey] = cinematicMoveSelect.value
 
-    submitFormIfValid()
+    submitGoodToGoForm()
   }
 
   const createMoveOption = (move, moveId, moveKey) => {
@@ -235,7 +239,7 @@ ready(() => {
     }
   }
 
-  const submitFormIfValid = () => {
+  const submitGoodToGoForm = () => {
     if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
       let valid = true
       for (const key in goodToGoForm) {
@@ -246,37 +250,43 @@ ready(() => {
         }
       }
       if (valid) {
-        submitGoodToGoForm()
+        return new Promise((resolve) => {
+          if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
+            goodToGoForm.status = FORM_STATE.SUBMITTING
+            toggleLoading()
+
+            const request = new XMLHttpRequest()
+            const getParams = formatParams(goodToGoForm)
+            const url = window.pgoAPIURLs['good-to-go'] + getParams
+            request.open('GET', url, true)
+
+            request.onload = () => {
+              if (request.status >= 500) {
+                showErrors()
+              } else {
+                const json = JSON.parse(request.responseText)
+
+                if (request.status >= 200 && request.status < 400) {
+                  updateBrowserHistory(getParams)
+                } else {
+                  showErrors()
+                }
+                goodToGoForm.status = FORM_STATE.READY
+
+                toggleLoading()
+                renderResults(json)
+                resolve()
+              }
+            }
+            request.onerror = () => {
+              goodToGoForm.status = FORM_STATE.ERROR
+              showErrors()
+              resolve()
+            }
+            request.send()
+          }
+        })
       }
-    }
-  }
-
-  const submitGoodToGoForm = () => {
-    if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
-      goodToGoForm.status = FORM_STATE.SUBMITTING
-      toggleLoading()
-
-      const request = new XMLHttpRequest()
-      const getParams = formatParams(goodToGoForm)
-      const url = window.pgoAPIURLs['good-to-go'] + getParams
-      request.open('GET', url, true)
-
-      request.onload = () => {
-        const json = JSON.parse(request.responseText)
-
-        if (request.status >= 200 && request.status < 400) {
-          updateBrowserHistory(getParams)
-        }
-        goodToGoForm.status = FORM_STATE.READY
-
-        toggleLoading()
-        renderResults(json)
-      }
-      request.onerror = () => {
-        goodToGoForm.status = FORM_STATE.ERROR
-        goodToGoSummary.innerHTML = 'Looks like something broke, please let me know if simply refreshing the page does not help.'
-      }
-      request.send()
     }
   }
 
@@ -433,6 +443,12 @@ ready(() => {
       goodToGoForm.status = FORM_STATE.READY
       submitGoodToGoForm()
     })
+  }
+
+  const showErrors = () => {
+    goodToGoResults.hidden = false
+    goodToGoResults.classList.add('error-text')
+    goodToGoResults.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
   }
 
   if (goodToGoForm.attacker && !(goodToGoForm.attacker_quick_move && goodToGoForm.attacker_cinematic_move)) {

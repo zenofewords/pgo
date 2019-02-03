@@ -84,44 +84,44 @@ ready(() => {
 
     breakpointCalcForm.attacker = event.currentTarget.value
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm()
   })
   inputAttackerLevel.addEventListener('change', (event) => {
     setValidLevel(event.currentTarget, 'attacker_level')
     inputAttackerLevel.classList.remove('error')
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => inputAttackerLevel.focus())
   })
   selectAttackerQuickMove.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_quick_move = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectAttackerQuickMove.focus())
   })
   selectAttackerCinematicMove.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_cinematic_move = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectAttackerCinematicMove.focus())
   })
   selectAttackerAtkIv.addEventListener('change', (event) => {
     breakpointCalcForm.attacker_atk_iv = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectAttackerAtkIv.focus())
   })
   selectWeatherCondition.addEventListener('change', (event) => {
     breakpointCalcForm.weather_condition = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectWeatherCondition.focus())
   })
   selectFriendShipBoost.addEventListener('change', (event) => {
     breakpointCalcForm.friendship_boost = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectFriendShipBoost.focus())
   })
   selectDefender.passedElement.addEventListener('change', (event) => {
     clearMoveInputs('defender')
@@ -130,25 +130,25 @@ ready(() => {
 
     breakpointCalcForm.defender = event.currentTarget.value
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm()
   })
   selectDefenderQuickMove.addEventListener('change', (event) => {
     breakpointCalcForm.defender_quick_move = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectDefenderQuickMove.focus())
   })
   selectDefenderCinematicMove.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cinematic_move = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectDefenderCinematicMove.focus())
   })
   selectDefenderCPM.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cpm = event.currentTarget.value
 
     breakpointCalcForm.staleTab = true
-    submitFormIfValid()
+    submitBreakpointCalcForm().then(() => selectDefenderCPM.focus())
   })
   inputToggleCinematicBreakpoints.addEventListener('click', (event) => {
     event.preventDefault()
@@ -172,7 +172,7 @@ ready(() => {
 
     if (breakpointCalcForm.staleTab) {
       breakpointCalcForm.staleTab = false
-      submitFormIfValid()
+      submitBreakpointCalcForm()
     }
   })
   document.getElementById('faq-legend-link').addEventListener('click', (event) => {
@@ -194,7 +194,7 @@ ready(() => {
 
   // functions
   const initialFetch = () => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
         breakpointCalcForm.status = FORM_STATE.SUBMITTING
         toggleLoading()
@@ -212,30 +212,14 @@ ready(() => {
               toggleLoading()
               resolve()
             })
-          }).catch((error) => {
-            console.log(error)
+          }).catch(() => {
             breakpointCalcForm.status = FORM_STATE.ERROR
-            toggleLoading()
+            showErrors()
             resolve()
           })
         })
       }
     })
-  }
-
-  const submitFormIfValid = () => {
-    if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
-      let valid = true
-      for (const key in breakpointCalcForm) {
-        if (breakpointCalcForm[key] === undefined || breakpointCalcForm[key] === -1) {
-          valid = false
-        }
-      }
-
-      if (valid) {
-        submitBreakpointCalcForm()
-      }
-    }
   }
 
   const updateBrowserHistory = (getParams) => {
@@ -277,16 +261,12 @@ ready(() => {
   const toggleElementsByTab = (tab) => {
     if (tab === TAB.COUNTERS) {
       selectAttacker.disable()
-
-      inputAttackerLevel.disabled = true
       selectAttackerQuickMove.disabled = true
       selectAttackerCinematicMove.disabled = true
 
       ivAssessment.hidden = true
     } else {
       selectAttacker.enable()
-
-      inputAttackerLevel.disabled = false
       selectAttackerQuickMove.disabled = false
       selectAttackerCinematicMove.disabled = false
 
@@ -303,10 +283,13 @@ ready(() => {
         if (request.status >= 200 && request.status < 400) {
           const json = JSON.parse(request.responseText)
           selectMoves(json, pokemon)
+        } else {
+          showErrors()
         }
       }
       request.onerror = () => {
         breakpointCalcForm.status = FORM_STATE.ERROR
+        showErrors()
       }
       request.send()
     } else {
@@ -322,12 +305,15 @@ ready(() => {
 
   const toggleLoading = () => {
     const submitting = breakpointCalcForm.status === FORM_STATE.SUBMITTING
+    const breakpointsTab = breakpointCalcForm.tab === 'breakpoints'
 
     if (submitting) {
       selectAttacker.disable()
       selectDefender.disable()
     } else {
-      selectAttacker.enable()
+      if (breakpointsTab) {
+        selectAttacker.enable()
+      }
       selectDefender.enable()
     }
     inputAttackerLevel.disabled = submitting
@@ -341,45 +327,65 @@ ready(() => {
     tabBreakpoints.disabled = submitting
     tabTopCounters.disabled = submitting
 
-    selectAttackerQuickMove.disabled = submitting || selectAttackerQuickMove.value < 0
-    selectAttackerCinematicMove.disabled = submitting || selectAttackerCinematicMove.value < 0
+    selectAttackerQuickMove.disabled = submitting || selectAttackerQuickMove.value < 0 || !breakpointsTab
+    selectAttackerCinematicMove.disabled = submitting || selectAttackerCinematicMove.value < 0 || !breakpointsTab
   }
 
   const submitBreakpointCalcForm = () => {
     if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
-      breakpointCalcForm.status = FORM_STATE.SUBMITTING
-      toggleLoading()
-
-      const request = new XMLHttpRequest()
-      const getParams = formatParams(breakpointCalcForm)
-      const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
-      request.open('GET', url, true)
-
-      request.onload = () => {
-        const json = JSON.parse(request.responseText)
-
-        if (request.status >= 200 && request.status < 400) {
-          moveEffectivness.innerHTML = ''
-          ivAssessment.innerHTML = json.attack_iv_assessment
-
-          displayBreakpointCalcDetails(json)
-          generateTopCountersTable(json.top_counters)
-          updateBrowserHistory(getParams)
-        } else {
-          showErrors(json)
+      let valid = true
+      for (const key in breakpointCalcForm) {
+        if (breakpointCalcForm[key] === undefined || breakpointCalcForm[key] === -1) {
+          valid = false
         }
-        breakpointCalcForm.status = FORM_STATE.READY
+      }
 
-        if (breakpointCalcForm.tab === TAB.COUNTERS) {
-          breakpointCalcForm.staleTab = false
-          toggleElementsByTab(TAB.COUNTERS)
-        }
-        toggleLoading()
+      if (valid) {
+        return new Promise((resolve) => {
+          if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
+            breakpointCalcForm.status = FORM_STATE.SUBMITTING
+            toggleLoading()
+
+            const request = new XMLHttpRequest()
+            const getParams = formatParams(breakpointCalcForm)
+            const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
+            request.open('GET', url, true)
+
+            request.onload = () => {
+              if (request.status >= 500) {
+                showErrors()
+              } else {
+                const json = JSON.parse(request.responseText)
+
+                if (request.status >= 200 && request.status < 400) {
+                  moveEffectivness.innerHTML = ''
+                  ivAssessment.innerHTML = json.attack_iv_assessment
+
+                  displayBreakpointCalcDetails(json)
+                  generateTopCountersTable(json.top_counters)
+                  updateBrowserHistory(getParams)
+                } else {
+                  showErrors(json)
+                }
+                breakpointCalcForm.status = FORM_STATE.READY
+
+                if (breakpointCalcForm.tab === TAB.COUNTERS) {
+                  breakpointCalcForm.staleTab = false
+                  toggleElementsByTab(TAB.COUNTERS)
+                }
+                toggleLoading()
+                resolve()
+              }
+            }
+            request.onerror = () => {
+              breakpointCalcForm.status = FORM_STATE.ERROR
+              showErrors()
+              resolve()
+            }
+            request.send()
+          }
+        })
       }
-      request.onerror = () => {
-        breakpointCalcForm.status = FORM_STATE.ERROR
-      }
-      request.send()
     }
   }
 
@@ -439,7 +445,7 @@ ready(() => {
     breakpointCalcForm[quickMoveKey] = quickMoveSelect.value
     breakpointCalcForm[cinematicMoveKey] = cinematicMoveSelect.value
 
-    submitFormIfValid()
+    submitBreakpointCalcForm()
   }
 
   const createMoveOption = (move, moveId, moveKey, pokemon) => {
@@ -489,6 +495,8 @@ ready(() => {
   }
 
   const generateTopCountersTable = (dataset) => {
+    const attackerStats = document.getElementById('top-counters-table-attacker-stats')
+    attackerStats.innerHTML = `L${breakpointCalcForm.attacker_level} ${breakpointCalcForm.attacker_atk_iv}ATK`
     const dataTable = document.getElementById('breakpoint-calc-top-counters-table-body')
     let dataRow
     let dataCell
@@ -558,14 +566,22 @@ ready(() => {
     submitBreakpointCalcForm()
   }
 
-  const showErrors = (errorObject) => {
-    for (let field in errorObject) {
-      if (field !== 'attacker_level') {
-        const invalidInput = document.querySelector('.breakpoint-calc-select-' + field)
-        invalidInput.parentElement.parentElement.classList.add('error')
-      } else {
-        document.querySelector('.' + field).classList.add('error')
+  const showErrors = (errorObject = null) => {
+    if (errorObject) {
+      for (let field in errorObject) {
+        if (field !== 'attacker_level') {
+          const invalidInput = document.querySelector('.breakpoint-calc-select-' + field)
+          if (invalidInput) {
+            invalidInput.parentElement.parentElement.classList.add('error')
+          }
+        } else {
+          document.querySelector('.' + field).classList.add('error')
+        }
       }
+    } else {
+      detailsTable.hidden = false
+      detailsTable.classList.add('error-text')
+      detailsTable.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
     }
   }
 

@@ -363,7 +363,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         top_counters = []
         for pokemon in get_top_counter_qs(self.defender):
             attacker_multiplier = (
-                (pokemon.pgo_attack + self.attacker.atk_iv) * self.max_cpm_value) / (
+                (pokemon.pgo_attack + self.attacker.atk_iv) * self.attacker.cpm.value) / (
                 (self.defender.pgo_defense + MAX_IV) * self.defender.cpm)
             defender_multiplier = (
                 (self.defender.pgo_attack + MAX_IV) * self.defender.cpm) / (

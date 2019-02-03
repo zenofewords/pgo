@@ -74,7 +74,7 @@ class PokemonSimpleSerializer(serializers.Serializer):
 
         if obj.secondary_type:
             label = '{} / {}'.format(label, obj.secondary_type.name)
-        return '{} | {} CP'.format(label, int(obj.maximum_cp))
+        return label
 
 
 class BreakpointCalcSerializer(serializers.Serializer):

@@ -18,9 +18,6 @@
           <label for="choices-single-default" class="sr-only">Select attacker</label>
           <select class="form-control good-to-go-select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
             <option value="-1" placeholder disabled selected>Select attacker</option>
-            {% for data in pokemon_data %}
-              <option value="{{ data.0 }}">{{ data.1 }} ({{ data.2 }} ATK)</option>
-            {% endfor %}
           </select>
         </div>
         <div class="col-xs-4 input-padding-left">
@@ -115,6 +112,7 @@
   <script type="text/javascript">
     var initialData = {{ initial_data|safe }};
     window.pgoAPIURLs = {
+      'simple-pokemon-list': "{% url 'api-pgo:simple-pokemon-list' %}",
       'move-list': "{% url 'api-pgo:move-list' %}",
       'good-to-go': "{% url 'api-pgo:good-to-go' %}",
     };

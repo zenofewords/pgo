@@ -49,7 +49,6 @@ class CalculatorInitialDataMixin(TemplateView):
         )
 
         data = {
-            'pokemon_data': Pokemon.objects.values_list('id', 'name', 'pgo_attack', 'pgo_defense'),
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.values_list('id', 'name'),
             'friendship': Friendship.objects.all(),

@@ -12,8 +12,8 @@ from pgo.models import (
     RaidBoss,
     RaidTier,
     Type,
-    TypeEffectivness,
-    TypeEffectivnessScalar,
+    TypeEffectiveness,
+    TypeEffectivenessScalar,
     WeatherCondition,
 )
 
@@ -79,6 +79,6 @@ admin.site.register(PokemonMove, PokemonMoveAdmin)
 admin.site.register(RaidBoss, RaidBossAdmin)
 admin.site.register(RaidTier)
 admin.site.register(Type)
-admin.site.register(TypeEffectivness)
-admin.site.register(TypeEffectivnessScalar)
+admin.site.register(TypeEffectiveness)
+admin.site.register(TypeEffectivenessScalar)
 admin.site.register(WeatherCondition)

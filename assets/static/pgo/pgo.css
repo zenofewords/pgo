@@ -100,7 +100,7 @@
   margin: 0 0 1.5rem 0;
   text-align: justify;
 }
-#breakpoint-calc-move-effectivness {
+#breakpoint-calc-move-effectiveness {
   margin: 0 0 1.5rem 0;
   text-align: justify;
 }
@@ -352,7 +352,7 @@ table#top-counters-table tr td:last-child {
 .pvp-compound-weakness li span:last-child {
   padding: 0 0 0 3rem;
 }
-.pvp-pokemon-type-effectivness-wrapper {
+.pvp-pokemon-type-effectiveness-wrapper {
   display: flex;
   justify-content: space-between;
 }

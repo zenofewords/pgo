@@ -16,8 +16,8 @@ from pgo.models import (
     Move,
     Moveset,
     Type,
-    TypeEffectivness,
-    TypeEffectivnessScalar,
+    TypeEffectiveness,
+    TypeEffectivenessScalar,
 )
 from pgo.utils import (
     SUPER_EFFECTIVE_SCALAR,
@@ -25,7 +25,7 @@ from pgo.utils import (
     NEUTRAL_SCALAR,
     IMMUNE,
 )
-TYPE_EFFECTIVNESS = {
+TYPE_EFFECTIVENESS = {
     'Super effective': SUPER_EFFECTIVE_SCALAR,
     'Not very effective': NOT_VERY_EFFECTIVE_SCALAR,
     'Immune': IMMUNE,

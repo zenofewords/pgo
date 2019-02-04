@@ -118,17 +118,17 @@ class Type(DefaultModelMixin, NameMixin, OrderMixin):
         return self.name
 
 
-class TypeEffectivness(models.Model):
+class TypeEffectiveness(models.Model):
     type_offense = models.ForeignKey('pgo.Type', related_name='type_offense', on_delete=models.deletion.CASCADE)
     type_defense = models.ForeignKey('pgo.Type', related_name='type_defense', on_delete=models.deletion.CASCADE)
     relation = models.CharField(max_length=30, blank=True)
-    effectivness = models.ForeignKey('pgo.TypeEffectivnessScalar', on_delete=models.deletion.CASCADE)
+    effectiveness = models.ForeignKey('pgo.TypeEffectivenessScalar', on_delete=models.deletion.CASCADE)
 
     def __str__(self):
-        return '{0}: {1}'.format(self.relation, self.effectivness)
+        return '{0}: {1}'.format(self.relation, self.effectiveness)
 
 
-class TypeEffectivnessScalar(NameMixin):
+class TypeEffectivenessScalar(NameMixin):
     scalar = models.DecimalField(max_digits=8, decimal_places=6)
 
     def __str__(self):

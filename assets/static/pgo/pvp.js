@@ -225,8 +225,8 @@ ready(() => {
     element.append(header)
 
     // extract compound resistance / weakness
-    const typeEffectivness = document.createElement('div')
-    typeEffectivness.classList.add('pvp-pokemon-type-effectivness-wrapper')
+    const typeEffectiveness = document.createElement('div')
+    typeEffectiveness.classList.add('pvp-pokemon-type-effectiveness-wrapper')
     const compoundResistance = document.createElement('ul')
     compoundResistance.classList.add('pvp-compound-resistance')
     const compoundWeakness = document.createElement('ul')
@@ -243,7 +243,7 @@ ready(() => {
       resistance.append(percentage)
       compoundResistance.append(resistance)
     }
-    typeEffectivness.append(compoundResistance)
+    typeEffectiveness.append(compoundResistance)
 
     for (const [key, value] of Object.entries(data.compound_weakness)) {
       let resistance = document.createElement('li')
@@ -256,10 +256,10 @@ ready(() => {
       resistance.append(percentage)
       compoundWeakness.append(resistance)
     }
-    typeEffectivness.append(compoundWeakness)
+    typeEffectiveness.append(compoundWeakness)
 
-    typeEffectivness.append(compoundWeakness)
-    element.append(typeEffectivness)
+    typeEffectiveness.append(compoundWeakness)
+    element.append(typeEffectiveness)
     element.classList.add('pvp-pokemon-wrapper')
   }
 

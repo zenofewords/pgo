@@ -187,10 +187,10 @@ class MoveDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         move_type = self.object.move_type
-        effectivness = move_type.strong + move_type.feeble + move_type.puny
+        effectiveness = move_type.strong + move_type.feeble + move_type.puny
         context.update({
             'data': Move.objects.values_list('slug', 'name'),
-            'effectivness': effectivness,
+            'effectiveness': effectiveness,
             'pokemon_moves': PokemonMove.objects.filter(
                 move_id=self.object.pk
             ).select_related(

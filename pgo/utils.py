@@ -7,7 +7,7 @@ from django.db.models import Q, Max
 from django.http import Http404
 from django.utils.text import slugify
 
-from pgo.models import Move, Pokemon, RaidBoss, Type, TypeEffectivness
+from pgo.models import Move, Pokemon, RaidBoss, Type, TypeEffectiveness
 
 SUPER_EFFECTIVE_SCALAR = 1.4
 NOT_VERY_EFFECTIVE_SCALAR = 0.714
@@ -16,7 +16,7 @@ NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
 WEATHER_BOOST_SCALAR = 1.2
 MAX_IV = 15
-DEFAULT_EFFECTIVNESS = Decimal(str(NEUTRAL_SCALAR))
+DEFAULT_EFFECTIVENESS = Decimal(str(NEUTRAL_SCALAR))
 
 
 class Frailty(object):
@@ -42,7 +42,7 @@ def calculate_cycle_dps(quick_move, cinematic_move):
 
 
 def calculate_dph(
-        power, attack_multiplier, stab, weather_boost, effectivness=1.0, friendship_boost=1.0):
+        power, attack_multiplier, stab, weather_boost, effectiveness=1.0, friendship_boost=1.0):
 
     def _get_stab(stab):
         return STAB_SCALAR if stab else NEUTRAL_SCALAR
@@ -51,7 +51,7 @@ def calculate_dph(
         return WEATHER_BOOST_SCALAR if weather_boost else NEUTRAL_SCALAR
 
     return int(floor(
-        0.5 * power * float(attack_multiplier) * _get_stab(stab) * float(effectivness) *
+        0.5 * power * float(attack_multiplier) * _get_stab(stab) * float(effectiveness) *
         _get_weather_boost(weather_boost) * float(friendship_boost))
     ) + 1
 
@@ -92,16 +92,16 @@ def get_move_data(id):
         raise Http404
 
 
-def determine_move_effectivness(move_type, pokemon):
+def determine_move_effectiveness(move_type, pokemon):
     if isinstance(pokemon, RaidBoss):
         pokemon = pokemon.pokemon
 
-    effectivness = 1.0
+    effectiveness = 1.0
     if pokemon.compound_resistance.get(move_type.name):
-        effectivness = pokemon.compound_resistance[move_type.name]
+        effectiveness = pokemon.compound_resistance[move_type.name]
     if pokemon.compound_weakness.get(move_type.name):
-        effectivness = pokemon.compound_weakness[move_type.name]
-    return effectivness
+        effectiveness = pokemon.compound_weakness[move_type.name]
+    return effectiveness
 
 
 def is_move_stab(move, pokemon):

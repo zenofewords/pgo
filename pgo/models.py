@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
-
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.utils.timezone import datetime
 
 from zenofewords.mixins import (
     DefaultModelMixin,
@@ -13,6 +12,7 @@ from zenofewords.mixins import (
 class MoveCategory:
     QK = 'QK'
     CC = 'CC'
+
     CHOICES = (
         (QK, 'Quick'),
         (CC, 'Cinematic'),
@@ -48,6 +48,22 @@ class Generation:
         (VI, 'VI'),
         (VII, 'VII'),
         (VIII, 'VIII'),
+    )
+
+
+class MoveAvailabiltyLegacyType:
+    COMMUNIY_DAY = 'CD'
+    RAID_DAY = 'RD'
+    QUEST_ENCOUNTER = 'QE'
+    REMOVED = 'RM'
+    ACTIVE = 'AC'
+
+    CHOICES = (
+        (COMMUNIY_DAY, 'Community day'),
+        (RAID_DAY, 'Raid day'),
+        (QUEST_ENCOUNTER, 'Quest encounter'),
+        (REMOVED, 'Removed'),
+        (ACTIVE, 'Active'),
     )
 
 
@@ -170,7 +186,6 @@ class PokemonMove(DefaultModelMixin):
     pokemon = models.ForeignKey('pgo.Pokemon', on_delete=models.deletion.CASCADE)
     move = models.ForeignKey('pgo.Move', on_delete=models.deletion.CASCADE)
 
-    legacy = models.BooleanField(default=False)
     stab = models.BooleanField(default=False)
     score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
 
@@ -182,6 +197,27 @@ class PokemonMove(DefaultModelMixin):
         return '{}\'s {}'.format(self.pokemon, self.move)
 
 
+class MoveAvailability(models.Model):
+    pokemon_move = models.ForeignKey('pgo.PokemonMove', on_delete=models.deletion.CASCADE)
+    available_from = models.DateField(default=datetime(2016, 7, 6))
+    available_to = models.DateField(blank=True, null=True)
+    legacy_status = models.CharField(
+        choices=MoveAvailabiltyLegacyType.CHOICES,
+        default=MoveAvailabiltyLegacyType.ACTIVE,
+        max_length=2)
+
+    class Meta:
+        verbose_name = 'Move availability'
+        verbose_name_plural = 'Move availability'
+
+    def __str__(self):
+        return '{} - {}'.format(self.pokemon_move, self.legacy_status)
+
+    @property
+    def is_legacy(self):
+        return True if self.available_to else False
+
+
 class Moveset(DefaultModelMixin):
     pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True, on_delete=models.deletion.CASCADE)
     quick_move = models.ForeignKey(
@@ -190,11 +226,10 @@ class Moveset(DefaultModelMixin):
         'pgo.PokemonMove', blank=True, null=True, related_name='cinematic_moves', on_delete=models.deletion.CASCADE)
     key = models.CharField(max_length=50, blank=True)
 
-    legacy = models.BooleanField(default=False)
     weave_damage = JSONField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('pokemon', 'key',)
+        unique_together = ('pokemon', 'quick_move', 'cinematic_move',)
 
     def __str__(self):
         return '{} {}'.format(self.pokemon.name, self.key)

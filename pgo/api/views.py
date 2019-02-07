@@ -1,6 +1,5 @@
-from __future__ import division, unicode_literals
-
 import six.moves.urllib as urllib
+import copy
 import logging
 
 from collections import OrderedDict
@@ -122,19 +121,44 @@ class BreakpointCalcAPIView(GenericAPIView):
         cpm_qs = CPM.gyms.all()
         self.max_cpm_value = cpm_qs.last().value
 
-        self.attacker = get_pokemon_data(data.get('attacker'))
+        attacker_id = data.get('attacker')
+        defender_id = data.get('defender')
+        if attacker_id == defender_id:
+            pokemon = get_pokemon_data(attacker_id)
+            self.attacker = pokemon
+            self.defender = copy.deepcopy(pokemon)
+        else:
+            self.attacker = get_pokemon_data(data.get('attacker'))
+            self.defender = get_pokemon_data(data.get('defender'))
+
         self.attacker.atk_iv = data.get('attacker_atk_iv')
         self.attacker.level = data.get('attacker_level')
         self.attacker.cpm = cpm_qs.get(level=self.attacker.level)
         self.attacker.cpm_list = cpm_qs.filter(level__gte=self.attacker.level).values(
             'level', 'value', 'total_stardust_cost', 'total_candy_cost')
-        self.attacker_quick_move = get_move_data(data.get('attacker_quick_move'))
-        self.attacker_cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
-        self.defender = get_pokemon_data(data.get('defender'))
+
         self.defender.defense_iv = data.get('defense_iv', MAX_IV)
-        self.defender.quick_move = get_move_data(data.get('defender_quick_move'))
-        self.defender.cinematic_move = get_move_data(data.get('defender_cinematic_move'))
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])
+
+        attacker_qk_move_id = data.get('attacker_quick_move')
+        defender_qk_move_id = data.get('defender_quick_move')
+        if attacker_qk_move_id == defender_qk_move_id:
+            quick_move = get_move_data(attacker_qk_move_id)
+            self.attacker_quick_move = quick_move
+            self.defender.quick_move = copy.deepcopy(quick_move)
+        else:
+            self.attacker_quick_move = get_move_data(data.get('attacker_quick_move'))
+            self.defender.quick_move = get_move_data(data.get('defender_quick_move'))
+
+        attacker_cc_move_id = data.get('attacker_cinematic_move')
+        defender_cc_move_id = data.get('defender_cinematic_move')
+        if attacker_cc_move_id == defender_cc_move_id:
+            cinematic_move = get_move_data(attacker_cc_move_id)
+            self.attacker_cinematic_move = cinematic_move
+            self.defender.cinematic_move = copy.deepcopy(cinematic_move)
+        else:
+            self.attacker_cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
+            self.defender.cinematic_move = get_move_data(data.get('defender_cinematic_move'))
 
         self.friendship_boost = data.get('friendship_boost', 1.00)
         self.raid_tier = None
@@ -379,7 +403,9 @@ class BreakpointCalcAPIView(GenericAPIView):
                     attacker_multiplier,
                     moveset.quick_move.stab,
                     quick_move.move_type_id in self.boosted_types,
-                    determine_move_effectiveness(quick_move.move_type, self.defender),
+                    determine_move_effectiveness(
+                        moveset.quick_move.move_type.title(), self.defender
+                    ),
                     self.friendship_boost
                 )
                 cinematic_move.damage_per_hit = calculate_dph(
@@ -387,7 +413,9 @@ class BreakpointCalcAPIView(GenericAPIView):
                     attacker_multiplier,
                     moveset.cinematic_move.stab,
                     cinematic_move.move_type_id in self.boosted_types,
-                    determine_move_effectiveness(cinematic_move.move_type, self.defender),
+                    determine_move_effectiveness(
+                        moveset.cinematic_move.move_type.title(), self.defender
+                    ),
                     self.friendship_boost
                 )
                 dps = calculate_cycle_dps(quick_move, cinematic_move)

@@ -63,8 +63,8 @@
         <div class="col-xs-4 input-padding-right input-padding-left">
           <label for="breakpoint-calc-select-weather-condition" class="sr-only">Weather condition</label>
           <select id="breakpoint-calc-select-weather-condition" class="form-control input-height">
-            {% for data in weather_condition_data %}
-              <option value="{{ data.0 }}">{{ data.1 }}</option>
+            {% for weather_condition in weather_condition_data %}
+              <option value="{{ weather_condition.pk }}">{{ weather_condition.name }}</option>
             {% endfor %}
           </select>
         </div>

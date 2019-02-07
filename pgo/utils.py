@@ -70,24 +70,14 @@ def calculate_defense(total_defense, cpm):
 
 def get_pokemon_data(id):
     try:
-        return Pokemon.objects.only(
-            'name', 'pgo_attack', 'pgo_stamina', 'primary_type_id', 'secondary_type_id',
-            'compound_weakness', 'compound_resistance',
-        ).prefetch_related(
-            'quick_moves__move__move_type',
-            'cinematic_moves__move__move_type'
-        ).get(pk=id)
+        return Pokemon.objects.get(pk=id)
     except Pokemon.DoesNotExist:
         raise Http404
 
 
 def get_move_data(id):
     try:
-        return Move.objects.only(
-            'name', 'power', 'duration', 'move_type_id'
-        ).select_related(
-            'move_type'
-        ).get(pk=id)
+        return Move.objects.select_related('move_type').get(pk=id)
     except Move.DoesNotExist:
         raise Http404
 
@@ -96,11 +86,14 @@ def determine_move_effectiveness(move_type, pokemon):
     if isinstance(pokemon, RaidBoss):
         pokemon = pokemon.pokemon
 
+    if isinstance(move_type, Type):
+        move_type = move_type.name
+
     effectiveness = 1.0
-    if pokemon.compound_resistance.get(move_type.name):
-        effectiveness = pokemon.compound_resistance[move_type.name]
-    if pokemon.compound_weakness.get(move_type.name):
-        effectiveness = pokemon.compound_weakness[move_type.name]
+    if pokemon.compound_resistance.get(move_type):
+        effectiveness = pokemon.compound_resistance[move_type]
+    if pokemon.compound_weakness.get(move_type):
+        effectiveness = pokemon.compound_weakness[move_type]
     return effectiveness
 
 
@@ -251,6 +244,6 @@ def get_top_counter_qs(defender):
     qs_id_list += h_id_list
 
     return queryset.filter(id__in=qs_id_list).prefetch_related(
-        'moveset_set__quick_move__move__move_type',
-        'moveset_set__cinematic_move__move__move_type',
+        'moveset_set__quick_move__move',
+        'moveset_set__cinematic_move__move',
     )

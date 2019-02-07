@@ -3,7 +3,6 @@ from django.db import models
 from django.utils.timezone import datetime
 
 from zenofewords.mixins import (
-    DefaultModelMixin,
     NameMixin,
     OrderMixin,
 )
@@ -114,7 +113,7 @@ class PokemonManager(models.Manager):
         return super().get_queryset().filter(implemented=True)
 
 
-class Pokemon(DefaultModelMixin, NameMixin):
+class Pokemon(NameMixin):
     number = models.CharField(max_length=5)
     primary_type = models.ForeignKey('pgo.Type', related_name='primary_types',
         blank=True, null=True, on_delete=models.deletion.CASCADE)
@@ -161,7 +160,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
         return '{0} ({1})'.format(self.name, self.number)
 
 
-class Type(DefaultModelMixin, NameMixin, OrderMixin):
+class Type(NameMixin, OrderMixin):
     strong = JSONField(blank=True, null=True)
     feeble = JSONField(blank=True, null=True)
     puny = JSONField(blank=True, null=True)
@@ -193,7 +192,7 @@ class TypeEffectivenessScalar(NameMixin):
         return '{0} ({1})'.format(self.name, self.scalar)
 
 
-class Move(DefaultModelMixin, NameMixin):
+class Move(NameMixin):
     category = models.CharField(max_length=2, choices=MoveCategory.CHOICES)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True, on_delete=models.deletion.CASCADE)
 
@@ -224,7 +223,7 @@ class Move(DefaultModelMixin, NameMixin):
         return self.name
 
 
-class PokemonMove(DefaultModelMixin):
+class PokemonMove(models.Model):
     pokemon = models.ForeignKey('pgo.Pokemon', on_delete=models.deletion.CASCADE)
     move = models.ForeignKey('pgo.Move', on_delete=models.deletion.CASCADE)
 
@@ -264,7 +263,7 @@ class MoveAvailability(models.Model):
         return True if self.available_to else False
 
 
-class Moveset(DefaultModelMixin):
+class Moveset(models.Model):
     pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True, on_delete=models.deletion.CASCADE)
     quick_move = models.ForeignKey(
         'pgo.PokemonMove', blank=True, null=True, related_name='quick_moves', on_delete=models.deletion.CASCADE)
@@ -344,7 +343,7 @@ class RaidBoss(models.Model):
         return 'T{} raid boss {}'.format(self.raid_tier.tier, self.pokemon.name)
 
 
-class WeatherCondition(DefaultModelMixin, NameMixin, OrderMixin):
+class WeatherCondition(NameMixin, OrderMixin):
     types_boosted = models.ManyToManyField('pgo.Type', verbose_name='Boosts Type', blank=True)
 
     class Meta:

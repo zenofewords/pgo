@@ -50,7 +50,7 @@ class CalculatorInitialDataMixin(TemplateView):
 
         data = {
             'attack_iv_range': list(range(15, -1, -1)),
-            'weather_condition_data': WeatherCondition.objects.values_list('id', 'name'),
+            'weather_condition_data': WeatherCondition.objects.all(),
             'friendship': Friendship.objects.all(),
             'defender_cpm_data': defender_cpm_data,
             'initial_data': self.initial_data,

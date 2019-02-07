@@ -162,6 +162,9 @@
 .glyphicon {
   top: .2rem;
 }
+#breakpoint-calc-breakpoints-table {
+  margin-bottom: 1.5rem;
+}
 table#breakpoint-calc-breakpoints-table tr th:first-child,
 table#breakpoint-calc-breakpoints-table tr td:first-child {
   padding-left: .7rem;
@@ -189,8 +192,10 @@ table#top-counters-table tr td:last-child {
   text-align: justify;
   font-size: 1.3rem;
 }
+.faq-legend-wrapper hr {
+  margin: 1.5rem 0;
+}
 #faq-legend-link {
-  font-size: 1.8rem;
   text-align: center;
   text-decoration: none;
 }
@@ -418,6 +423,9 @@ body {
 }
 .content {
   flex: 1 0 auto;
+}
+.foosnote {
+  margin: 0;
 }
 .footer {
   flex-shrink: 0;

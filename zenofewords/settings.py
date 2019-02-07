@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 """
 Django settings for zenofewords project.
 
@@ -23,6 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
+DEBUG_TOOLBAR = bool(os.getenv('DEBUG_TOOLBAR', False) and DEBUG)
 CACHE = not DEBUG
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -68,6 +67,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG_TOOLBAR:
+    INSTALLED_APPS.insert(6, 'debug_toolbar')
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 LOADERS = [
     'django.template.loaders.filesystem.Loader',

@@ -67,6 +67,48 @@ class MoveAvailabiltyLegacyType:
     )
 
 
+class MoveType:
+    BUG = 'bug'
+    DARK = 'dark'
+    DRAGON = 'dragon'
+    ELECTRIC = 'electric'
+    FAIRY = 'fairy'
+    FIGHTING = 'fighting'
+    FIRE = 'fire'
+    FLYING = 'flying'
+    GHOST = 'ghost'
+    GRASS = 'grass'
+    GROUND = 'ground'
+    ICE = 'ice'
+    NORMAL = 'normal'
+    POISON = 'poison'
+    PSYCHIC = 'psychic'
+    ROCK = 'rock'
+    STEEL = 'steel'
+    WATER = 'water'
+
+    CHOICES = (
+        (BUG, 'Bug'),
+        (DARK, 'Dark'),
+        (DRAGON, 'Dragon'),
+        (ELECTRIC, 'Electric'),
+        (FAIRY, 'Fairy'),
+        (FIGHTING, 'Fighting'),
+        (FIRE, 'Fire'),
+        (FLYING, 'Flying'),
+        (GHOST, 'Ghost'),
+        (GRASS, 'Grass'),
+        (GROUND, 'Ground'),
+        (ICE, 'Ice'),
+        (NORMAL, 'Normal'),
+        (POISON, 'Poison'),
+        (PSYCHIC, 'Psychic'),
+        (ROCK, 'Rock'),
+        (STEEL, 'Steel'),
+        (WATER, 'Water'),
+    )
+
+
 class PokemonManager(models.Manager):
     def implemented(self):
         return super().get_queryset().filter(implemented=True)
@@ -186,7 +228,11 @@ class PokemonMove(DefaultModelMixin):
     pokemon = models.ForeignKey('pgo.Pokemon', on_delete=models.deletion.CASCADE)
     move = models.ForeignKey('pgo.Move', on_delete=models.deletion.CASCADE)
 
+    cinematic = models.BooleanField(default=False)
+    legacy = models.BooleanField(default=False)
     stab = models.BooleanField(default=False)
+
+    move_type = models.CharField(choices=MoveType.CHOICES, max_length=10, default=MoveType.NORMAL)
     score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
 
     class Meta:

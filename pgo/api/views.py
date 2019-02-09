@@ -147,8 +147,8 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.attacker_quick_move = quick_move
             self.defender.quick_move = copy.deepcopy(quick_move)
         else:
-            self.attacker_quick_move = get_move_data(data.get('attacker_quick_move'))
-            self.defender.quick_move = get_move_data(data.get('defender_quick_move'))
+            self.attacker_quick_move = get_move_data(attacker_qk_move_id)
+            self.defender.quick_move = get_move_data(defender_qk_move_id)
 
         attacker_cc_move_id = data.get('attacker_cinematic_move')
         defender_cc_move_id = data.get('defender_cinematic_move')
@@ -157,8 +157,8 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.attacker_cinematic_move = cinematic_move
             self.defender.cinematic_move = copy.deepcopy(cinematic_move)
         else:
-            self.attacker_cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
-            self.defender.cinematic_move = get_move_data(data.get('defender_cinematic_move'))
+            self.attacker_cinematic_move = get_move_data(attacker_cc_move_id)
+            self.defender.cinematic_move = get_move_data(defender_cc_move_id)
 
         self.friendship_boost = data.get('friendship_boost', 1.00)
         self.raid_tier = None
@@ -477,55 +477,19 @@ class BreakpointCalcAPIView(GenericAPIView):
             score += 10
 
         quick_move_threshold = 2 if self.defender.quick_move.duration > 1000 else 3
-        if self.defender.cinematic_move.energy_delta == -100 or self.defender.cinematic_move.energy_delta == -50:
+        cm_energy_delta = self.defender.cinematic_move.energy_delta
+        if cm_energy_delta == -100 or cm_energy_delta == -50:
             if health - cinematic_move_dph < 0:
-                score += self.defender.cinematic_move.energy_delta * 1.5
+                score += cm_energy_delta * 1.5
             elif health - (cinematic_move_dph + quick_move_dph) < 0:
-                score += self.defender.cinematic_move.energy_delta * 1.5
+                score += cm_energy_delta * 1.5
             elif health - (cinematic_move_dph + quick_move_threshold * quick_move_dph) < 0:
-                score += self.defender.cinematic_move.energy_delta * 1.5
+                score += cm_energy_delta * 1.5
         else:
             if (health - (cinematic_move_dph * 2 + quick_move_threshold * quick_move_dph) < 0
                 or health - quick_move_dph * 5 < 0):
                     score -= 70
         return score
-
-    def _get_counter_frailty(self, instance):
-        cinematic_move_dph = self._get_defender_move_dph(
-            self.defender.cinematic_move, instance.multiplier, instance.counter)
-        quick_move_dph = self._get_defender_move_dph(
-            self.defender.quick_move, instance.multiplier, instance.counter)
-
-        quick_attacks = 2 if self.defender.quick_move.duration > 1000 else 3
-        cycle_damage_percentage = (
-            cinematic_move_dph / instance.counter_hp * 100
-        ) + (quick_move_dph / instance.counter_hp * 100) * quick_attacks
-
-        fragile_cut_off = 99
-        resilient_cut_off = 60
-        if self.defender.cinematic_move.energy_delta == -50:
-            fragile_cut_off = 60
-            resilient_cut_off = 45
-        elif self.defender.cinematic_move.energy_delta == -33:
-            fragile_cut_off = 55
-            resilient_cut_off = 40
-
-        frailty = Frailty.NEUTRAL
-        if cycle_damage_percentage > fragile_cut_off:
-            frailty = Frailty.FRAGILE
-        elif cycle_damage_percentage < resilient_cut_off:
-            frailty = Frailty.RESILIENT
-
-        return frailty
-
-    def _get_defender_move_dph(self, move, multiplier, pokemon):
-        return calculate_dph(
-            move.power,
-            multiplier,
-            is_move_stab(move, self.defender),
-            move.move_type_id in self.boosted_types,
-            determine_move_effectiveness(move.move_type, pokemon)
-        )
 
     def _get_top_counter_url(self, pokemon, moveset_data):
         params = urllib.parse.urlencode({

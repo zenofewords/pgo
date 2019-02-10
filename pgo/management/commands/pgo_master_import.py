@@ -148,6 +148,7 @@ class Command(BaseCommand):
                 if 'legendary' in detail:
                     pokemon.legendary = True
 
+            self._legacy_check_existing_moves(pokemon, quick_moves, cinematic_moves)
             for quick_move in quick_moves:
                 for cinematic_move in cinematic_moves:
                     new_movesets.append(Moveset.objects.get_or_create(
@@ -159,6 +160,23 @@ class Command(BaseCommand):
                         }
                     ))
             pokemon.save()
+
+    def _legacy_check_existing_moves(self, pokemon, quick_moves, cinematic_moves):
+        hidden_powers = []
+        for quick_move in quick_moves:
+            if quick_move.move.slug == 'hidden-power':
+                quick_moves.remove(quick_move)
+
+                hidden_powers = PokemonMove.objects.filter(
+                    pokemon=pokemon, move__slug__startswith=quick_move.move.slug)
+
+        for hidden_power in hidden_powers:
+            quick_moves.append(hidden_power)
+
+        legacy_moves = PokemonMove.objects.filter(
+            pokemon=pokemon).exclude(id__in=[x.pk for x in quick_moves + cinematic_moves])
+        if legacy_moves:
+            legacy_moves.update(legacy=True)
 
     def _process_moves(self, move_data):
         for move_slug, data in move_data.items():

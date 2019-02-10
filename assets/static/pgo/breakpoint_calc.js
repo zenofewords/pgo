@@ -146,6 +146,8 @@ ready(() => {
   })
   selectDefenderCPM.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cpm = event.currentTarget.value
+    clearMoveInputs('defender')
+    selectPokemonMoves(breakpointCalcForm.defender, 'defender')
 
     breakpointCalcForm.staleTab = true
     submitBreakpointCalcForm().then(() => selectDefenderCPM.focus())
@@ -277,7 +279,12 @@ ready(() => {
   const selectPokemonMoves = (value, pokemon) => {
     if (parseInt(value) > 0) {
       const request = new XMLHttpRequest()
-      request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
+      const excludeLegacy = pokemon === 'defender' && selectDefenderCPM.value.slice(-1) !== '0'
+      request.open(
+        'GET',
+        `${window.pgoAPIURLs['move-list']}?pokemon-id=${value}&exclude-legacy=${excludeLegacy}`,
+        true
+      )
 
       request.onload = () => {
         if (request.status >= 200 && request.status < 400) {

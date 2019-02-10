@@ -52,7 +52,11 @@ class MoveViewSet(viewsets.ModelViewSet):
 
             if query != 0:
                 self.serializer_class = PokemonMoveSerializer
-                return PokemonMove.objects.filter(pokemon_id=query)
+                qs = PokemonMove.objects.filter(pokemon_id=query)
+
+                if self.request.GET.get('exclude-legacy') == 'true':
+                    qs = qs.exclude(legacy=True)
+                return qs
             else:
                 return []
         else:

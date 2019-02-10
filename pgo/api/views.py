@@ -1,6 +1,5 @@
-from __future__ import division, unicode_literals
-
 import six.moves.urllib as urllib
+import copy
 import logging
 
 from collections import OrderedDict
@@ -31,7 +30,7 @@ from pgo.utils import (
     get_pokemon_data,
     get_move_data,
     get_top_counter_qs,
-    determine_move_effectivness,
+    determine_move_effectiveness,
     is_move_stab,
     MAX_IV,
     Frailty,
@@ -53,7 +52,11 @@ class MoveViewSet(viewsets.ModelViewSet):
 
             if query != 0:
                 self.serializer_class = PokemonMoveSerializer
-                return PokemonMove.objects.filter(pokemon_id=query)
+                qs = PokemonMove.objects.filter(pokemon_id=query)
+
+                if self.request.GET.get('exclude-legacy') == 'true':
+                    qs = qs.exclude(legacy=True)
+                return qs
             else:
                 return []
         else:
@@ -122,19 +125,44 @@ class BreakpointCalcAPIView(GenericAPIView):
         cpm_qs = CPM.gyms.all()
         self.max_cpm_value = cpm_qs.last().value
 
-        self.attacker = get_pokemon_data(data.get('attacker'))
+        attacker_id = data.get('attacker')
+        defender_id = data.get('defender')
+        if attacker_id == defender_id:
+            pokemon = get_pokemon_data(attacker_id)
+            self.attacker = pokemon
+            self.defender = copy.deepcopy(pokemon)
+        else:
+            self.attacker = get_pokemon_data(data.get('attacker'))
+            self.defender = get_pokemon_data(data.get('defender'))
+
         self.attacker.atk_iv = data.get('attacker_atk_iv')
         self.attacker.level = data.get('attacker_level')
         self.attacker.cpm = cpm_qs.get(level=self.attacker.level)
         self.attacker.cpm_list = cpm_qs.filter(level__gte=self.attacker.level).values(
             'level', 'value', 'total_stardust_cost', 'total_candy_cost')
-        self.attacker_quick_move = get_move_data(data.get('attacker_quick_move'))
-        self.attacker_cinematic_move = get_move_data(data.get('attacker_cinematic_move'))
-        self.defender = get_pokemon_data(data.get('defender'))
+
         self.defender.defense_iv = data.get('defense_iv', MAX_IV)
-        self.defender.quick_move = get_move_data(data.get('defender_quick_move'))
-        self.defender.cinematic_move = get_move_data(data.get('defender_cinematic_move'))
         self.defender.cpm = Decimal(data.get('defender_cpm')[:11])
+
+        attacker_qk_move_id = data.get('attacker_quick_move')
+        defender_qk_move_id = data.get('defender_quick_move')
+        if attacker_qk_move_id == defender_qk_move_id:
+            quick_move = get_move_data(attacker_qk_move_id)
+            self.attacker_quick_move = quick_move
+            self.defender.quick_move = copy.deepcopy(quick_move)
+        else:
+            self.attacker_quick_move = get_move_data(attacker_qk_move_id)
+            self.defender.quick_move = get_move_data(defender_qk_move_id)
+
+        attacker_cc_move_id = data.get('attacker_cinematic_move')
+        defender_cc_move_id = data.get('defender_cinematic_move')
+        if attacker_cc_move_id == defender_cc_move_id:
+            cinematic_move = get_move_data(attacker_cc_move_id)
+            self.attacker_cinematic_move = cinematic_move
+            self.defender.cinematic_move = copy.deepcopy(cinematic_move)
+        else:
+            self.attacker_cinematic_move = get_move_data(attacker_cc_move_id)
+            self.defender.cinematic_move = get_move_data(defender_cc_move_id)
 
         self.friendship_boost = data.get('friendship_boost', 1.00)
         self.raid_tier = None
@@ -179,9 +207,9 @@ class BreakpointCalcAPIView(GenericAPIView):
         self.attacker_cinematic_move.stab = is_move_stab(
             self.attacker_cinematic_move, self.attacker)
 
-        self.attacker_quick_move.effectivness = determine_move_effectivness(
+        self.attacker_quick_move.effectiveness = determine_move_effectiveness(
             self.attacker_quick_move.move_type, self.defender)
-        self.attacker_cinematic_move.effectivness = determine_move_effectivness(
+        self.attacker_cinematic_move.effectiveness = determine_move_effectiveness(
             self.attacker_cinematic_move.move_type, self.defender)
 
         self.attacker_quick_move.weather_boosted = \
@@ -235,7 +263,7 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.attack_multiplier,
             move.stab,
             move.weather_boosted,
-            move.effectivness,
+            move.effectiveness,
             self.friendship_boost
         )
 
@@ -379,7 +407,9 @@ class BreakpointCalcAPIView(GenericAPIView):
                     attacker_multiplier,
                     moveset.quick_move.stab,
                     quick_move.move_type_id in self.boosted_types,
-                    determine_move_effectivness(quick_move.move_type, self.defender),
+                    determine_move_effectiveness(
+                        moveset.quick_move.move_type.title(), self.defender
+                    ),
                     self.friendship_boost
                 )
                 cinematic_move.damage_per_hit = calculate_dph(
@@ -387,7 +417,9 @@ class BreakpointCalcAPIView(GenericAPIView):
                     attacker_multiplier,
                     moveset.cinematic_move.stab,
                     cinematic_move.move_type_id in self.boosted_types,
-                    determine_move_effectivness(cinematic_move.move_type, self.defender),
+                    determine_move_effectiveness(
+                        moveset.cinematic_move.move_type.title(), self.defender
+                    ),
                     self.friendship_boost
                 )
                 dps = calculate_cycle_dps(quick_move, cinematic_move)
@@ -414,14 +446,14 @@ class BreakpointCalcAPIView(GenericAPIView):
             defender_multiplier,
             is_move_stab(self.defender.quick_move, self.defender),
             self.defender.quick_move.move_type_id in self.boosted_types,
-            determine_move_effectivness(self.defender.quick_move.move_type, pokemon),
+            determine_move_effectiveness(self.defender.quick_move.move_type, pokemon),
         )
         cinematic_move_dph = calculate_dph(
             self.defender.cinematic_move.power,
             defender_multiplier,
             is_move_stab(self.defender.cinematic_move, self.defender),
             self.defender.cinematic_move.move_type_id in self.boosted_types,
-            determine_move_effectivness(self.defender.cinematic_move.move_type, pokemon),
+            determine_move_effectiveness(self.defender.cinematic_move.move_type, pokemon),
         )
         health = int((pokemon.pgo_stamina + MAX_IV) * self.max_cpm_value)
         score = dps * 20
@@ -449,55 +481,19 @@ class BreakpointCalcAPIView(GenericAPIView):
             score += 10
 
         quick_move_threshold = 2 if self.defender.quick_move.duration > 1000 else 3
-        if self.defender.cinematic_move.energy_delta == -100 or self.defender.cinematic_move.energy_delta == -50:
+        cm_energy_delta = self.defender.cinematic_move.energy_delta
+        if cm_energy_delta == -100 or cm_energy_delta == -50:
             if health - cinematic_move_dph < 0:
-                score += self.defender.cinematic_move.energy_delta * 1.5
+                score += cm_energy_delta * 1.5
             elif health - (cinematic_move_dph + quick_move_dph) < 0:
-                score += self.defender.cinematic_move.energy_delta * 1.5
+                score += cm_energy_delta * 1.5
             elif health - (cinematic_move_dph + quick_move_threshold * quick_move_dph) < 0:
-                score += self.defender.cinematic_move.energy_delta * 1.5
+                score += cm_energy_delta * 1.5
         else:
             if (health - (cinematic_move_dph * 2 + quick_move_threshold * quick_move_dph) < 0
                 or health - quick_move_dph * 5 < 0):
                     score -= 70
         return score
-
-    def _get_counter_frailty(self, instance):
-        cinematic_move_dph = self._get_defender_move_dph(
-            self.defender.cinematic_move, instance.multiplier, instance.counter)
-        quick_move_dph = self._get_defender_move_dph(
-            self.defender.quick_move, instance.multiplier, instance.counter)
-
-        quick_attacks = 2 if self.defender.quick_move.duration > 1000 else 3
-        cycle_damage_percentage = (
-            cinematic_move_dph / instance.counter_hp * 100
-        ) + (quick_move_dph / instance.counter_hp * 100) * quick_attacks
-
-        fragile_cut_off = 99
-        resilient_cut_off = 60
-        if self.defender.cinematic_move.energy_delta == -50:
-            fragile_cut_off = 60
-            resilient_cut_off = 45
-        elif self.defender.cinematic_move.energy_delta == -33:
-            fragile_cut_off = 55
-            resilient_cut_off = 40
-
-        frailty = Frailty.NEUTRAL
-        if cycle_damage_percentage > fragile_cut_off:
-            frailty = Frailty.FRAGILE
-        elif cycle_damage_percentage < resilient_cut_off:
-            frailty = Frailty.RESILIENT
-
-        return frailty
-
-    def _get_defender_move_dph(self, move, multiplier, pokemon):
-        return calculate_dph(
-            move.power,
-            multiplier,
-            is_move_stab(move, self.defender),
-            move.move_type_id in self.boosted_types,
-            determine_move_effectivness(move.move_type, pokemon)
-        )
 
     def _get_top_counter_url(self, pokemon, moveset_data):
         params = urllib.parse.urlencode({
@@ -613,18 +609,18 @@ class GoodToGoAPIView(GenericAPIView):
     def _get_breakpoint_data(self, defender):
         stab = is_move_stab(self.quick_move, self.attacker)
         weather_boosted = self.quick_move.move_type_id in self.boosted_types
-        effectivness = determine_move_effectivness(self.quick_move.move_type, defender)
+        effectiveness = determine_move_effectiveness(self.quick_move.move_type, defender)
         max_multiplier = self._get_attack_multiplier(MAX_IV, defender)
 
         max_damage_per_hit = calculate_dph(
             self.quick_move.power, max_multiplier, stab,
-            weather_boosted, effectivness, self.friendship_boost
+            weather_boosted, effectiveness, self.friendship_boost
         )
 
         actual_multiplier = self._get_attack_multiplier(self.attack_iv, defender)
         actual_damage_per_hit = calculate_dph(
             self.quick_move.power, actual_multiplier, stab,
-            weather_boosted, effectivness, self.friendship_boost
+            weather_boosted, effectiveness, self.friendship_boost
         )
 
         tier = defender.raid_tier.tier

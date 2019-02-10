@@ -38,7 +38,7 @@ class PokemonMoveSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PokemonMove
         fields = (
-            'id', 'score', 'move',
+            'id', 'score', 'move', 'legacy',
         )
 
 

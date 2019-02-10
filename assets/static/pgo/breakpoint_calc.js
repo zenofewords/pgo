@@ -48,7 +48,7 @@ ready(() => {
   const selectFriendShipBoost = document.getElementById('breakpoint-calc-select-friendship-boost')
   const selectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
 
-  const moveEffectivness = document.getElementById('breakpoint-calc-move-effectivness')
+  const moveEffectiveness = document.getElementById('breakpoint-calc-move-effectiveness')
   const detailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
   const inputToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
 
@@ -146,6 +146,8 @@ ready(() => {
   })
   selectDefenderCPM.addEventListener('change', (event) => {
     breakpointCalcForm.defender_cpm = event.currentTarget.value
+    clearMoveInputs('defender')
+    selectPokemonMoves(breakpointCalcForm.defender, 'defender')
 
     breakpointCalcForm.staleTab = true
     submitBreakpointCalcForm().then(() => selectDefenderCPM.focus())
@@ -277,7 +279,12 @@ ready(() => {
   const selectPokemonMoves = (value, pokemon) => {
     if (parseInt(value) > 0) {
       const request = new XMLHttpRequest()
-      request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
+      const excludeLegacy = pokemon === 'defender' && selectDefenderCPM.value.slice(-1) !== '0'
+      request.open(
+        'GET',
+        `${window.pgoAPIURLs['move-list']}?pokemon-id=${value}&exclude-legacy=${excludeLegacy}`,
+        true
+      )
 
       request.onload = () => {
         if (request.status >= 200 && request.status < 400) {
@@ -358,7 +365,7 @@ ready(() => {
                 const json = JSON.parse(request.responseText)
 
                 if (request.status >= 200 && request.status < 400) {
-                  moveEffectivness.innerHTML = ''
+                  moveEffectiveness.innerHTML = ''
                   ivAssessment.innerHTML = json.attack_iv_assessment
 
                   displayBreakpointCalcDetails(json)

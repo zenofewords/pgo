@@ -63,8 +63,8 @@
         <div class="col-xs-4 input-padding-right input-padding-left">
           <label for="breakpoint-calc-select-weather-condition" class="sr-only">Weather condition</label>
           <select id="breakpoint-calc-select-weather-condition" class="form-control input-height">
-            {% for data in weather_condition_data %}
-              <option value="{{ data.0 }}">{{ data.1 }}</option>
+            {% for weather_condition in weather_condition_data %}
+              <option value="{{ weather_condition.pk }}">{{ weather_condition.name }}</option>
             {% endfor %}
           </select>
         </div>
@@ -103,7 +103,7 @@
     <p id="breakpoint-calc-atk-iv-assessment">
       The Pokemon GO breakpoint calculator was built to help you find your pokemon's breakpoints and plan power-ups accordingly.
     </p>
-    <p id="breakpoint-calc-move-effectivness">
+    <p id="breakpoint-calc-move-effectiveness">
       Selecting an attacker and a defender will auto submit the form. Changing any value will refresh the data.
     </p>
   </div>

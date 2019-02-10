@@ -1,19 +1,18 @@
-from __future__ import unicode_literals
-
 from django.contrib import admin
 
 from pgo.models import (
     CPM,
     Friendship,
     Move,
+    MoveAvailability,
     Moveset,
     Pokemon,
     PokemonMove,
     RaidBoss,
     RaidTier,
     Type,
-    TypeEffectivness,
-    TypeEffectivnessScalar,
+    TypeEffectiveness,
+    TypeEffectivenessScalar,
     WeatherCondition,
 )
 
@@ -21,6 +20,15 @@ from pgo.models import (
 class MoveAdmin(admin.ModelAdmin):
     search_fields = (
         'name',
+    )
+
+
+class MoveAvailabilityAdmin(admin.ModelAdmin):
+    search_fields = (
+        'pokemon_move__pokemon__name', 'available_from', 'available_to', 'legacy_status',
+    )
+    raw_id_fields = (
+        'pokemon_move',
     )
 
 
@@ -73,12 +81,13 @@ class RaidBossAdmin(admin.ModelAdmin):
 admin.site.register(CPM)
 admin.site.register(Friendship)
 admin.site.register(Move, MoveAdmin)
+admin.site.register(MoveAvailability, MoveAvailabilityAdmin)
 admin.site.register(Moveset, MovesetAdmin)
 admin.site.register(Pokemon, PokemonAdmin)
 admin.site.register(PokemonMove, PokemonMoveAdmin)
 admin.site.register(RaidBoss, RaidBossAdmin)
 admin.site.register(RaidTier)
 admin.site.register(Type)
-admin.site.register(TypeEffectivness)
-admin.site.register(TypeEffectivnessScalar)
+admin.site.register(TypeEffectiveness)
+admin.site.register(TypeEffectivenessScalar)
 admin.site.register(WeatherCondition)

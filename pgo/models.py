@@ -1,10 +1,8 @@
-from __future__ import unicode_literals
-
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.utils.timezone import datetime
 
 from zenofewords.mixins import (
-    DefaultModelMixin,
     NameMixin,
     OrderMixin,
 )
@@ -13,6 +11,7 @@ from zenofewords.mixins import (
 class MoveCategory:
     QK = 'QK'
     CC = 'CC'
+
     CHOICES = (
         (QK, 'Quick'),
         (CC, 'Cinematic'),
@@ -51,12 +50,70 @@ class Generation:
     )
 
 
+class MoveAvailabiltyLegacyType:
+    COMMUNIY_DAY = 'CD'
+    RAID_DAY = 'RD'
+    QUEST_ENCOUNTER = 'QE'
+    REMOVED = 'RM'
+    ACTIVE = 'AC'
+
+    CHOICES = (
+        (COMMUNIY_DAY, 'Community day'),
+        (RAID_DAY, 'Raid day'),
+        (QUEST_ENCOUNTER, 'Quest encounter'),
+        (REMOVED, 'Removed'),
+        (ACTIVE, 'Active'),
+    )
+
+
+class MoveType:
+    BUG = 'bug'
+    DARK = 'dark'
+    DRAGON = 'dragon'
+    ELECTRIC = 'electric'
+    FAIRY = 'fairy'
+    FIGHTING = 'fighting'
+    FIRE = 'fire'
+    FLYING = 'flying'
+    GHOST = 'ghost'
+    GRASS = 'grass'
+    GROUND = 'ground'
+    ICE = 'ice'
+    NORMAL = 'normal'
+    POISON = 'poison'
+    PSYCHIC = 'psychic'
+    ROCK = 'rock'
+    STEEL = 'steel'
+    WATER = 'water'
+
+    CHOICES = (
+        (BUG, 'Bug'),
+        (DARK, 'Dark'),
+        (DRAGON, 'Dragon'),
+        (ELECTRIC, 'Electric'),
+        (FAIRY, 'Fairy'),
+        (FIGHTING, 'Fighting'),
+        (FIRE, 'Fire'),
+        (FLYING, 'Flying'),
+        (GHOST, 'Ghost'),
+        (GRASS, 'Grass'),
+        (GROUND, 'Ground'),
+        (ICE, 'Ice'),
+        (NORMAL, 'Normal'),
+        (POISON, 'Poison'),
+        (PSYCHIC, 'Psychic'),
+        (ROCK, 'Rock'),
+        (STEEL, 'Steel'),
+        (WATER, 'Water'),
+    )
+
+
 class PokemonManager(models.Manager):
     def implemented(self):
         return super().get_queryset().filter(implemented=True)
 
 
-class Pokemon(DefaultModelMixin, NameMixin):
+class Pokemon(NameMixin):
     number = models.CharField(max_length=5)
     primary_type = models.ForeignKey('pgo.Type', related_name='primary_types',
         blank=True, null=True, on_delete=models.deletion.CASCADE)
@@ -75,7 +132,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
         verbose_name='PGo Stamina', blank=True, null=True)
     maximum_cp = models.DecimalField(
         verbose_name='Combat Power', max_digits=7, decimal_places=2, blank=True, null=True)
-    stat_product = models.IntegerField(blank=True, null=True)
+    stat_sum = models.IntegerField(blank=True, null=True)
     bulk = models.IntegerField(blank=True, null=True)
 
     compound_resistance = JSONField(blank=True, null=True)
@@ -103,7 +160,7 @@ class Pokemon(DefaultModelMixin, NameMixin):
         return '{0} ({1})'.format(self.name, self.number)
 
 
-class Type(DefaultModelMixin, NameMixin, OrderMixin):
+class Type(NameMixin, OrderMixin):
     strong = JSONField(blank=True, null=True)
     feeble = JSONField(blank=True, null=True)
     puny = JSONField(blank=True, null=True)
@@ -118,24 +175,24 @@ class Type(DefaultModelMixin, NameMixin, OrderMixin):
         return self.name
 
 
-class TypeEffectivness(models.Model):
+class TypeEffectiveness(models.Model):
     type_offense = models.ForeignKey('pgo.Type', related_name='type_offense', on_delete=models.deletion.CASCADE)
     type_defense = models.ForeignKey('pgo.Type', related_name='type_defense', on_delete=models.deletion.CASCADE)
     relation = models.CharField(max_length=30, blank=True)
-    effectivness = models.ForeignKey('pgo.TypeEffectivnessScalar', on_delete=models.deletion.CASCADE)
+    effectiveness = models.ForeignKey('pgo.TypeEffectivenessScalar', on_delete=models.deletion.CASCADE)
 
     def __str__(self):
-        return '{0}: {1}'.format(self.relation, self.effectivness)
+        return '{0}: {1}'.format(self.relation, self.effectiveness)
 
 
-class TypeEffectivnessScalar(NameMixin):
+class TypeEffectivenessScalar(NameMixin):
     scalar = models.DecimalField(max_digits=8, decimal_places=6)
 
     def __str__(self):
         return '{0} ({1})'.format(self.name, self.scalar)
 
 
-class Move(DefaultModelMixin, NameMixin):
+class Move(NameMixin):
     category = models.CharField(max_length=2, choices=MoveCategory.CHOICES)
     move_type = models.ForeignKey('pgo.Type', blank=True, null=True, on_delete=models.deletion.CASCADE)
 
@@ -166,12 +223,15 @@ class Move(DefaultModelMixin, NameMixin):
         return self.name
 
 
-class PokemonMove(DefaultModelMixin):
+class PokemonMove(models.Model):
     pokemon = models.ForeignKey('pgo.Pokemon', on_delete=models.deletion.CASCADE)
     move = models.ForeignKey('pgo.Move', on_delete=models.deletion.CASCADE)
 
+    cinematic = models.BooleanField(default=False)
     legacy = models.BooleanField(default=False)
     stab = models.BooleanField(default=False)
+
+    move_type = models.CharField(choices=MoveType.CHOICES, max_length=10, default=MoveType.NORMAL)
     score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
 
     class Meta:
@@ -182,7 +242,28 @@ class PokemonMove(DefaultModelMixin):
         return '{}\'s {}'.format(self.pokemon, self.move)
 
 
-class Moveset(DefaultModelMixin):
+class MoveAvailability(models.Model):
+    pokemon_move = models.ForeignKey('pgo.PokemonMove', on_delete=models.deletion.CASCADE)
+    available_from = models.DateField(default=datetime(2016, 7, 6))
+    available_to = models.DateField(blank=True, null=True)
+    legacy_status = models.CharField(
+        choices=MoveAvailabiltyLegacyType.CHOICES,
+        default=MoveAvailabiltyLegacyType.ACTIVE,
+        max_length=2)
+
+    class Meta:
+        verbose_name = 'Move availability'
+        verbose_name_plural = 'Move availability'
+
+    def __str__(self):
+        return '{} - {}'.format(self.pokemon_move, self.legacy_status)
+
+    @property
+    def is_legacy(self):
+        return True if self.available_to else False
+
+
+class Moveset(models.Model):
     pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True, on_delete=models.deletion.CASCADE)
     quick_move = models.ForeignKey(
         'pgo.PokemonMove', blank=True, null=True, related_name='quick_moves', on_delete=models.deletion.CASCADE)
@@ -190,11 +271,10 @@ class Moveset(DefaultModelMixin):
         'pgo.PokemonMove', blank=True, null=True, related_name='cinematic_moves', on_delete=models.deletion.CASCADE)
     key = models.CharField(max_length=50, blank=True)
 
-    legacy = models.BooleanField(default=False)
     weave_damage = JSONField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('pokemon', 'key',)
+        unique_together = ('pokemon', 'quick_move', 'cinematic_move',)
 
     def __str__(self):
         return '{} {}'.format(self.pokemon.name, self.key)
@@ -263,7 +343,7 @@ class RaidBoss(models.Model):
         return 'T{} raid boss {}'.format(self.raid_tier.tier, self.pokemon.name)
 
 
-class WeatherCondition(DefaultModelMixin, NameMixin, OrderMixin):
+class WeatherCondition(NameMixin, OrderMixin):
     types_boosted = models.ManyToManyField('pgo.Type', verbose_name='Boosts Type', blank=True)
 
     class Meta:

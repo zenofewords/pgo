@@ -110,7 +110,7 @@ def get_top_counter_qs(defender):
     defender_qk_move_type = defender.quick_move.move_type
     defender_cm_move_type = defender.cinematic_move.move_type
     queryset = Pokemon.objects.implemented().filter(
-        stat_product__gte=500,
+        stat_sum__gte=500,
         pgo_attack__gte=170
     )
 
@@ -135,7 +135,7 @@ def get_top_counter_qs(defender):
             quick_moves__move_type__in=defender_weakness,
             cinematic_moves__move_type__in=defender_weakness,
             compound_resistance__icontains=defender_cm_move_type,
-            stat_product__gte=510
+            stat_sum__gte=510
         ).exclude(
             id__in=qs_id_list
         ).values_list('id', flat=True))
@@ -147,7 +147,7 @@ def get_top_counter_qs(defender):
             Q(cinematic_moves__move_type__in=defender_weakness)
             & Q(compound_resistance__icontains=defender_qk_move_type)
             & Q(compound_resistance__icontains=defender_cm_move_type)
-            & Q(stat_product__gte=530)
+            & Q(stat_sum__gte=530)
         ).exclude(
             quick_moves__move_type__in=defender_resistance
         ).exclude(
@@ -160,7 +160,7 @@ def get_top_counter_qs(defender):
     c_id_list = list(queryset.filter(
             cinematic_moves__move_type__in=defender_weakness,
             compound_resistance__icontains=defender_cm_move_type,
-            stat_product__gte=550
+            stat_sum__gte=550
         ).exclude(
             quick_moves__move_type__in=defender_resistance
         ).exclude(
@@ -173,7 +173,7 @@ def get_top_counter_qs(defender):
     d_id_list = list(queryset.filter(
             quick_moves__move_type__in=defender_weakness,
             cinematic_moves__move_type__in=defender_weakness,
-            stat_product__gte=570
+            stat_sum__gte=570
         ).exclude(
             Q(compound_weakness__icontains=defender_qk_move_type)
             | Q(compound_weakness__icontains=defender_cm_move_type)
@@ -197,7 +197,7 @@ def get_top_counter_qs(defender):
     # F = pokemon with a charge move that is SE against the defender,
     # and they are not weak to the defender's charge move, excluding E
     f_id_list = list(queryset.filter(
-            stat_product__gte=550,
+            stat_sum__gte=550,
             pgo_attack__gte=200,
             cinematic_moves__move_type__in=defender_weakness,
         ).exclude(
@@ -210,7 +210,7 @@ def get_top_counter_qs(defender):
     # strong pokemon who are not weak to the defender's charge move
     g_id_list = list(queryset.filter(
             pgo_attack__gte=190,
-            stat_product__gte=600,
+            stat_sum__gte=600,
         ).exclude(
             compound_weakness__icontains=defender_cm_move_type
         ).exclude(
@@ -225,10 +225,10 @@ def get_top_counter_qs(defender):
             Q(
                 Q(
                     pgo_attack__gte=190,
-                    stat_product__gte=600
+                    stat_sum__gte=600
                 ) | Q(
                     pgo_attack__gte=250,
-                    stat_product__gte=550
+                    stat_sum__gte=550
                 )) &
             Q(
                 Q(cinematic_moves__move_type__in=defender_weakness) |

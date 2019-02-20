@@ -29,3 +29,8 @@ def google_noscript_tag_manager():
 @register.filter
 def floor(value):
     return int(value)
+
+
+@register.simple_tag
+def option_matches_value(option, values):
+    return option in values

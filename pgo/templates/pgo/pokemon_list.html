@@ -1,4 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
+{% load zenofewords_tags %}
 
 
 {% block title %}
@@ -10,6 +11,74 @@
 {% endblock %}
 
 {% block content %}
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="pokemon-list-filter-wrapper" hidden>
+      <form>
+        <table class="table">
+          <tr>
+            <th width="33%">Pokemon types</th>
+            <th width="33%">Resists types</th>
+            <th width="33%">Attacks SE vs types</th>
+          </tr>
+          <tr>
+            <td>
+              <label for="choices-single-default" class="sr-only">
+                Type
+              </label>
+              <select class="form-control type-filter" name="type-filter" multiple="multiple">
+                {% for type in types %}
+                  {% option_matches_value type.slug filters.pokemon_types as selected %}
+                  <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
+                    {{ type.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td>
+              <label for="choices-single-default" class="sr-only">
+                Type
+              </label>
+              <select class="form-control resistance-filter" name="resistance-filter" multiple="multiple">
+                {% for type in types %}
+                  {% option_matches_value type.slug filters.resistance_types as selected %}
+                  <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
+                    {{ type.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </td>
+            <td>
+              <label for="choices-single-default" class="sr-only">
+                Type
+              </label>
+              <select class="form-control super-effectiveness-filter" name="super-effectiveness-filter" multiple="multiple">
+                {% for type in types %}
+                  {% option_matches_value type.slug filters.super_effectiveness_types as selected %}
+                  <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
+                    {{ type.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </td>
+          </tr>
+            <td>
+              &nbsp;
+            </td>
+            <td>
+              <a href="{% url 'pgo:pokemon-list' %}" id="filter-reset" class="btn btn-danger" style="width: 100%">
+                Reset
+              </a>
+            </td>
+            <td>
+              <button id="filter-submit" type="submit" class="btn btn-primary" style="width: 100%">
+                Apply
+              </button>
+            </td>
+          </tr>
+        </table>
+      </form>
+    </div>
+  </div>
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <table class="table">
@@ -35,32 +104,37 @@
             </select>
           </td>
           <th>
-            <a href="?ordering={% if ordering == 'primary_type' %}-{% endif %}primary_type">
+            <a href="?ordering={% if ordering == 'primary_type' %}-{% endif %}primary_type{{ query_param_url }}">
               P. type
             </a>
           </th>
           <th>
-            <a href="?ordering={% if ordering == 'secondary_type' %}-{% endif %}secondary_type">
+            <a href="?ordering={% if ordering == 'secondary_type' %}-{% endif %}secondary_type{{ query_param_url }}">
               S. type
             </a>
           </th>
           <th>
-            <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack">
+            <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack{{ query_param_url }}">
               Attack
             </a>
           </th>
           <th>
-            <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense">
+            <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense{{ query_param_url }}">
               Defense
             </a>
           </th>
           <th>
-            <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina">
+            <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina{{ query_param_url }}">
               Stamina
             </a>
           </th>
           <th>
-            <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp">
+            <a href="?ordering={% if ordering == '-stat_product' %}{% else %}-{% endif %}stat_product{{ query_param_url }}">
+              Stat product
+            </a>
+          </th>
+          <th>
+            <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp{{ query_param_url }}">
               MaxCP
             </a>
           </th>
@@ -86,7 +160,14 @@
             <td>{{ pokemon.pgo_attack }}</td>
             <td>{{ pokemon.pgo_defense }}</td>
             <td>{{ pokemon.pgo_stamina }}</td>
+            <td>{{ pokemon.stat_product }}</td>
             <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8">
+              No pokemon found, try to select different filtering criteria.
+            </td>
           </tr>
         {% endfor %}
       </table>

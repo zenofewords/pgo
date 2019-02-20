@@ -33,7 +33,6 @@ from pgo.utils import (
     determine_move_effectiveness,
     is_move_stab,
     MAX_IV,
-    Frailty,
 )
 logger = logging.getLogger(__name__)
 

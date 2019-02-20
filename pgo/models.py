@@ -133,6 +133,7 @@ class Pokemon(NameMixin):
     maximum_cp = models.DecimalField(
         verbose_name='Combat Power', max_digits=7, decimal_places=2, blank=True, null=True)
     stat_sum = models.IntegerField(blank=True, null=True)
+    stat_product = models.IntegerField(blank=True, null=True)
     bulk = models.IntegerField(blank=True, null=True)
 
     compound_resistance = JSONField(blank=True, null=True)
@@ -175,17 +176,7 @@ class Type(NameMixin, OrderMixin):
         return self.name
 
 
-class TypeEffectiveness(models.Model):
-    type_offense = models.ForeignKey('pgo.Type', related_name='type_offense', on_delete=models.deletion.CASCADE)
-    type_defense = models.ForeignKey('pgo.Type', related_name='type_defense', on_delete=models.deletion.CASCADE)
-    relation = models.CharField(max_length=30, blank=True)
-    effectiveness = models.ForeignKey('pgo.TypeEffectivenessScalar', on_delete=models.deletion.CASCADE)
-
-    def __str__(self):
-        return '{0}: {1}'.format(self.relation, self.effectiveness)
-
-
-class TypeEffectivenessScalar(NameMixin):
+class EffectivenessScalar(NameMixin):
     scalar = models.DecimalField(max_digits=8, decimal_places=6)
 
     def __str__(self):

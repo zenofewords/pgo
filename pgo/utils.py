@@ -1,28 +1,14 @@
-from __future__ import division
-
-from decimal import Decimal
 from math import floor
 
 from django.db.models import Q, Max
 from django.http import Http404
-from django.utils.text import slugify
 
-from pgo.models import Move, Pokemon, RaidBoss, Type, TypeEffectiveness
+from pgo.models import Move, Pokemon, RaidBoss, Type
 
-SUPER_EFFECTIVE_SCALAR = 1.4
-NOT_VERY_EFFECTIVE_SCALAR = 0.714
-IMMUNE = 0.51
 NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
 WEATHER_BOOST_SCALAR = 1.2
 MAX_IV = 15
-DEFAULT_EFFECTIVENESS = Decimal(str(NEUTRAL_SCALAR))
-
-
-class Frailty(object):
-    NEUTRAL = '{neutral}'
-    RESILIENT = '{resilient}'
-    FRAGILE = '{fragile}'
 
 
 def calculate_cycle_dps(quick_move, cinematic_move):

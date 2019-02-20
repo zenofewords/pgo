@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from pgo.models import (
     CPM,
+    EffectivenessScalar,
     Friendship,
     Move,
     MoveAvailability,
@@ -11,8 +12,6 @@ from pgo.models import (
     RaidBoss,
     RaidTier,
     Type,
-    TypeEffectiveness,
-    TypeEffectivenessScalar,
     WeatherCondition,
 )
 
@@ -79,6 +78,7 @@ class RaidBossAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CPM)
+admin.site.register(EffectivenessScalar)
 admin.site.register(Friendship)
 admin.site.register(Move, MoveAdmin)
 admin.site.register(MoveAvailability, MoveAvailabilityAdmin)
@@ -88,6 +88,4 @@ admin.site.register(PokemonMove, PokemonMoveAdmin)
 admin.site.register(RaidBoss, RaidBossAdmin)
 admin.site.register(RaidTier)
 admin.site.register(Type)
-admin.site.register(TypeEffectiveness)
-admin.site.register(TypeEffectivenessScalar)
 admin.site.register(WeatherCondition)

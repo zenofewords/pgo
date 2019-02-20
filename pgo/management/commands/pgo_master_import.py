@@ -2,7 +2,6 @@ import csv
 import re
 
 from decimal import Decimal
-from math import sqrt, pow
 
 from django.conf import settings
 from django.core.management import call_command
@@ -10,46 +9,11 @@ from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
 from pgo.models import (
-    CPM,
     Pokemon,
     PokemonMove,
     Move,
     Moveset,
     Type,
-    TypeEffectiveness,
-    TypeEffectivenessScalar,
-)
-from pgo.utils import (
-    SUPER_EFFECTIVE_SCALAR,
-    NOT_VERY_EFFECTIVE_SCALAR,
-    NEUTRAL_SCALAR,
-    IMMUNE,
-)
-TYPE_EFFECTIVENESS = {
-    'Super effective': SUPER_EFFECTIVE_SCALAR,
-    'Not very effective': NOT_VERY_EFFECTIVE_SCALAR,
-    'Immune': IMMUNE,
-    'Neutral': NEUTRAL_SCALAR,
-}
-TYPE_IMPORT_ORDER = (
-    'normal',
-    'fighting',
-    'flying',
-    'poison',
-    'ground',
-    'rock',
-    'bug',
-    'ghost',
-    'steel',
-    'fire',
-    'water',
-    'grass',
-    'electric',
-    'psychic',
-    'ice',
-    'dragon',
-    'dark',
-    'fairy',
 )
 
 

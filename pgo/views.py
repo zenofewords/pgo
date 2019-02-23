@@ -219,11 +219,16 @@ class MoveListView(ListViewOrderingMixin):
     queryset = Move.objects.select_related('move_type')
     default_ordering = ('-category', 'name',)
     ordering_fields = (
-        'slug', 'category', 'move_type', 'power', 'energy_delta', 'duration',
+        'name', 'slug', 'category', 'move_type', 'power', 'energy_delta', 'duration',
         'damage_window_start', 'damage_window_end', 'dps', 'eps',
         'pvp_power', 'pvp_energy_delta', 'pvp_duration', 'dpt', 'ept', 'dpe',
     )
     values_list_args = ('slug', 'name',)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['preset'] = self.request.GET.get('preset', 'pvp')
+        return context
 
 
 class PokemonDetailView(DetailView):

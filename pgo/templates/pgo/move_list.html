@@ -12,9 +12,9 @@
 {% block content %}
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table class="table">
-        <tr class="move-detail">
-          <td class="search-move-wrapper">
+      <table id="move-table" class="table">
+        <tr>
+          <td colspan="2" class="search-move-wrapper">
             <label for="choices-single-default" class="sr-only">
               Find move
             </label>
@@ -29,97 +29,120 @@
               {% endfor %}
             </select>
           </td>
-          <th>
-            <a href="?ordering={% if ordering == 'category' %}-{% endif %}category">
-              Category
+          <td colspan="{% if preset == 'pve' %}5{% else %}6{% endif %}">
+            <a href="?preset={% if preset == 'pve' %}pvp{% else %}pve{% endif %}">
+              <span class="{% if preset == 'pvp' %}underline{% endif %}">
+                PvP
+              </span>
+              /
+              <span class="{% if preset == 'pve' %}underline{% endif %}">
+                PvE
+              </span>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <th width="30%" id="no-left-padding">
+            <a href="?preset={{ preset}}&amp;ordering={% if ordering == 'name' %}-{% endif %}name">
+              Name
             </a>
           </th>
           <th>
-            <a href="?ordering={% if ordering == 'move_type' %}-{% endif %}move_type">
+            <a href="?preset={{ preset}}&amp;ordering={% if ordering == 'move_type' %}-{% endif %}move_type">
               Type
             </a>
           </th>
-          <th>
-            <a href="?ordering={% if ordering == '-power' %}{% else %}-{% endif %}power">
-              Power
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-energy_delta' %}{% else %}-{% endif %}energy_delta">
-              Energy
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == 'duration' %}-{% endif %}duration">
-              Duration
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-dps' %}{% else %}-{% endif %}dps">
-              DPS
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-eps' %}{% else %}-{% endif %}eps">
-              EPS
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-pvp_power' %}{% else %}-{% endif %}pvp_power">
-              PvP Power
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-pvp_energy_delta' %}{% else %}-{% endif %}pvp_energy_delta">
-              PvP Energy
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-pvp_duration' %}{% else %}-{% endif %}pvp_duration">
-              PvP Duration
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-dpt' %}{% else %}-{% endif %}dpt">
-              DPT
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-ept' %}{% else %}-{% endif %}ept">
-              EPT
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-dpe' %}{% else %}-{% endif %}dpe">
-              DPE
-            </a>
-          </th>
+          {% if preset == 'pve' %}
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-power' %}{% else %}-{% endif %}power">
+                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-energy_delta' %}{% else %}-{% endif %}energy_delta">
+                <span class="glyphicon glyphicon-leaf" aria-hidden="true"></span>
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == 'duration' %}-{% endif %}duration">
+                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-dps' %}{% else %}-{% endif %}dps">
+                DPS
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-eps' %}{% else %}-{% endif %}eps">
+                EPS
+              </a>
+            </th>
+          {% else %}
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-pvp_power' %}{% else %}-{% endif %}pvp_power">
+                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-pvp_energy_delta' %}{% else %}-{% endif %}pvp_energy_delta">
+                <span class="glyphicon glyphicon-leaf" aria-hidden="true"></span>
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-pvp_duration' %}{% else %}-{% endif %}pvp_duration">
+                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-dpt' %}{% else %}-{% endif %}dpt">
+                DPT
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-ept' %}{% else %}-{% endif %}ept">
+                EPT
+              </a>
+            </th>
+            <th>
+              <a href="?preset={{ preset}}&amp;ordering={% if ordering == '-dpe' %}{% else %}-{% endif %}dpe">
+                DPE
+              </a>
+            </th>
+          {% endif %}
         </tr>
 
         {% for move in move_list %}
           <tr>
-            <td>
+            <td id="no-left-padding">
               <a href="{% url 'pgo:move-detail' move.slug %}">
+                {% if move.category == 'QK' %}
+                  <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+                {% else %}
+                  <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+                {% endif %}
                 {{ move.name }}
               </a>
             </td>
-            <td>{{ move.get_category_display }}</td>
             <td id="type-label-wrapper">
               <div class="type-label type-{{ move.move_type.slug }}">
-                {{ move.move_type }}
+                {{ move.move_type.name|slice:":2" }}
               </div>
             </td>
-            <td>{{ move.power }}</td>
-            <td>{{ move.energy_delta }}</td>
-            <td>{{ move.duration }}</td>
-            <td>{{ move.dps }}</td>
-            <td>{{ move.eps }}</td>
-            <td>{{ move.pvp_power }}</td>
-            <td>{{ move.pvp_energy_delta }}</td>
-            <td>{{ move.pvp_duration }} turns</td>
-            <td>{{ move.dpt|default:"0" }}</td>
-            <td>{{ move.ept|default:"0" }}</td>
-            <td>{{ move.dpe|default:"0" }}</td>
+            {% if preset == 'pve' %}
+              <td>{{ move.power }}</td>
+              <td>{{ move.energy_delta }}</td>
+              <td>{{ move.duration }}</td>
+              <td>{{ move.dps }}</td>
+              <td>{{ move.eps }}</td>
+            {% else %}
+              <td>{{ move.pvp_power }}</td>
+              <td>{{ move.pvp_energy_delta }}</td>
+              <td>{{ move.pvp_duration }}</td>
+              <td>{{ move.dpt|default:"0" }}</td>
+              <td>{{ move.ept|default:"0" }}</td>
+              <td>{{ move.dpe|default:"0" }}</td>
+            {% endif %}
           </tr>
         {% endfor %}
       </table>

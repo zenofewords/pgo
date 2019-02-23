@@ -1,12 +1,12 @@
 #type-label-wrapper {
-  padding: .4rem .6rem
+  padding: .4rem .6rem;
 }
 .type-label {
   color: #333;
-  padding: .4rem .8rem;
+  padding: .4rem .7rem;
   border-radius: .5rem;
-  font-size: 1.4rem;
-  width: 7rem;
+  font-size: 1.3rem;
+  width: 3.7rem;
   text-align: center;
 }
 .type-label-small {
@@ -68,6 +68,15 @@
 }
 .type-water {
   background-color: rgba(85, 155, 217, .7);
+}
+#move-table tr td {
+  padding-right: 2px;
+}
+#no-left-padding {
+  padding-left: 0;
+}
+.underline {
+  text-decoration: underline;
 }
 
 .input-padding-right {

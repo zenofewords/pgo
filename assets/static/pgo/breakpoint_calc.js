@@ -51,7 +51,9 @@ ready(() => {
   const moveEffectiveness = document.getElementById('breakpoint-calc-move-effectiveness')
   const detailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
   const inputToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
+  const inputToggleTopCounterSort = document.getElementById('top-counter-sort-toggle')
 
+  const topCounterSortLabel = document.getElementById('top-counter-sort-label')
   const tabBreakpoints = document.getElementById('breakpoint-calc-breakpoints')
   const tabTopCounters = document.getElementById('breakpoint-calc-top-counters')
   const breakpointsTable = document.getElementById('breakpoint-calc-breakpoints-table')
@@ -71,6 +73,7 @@ ready(() => {
     defender_quick_move: selectDefenderQuickMove.value,
     defender_cinematic_move: selectDefenderCinematicMove.value,
     defender_cpm: selectDefenderCPM.value,
+    top_counter_order: 'rnk',
     tab: TAB.BREAKPOINTS,
     status: FORM_STATE.READY,
     staleTab: false,
@@ -157,6 +160,15 @@ ready(() => {
 
     breakpointCalcForm.staleTab = true
     toggleCinematicBreakpoints()
+  })
+  inputToggleTopCounterSort.addEventListener('click', event => {
+    event.preventDefault()
+
+    breakpointCalcForm.staleTab = true
+    if (!inputToggleTopCounterSort.disabled) {
+      toggleTopCounterOrder(breakpointCalcForm.top_counter_order)
+      submitBreakpointCalcForm()
+    }
   })
   tabBreakpoints.addEventListener('click', (event) => {
     event.preventDefault()
@@ -331,6 +343,9 @@ ready(() => {
     selectFriendShipBoost.disabled = submitting
     selectDefenderCPM.disabled = submitting
 
+    inputToggleCinematicBreakpoints.disabled = submitting
+    inputToggleTopCounterSort.disabled = submitting
+
     tabBreakpoints.disabled = submitting
     tabTopCounters.disabled = submitting
 
@@ -399,6 +414,7 @@ ready(() => {
   async function restoreBreakpointCalcForm (data) {
     initialFetch().then(() => {
       toggleTab(data.tab)
+
       selectAttacker.setValueByChoice(String(data.attacker))
       selectDefender.setValueByChoice(String(data.defender))
 
@@ -414,6 +430,9 @@ ready(() => {
       breakpointCalcForm = data
       breakpointCalcForm.staleTab = true
       breakpointCalcForm.status = FORM_STATE.READY
+      breakpointCalcForm.top_counter_order = data.top_counter_order
+
+      toggleTopCounterOrder(data.top_counter_order === 'dps' ? 'rnk' : 'dps')
       submitBreakpointCalcForm()
     })
   }
@@ -532,6 +551,7 @@ ready(() => {
         if (i > 0) {
           className = 'toggle_' + className + ' breakpoint-calc-top-counter-subrow'
           dataRow.hidden = true
+          dataCell.classList.add('align-right-pad')
         } else {
           const chevron = document.createElement('span')
           chevron.setAttribute(
@@ -556,6 +576,7 @@ ready(() => {
           }
           href.appendChild(chevron)
           dataCell.appendChild(href)
+          dataCell.classList.add('align-right')
         }
         dataRow.appendChild(dataCell)
         dataRow.setAttribute('class', className)
@@ -571,6 +592,11 @@ ready(() => {
       breakpointCalcForm.show_cinematic_breakpoints = true
     }
     submitBreakpointCalcForm()
+  }
+
+  const toggleTopCounterOrder = (value) => {
+    breakpointCalcForm.top_counter_order = value === 'rnk' ? 'dps' : 'rnk'
+    topCounterSortLabel.innerHTML = breakpointCalcForm.top_counter_order.toUpperCase()
   }
 
   const showErrors = (errorObject = null) => {

@@ -104,6 +104,7 @@ class BreakpointCalcAPIView(GenericAPIView):
     def get(self, request, *args, **kwargs):
         self.current_tab = request.GET.get('tab', 'breakpoints')
         self.show_cinematic_breakpoints = request.GET.get('show_cinematic_breakpoints', False)
+        self.top_counter_order = request.GET.get('top_counter_order', False)
 
         serializer = self.get_serializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
@@ -440,6 +441,9 @@ class BreakpointCalcAPIView(GenericAPIView):
 
     def _get_score(self, pokemon, defender_multiplier, moveset_data):
         dps = moveset_data[0][2]
+        if self.top_counter_order == 'dps':
+            return dps
+
         quick_move_dph = calculate_dph(
             self.defender.quick_move.power,
             defender_multiplier,

@@ -34,3 +34,8 @@ def floor(value):
 @register.simple_tag
 def option_matches_value(option, values):
     return option in values
+
+
+@register.filter
+def format_stat_product(value):
+    return '{}k'.format(str(value / 1000).split('.')[0])

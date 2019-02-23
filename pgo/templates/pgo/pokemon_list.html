@@ -13,82 +13,56 @@
 {% block content %}
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="pokemon-list-filter-wrapper" hidden>
-      <form>
-        <table class="table">
-          <tr>
-            <th width="33%">Pokemon types</th>
-            <th width="33%">Resists types</th>
-            <th width="33%">Attacks SE vs types</th>
-          </tr>
-          <tr>
-            <td>
-              <label for="choices-single-default" class="sr-only">
-                Type
-              </label>
-              <select class="form-control type-filter" name="type-filter" multiple="multiple">
-                {% for type in types %}
-                  {% option_matches_value type.slug filters.pokemon_types as selected %}
-                  <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-                    {{ type.name }}
-                  </option>
-                {% endfor %}
-              </select>
-            </td>
-            <td>
-              <label for="choices-single-default" class="sr-only">
-                Type
-              </label>
-              <select class="form-control resistance-filter" name="resistance-filter" multiple="multiple">
-                {% for type in types %}
-                  {% option_matches_value type.slug filters.resistance_types as selected %}
-                  <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-                    {{ type.name }}
-                  </option>
-                {% endfor %}
-              </select>
-            </td>
-            <td>
-              <label for="choices-single-default" class="sr-only">
-                Type
-              </label>
-              <select class="form-control super-effectiveness-filter" name="super-effectiveness-filter" multiple="multiple">
-                {% for type in types %}
-                  {% option_matches_value type.slug filters.super_effectiveness_types as selected %}
-                  <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-                    {{ type.name }}
-                  </option>
-                {% endfor %}
-              </select>
-            </td>
-          </tr>
-            <td>
-              &nbsp;
-            </td>
-            <td>
-              <a href="{% url 'pgo:pokemon-list' %}" id="filter-reset" class="btn btn-danger" style="width: 100%">
-                Reset
-              </a>
-            </td>
-            <td>
-              <button id="filter-submit" type="submit" class="btn btn-primary" style="width: 100%">
-                Apply
-              </button>
-            </td>
-          </tr>
-        </table>
+      <form class="pokemon-filter-form">
+        <label for="choices-single-default" class="sr-only">
+          Pokemon type filter
+        </label>
+        <select class="form-control type-filter" name="type-filter" multiple="multiple">
+          {% for type in types %}
+            {% option_matches_value type.slug filters.pokemon_types as selected %}
+            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
+              {{ type.name }}
+            </option>
+          {% endfor %}
+        </select>
+        <label for="choices-single-default" class="sr-only">
+          Pokemon resistance filter
+        </label>
+        <select class="form-control resistance-filter" name="resistance-filter" multiple="multiple">
+          {% for type in types %}
+            {% option_matches_value type.slug filters.resistance_types as selected %}
+            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
+              {{ type.name }}
+            </option>
+          {% endfor %}
+        </select>
+        <label for="choices-single-default" class="sr-only">
+          Pokemon super effective filter
+        </label>
+        <select class="form-control super-effectiveness-filter" name="super-effectiveness-filter" multiple="multiple">
+          {% for type in types %}
+            {% option_matches_value type.slug filters.super_effectiveness_types as selected %}
+            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
+              {{ type.name }}
+            </option>
+          {% endfor %}
+        </select>
+        <div class="pokemon-filter-control-wrapper">
+          <a href="{% url 'pgo:pokemon-list' %}" id="filter-reset" class="btn btn-xs btn-danger" style="width: 30%">
+            Reset
+          </a>
+          <button id="filter-submit" type="submit" class="btn btn-xs btn-primary" style="width: 30%">
+            Apply
+          </button>
+        </div>
       </form>
     </div>
   </div>
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table class="table">
+      <table id="contracted-table" class="table">
         <tr>
-          <th>
-            <a href="?ordering={% if ordering == 'number' %}-{% endif %}number">
-              #
-            </a>
-          </th>
-          <td class="search-pokemon-wrapper">
+          <td width="35%" class="search-pokemon-wrapper" hidden>
             <label for="choices-single-default" class="sr-only">
               Find pokemon
             </label>
@@ -104,63 +78,52 @@
             </select>
           </td>
           <th>
-            <a href="?ordering={% if ordering == 'primary_type' %}-{% endif %}primary_type{{ query_param_url }}">
-              P. type
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == 'secondary_type' %}-{% endif %}secondary_type{{ query_param_url }}">
-              S. type
-            </a>
-          </th>
-          <th>
             <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack{{ query_param_url }}">
-              Attack
+              Atk
             </a>
           </th>
           <th>
             <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense{{ query_param_url }}">
-              Defense
+              Def
             </a>
           </th>
           <th>
             <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina{{ query_param_url }}">
-              Stamina
+              Sta
             </a>
           </th>
           <th>
             <a href="?ordering={% if ordering == '-stat_product' %}{% else %}-{% endif %}stat_product{{ query_param_url }}">
-              Stat product
+              Product
             </a>
           </th>
           <th>
             <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp{{ query_param_url }}">
-              MaxCP
+              CP
             </a>
           </th>
         </tr>
         {% for pokemon in pokemon_list %}
           <tr>
-            <td>{{ pokemon.number }}</td>
-            <td>
-              <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
-                {{ pokemon.name }}
-              </a>
-            </td>
-            <td id="type-label-wrapper">
-              <div class="type-label type-{{ pokemon.primary_type.slug }}">
-                {{ pokemon.primary_type }}
-              </div>
-            </td>
-            <td id="type-label-wrapper">
-              <div class="type-label type-{{ pokemon.secondary_type.slug }}">
-                {{ pokemon.secondary_type|default:"" }}
+            <td id="no-left-padding">
+              <div class="pokemon-item-wrapper">
+                <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
+                  {{ pokemon.name }}
+                </a>
+                <div class="pokemon-type-wrapper">
+                  <div class="type-label type-{{ pokemon.primary_type.slug }}">
+                    {{ pokemon.primary_type.name }}
+                  </div>
+                  <div class="type-label type-{{ pokemon.secondary_type.slug }}">
+                    {{ pokemon.secondary_type.name|default:"" }}
+                  </div>
+                </div>
               </div>
             </td>
             <td>{{ pokemon.pgo_attack }}</td>
             <td>{{ pokemon.pgo_defense }}</td>
             <td>{{ pokemon.pgo_stamina }}</td>
-            <td>{{ pokemon.stat_product }}</td>
+            <td>{{ pokemon.stat_product|format_stat_product }}</td>
             <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
           </tr>
         {% empty %}

@@ -91,6 +91,7 @@ class BreakpointCalculatorView(CalculatorInitialDataMixin):
             'defender_cinematic_move': self._get_object_id(
                 'Move', params.get('defender_cinematic_move')),
             'defender_cpm': str(Decimal(params.get('defender_cpm'))),
+            'top_counter_order': str(params.get('top_counter_order')),
             'tab': slugify(params.get('tab', 'breakpoints')),
         }
 
@@ -225,9 +226,24 @@ class MoveListView(ListViewOrderingMixin):
     )
     values_list_args = ('slug', 'name',)
 
+    def get(self, request, *args, **kwargs):
+        self.preset = slugify(self.request.GET.get('preset', 'pvp'))
+        self.selected_move_type = slugify(self.request.GET.get('selected-move-type', ''))
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.selected_move_type:
+            queryset = queryset.filter(move_type__slug=self.selected_move_type)
+        return queryset.filter()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['preset'] = self.request.GET.get('preset', 'pvp')
+        context.update({
+            'preset': self.preset,
+            'selected_move_type': self.selected_move_type,
+            'move_types': Type.objects.all(),
+        })
         return context
 
 

@@ -21,24 +21,32 @@ ready(() => {
     '.type-filter',
     {
       maxItemCount: 4,
-      placeholderValue: 'Select up to 4 types',
+      placeholderValue: 'Filter by type (up to 4)',
     }
   )
   const resistanceFilterSelect = new Choices(
     '.resistance-filter',
     {
-      maxItemCount: 12,
-      placeholderValue: 'Select up 12 types',
+      maxItemCount: 6,
+      placeholderValue: 'Filter by resistance (up to 6)',
     }
   )
   const superEffectivenessFilterSelect = new Choices(
     '.super-effectiveness-filter',
     {
       maxItemCount: 2,
-      placeholderValue: 'Select up to 2 types',
+      placeholderValue: 'Filter by super effectiveness (up to 2)',
     }
   )
   const pokemonListFilterWrapper = document.getElementById('pokemon-list-filter-wrapper')
+  const searchPokemonWrapper = document.querySelector('.search-pokemon-wrapper')
+  const moveTypeFilter = document.getElementById('move-type-filter')
+
+  if (moveTypeFilter) {
+    moveTypeFilter.addEventListener('change', event => {
+      window.location = `${window.pgoURLs['list-url']}?selected-move-type=${event.currentTarget.value}`
+    })
+  }
 
   searchInput.passedElement.addEventListener('change', event => {
     window.location = `${window.pgoURLs['list-url']}${event.currentTarget.value}`
@@ -82,4 +90,5 @@ ready(() => {
 
   removePlaceholderIfSelected()
   pokemonListFilterWrapper.hidden = false
+  searchPokemonWrapper.hidden = false
 })

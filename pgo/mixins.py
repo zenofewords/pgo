@@ -4,7 +4,7 @@ from pgo.models import Type
 
 
 class ListViewOrderingMixin(ListView):
-    paginate_by = 150
+    paginate_by = 100
 
     def get_ordering(self):
         default = self.default_ordering

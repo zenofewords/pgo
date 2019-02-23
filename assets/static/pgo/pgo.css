@@ -3,11 +3,12 @@
 }
 .type-label {
   color: #333;
-  padding: .4rem .7rem;
+  padding: .4rem .5rem .3rem;
   border-radius: .5rem;
-  font-size: 1.3rem;
-  width: 3.7rem;
+  font-size: 1.2rem;
+  width: 5.5rem;
   text-align: center;
+  margin: 0 .1rem;
 }
 .type-label-small {
   color: #333;
@@ -69,14 +70,37 @@
 .type-water {
   background-color: rgba(85, 155, 217, .7);
 }
-#move-table tr td {
-  padding-right: 2px;
+#contracted-table tr td {
+  padding-right: .1rem;
 }
 #no-left-padding {
   padding-left: 0;
 }
 .underline {
   text-decoration: underline;
+}
+.pokemon-filter-form {
+  margin-bottom: 2rem;
+}
+.pokemon-filter-form .choices {
+  margin-bottom: .5rem;
+}
+.pokemon-filter-control-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+.pokemon-item-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.pokemon-type-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+.move-name {
+  min-width: 5rem;
+  margin-right: 1rem;
 }
 
 .input-padding-right {
@@ -93,6 +117,9 @@
 .input-height {
   height: 28px;
   padding: .35rem;
+}
+.input-table {
+  margin: -.3rem;
 }
 .text-margin-bottom {
   margin-bottom: 2rem;
@@ -214,6 +241,13 @@ table#top-counters-table tr td:last-child {
 #faq-legend-content ul {
   list-style-type: none;
   padding-left: 0;
+}
+.align-right {
+  text-align: right;
+}
+.align-right-pad {
+  text-align: right;
+  padding-right: 2rem !important;
 }
 
 /* good to go specific */

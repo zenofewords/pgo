@@ -17,27 +17,42 @@ ready(() => {
       itemSelectText: '',
     }
   )
-  const typeFilterSelect = new Choices(
-    '.type-filter',
-    {
-      maxItemCount: 4,
-      placeholderValue: 'Filter by type (up to 4)',
-    }
-  )
-  const resistanceFilterSelect = new Choices(
-    '.resistance-filter',
-    {
-      maxItemCount: 6,
-      placeholderValue: 'Filter by resistance (up to 6)',
-    }
-  )
-  const superEffectivenessFilterSelect = new Choices(
-    '.super-effectiveness-filter',
-    {
-      maxItemCount: 2,
-      placeholderValue: 'Filter by super effectiveness (up to 2)',
-    }
-  )
+
+  const typeFilterSelectInput = document.querySelector('.type-filter')
+  let typeFilterSelect
+  if (typeFilterSelectInput) {
+    typeFilterSelect = new Choices(
+      '.type-filter',
+      {
+        maxItemCount: 4,
+        placeholderValue: 'Filter by type (up to 4)',
+      }
+    )
+  }
+
+  const resistanceFilterSelectInput = document.querySelector('.resistance-filter')
+  let resistanceFilterSelect
+  if (resistanceFilterSelectInput) {
+    resistanceFilterSelect = new Choices(
+      '.resistance-filter',
+      {
+        maxItemCount: 6,
+        placeholderValue: 'Filter by resistance (up to 6)',
+      }
+    )
+  }
+
+  const superEffectivenessFilterSelectInput = document.querySelector('.super-effectiveness-filter')
+  let superEffectivenessFilterSelect
+  if (superEffectivenessFilterSelectInput) {
+    superEffectivenessFilterSelect = new Choices(
+      '.super-effectiveness-filter',
+      {
+        maxItemCount: 2,
+        placeholderValue: 'Filter by super effectiveness (up to 2)',
+      }
+    )
+  }
   const pokemonListFilterWrapper = document.getElementById('pokemon-list-filter-wrapper')
   const searchPokemonWrapper = document.querySelector('.search-pokemon-wrapper')
   const moveTypeFilter = document.getElementById('move-type-filter')
@@ -51,44 +66,57 @@ ready(() => {
   searchInput.passedElement.addEventListener('change', event => {
     window.location = `${window.pgoURLs['list-url']}${event.currentTarget.value}`
   })
-  typeFilterSelect.passedElement.addEventListener('change', event => {
-    const placeholder = typeFilterSelect.placeholder
-    if (typeFilterSelect.passedElement.selectedOptions.length > 0) {
-      typeFilterSelect.input.placeholder = ''
-    } else {
-      typeFilterSelect.input.placeholder = placeholder
-    }
-  })
-  resistanceFilterSelect.passedElement.addEventListener('change', event => {
-    const placeholder = resistanceFilterSelect.placeholder
-    if (resistanceFilterSelect.passedElement.selectedOptions.length > 0) {
-      resistanceFilterSelect.input.placeholder = ''
-    } else {
-      resistanceFilterSelect.input.placeholder = placeholder
-    }
-  })
-  superEffectivenessFilterSelect.passedElement.addEventListener('change', event => {
-    const placeholder = superEffectivenessFilterSelect.placeholder
-    if (superEffectivenessFilterSelect.passedElement.selectedOptions.length > 0) {
-      superEffectivenessFilterSelect.input.placeholder = ''
-    } else {
-      superEffectivenessFilterSelect.input.placeholder = placeholder
-    }
-  })
+
+  if (typeFilterSelect) {
+    typeFilterSelect.passedElement.addEventListener('change', event => {
+      const placeholder = typeFilterSelect.placeholder
+      if (typeFilterSelect.passedElement.selectedOptions.length > 0) {
+        typeFilterSelect.input.placeholder = ''
+      } else {
+        typeFilterSelect.input.placeholder = placeholder
+      }
+    })
+  }
+
+  if (resistanceFilterSelect) {
+    resistanceFilterSelect.passedElement.addEventListener('change', event => {
+      const placeholder = resistanceFilterSelect.placeholder
+      if (resistanceFilterSelect.passedElement.selectedOptions.length > 0) {
+        resistanceFilterSelect.input.placeholder = ''
+      } else {
+        resistanceFilterSelect.input.placeholder = placeholder
+      }
+    })
+  }
+
+  if (superEffectivenessFilterSelect) {
+    superEffectivenessFilterSelect.passedElement.addEventListener('change', event => {
+      const placeholder = superEffectivenessFilterSelect.placeholder
+      if (superEffectivenessFilterSelect.passedElement.selectedOptions.length > 0) {
+        superEffectivenessFilterSelect.input.placeholder = ''
+      } else {
+        superEffectivenessFilterSelect.input.placeholder = placeholder
+      }
+    })
+  }
 
   const removePlaceholderIfSelected = () => {
-    if (typeFilterSelect.passedElement.selectedOptions.length > 0) {
+    if (typeFilterSelect && typeFilterSelect.passedElement.selectedOptions.length > 0) {
       typeFilterSelect.input.placeholder = ''
     }
-    if (resistanceFilterSelect.passedElement.selectedOptions.length > 0) {
+    if (resistanceFilterSelect && resistanceFilterSelect.passedElement.selectedOptions.length > 0) {
       resistanceFilterSelect.input.placeholder = ''
     }
-    if (superEffectivenessFilterSelect.passedElement.selectedOptions.length > 0) {
+    if (superEffectivenessFilterSelect && superEffectivenessFilterSelect.passedElement.selectedOptions.length > 0) {
       superEffectivenessFilterSelect.input.placeholder = ''
     }
   }
 
   removePlaceholderIfSelected()
-  pokemonListFilterWrapper.hidden = false
-  searchPokemonWrapper.hidden = false
+  if (pokemonListFilterWrapper) {
+    pokemonListFilterWrapper.hidden = false
+  }
+  if (searchPokemonWrapper) {
+    searchPokemonWrapper.hidden = false
+  }
 })

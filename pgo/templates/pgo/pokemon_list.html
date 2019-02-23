@@ -70,7 +70,7 @@
               <option value="-1" placeholder disabled selected>
                 Find pokemon
               </option>
-              {% for row in data %}
+              {% for row in unfiltered_data %}
                 <option value="{{ row.0 }}">
                   {{ row.1 }}
                 </option>
@@ -129,7 +129,7 @@
         {% empty %}
           <tr>
             <td colspan="8">
-              No pokemon found, try to select different filtering criteria.
+              No pokemon found, try selecting different filtering criteria.
             </td>
           </tr>
         {% endfor %}

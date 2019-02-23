@@ -233,9 +233,9 @@ class MoveListView(ListViewOrderingMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.selected_move_type:
+        if self.selected_move_type and self.selected_move_type != 'all':
             queryset = queryset.filter(move_type__slug=self.selected_move_type)
-        return queryset.filter()
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

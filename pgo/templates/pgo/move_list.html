@@ -22,7 +22,7 @@
               <option value="-1" placeholder disabled selected>
                 Find move
               </option>
-              {% for row in data %}
+              {% for row in unfiltered_data %}
                 <option value="{{ row.0 }}">
                   {{ row.1 }}
                 </option>
@@ -34,7 +34,7 @@
               Filter move type
             </label>
             <select id="move-type-filter" class="form-control input-height input-table">
-              <option selected value="-1">Every type</option>
+              <option selected value="all">Every type</option>
               {% for move_type in move_types %}
                 <option value="{{ move_type.slug }}" {% if move_type.slug == selected_move_type %}selected{% endif %}>
                   {{ move_type.name }}

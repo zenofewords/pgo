@@ -355,59 +355,58 @@ ready(() => {
 
   const submitBreakpointCalcForm = () => {
     if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
-      let valid = true
       for (const key in breakpointCalcForm) {
-        if (breakpointCalcForm[key] === undefined || breakpointCalcForm[key] === -1) {
-          valid = false
+        if (breakpointCalcForm[key] === undefined || breakpointCalcForm[key].toString() === '-1') {
+          return new Promise(() => {
+            return false
+          })
         }
       }
 
-      if (valid) {
-        return new Promise((resolve) => {
-          if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
-            breakpointCalcForm.status = FORM_STATE.SUBMITTING
-            toggleLoading()
+      return new Promise((resolve) => {
+        if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
+          breakpointCalcForm.status = FORM_STATE.SUBMITTING
+          toggleLoading()
 
-            const request = new XMLHttpRequest()
-            const getParams = formatParams(breakpointCalcForm)
-            const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
-            request.open('GET', url, true)
+          const request = new XMLHttpRequest()
+          const getParams = formatParams(breakpointCalcForm)
+          const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
+          request.open('GET', url, true)
 
-            request.onload = () => {
-              if (request.status >= 500) {
-                showErrors()
-              } else {
-                const json = JSON.parse(request.responseText)
-
-                if (request.status >= 200 && request.status < 400) {
-                  moveEffectiveness.innerHTML = ''
-                  ivAssessment.innerHTML = json.attack_iv_assessment
-
-                  displayBreakpointCalcDetails(json)
-                  generateTopCountersTable(json.top_counters)
-                  updateBrowserHistory(getParams)
-                } else {
-                  showErrors(json)
-                }
-                breakpointCalcForm.status = FORM_STATE.READY
-
-                if (breakpointCalcForm.tab === TAB.COUNTERS) {
-                  breakpointCalcForm.staleTab = false
-                  toggleElementsByTab(TAB.COUNTERS)
-                }
-                toggleLoading()
-                resolve()
-              }
-            }
-            request.onerror = () => {
-              breakpointCalcForm.status = FORM_STATE.ERROR
+          request.onload = () => {
+            if (request.status >= 500) {
               showErrors()
+            } else {
+              const json = JSON.parse(request.responseText)
+
+              if (request.status >= 200 && request.status < 400) {
+                moveEffectiveness.innerHTML = ''
+                ivAssessment.innerHTML = json.attack_iv_assessment
+
+                displayBreakpointCalcDetails(json)
+                generateTopCountersTable(json.top_counters)
+                updateBrowserHistory(getParams)
+              } else {
+                showErrors(json)
+              }
+              breakpointCalcForm.status = FORM_STATE.READY
+
+              if (breakpointCalcForm.tab === TAB.COUNTERS) {
+                breakpointCalcForm.staleTab = false
+                toggleElementsByTab(TAB.COUNTERS)
+              }
+              toggleLoading()
               resolve()
             }
-            request.send()
           }
-        })
-      }
+          request.onerror = () => {
+            breakpointCalcForm.status = FORM_STATE.ERROR
+            showErrors()
+            resolve()
+          }
+          request.send()
+        }
+      })
     }
   }
 

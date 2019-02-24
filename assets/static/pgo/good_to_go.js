@@ -241,52 +241,52 @@ ready(() => {
 
   const submitGoodToGoForm = () => {
     if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
-      let valid = true
       for (const key in goodToGoForm) {
         const value = String(goodToGoForm[key])
 
         if (value === 'undefined' || value === '-1') {
-          valid = false
+          return new Promise(() => {
+            return false
+          })
         }
       }
-      if (valid) {
-        return new Promise((resolve) => {
-          if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
-            goodToGoForm.status = FORM_STATE.SUBMITTING
-            toggleLoading()
 
-            const request = new XMLHttpRequest()
-            const getParams = formatParams(goodToGoForm)
-            const url = window.pgoAPIURLs['good-to-go'] + getParams
-            request.open('GET', url, true)
+      return new Promise((resolve) => {
+        if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
+          goodToGoForm.status = FORM_STATE.SUBMITTING
+          toggleLoading()
 
-            request.onload = () => {
-              if (request.status >= 500) {
-                showErrors()
-              } else {
-                const json = JSON.parse(request.responseText)
+          const request = new XMLHttpRequest()
+          const getParams = formatParams(goodToGoForm)
+          const url = window.pgoAPIURLs['good-to-go'] + getParams
+          request.open('GET', url, true)
 
-                if (request.status >= 200 && request.status < 400) {
-                  updateBrowserHistory(getParams)
-                } else {
-                  showErrors()
-                }
-                goodToGoForm.status = FORM_STATE.READY
-
-                toggleLoading()
-                renderResults(json)
-                resolve()
-              }
-            }
-            request.onerror = () => {
-              goodToGoForm.status = FORM_STATE.ERROR
+          request.onload = () => {
+            if (request.status >= 500) {
               showErrors()
+            } else {
+              const json = JSON.parse(request.responseText)
+
+              if (request.status >= 200 && request.status < 400) {
+                updateBrowserHistory(getParams)
+              } else {
+                showErrors()
+              }
+              goodToGoForm.status = FORM_STATE.READY
+
+              toggleLoading()
+              renderResults(json)
               resolve()
             }
-            request.send()
           }
-        })
-      }
+          request.onerror = () => {
+            goodToGoForm.status = FORM_STATE.ERROR
+            showErrors()
+            resolve()
+          }
+          request.send()
+        }
+      })
     }
   }
 

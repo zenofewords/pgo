@@ -12,7 +12,10 @@ from django.views.generic import (
     TemplateView,
 )
 
-from pgo.mixins import ListViewOrderingMixin
+from pgo.mixins import (
+    ListViewOrderingMixin,
+    PresetMixin,
+)
 from pgo.models import (
     CPM,
     Friendship,
@@ -91,6 +94,7 @@ class BreakpointCalculatorView(CalculatorInitialDataMixin):
             'defender_cinematic_move': self._get_object_id(
                 'Move', params.get('defender_cinematic_move')),
             'defender_cpm': str(Decimal(params.get('defender_cpm'))),
+            'top_counter_order': str(params.get('top_counter_order')),
             'tab': slugify(params.get('tab', 'breakpoints')),
         }
 
@@ -219,14 +223,34 @@ class MoveListView(ListViewOrderingMixin):
     queryset = Move.objects.select_related('move_type')
     default_ordering = ('-category', 'name',)
     ordering_fields = (
-        'slug', 'category', 'move_type', 'power', 'energy_delta', 'duration',
+        'name', 'slug', 'category', 'move_type', 'power', 'energy_delta', 'duration',
         'damage_window_start', 'damage_window_end', 'dps', 'eps',
         'pvp_power', 'pvp_energy_delta', 'pvp_duration', 'dpt', 'ept', 'dpe',
     )
     values_list_args = ('slug', 'name',)
 
+    def get(self, request, *args, **kwargs):
+        self.preset = slugify(self.request.GET.get('preset', 'pvp'))
+        self.selected_move_type = slugify(self.request.GET.get('selected-move-type', ''))
+        return super().get(request, *args, **kwargs)
 
-class PokemonDetailView(DetailView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.selected_move_type and self.selected_move_type != 'all':
+            queryset = queryset.filter(move_type__slug=self.selected_move_type)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'preset': self.preset,
+            'selected_move_type': self.selected_move_type,
+            'move_types': Type.objects.all(),
+        })
+        return context
+
+
+class PokemonDetailView(PresetMixin, DetailView):
     model = Pokemon
 
     def get_context_data(self, **kwargs):
@@ -247,9 +271,6 @@ class PokemonDetailView(DetailView):
                 floor(x.value * (self.object.pgo_stamina + 15)),
                 self._calculate_cp(float(x.value)),
             ) for x in cpm_qs.order_by('-level')],
-            'movesets': Moveset.objects.filter(
-                pokemon_id=self.object.pk
-            ).order_by('-weave_damage__4'),
             'pokemon_moves': PokemonMove.objects.filter(
                 pokemon_id=self.object.pk
             ).select_related(
@@ -268,16 +289,19 @@ class PokemonDetailView(DetailView):
             * pow(value, 2) / 10.0
         )
 
-class MoveDetailView(DetailView):
+class MoveDetailView(PresetMixin, DetailView):
     model = Move
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         move_type = self.object.move_type
-        effectiveness = move_type.strong + move_type.feeble + move_type.puny
+        effectiveness_effective = move_type.strong
+        effectiveness_not_effective = move_type.feeble + move_type.puny
+
         context.update({
             'data': Move.objects.values_list('slug', 'name'),
-            'effectiveness': effectiveness,
+            'effectiveness_effective': effectiveness_effective,
+            'effectiveness_not_effective': effectiveness_not_effective,
             'pokemon_moves': PokemonMove.objects.filter(
                 move_id=self.object.pk
             ).select_related(

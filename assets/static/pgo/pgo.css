@@ -1,13 +1,14 @@
 #type-label-wrapper {
-  padding: .4rem .6rem
+  padding: .4rem .6rem .4rem 0;
 }
 .type-label {
   color: #333;
-  padding: .4rem .8rem;
+  padding: .4rem .5rem .3rem;
   border-radius: .5rem;
-  font-size: 1.4rem;
-  width: 7rem;
+  font-size: 1.2rem;
+  width: 5.5rem;
   text-align: center;
+  margin: 0 .1rem;
 }
 .type-label-small {
   color: #333;
@@ -69,6 +70,37 @@
 .type-water {
   background-color: rgba(85, 155, 217, .7);
 }
+#contracted-table tr td {
+  padding-right: .1rem;
+}
+#no-left-padding {
+  padding-left: 0;
+}
+.underline {
+  text-decoration: underline;
+}
+.pokemon-filter-form {
+  margin-bottom: 2rem;
+}
+.pokemon-filter-form .choices {
+  margin-bottom: .5rem;
+}
+.pokemon-filter-control-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+.pokemon-item-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.pokemon-type-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+.move-name {
+  min-width: 5rem;
+}
 
 .input-padding-right {
   padding-right: .3rem;
@@ -84,6 +116,9 @@
 .input-height {
   height: 28px;
   padding: .35rem;
+}
+.input-table {
+  margin: -.3rem;
 }
 .text-margin-bottom {
   margin-bottom: 2rem;
@@ -205,6 +240,13 @@ table#top-counters-table tr td:last-child {
 #faq-legend-content ul {
   list-style-type: none;
   padding-left: 0;
+}
+.align-right {
+  text-align: right;
+}
+.align-right-pad {
+  text-align: right;
+  padding-right: 2rem !important;
 }
 
 /* good to go specific */
@@ -444,22 +486,13 @@ body {
 .search-move-wrapper .choices {
   margin: -.35rem 0 0 -.8rem;
 }
-.stacked-xlarge-table {
-  width: 90%;
-  float: left;
-}
-.stacked-large-table {
-  width: 40%;
-  float: left;
-}
-.stacked-medium-table {
-  width: 30%;
-  float: left;
-}
-.stacked-small-table {
-  width: 15%;
-  float: left;
-}
 .table-wrapper {
   display: flex;
+  flex-wrap: wrap;
+}
+.effectiveness-table-wrapper,
+.stats-table-wrapper,
+.pokemon-with-move-table-wrapper {
+  display: flex;
+  flex-grow: 1;
 }

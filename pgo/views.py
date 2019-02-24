@@ -12,7 +12,10 @@ from django.views.generic import (
     TemplateView,
 )
 
-from pgo.mixins import ListViewOrderingMixin
+from pgo.mixins import (
+    ListViewOrderingMixin,
+    PresetMixin,
+)
 from pgo.models import (
     CPM,
     Friendship,
@@ -247,7 +250,7 @@ class MoveListView(ListViewOrderingMixin):
         return context
 
 
-class PokemonDetailView(DetailView):
+class PokemonDetailView(PresetMixin, DetailView):
     model = Pokemon
 
     def get_context_data(self, **kwargs):
@@ -286,16 +289,19 @@ class PokemonDetailView(DetailView):
             * pow(value, 2) / 10.0
         )
 
-class MoveDetailView(DetailView):
+class MoveDetailView(PresetMixin, DetailView):
     model = Move
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         move_type = self.object.move_type
-        effectiveness = move_type.strong + move_type.feeble + move_type.puny
+        effectiveness_effective = move_type.strong
+        effectiveness_not_effective = move_type.feeble + move_type.puny
+
         context.update({
             'data': Move.objects.values_list('slug', 'name'),
-            'effectiveness': effectiveness,
+            'effectiveness_effective': effectiveness_effective,
+            'effectiveness_not_effective': effectiveness_not_effective,
             'pokemon_moves': PokemonMove.objects.filter(
                 move_id=self.object.pk
             ).select_related(

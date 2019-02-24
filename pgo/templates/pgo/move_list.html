@@ -43,7 +43,7 @@
             </select>
           </td>
           <td colspan="{% if preset == 'pve' %}2{% else %}3{% endif %}">
-            <a href="?preset={% if preset == 'pve' %}pvp{% else %}pve{% endif %}">
+            <a href="?preset={% if preset == 'pve' %}pvp{% else %}pve{% endif %}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={{ ordering }}">
               <span class="{% if preset == 'pvp' %}underline{% endif %}">
                 PvP
               </span>

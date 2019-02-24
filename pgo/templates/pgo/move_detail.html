@@ -118,7 +118,7 @@
         <tr>
           <td colspan="14">
             <a href="{% url 'pgo:move-list' %}">
-              &lt; moves
+              &lt; move list
             </a>
           </td>
         </tr>
@@ -128,9 +128,26 @@
         <div class="effectiveness-table-wrapper">
           <table class="table">
             <tr>
-              <th id="no-left-padding" colspan="2">Effectiveness</th>
+              <th id="no-left-padding" colspan="2">Super effective</th>
             </tr>
-            {% for type, value in effectiveness %}
+            {% for type, value in effectiveness_effective %}
+              <tr>
+                <td id="type-label-wrapper">
+                  <div class="type-label type-{{ type|lower }}">
+                    {{ type }}
+                  </div>
+                </td>
+                <td>
+                  {% widthratio value 1 100 %}%
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+          <table class="table">
+            <tr>
+              <th id="no-left-padding" colspan="2">Not very effective</th>
+            </tr>
+            {% for type, value in effectiveness_not_effective %}
               <tr>
                 <td id="type-label-wrapper">
                   <div class="type-label type-{{ type|lower }}">
@@ -175,7 +192,7 @@
             {% for pokemon_move in pokemon_moves %}
               {% with pokemon_move.pokemon as pokemon %}
                 <tr>
-                  <td id="no-left-padding">
+                  <td id="type-label-wrapper">
                     <div class="pokemon-item-wrapper">
                       <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
                         {{ pokemon.name }}

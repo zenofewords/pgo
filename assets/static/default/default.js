@@ -59,7 +59,17 @@ ready(() => {
 
   if (moveTypeFilter) {
     moveTypeFilter.addEventListener('change', event => {
-      window.location = `${window.pgoURLs['list-url']}?selected-move-type=${event.currentTarget.value}`
+      const searchParams = window.location.search.split(/[?&]+/).slice(1)
+      const index = searchParams.findIndex(element => element.includes('selected-move-type'))
+      searchParams[index] = `selected-move-type=${event.currentTarget.value}`
+
+      let query
+      if (searchParams.length > 1) {
+        query = searchParams.join('&')
+      } else {
+        query = searchParams[0]
+      }
+      window.location = `${window.pgoURLs['list-url']}?${query}`
     })
   }
 

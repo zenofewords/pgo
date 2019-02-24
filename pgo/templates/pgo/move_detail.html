@@ -1,4 +1,5 @@
 {% extends 'pgo/move_list.html' %}
+{% load zenofewords_tags %}
 
 
 {% block title %}
@@ -14,7 +15,7 @@
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
       <table class="table">
         <tr>
-          <td class="search-move-wrapper">
+          <td colspan="2" class="search-move-wrapper">
             <label for="choices-single-default" class="sr-only">
               Find move
             </label>
@@ -29,65 +30,90 @@
               {% endfor %}
             </select>
           </td>
-          <th>
-            Category
-          </th>
-          <th>
-            Type
-          </th>
-          <th>
-            Power
-          </th>
-          <th>
-            Energy
-          </th>
-          <th>
-            Duration
-          </th>
-          <th>
-            DPS
-          </th>
-          <th>
-            EPS
-          </th>
-          <th>
-            PvP Power
-          </th>
-          <th>
-            PvP Energy
-          </th>
-          <th>
-            PvP Duration
-          </th>
-          <th>
-            DPT
-          </th>
-          <th>
-            EPT
-          </th>
-          <th>
-            DPE
-          </th>
+          <td colspan="{% if preset == 'pve' %}5{% else %}6{% endif %}">
+            <a href="?preset={% if preset == 'pve' %}pvp{% else %}pve{% endif %}">
+              <span class="{% if preset == 'pvp' %}underline{% endif %}">
+                PvP
+              </span>
+              /
+              <span class="{% if preset == 'pve' %}underline{% endif %}">
+                PvE
+              </span>
+            </a>
+          </td>
         </tr>
         <tr>
-          <td>{{ move.name }}</td>
-          <td>{{ move.get_category_display }}</td>
-          <td id="type-label-wrapper">
-            <div class="type-label type-{{ move.move_type.slug }}">
-              {{ move.move_type }}
+          <th width="30%" id="no-left-padding">
+            Move
+          </th>
+          {% if preset == 'pve' %}
+            <th>
+              <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+            </th>
+            <th>
+              <span class="glyphicon glyphicon-leaf" aria-hidden="true"></span>
+            </th>
+            <th>
+              <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+            </th>
+            <th>
+              DPS
+            </th>
+            <th>
+              EPS
+            </th>
+          {% else %}
+            <th>
+              <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+            </th>
+            <th>
+              <span class="glyphicon glyphicon-leaf" aria-hidden="true"></span>
+            </th>
+            <th>
+              <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
+            </th>
+            <th>
+              DPT
+            </th>
+            <th>
+              EPT
+            </th>
+            <th>
+              DPE
+            </th>
+          {% endif %}
+        </tr>
+        <tr>
+          <td id="no-left-padding">
+            <div class="pokemon-item-wrapper">
+              <a href="{% url 'pgo:move-detail' move.slug %}">
+                <div class="move-name">
+                  {% if 'Hidden P.' in move.name %}
+                    Hidden Power
+                  {% else %}
+                    {{ move.name }}
+                  {% endif %}
+                </div>
+              </a>
+              <div class="type-label type-{{ move.move_type.slug }}">
+                {{ move.move_type.name }}
+              </div>
             </div>
           </td>
-          <td>{{ move.power }}</td>
-          <td>{{ move.energy_delta }}</td>
-          <td>{{ move.duration }}</td>
-          <td>{{ move.dps }}</td>
-          <td>{{ move.eps }}</td>
-          <td>{{ move.pvp_power }}</td>
-          <td>{{ move.pvp_energy_delta }}</td>
-          <td>{{ move.pvp_duration }} turns</td>
-          <td>{{ move.dpt|default:"0" }}</td>
-          <td>{{ move.ept|default:"0" }}</td>
-          <td>{{ move.dpe|default:"0" }}</td>
+          {% if preset == 'pve' %}
+            <td>{{ move.power }}</td>
+            <td>{{ move.energy_delta }}</td>
+            <td>{{ move.duration }}</td>
+            <td>{{ move.dps }}</td>
+            <td>{{ move.eps }}</td>
+          {% else %}
+            <td>{{ move.pvp_power }}</td>
+            <td>{{ move.pvp_energy_delta }}</td>
+            <td>{{ move.pvp_duration }}</td>
+            <td>{{ move.dpt|default:"0" }}</td>
+            <td>{{ move.ept|default:"0" }}</td>
+            <td>{{ move.dpe|floatformat:"2"|default:"0" }}</td>
+          {% endif %}
         </tr>
         <tr>
           <td colspan="14">
@@ -99,87 +125,81 @@
       </table>
 
       <div class="table-wrapper">
-        <table class="table stacked-small-table">
-          <tr>
-            <th colspan="2">Effectiveness</th>
-          </tr>
-          <tr>
-            <th>Type</th>
-            <th>x</th>
-          </tr>
-          {% for type, value in effectiveness %}
+        <div class="effectiveness-table-wrapper">
+          <table class="table">
             <tr>
-              <td id="type-label-wrapper">
-                <div class="type-label type-{{ type|lower }}">
-                  {{ type }}
-                </div>
-              </td>
-              <td>
-                {% widthratio value 1 100 %}%
-              </td>
+              <th id="no-left-padding" colspan="2">Effectiveness</th>
             </tr>
-          {% endfor %}
-        </table>
-        <table class="table stacked-xlarge-table">
-          <tr>
-            <th colspan="8">
-              List of pokemon which learn {{ move.name }}
-            </th>
-          </tr>
-          <tr>
-            <th>
-              #
-            </th>
-            <th>
-              Name
-            </th>
-            <th>
-              P. type
-            </th>
-            <th>
-              S. type
-            </th>
-            <th>
-              Attack
-            </th>
-            <th>
-              Defense
-            </th>
-            <th>
-              Stamina
-            </th>
-            <th>
-              MaxCP
-            </th>
-          </tr>
-
-          {% for pokemon_move in pokemon_moves %}
-            {% with pokemon_move.pokemon as pokemon %}
+            {% for type, value in effectiveness %}
               <tr>
-                <td>{{ pokemon.number }}</td>
+                <td id="type-label-wrapper">
+                  <div class="type-label type-{{ type|lower }}">
+                    {{ type }}
+                  </div>
+                </td>
                 <td>
-                  <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
-                    {{ pokemon.name }}
-                  </a>
+                  {% widthratio value 1 100 %}%
                 </td>
-                <td id="type-label-wrapper">
-                  <div class="type-label type-{{ pokemon.primary_type.slug }}">
-                    {{ pokemon.primary_type }}
-                  </div>
-                </td>
-                <td id="type-label-wrapper">
-                  <div class="type-label type-{{ pokemon.secondary_type.slug }}">
-                    {{ pokemon.secondary_type|default:"" }}
-                  </div>
-                </td>
-                <td>{{ pokemon.pgo_attack }}</td>
-                <td>{{ pokemon.pgo_defense }}</td>
-                <td>{{ pokemon.pgo_stamina }}</td>
-                <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
               </tr>
-            {% endwith %}
-          {% endfor %}
-        </table>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="pokemon-with-move-table-wrapper">
+          <table class="table">
+            <tr>
+              <th id="no-left-padding" colspan="8">
+                List of pokemon which learn {{ move.name }}
+              </th>
+            </tr>
+            <tr>
+              <th id="no-left-padding">
+                Pokemon
+              </th>
+              <th>
+                Atk
+              </th>
+              <th>
+                Def
+              </th>
+              <th>
+                Sta
+              </th>
+              <th>
+                Product
+              </th>
+              <th>
+                CP
+              </th>
+            </tr>
+
+            {% for pokemon_move in pokemon_moves %}
+              {% with pokemon_move.pokemon as pokemon %}
+                <tr>
+                  <td id="no-left-padding">
+                    <div class="pokemon-item-wrapper">
+                      <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
+                        {{ pokemon.name }}
+                      </a>
+                      <div class="pokemon-type-wrapper">
+                        <div class="type-label type-{{ pokemon.primary_type.slug }}">
+                          {{ pokemon.primary_type.name }}
+                        </div>
+                        <div class="type-label type-{{ pokemon.secondary_type.slug }}">
+                          {{ pokemon.secondary_type.name|default:"" }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ pokemon.pgo_attack }}</td>
+                  <td>{{ pokemon.pgo_defense }}</td>
+                  <td>{{ pokemon.pgo_stamina }}</td>
+                  <td>{{ pokemon.stat_product|format_stat_product }}</td>
+                  <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
+                </tr>
+              {% endwith %}
+            {% endfor %}
+          </table>
+        </div>
       </div>
     </div>
   </div>

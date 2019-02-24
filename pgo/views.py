@@ -268,9 +268,6 @@ class PokemonDetailView(DetailView):
                 floor(x.value * (self.object.pgo_stamina + 15)),
                 self._calculate_cp(float(x.value)),
             ) for x in cpm_qs.order_by('-level')],
-            'movesets': Moveset.objects.filter(
-                pokemon_id=self.object.pk
-            ).order_by('-weave_damage__4'),
             'pokemon_moves': PokemonMove.objects.filter(
                 pokemon_id=self.object.pk
             ).select_related(

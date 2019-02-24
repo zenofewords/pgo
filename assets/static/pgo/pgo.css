@@ -1,5 +1,5 @@
 #type-label-wrapper {
-  padding: .4rem .6rem;
+  padding: .4rem .6rem .4rem 0;
 }
 .type-label {
   color: #333;
@@ -486,22 +486,13 @@ body {
 .search-move-wrapper .choices {
   margin: -.35rem 0 0 -.8rem;
 }
-.stacked-xlarge-table {
-  width: 90%;
-  float: left;
-}
-.stacked-large-table {
-  width: 40%;
-  float: left;
-}
-.stacked-medium-table {
-  width: 30%;
-  float: left;
-}
-.stacked-small-table {
-  width: 15%;
-  float: left;
-}
 .table-wrapper {
   display: flex;
+  flex-wrap: wrap;
+}
+.effectiveness-table-wrapper,
+.stats-table-wrapper,
+.pokemon-with-move-table-wrapper {
+  display: flex;
+  flex-grow: 1;
 }

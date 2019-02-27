@@ -457,14 +457,12 @@ ready(() => {
     const cinematicMoveId = parseInt(breakpointCalcForm[cinematicMoveKey])
 
     data.forEach((moveData, i) => {
-      const move = moveData.move
-
-      if (move.category === 'QK') {
+      if (moveData.move.category === 'QK') {
         quickMoveSelect.disabled = false
-        quickMoveSelect.options.add(createMoveOption(move, quickMoveId, quickMoveKey, pokemon))
+        quickMoveSelect.options.add(createMoveOption(moveData, quickMoveId, quickMoveKey, pokemon))
       } else {
         cinematicMoveSelect.disabled = false
-        cinematicMoveSelect.options.add(createMoveOption(move, cinematicMoveId, cinematicMoveKey, pokemon))
+        cinematicMoveSelect.options.add(createMoveOption(moveData, cinematicMoveId, cinematicMoveKey, pokemon))
       }
     })
     breakpointCalcForm[quickMoveKey] = quickMoveSelect.value
@@ -473,9 +471,11 @@ ready(() => {
     submitBreakpointCalcForm()
   }
 
-  const createMoveOption = (move, moveId, moveKey, pokemon) => {
+  const createMoveOption = (moveData, moveId, moveKey, pokemon) => {
+    const move = moveData.move
+
     return new Option(
-      pokemon === 'attacker' ? move.name + ' (' + move.power + ')' : move.name,
+      pokemon === 'attacker' ? `${move.name} ${moveData.legacy ? '*' : ''} (${move.power})` : move.name,
       move.id,
       false,
       determineSelectedMove(moveId, move, moveKey)

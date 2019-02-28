@@ -95,7 +95,7 @@
           </td>
         </tr>
         <tr>
-          <th width="30%" id="no-left-padding">
+          <th width="31%" id="no-left-padding">
             Move
           </th>
           {% if preset == 'pve' %}
@@ -147,6 +147,9 @@
                         Hidden Power
                       {% else %}
                         {{ move.name }}
+                      {% endif %}
+                      {% if pokemon_move.legacy %}
+                        *
                       {% endif %}
                     </div>
                   </a>

@@ -20,20 +20,63 @@
       {% endfor %}
     </ul>
   </div>
+  <div class="donate-toggle-wrapper">
+    <h5>
+      Changelog / Donate
+      <span class="glyphicon glyphicon-chevron-down donate-chevron" aria-hidden="true"></span>
+    </h5>
+  </div>
 </nav>
+<div class="donate-info-wrapper" hidden>
+  <h5>Why donate? (via PayPal)</h5>
+  <ul>
+    <li>this site does not have ads, and never will</li>
+    <li>keeping up with game changes and maintenance takes time and effort</li>
+    <li>even though I'm using the cheapest hosting option, it's still not free :)</li>
+    <li>and above all else, you find the site useful</li>
+  </ul>
 
-<style type="text/css">
-  #navbar-toggle-cbox:checked ~ .collapse {
-    display: block;
-  }
-  #navbar-toggle-cbox {
-    display: none;
-  }
-  #navbar {
-    padding-bottom: 2rem;
-  }
-  .navbar-default {
-    background: none;
-    padding-bottom: 1rem;
-  }
-</style>
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+    <input type="hidden" name="cmd" value="_s-xclick" />
+    <input type="hidden" name="hosted_button_id" value="TR6YGU7YMYM4G" />
+    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+  </form>
+
+  <h5>Changelog</h5>
+  3/2019
+  <ul>
+    <li>added the changelog / donate section</li>
+  </ul>
+  2/2019
+  <ul>
+    <li>made pokemon and move pages mobile friendly, added filtering</li>
+    <li>added indicators for legacy moves and excluded them from raid boss' movesets</li>
+    <li>completely reworked top counters to be more accurate and flexible, added rank/DPS toggle</li>
+    <li>slightly improved performance and load times</li>
+  </ul>
+  1/2019
+  <ul>
+    <li>brought pokemon and move pages back</li>
+    <li>updated moves with PvP data</li>
+    <li>implemented hidden power properly</li>
+    <li>performed some code cleanup</li>
+  </ul>
+</div>
+
+<script type="text/javascript">
+  const donateToggleWrapper = document.querySelector('.donate-toggle-wrapper');
+  const donateInfoWrapper = document.querySelector('.donate-info-wrapper');
+  const donateChevron = document.querySelector('.donate-chevron');
+
+  donateToggleWrapper.addEventListener('click', function() {
+    donateInfoWrapper.hidden = !donateInfoWrapper.hidden;
+
+    if (donateChevron.classList.contains('glyphicon-chevron-down')) {
+      donateChevron.classList.remove('glyphicon-chevron-down');
+      donateChevron.classList.add('glyphicon-chevron-up');
+    } else {
+      donateChevron.classList.remove('glyphicon-chevron-up');
+      donateChevron.classList.add('glyphicon-chevron-down');
+    }
+  })
+</script>

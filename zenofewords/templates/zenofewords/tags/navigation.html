@@ -7,6 +7,12 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </label>
+    <div class="changelog-toggle-wrapper">
+      <h5>
+        Changelog
+        <span class="glyphicon glyphicon-chevron-down changelog-chevron" aria-hidden="true"></span>
+      </h5>
+    </div>
   </div>
   <div id="navbar" class="col-xs-12 navbar-collapse collapse">
     <ul class="nav navbar-nav">
@@ -20,32 +26,12 @@
       {% endfor %}
     </ul>
   </div>
-  <div class="donate-toggle-wrapper" hidden>
-    <h5>
-      Changelog / Donate
-      <span class="glyphicon glyphicon-chevron-down donate-chevron" aria-hidden="true"></span>
-    </h5>
-  </div>
 </nav>
-<div class="donate-info-wrapper" hidden>
-  <h5>Why donate? (via PayPal)</h5>
-  <ul>
-    <li>this site does not have ads, and never will</li>
-    <li>keeping up with game changes and maintenance takes time and effort</li>
-    <li>even though I'm using the cheapest hosting option, it's still not free :)</li>
-    <li>and above all else, you find the site useful</li>
-  </ul>
-
-  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-    <input type="hidden" name="cmd" value="_s-xclick" />
-    <input type="hidden" name="hosted_button_id" value="TR6YGU7YMYM4G" />
-    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-  </form>
-
+<div class="changelog-info-wrapper" hidden>
   <h5>Changelog</h5>
   3/2019
   <ul>
-    <li>added the changelog / donate section</li>
+    <li>added changelog</li>
   </ul>
   2/2019
   <ul>
@@ -59,7 +45,6 @@
     <li>brought pokemon and move pages back</li>
     <li>updated moves with PvP data</li>
     <li>implemented hidden power properly</li>
-    <li>performed some code cleanup</li>
   </ul>
 </div>
 
@@ -77,31 +62,33 @@
     background: none;
     padding-bottom: 1rem;
   }
-  .donate-toggle-wrapper {
+  .changelog-toggle-wrapper {
     position: absolute;
-    top: 1%;
-    right: 4.5%;
+    top: 0;
+    right: 0;
+    margin: .7rem 1.4rem 0 0;
     color: #337ab7;
+    cursor: pointer;
   }
-  .donate-info-wrapper {
+  .changelog-info-wrapper {
     margin: 0 0 30px 0;
   }
 </style>
 
 <script type="text/javascript">
-  const donateToggleWrapper = document.querySelector('.donate-toggle-wrapper');
-  const donateInfoWrapper = document.querySelector('.donate-info-wrapper');
-  const donateChevron = document.querySelector('.donate-chevron');
+  const changelogToggleWrapper = document.querySelector('.changelog-toggle-wrapper');
+  const changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');
+  const changelogChevron = document.querySelector('.changelog-chevron');
 
-  donateToggleWrapper.addEventListener('click', function() {
-    donateInfoWrapper.hidden = !donateInfoWrapper.hidden;
+  changelogToggleWrapper.addEventListener('click', function() {
+    changelogInfoWrapper.hidden = !changelogInfoWrapper.hidden;
 
-    if (donateChevron.classList.contains('glyphicon-chevron-down')) {
-      donateChevron.classList.remove('glyphicon-chevron-down');
-      donateChevron.classList.add('glyphicon-chevron-up');
+    if (changelogChevron.classList.contains('glyphicon-chevron-down')) {
+      changelogChevron.classList.remove('glyphicon-chevron-down');
+      changelogChevron.classList.add('glyphicon-chevron-up');
     } else {
-      donateChevron.classList.remove('glyphicon-chevron-up');
-      donateChevron.classList.add('glyphicon-chevron-down');
+      changelogChevron.classList.remove('glyphicon-chevron-up');
+      changelogChevron.classList.add('glyphicon-chevron-down');
     }
   })
 </script>

@@ -1,4 +1,3 @@
-{% load zenofewords_tags %}
 {% load static %}
 {% load render_bundle from webpack_loader %}
 
@@ -16,14 +15,12 @@
       <!-- <link rel="stylesheet" href="{% static 'static/css/bootstrap.min.css' %}"> -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
 
-      {% google_tag_manager %}
       <meta name="viewport" content="width=device-width, initial-scale=1">
     {% endblock head %}
   </head>
 
   {% block body %}
     <body>
-      {% google_noscript_tag_manager %}
       <div class="container content">
         {% block header %}
         {% endblock header %}

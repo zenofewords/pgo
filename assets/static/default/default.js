@@ -60,7 +60,10 @@ ready(() => {
   if (moveTypeFilter) {
     moveTypeFilter.addEventListener('change', event => {
       const searchParams = window.location.search.split(/[?&]+/).slice(1)
-      const index = searchParams.findIndex(element => element.includes('selected-move-type'))
+      let index = searchParams.findIndex(element => element.includes('selected-move-type'))
+      if (index < 0) {
+        index = 0
+      }
       searchParams[index] = `selected-move-type=${event.currentTarget.value}`
 
       let query

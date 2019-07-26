@@ -15,6 +15,14 @@ from pgo.models import (
     WeatherCondition,
 )
 
+class FriendshipAdmin(admin.ModelAdmin):
+    list_display = (
+        'level', 'damage_boost', 'order',
+    )
+    list_editable = (
+        'order',
+    )
+    ordering = ('order',)
 
 class MoveAdmin(admin.ModelAdmin):
     search_fields = (
@@ -79,7 +87,7 @@ class RaidBossAdmin(admin.ModelAdmin):
 
 admin.site.register(CPM)
 admin.site.register(EffectivenessScalar)
-admin.site.register(Friendship)
+admin.site.register(Friendship, FriendshipAdmin)
 admin.site.register(Move, MoveAdmin)
 admin.site.register(MoveAvailability, MoveAvailabilityAdmin)
 admin.site.register(Moveset, MovesetAdmin)

@@ -55,7 +55,7 @@ class CalculatorInitialDataMixin(TemplateView):
         data = {
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.all(),
-            'friendship': Friendship.objects.all(),
+            'friendship': Friendship.objects.order_by('order'),
             'defender_cpm_data': defender_cpm_data,
             'initial_data': self.initial_data,
             'site_notifications': SiteNotification.objects.all(),

@@ -346,8 +346,9 @@ class WeatherCondition(NameMixin, OrderMixin):
 
 
 class Friendship(models.Model):
-    level = models.CharField(max_length=9)
+    level = models.CharField(max_length=12)
     damage_boost = models.DecimalField(max_digits=3, decimal_places=2)
+    order = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'Friendship'

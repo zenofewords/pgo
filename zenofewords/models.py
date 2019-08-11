@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models
 
 from zenofewords.mixins import (
@@ -25,6 +23,14 @@ class NavigationItem(DefaultModelMixin, NameMixin, OrderMixin):
         return self.name if self.name else self.slug
 
 
+class SiteNotificationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(active=True)
+
+
 class SiteNotification(DefaultModelMixin, NameMixin):
     active = models.BooleanField()
     message = models.CharField(max_length=1024)
+
+    objects = models.Manager()
+    active_notifications = SiteNotificationManager()

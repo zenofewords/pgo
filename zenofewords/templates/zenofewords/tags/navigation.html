@@ -1,34 +1,36 @@
-<nav class="row navbar-default">
-  <input type="checkbox" id="navbar-toggle-cbox" hidden>
-  <div class="col-xs-12">
-    <label for="navbar-toggle-cbox" class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </label>
-    <div class="changelog-toggle-wrapper">
-      <h5>
-        Changelog
-        <span class="glyphicon glyphicon-chevron-down changelog-chevron" aria-hidden="true"></span>
-      </h5>
-    </div>
-  </div>
-  <div id="navbar" class="col-xs-12 navbar-collapse collapse">
-    <ul class="nav navbar-nav">
+<nav
+  role="navigation"
+  style="display: flex; justify-content: space-between; margin-bottom: 1rem;"
+>
+  <div
+    id="menuToggle"
+  >
+    <input type="checkbox" style="opacity: 0;"/>
+    <span></span>
+    <span></span>
+    <span></span>
+    <ul id="menu" style="opacity: 0;">
       {% for menu_item in navigation.navigationitem_set.all %}
-        {% if menu_item.active %}
-        <li class="{% if menu_item.slug in current_url %}active{% endif %}{% if menu_item.slug == 'breakpoint-calc' and current_url == '' %}active{% endif %}">
-          <a href="/{{ menu_item.slug }}/">{{ menu_item }}
+        <li>
+          <a href="/{{ menu_item.slug }}/">
+            <div class="{% if current_url == '' and forloop.first %}active{% endif %}{% if menu_item.slug in current_url %}active{% endif %}">
+              {{ menu_item|upper }}
+            </div>
           </a>
         </li>
-        {% endif %}
       {% endfor %}
     </ul>
   </div>
+  <div class="changelog-toggle">
+    Changelog
+  </div>
 </nav>
+
 <div class="changelog-info-wrapper" hidden>
-  <h5>Changelog</h5>
+  8/2019
+  <ul>
+    <li>removed bootstrap (technical debt/performance improvement)</li>
+  </ul>
   7/2019
   <ul>
     <li>added temporary friendship bonuses</li>
@@ -40,8 +42,8 @@
   </ul>
   2/2019
   <ul>
-    <li>made pokemon and move pages mobile friendly, added filtering</li>
-    <li>added indicators for legacy moves and excluded them from raid boss' movesets</li>
+    <li>made pokemon and move pages mobile friendly, added filters</li>
+    <li>added indicators for legacy moves and excluded them from raid boss movesets</li>
     <li>completely reworked top counters to be more accurate and flexible, added rank/DPS toggle</li>
     <li>slightly improved performance and load times</li>
   </ul>
@@ -49,51 +51,22 @@
   <ul>
     <li>brought pokemon and move pages back</li>
     <li>updated moves with PvP data</li>
-    <li>implemented hidden power properly</li>
+    <li>properly implemented hidden power</li>
+  </ul>
+  3/2018
+  <ul>
+    <li>updated the breakpoint calculator for raids</li>
+  </ul>
+  5/2017
+  <ul>
+    <li>launched breakpoint calculator beta</li>
   </ul>
 </div>
 
-<style type="text/css">
-  #navbar-toggle-cbox:checked ~ .collapse {
-    display: block;
-  }
-  #navbar-toggle-cbox {
-    display: none;
-  }
-  #navbar {
-    padding-bottom: 2rem;
-  }
-  .navbar-default {
-    background: none;
-    padding-bottom: 1rem;
-  }
-  .changelog-toggle-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: .7rem 1.4rem 0 0;
-    color: #337ab7;
-    cursor: pointer;
-  }
-  .changelog-info-wrapper {
-    margin: 0 0 30px 0;
-  }
-</style>
-
 <script type="text/javascript">
-  const changelogToggleWrapper = document.querySelector('.changelog-toggle-wrapper');
   const changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');
-  const changelogChevron = document.querySelector('.changelog-chevron');
 
-  changelogToggleWrapper.addEventListener('click', function() {
+  document.querySelector('.changelog-toggle').addEventListener('click', function() {
     changelogInfoWrapper.hidden = !changelogInfoWrapper.hidden;
-
-    if (changelogChevron.classList.contains('glyphicon-chevron-down')) {
-      changelogChevron.classList.remove('glyphicon-chevron-down');
-      changelogChevron.classList.add('glyphicon-chevron-up');
-    } else {
-      changelogChevron.classList.remove('glyphicon-chevron-up');
-      changelogChevron.classList.add('glyphicon-chevron-down');
-    }
   })
 </script>

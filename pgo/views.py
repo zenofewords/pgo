@@ -58,7 +58,7 @@ class CalculatorInitialDataMixin(TemplateView):
             'friendship': Friendship.objects.order_by('order'),
             'defender_cpm_data': defender_cpm_data,
             'initial_data': self.initial_data,
-            'site_notifications': SiteNotification.objects.all(),
+            'site_notifications': SiteNotification.active_notifications.all(),
         }
         context.update(data)
         return context
@@ -115,10 +115,6 @@ class GoodToGoView(CalculatorInitialDataMixin):
             'tier_1_2_raid_bosses': bool(params.get('tier_1_2_raid_bosses') == 'true'),
             'relevant_defenders': bool(params.get('relevant_defenders') == 'true'),
         }
-
-
-class PvPView(TemplateView):
-    template_name = 'pgo/pvp.html'
 
 
 class PokemonListView(ListViewOrderingMixin):

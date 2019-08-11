@@ -53,10 +53,10 @@
                 {{ pokemon.name }}
               </a>
               <div class="pokemon-type-wrapper">
-                <div class="type-label type-{{ pokemon.primary_type.slug }}">
+                <div class="type-{{ pokemon.primary_type.slug }}">
                   {{ pokemon.primary_type.name }}
                 </div>
-                <div class="type-label type-{{ pokemon.secondary_type.slug }}">
+                <div class="type-{{ pokemon.secondary_type.slug }}">
                   {{ pokemon.secondary_type.name|default:"" }}
                 </div>
               </div>
@@ -153,7 +153,7 @@
                       {% endif %}
                     </div>
                   </a>
-                  <div class="type-label type-{{ move.move_type.slug }}">
+                  <div class="type-{{ move.move_type.slug }}">
                     {{ move.move_type.name }}
                   </div>
                 </div>
@@ -189,7 +189,7 @@
         {% for resistance, value in pokemon.compound_resistance.items %}
           <tr>
             <td id="type-label-wrapper">
-              <div class="type-label type-{{ resistance|lower }}">
+              <div class="type-{{ resistance|lower }}">
                 {{ resistance }}
               </div>
             </td>
@@ -208,7 +208,7 @@
         {% for weakness, value in pokemon.compound_weakness.items %}
           <tr>
             <td id="type-label-wrapper">
-              <div class="type-label type-{{ weakness|lower }}">
+              <div class="type-{{ weakness|lower }}">
                 {{ weakness }}
               </div>
             </td>

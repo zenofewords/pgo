@@ -1,0 +1,385 @@
+/* breakpoint calc specific */
+.breakpoint-calc-wrapper
+
+
+.breakpoint-calc-row
+  display: flex
+
+.breakpoint-calc-select-attacker-wrapper,
+.breakpoint-calc-select-defender-wrapper
+  flex: 3 3
+  margin: 0 .5rem .5rem 0
+
+#breakpoint-calc-input-attacker-level
+  width: calc(100% - .4rem)
+
+%input-wrapper
+  flex: 1 1
+  position: relative
+
+.breakpoint-calc-input-attacker-level-wrapper
+  @extend %input-wrapper
+
+.breakpoint-calc-select-weather-condition-wrapper
+  @extend %input-wrapper
+  margin: 0 .25rem .4rem .25rem
+
+.breakpoint-calc-select-defender-tier-wrapper
+  @extend %input-wrapper
+
+.breakpoint-calc-select-quick-move-wrapper,
+.breakpoint-calc-select-attacker-atk-iv-wrapper
+  @extend %input-wrapper
+  margin: 0 .25rem .5rem 0
+
+.breakpoint-calc-select-cinematic-move-wrapper,
+.breakpoint-calc-select-friendship-boost-wrapper
+  @extend %input-wrapper
+  margin: 0 0 .4rem .25rem
+
+#breakpoint-calc-select-quick-move,
+#breakpoint-calc-select-cinematic-move,
+#breakpoint-calc-select-attacker-atk-iv,
+#breakpoint-calc-select-weather-condition,
+#breakpoint-calc-select-friendship-boost,
+#breakpoint-calc-select-defender-tier
+  width: 100%
+
+#breakpoint-calc-atk-iv-assessment
+  margin: .4rem 0 .8rem 0
+
+.breakpoint-calc-input-arrow:after
+  content: ""
+  height: 0
+  width: 0
+  border-style: solid
+  border-color: #333 transparent transparent
+  border-width: 5px
+  position: absolute
+  right: .5rem
+  top: 50%
+  margin-top: -2.5px
+  pointer-events: none
+
+.breakpoint-calc-input-arrow-raid-tier:after
+  @extend .breakpoint-calc-input-arrow
+  margin-top: -6px
+
+#breakpoint-calc-breakpoints-table
+  width: 100%
+  font-size: .9rem
+
+#breakpoint-calc-breakpoints-table tr
+  text-align: left
+
+#breakpoint-calc-breakpoints-table tr th:first-child
+  width: 15%
+
+#breakpoint-calc-breakpoints-table tr th:last-child,
+#breakpoint-calc-breakpoints-table tr td:last-child
+  text-align: right
+
+
+/* choices.js overrides */
+.choices__inner
+  min-height: 0
+  padding-right: 0
+  padding-left: 0
+  border: 0
+  font-size: 1rem
+  box-shadow: 0 .1rem .1rem 0 rgba(0, 0, 0, .3)
+
+.choices.is-disabled .choices__inner
+  background-color: #999
+
+.choices__item
+  font-size: 1rem
+  padding-left: .45rem
+
+.choices__list
+  max-height: 15rem
+  border: 0
+
+.choices__list--dropdown
+  background-color: #f9f9f9
+  border: 0
+  box-shadow: 0 .1rem .1rem 0 rgba(0, 0, 0, .3)
+
+.choices__list--dropdown .choices__item
+  font-size: 1rem
+
+.choices__list--single
+  padding: 0
+
+.choices__input
+  font-size: 1rem
+  background-color: #f9f9f9 !important
+
+.is-highlighted
+  background-color: rgba(102, 175, 233, .6) !important
+
+.choices[data-type*=select-one]:after
+  right: .5rem
+
+.choices[data-type*=select-one] .choices__inner
+  padding-bottom: .35rem
+
+.choices[data-type*=select-one] .choices__input
+  padding-top: .1rem
+  padding-bottom: .1rem
+
+
+/* general */
+.container
+  margin: .7rem
+  min-height: 450px
+
+@media (min-width: 813px)
+  body
+    max-width: 1200px
+    margin: 1rem auto
+
+  nav
+    #menuToggle
+      display: flex
+
+    #menu
+      display: flex
+      list-style-type: none
+      margin: 0 !important
+      opacity: 1 !important
+
+@media (max-width: 812px)
+  nav
+    #menuToggle
+      display: flex
+      flex-direction: column
+      position: relative
+      z-index: 1
+      -webkit-user-select: none
+      user-select: none
+
+      span
+        width: 2.2rem
+        height: .18rem
+        margin-bottom: .45rem
+        border-radius: .3rem
+        background: #333
+        z-index: 1
+        transform-origin: .5rem .1rem
+
+      span:first-child
+        transform-origin: 0% 0%
+
+      span:nth-last-child(2)
+        transform-origin: 0% 100%
+        margin-bottom: 0
+
+      input
+        position: absolute
+        cursor: pointer
+        z-index: 2
+        width: 3.7rem
+        height: 3rem
+        top: -.95rem
+        left: -.85rem
+
+      input:checked ~ span
+        opacity: 1
+        transform: rotate(45deg) translate(.31rem, .1rem)
+
+      input:checked ~ span:nth-last-child(3)
+        opacity: 0
+        transform: rotate(0deg) scale(0.2, 0.2)
+
+      input:checked ~ span:nth-last-child(2)
+        transform: rotate(-45deg) translate(.1rem, .4rem)
+
+      input:checked ~ ul
+        transform: none
+        opacity: 1 !important
+
+    #menu
+      position: absolute
+      z-index: 2
+      margin: 2.4rem 0 0 0
+      padding: 0 .5rem .7rem .5rem
+      border-radius: .3rem
+      background: #f9f9f9
+      list-style-type: none
+      transform-origin: 0% 0%
+      transform: translate(-150%, 0)
+      box-shadow: 0 .1rem .1rem 0 rgba(0, 0, 0, .3)
+
+      a
+        margin: .7rem 0 0
+        padding: .3rem
+
+nav
+  a
+    display: block
+    font-size: 1rem
+    text-decoration: none
+    color: #333
+    white-space: nowrap
+
+  input:checked
+    width: 100vw
+    height: 100vh
+
+  .active
+    border-bottom: .2rem solid rgba(102, 175, 233, .6)
+    width: fit-content
+
+body
+  font-family: Helvetica, sans-serif
+  margin: 0
+  -webkit-tap-highlight-color: rgba(0,0,0,0)
+  -webkit-tap-highlight-color: transparent
+
+table
+  border-collapse: collapse
+  border-spacing: 0
+
+thead tr
+  border-bottom: .15rem solid #777
+
+th,
+td
+  padding: .7rem .3rem
+  border-bottom: .1rem solid #777
+
+tr:nth-child(odd)
+  background-color: #f9f9f9
+
+tr:nth-child(even)
+  background-color: #e9e9e9
+
+input,
+select
+  height: 1.94rem
+  padding: 0 0 0 .4rem
+  border: 0
+  border-radius: .15rem
+  color: #333
+  font-size: 1rem
+  background-color: #f9f9f9
+  box-shadow: 0 .1rem .1rem 0 rgba(0, 0, 0, .3)
+  -webkit-appearance: none !important
+  -moz-appearance: none !important
+  -ms-appearance: none !important
+
+button
+  color: #333
+  box-shadow: .1rem .1rem 0 0 rgba(102, 175, 233, .6)
+
+input:disabled,
+select:disabled
+  color: #333
+  background-color: #999
+
+p
+  margin: 0
+  text-align: justify
+
+:focus
+  outline: 0
+  box-shadow: 0 0 0 .1rem rgba(102, 175, 233, .6)
+
+.changelog-toggle
+  font-size: 1.2rem
+  line-height: 1.3rem
+  cursor: pointer
+
+.screen-reader
+  position: absolute
+  top: auto
+  left: -100rem
+  width: .1rem
+  height: .1rem
+  overflow: hidden
+
+.type-label-wrapper
+  padding: .4rem .6rem .4rem 0
+
+%type-label
+  color: #333
+  padding: .4rem .5rem .3rem
+  border-radius: .5rem
+  font-size: 1.2rem
+  width: 5.5rem
+  text-align: center
+  margin: 0 .1rem
+
+.type-bug
+  @extend %type-label
+  background-color: rgba(148, 194, 46, .7)
+
+.type-dark
+  @extend %type-label
+  background-color: rgba(94, 90, 107, .7)
+
+.type-dragon
+  @extend %type-label
+  background-color: rgba(9, 108, 193, .7)
+
+.type-electric
+  @extend %type-label
+  background-color: rgba(245, 212, 73, .7)
+
+.type-fairy
+  @extend %type-label
+  background-color: rgba(238, 146, 229, .7)
+
+.type-fighting
+  @extend %type-label
+  background-color: rgba(209, 65, 101, .7)
+
+.type-fire
+  @extend %type-label
+  background-color: rgba(254, 161, 83, .7)
+
+.type-flying
+  @extend %type-label
+  background-color: rgba(143, 169, 222, .7)
+
+.type-ghost
+  @extend %type-label
+  background-color: rgba(92, 108, 183, .7)
+
+.type-grass
+  @extend %type-label
+  background-color: rgba(96, 188, 91, .7)
+
+.type-ground
+  @extend %type-label
+  background-color: rgba(217, 121, 71, .7)
+
+.type-ice
+  @extend %type-label
+  background-color: rgba(121, 209, 197, .7)
+
+.type-normal
+  @extend %type-label
+  background-color: rgba(145, 154, 161, .7)
+
+.type-poison
+  @extend %type-label
+  background-color: rgba(169, 101, 200, .7)
+
+.type-psychic
+  @extend %type-label
+  background-color: rgba(250, 126, 126, .7)
+
+.type-rock
+  @extend %type-label
+  background-color: rgba(201, 187, 140, .7)
+
+.type-steel
+  @extend %type-label
+  background-color: rgba(85, 146, 164, .7)
+
+.type-water
+  @extend %type-label
+  background-color: rgba(85, 155, 217, .7)
+

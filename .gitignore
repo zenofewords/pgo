@@ -91,14 +91,14 @@ ENV/
 # Project
 init.json
 /pgo/resources/
-/registry/resources/
 /staticfiles/
 
-# Webpack
+# NPM / webpack
 node_modules/
-bundles/
+/bundles/
+webpack-stats.json
+webpack-stats-prod.json
 server.js
-webpack/webpack-stats.json
-.eslintrc
-yarn.lock
-.flake8
+
+*.eslintrc
+*.flake8

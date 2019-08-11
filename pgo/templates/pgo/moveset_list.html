@@ -1,4 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
@@ -61,6 +62,7 @@
 
 {% block scripts %}
   {{ block.super }}
+  {% render_bundle 'lists' attrs='async' %}
 
   <script type="text/javascript">
     window.pgoURLs = {

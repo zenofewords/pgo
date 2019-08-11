@@ -1,3 +1,5 @@
+import '../../node_modules/choices.js/public/assets/styles/choices.min.css'
+import '../sass/pgo.sass'
 import Choices from 'choices.js'
 
 const ready = (runBreakpointCalc) => {
@@ -22,7 +24,7 @@ ready(() => {
 
   // inputs
   const selectAttacker = new Choices(
-    '.breakpoint-calc-select-attacker',
+    '#breakpoint-calc-select-attacker',
     {
       searchPlaceholderValue: 'Type in the attacker\'s name',
       searchResultLimit: 5,
@@ -34,7 +36,7 @@ ready(() => {
   const selectAttackerCinematicMove = document.getElementById('breakpoint-calc-select-cinematic-move')
   const selectAttackerAtkIv = document.getElementById('breakpoint-calc-select-attacker-atk-iv')
   const selectDefender = new Choices(
-    '.breakpoint-calc-select-defender',
+    '#breakpoint-calc-select-defender',
     {
       searchPlaceholderValue: 'Type in the defender\'s name',
       searchResultLimit: 5,
@@ -80,7 +82,7 @@ ready(() => {
   }
 
   // events
-  selectAttacker.passedElement.addEventListener('change', (event) => {
+  selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('attacker')
     selectPokemonMoves(event.currentTarget.value, 'attacker')
     clearChoicesFieldError('breakpoint-calc-select-attacker')
@@ -126,7 +128,7 @@ ready(() => {
     breakpointCalcForm.staleTab = true
     submitBreakpointCalcForm().then(() => selectFriendShipBoost.focus())
   })
-  selectDefender.passedElement.addEventListener('change', (event) => {
+  selectDefender.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('defender')
     selectPokemonMoves(event.currentTarget.value, 'defender')
     clearChoicesFieldError('breakpoint-calc-select-defender')
@@ -219,7 +221,7 @@ ready(() => {
               callback(data, 'value', 'label')
             }).then(() => {
               selectDefender.setChoices(
-                selectAttacker.currentState.choices.slice(1),
+                selectAttacker._currentState.choices.slice(1),
                 'value', 'label', false
               )
               breakpointCalcForm.status = FORM_STATE.READY
@@ -410,12 +412,12 @@ ready(() => {
     }
   }
 
-  async function restoreBreakpointCalcForm (data) {
+  const restoreBreakpointCalcForm = (data) => {
     initialFetch().then(() => {
       toggleTab(data.tab)
 
-      selectAttacker.setValueByChoice(String(data.attacker))
-      selectDefender.setValueByChoice(String(data.defender))
+      selectAttacker.setChoiceByValue(String(data.attacker))
+      selectDefender.setChoiceByValue(String(data.defender))
 
       inputAttackerLevel.value = data.attacker_level
       selectAttackerAtkIv.value = data.attacker_atk_iv
@@ -618,7 +620,7 @@ ready(() => {
   }
 
   const clearChoicesFieldError = (elementName) => {
-    const input = document.getElementsByClassName(elementName)[0]
+    const input = document.getElementById(elementName)[0]
     input.parentElement.parentElement.classList.remove('error')
   }
 

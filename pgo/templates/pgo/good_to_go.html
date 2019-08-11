@@ -103,11 +103,8 @@
 {% endblock content %}
 
 {% block scripts %}
-  {% render_bundle 'goodToGo' attrs='async' %}
   {{ block.super }}
-
-  {% block generic %}
-  {% endblock generic %}
+  {% render_bundle 'goodToGo' attrs='async' %}
 
   <script type="text/javascript">
     var initialData = {{ initial_data|safe }};

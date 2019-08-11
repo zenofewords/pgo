@@ -1,3 +1,5 @@
+import '../../node_modules/choices.js/public/assets/styles/choices.min.css'
+import '../sass/pgo.sass'
 import Choices from 'choices.js'
 
 const ready = (runGoodToGo) => {
@@ -52,7 +54,7 @@ ready(() => {
     status: FORM_STATE.READY,
   }
 
-  selectAttacker.passedElement.addEventListener('change', (event) => {
+  selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs()
     selectPokemonMoves(event.currentTarget.value)
 

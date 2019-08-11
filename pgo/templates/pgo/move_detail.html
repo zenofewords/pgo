@@ -95,7 +95,7 @@
                   {% endif %}
                 </div>
               </a>
-              <div class="type-label type-{{ move.move_type.slug }}">
+              <div class="type-{{ move.move_type.slug }}">
                 {{ move.move_type.name }}
               </div>
             </div>
@@ -132,8 +132,8 @@
             </tr>
             {% for type, value in effectiveness_effective %}
               <tr>
-                <td id="type-label-wrapper">
-                  <div class="type-label type-{{ type|lower }}">
+                <td class="type-label-wrapper">
+                  <div class="type-{{ type|lower }}">
                     {{ type }}
                   </div>
                 </td>
@@ -149,8 +149,8 @@
             </tr>
             {% for type, value in effectiveness_not_effective %}
               <tr>
-                <td id="type-label-wrapper">
-                  <div class="type-label type-{{ type|lower }}">
+                <td class="type-label-wrapper">
+                  <div class="type-{{ type|lower }}">
                     {{ type }}
                   </div>
                 </td>
@@ -192,16 +192,16 @@
             {% for pokemon_move in pokemon_moves %}
               {% with pokemon_move.pokemon as pokemon %}
                 <tr>
-                  <td id="type-label-wrapper">
+                  <td class="type-label-wrapper">
                     <div class="pokemon-item-wrapper">
                       <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
                         {{ pokemon.name }}
                       </a>
                       <div class="pokemon-type-wrapper">
-                        <div class="type-label type-{{ pokemon.primary_type.slug }}">
+                        <div class="type-{{ pokemon.primary_type.slug }}">
                           {{ pokemon.primary_type.name }}
                         </div>
-                        <div class="type-label type-{{ pokemon.secondary_type.slug }}">
+                        <div class="type-{{ pokemon.secondary_type.slug }}">
                           {{ pokemon.secondary_type.name|default:"" }}
                         </div>
                       </div>

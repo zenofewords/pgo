@@ -16,16 +16,6 @@ def navigation_tag(context, navigation_slug, subnav=False):
     }
 
 
-@register.inclusion_tag('zenofewords/tags/google_tag_manager.html')
-def google_tag_manager():
-    return {'render': not settings.DEBUG}
-
-
-@register.inclusion_tag('zenofewords/tags/google_noscript_tag_manager.html')
-def google_noscript_tag_manager():
-    return {'render': not settings.DEBUG}
-
-
 @register.filter
 def floor(value):
     return int(value)

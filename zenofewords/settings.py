@@ -15,13 +15,12 @@ import dj_database_url
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
-DEBUG_TOOLBAR = bool(os.getenv('DEBUG_TOOLBAR', False) and DEBUG)
+DEBUG_TOOLBAR = False # bool(os.getenv('DEBUG_TOOLBAR', False) and DEBUG)
 CACHE = not DEBUG
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -77,6 +76,7 @@ LOADERS = [
     'django.template.loaders.app_directories.Loader'
 ]
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 if CACHE:
     MIDDLEWARE.insert(0, 'django.middleware.cache.UpdateCacheMiddleware')
     MIDDLEWARE.append('django.middleware.cache.FetchFromCacheMiddleware')
@@ -98,7 +98,6 @@ if CACHE:
 
 ROOT_URLCONF = 'zenofewords.urls'
 
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -117,7 +116,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'zenofewords.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 DATABASES = {
@@ -127,7 +125,6 @@ CONN_MAX_AGE = None
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -143,10 +140,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Europe/Zagreb'
@@ -156,24 +151,18 @@ USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'assets'),
+    os.path.join(BASE_DIR, 'static'),
 )
-if not DEBUG:
-    WEBPACK_CONF = {
-        'BUNDLE_DIR_NAME': 'prod/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack/webpack-stats-prod.json')
-    }
-else:
-    WEBPACK_CONF = {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack/webpack-stats.json'),
-    }
 WEBPACK_LOADER = {
-    'DEFAULT': WEBPACK_CONF
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(
+            BASE_DIR, 'static/webpack-stats{}.json'.format('-prod' if not DEBUG else '')
+        )
+    }
 }
 
 REST_FRAMEWORK = {
@@ -182,8 +171,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-DEFAULT_FROM_EMAIL = 'zen@dominikzen.com'
-SERVER_EMAIL = 'zen@dominikzen.com'
+DEFAULT_FROM_EMAIL = ''
+SERVER_EMAIL = ''
 
 LOGGING = {
     'version': 1,

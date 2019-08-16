@@ -55,7 +55,6 @@ ready(() => {
   const inputToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
   const inputToggleTopCounterSort = document.getElementById('top-counter-sort-toggle')
 
-  const topCounterSortLabel = document.getElementById('top-counter-sort-label')
   const tabBreakpoints = document.getElementById('breakpoint-calc-breakpoints')
   const tabTopCounters = document.getElementById('breakpoint-calc-top-counters')
   const breakpointsTable = document.getElementById('breakpoint-calc-breakpoints-table')
@@ -158,14 +157,10 @@ ready(() => {
     submitBreakpointCalcForm().then(() => selectDefenderCPM.focus())
   })
   inputToggleCinematicBreakpoints.addEventListener('click', (event) => {
-    event.preventDefault()
-
     breakpointCalcForm.staleTab = true
     toggleCinematicBreakpoints()
   })
   inputToggleTopCounterSort.addEventListener('click', event => {
-    event.preventDefault()
-
     breakpointCalcForm.staleTab = true
     if (!inputToggleTopCounterSort.disabled) {
       toggleTopCounterOrder(breakpointCalcForm.top_counter_order)
@@ -198,12 +193,12 @@ ready(() => {
     const faqLegendChevrons = event.currentTarget.getElementsByClassName('faq-legend-chevron')
 
     for (var i = 0; i < faqLegendChevrons.length; i++) {
-      if (faqLegendChevrons[i].classList.contains('glyphicon-chevron-down')) {
-        faqLegendChevrons[i].classList.remove('glyphicon-chevron-down')
-        faqLegendChevrons[i].classList.add('glyphicon-chevron-up')
+      if (faqLegendChevrons[i].classList.contains('chevron-down')) {
+        faqLegendChevrons[i].classList.remove('chevron-down')
+        faqLegendChevrons[i].classList.add('chevron-up')
       } else {
-        faqLegendChevrons[i].classList.remove('glyphicon-chevron-up')
-        faqLegendChevrons[i].classList.add('glyphicon-chevron-down')
+        faqLegendChevrons[i].classList.remove('chevron-up')
+        faqLegendChevrons[i].classList.add('chevron-down')
       }
     }
   })
@@ -552,22 +547,20 @@ ready(() => {
         if (i > 0) {
           className = 'toggle_' + className + ' breakpoint-calc-top-counter-subrow'
           dataRow.hidden = true
-          dataCell.classList.add('align-right-pad')
+          dataCell.classList.add('top-counter-subrow')
         } else {
           const chevron = document.createElement('span')
           chevron.setAttribute(
-            'class', 'glyphicon glyphicon-chevron-down breakpoint-calc-top-counter-chevron')
-          chevron.setAttribute('aria-hidden', true)
+            'class', 'chevron-down breakpoint-calc-top-counter-chevron')
 
           href = document.createElement('a')
-          href.setAttribute('class', 'breakpoint-calc-toggle-chevron')
           href.onclick = () => {
-            if (chevron.classList.contains('glyphicon-chevron-down')) {
-              chevron.classList.remove('glyphicon-chevron-down')
-              chevron.classList.add('glyphicon-chevron-up')
+            if (chevron.classList.contains('chevron-down')) {
+              chevron.classList.remove('chevron-down')
+              chevron.classList.add('chevron-up')
             } else {
-              chevron.classList.remove('glyphicon-chevron-up')
-              chevron.classList.add('glyphicon-chevron-down')
+              chevron.classList.remove('chevron-up')
+              chevron.classList.add('chevron-down')
             }
 
             const elements = document.getElementsByClassName('toggle_' + className)
@@ -597,7 +590,7 @@ ready(() => {
 
   const toggleTopCounterOrder = (value) => {
     breakpointCalcForm.top_counter_order = value === 'rnk' ? 'dps' : 'rnk'
-    topCounterSortLabel.innerHTML = breakpointCalcForm.top_counter_order.toUpperCase()
+    inputToggleTopCounterSort.innerHTML = breakpointCalcForm.top_counter_order.toUpperCase()
   }
 
   const showErrors = (errorObject = null) => {

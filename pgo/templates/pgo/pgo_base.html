@@ -21,16 +21,13 @@
 
   {% for notification in site_notifications %}
     <p>
-      <i class="fas fa-exclamation-circle"></i>
       {{ notification.message|safe }}
     </p>
   {% endfor %}
 {% endblock header %}
 
 {% block footer %}
-  <div>
-    Something doesn't seem right? You can let me know at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.
-    <br>
-    {{ block.super }}
-  </div>
+  Notice something missing or broken? You can let me know at
+  <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a>.
+  {{ block.super }}
 {% endblock footer %}

@@ -1,28 +1,27 @@
-<nav
-  role="navigation"
-  style="display: flex; justify-content: space-between; margin-bottom: 1rem;"
->
-  <div
-    id="menuToggle"
-  >
-    <input type="checkbox" style="opacity: 0;"/>
-    <span></span>
-    <span></span>
-    <span></span>
-    <ul id="menu" style="opacity: 0;">
-      {% for menu_item in navigation.navigationitem_set.all %}
-        <li>
-          <a href="/{{ menu_item.slug }}/">
-            <div class="{% if current_url == '' and forloop.first %}active{% endif %}{% if menu_item.slug in current_url %}active{% endif %}">
-              {{ menu_item|upper }}
-            </div>
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  <div class="changelog-toggle">
-    Changelog
+<nav role="navigation">
+  <div class="nav">
+    <div
+      id="menuToggle"
+    >
+      <input type="checkbox" style="opacity: 0;"/>
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu" style="opacity: 0;">
+        {% for menu_item in navigation.navigationitem_set.all %}
+          <li>
+            <a href="/{{ menu_item.slug }}/">
+              <div class="{% if current_url == '' and forloop.first %}active{% endif %}{% if menu_item.slug in current_url %}active{% endif %}">
+                {{ menu_item|upper }}
+              </div>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="changelog-toggle">
+      Changelog
+    </div>
   </div>
 </nav>
 
@@ -30,6 +29,7 @@
   8/2019
   <ul>
     <li>removed bootstrap (technical debt/performance improvement)</li>
+    <li>updated UI after removing bootstrap</li>
   </ul>
   7/2019
   <ul>

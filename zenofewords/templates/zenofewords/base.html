@@ -17,7 +17,7 @@
 
   {% block body %}
     <body>
-      <div class="container">
+      <content>
         {% block header %}
         {% endblock header %}
 
@@ -30,12 +30,12 @@
               {% if page_obj.has_previous %}
                 <li>
                   <a href="?page={{ page_obj.previous_page_number }}&amp;ordering={{ ordering }}">
-                    <span class="glyphicon glyphicon-chevron-left faq-legend-chevron" aria-hidden="true"></span>
+                    Prev
                   </a>
                 </li>
               {% else %}
                 <li class="disabled">
-                  <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                  Prev
                 </li>
               {% endif %}
 
@@ -54,31 +54,28 @@
               {% if page_obj.has_next %}
                 <li>
                   <a href="?page={{ page_obj.next_page_number }}&amp;ordering={{ ordering }}">
-                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    Next
                   </a>
                 </li>
               {% else %}
                 <li class="disabled">
-                  <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                  Next
                 </li>
               {% endif %}
               <li>
                 <a href="{{ request.get_full_path }}" class="back-to-top">
-                  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                  To top
                 </a>
               </li>
             </ul>
           {% endif %}
         {% endblock pagination %}
+      </content>
 
-        <div class="footer">
-          {% block footer %}
-            <span>
-              &copy; {% now 'Y' %} Dominik Zen
-            </span>
-          {% endblock footer %}
-        </div>
-      </div>
+      <footer>
+        {% block footer %}
+        {% endblock footer %}
+      </footer>
 
       {% block scripts %}
       {% endblock scripts %}

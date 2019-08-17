@@ -40,7 +40,6 @@ ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS').split(',')]
 INTERNAL_IPS = ['127.0.0.1', ]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -170,9 +169,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAdminUser',
     ],
 }
-
-DEFAULT_FROM_EMAIL = ''
-SERVER_EMAIL = ''
 
 LOGGING = {
     'version': 1,

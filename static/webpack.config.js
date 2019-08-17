@@ -2,6 +2,7 @@ var MiniCssExtractPlugin = require('mini-css-extract-plugin')
 var path = require('path')
 var WebpackBundleTracker = require('webpack-bundle-tracker')
 
+
 module.exports = {
   entry: {
     breakpointCalc: './static/javascript/breakpointCalc',

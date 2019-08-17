@@ -11,75 +11,75 @@
 {% endblock %}
 
 {% block content %}
-<div class="breakpoint-calc-wrapper">
-  <div class="breakpoint-calc-input-wrapper">
-    <div class="breakpoint-calc-row">
-      <div class="breakpoint-calc-select-attacker-wrapper">
-        <label for="breakpoint-calc-select-attacker" class="screen-reader">Select attacker</label>
-        <select id="breakpoint-calc-select-attacker" data-trigger name="choices-single-default">
+<div class="wrapper">
+  <div class="input-wrapper">
+    <div class="row">
+      <div class="select-attacker-wrapper">
+        <label for="select-attacker" class="screen-reader">Select attacker</label>
+        <select id="select-attacker" data-trigger name="choices-single-default">
           <option value="-1" placeholder disabled selected>Select attacker</option>
         </select>
       </div>
 
-      <div class="breakpoint-calc-input-attacker-level-wrapper">
-        <label for="breakpoint-calc-input-attacker-level" class="screen-reader">Attacker level</label>
-        <input id="breakpoint-calc-input-attacker-level" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
+      <div class="input-attacker-level-wrapper">
+        <label for="input-attacker-level" class="screen-reader">Attacker level</label>
+        <input id="input-attacker-level" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
       </div>
     </div>
-    <div class="breakpoint-calc-row">
-      <div class="breakpoint-calc-select-quick-move-wrapper">
-        <label for="breakpoint-calc-select-quick-move" class="screen-reader">Quick move</label>
-        <select id="breakpoint-calc-select-quick-move" disabled>
+    <div class="row">
+      <div class="select-quick-move-wrapper">
+        <label for="select-quick-move" class="screen-reader">Quick move</label>
+        <select id="select-quick-move" disabled>
           <option value="-1" disabled selected>Quick move</option>
         </select>
       </div>
 
-      <div class="breakpoint-calc-select-cinematic-move-wrapper">
-        <label for="breakpoint-calc-select-cinematic-move" class="screen-reader">Cinematic move</label>
-        <select id="breakpoint-calc-select-cinematic-move" disabled>
+      <div class="select-cinematic-move-wrapper">
+        <label for="select-cinematic-move" class="screen-reader">Cinematic move</label>
+        <select id="select-cinematic-move" disabled>
           <option value="-1" disabled selected>Cinematic move</option>
         </select>
       </div>
     </div>
-    <div class="breakpoint-calc-row">
-      <div class="breakpoint-calc-select-attacker-atk-iv-wrapper">
-        <label for="breakpoint-calc-select-attacker-atk-iv" class="screen-reader">Attacker ATK IV</label>
-        <select id="breakpoint-calc-select-attacker-atk-iv">
+    <div class="row">
+      <div class="select-attacker-atk-iv-wrapper">
+        <label for="select-attacker-atk-iv" class="screen-reader">Attacker ATK IV</label>
+        <select id="select-attacker-atk-iv">
           {% for n in attack_iv_range %}
             <option value="{{ n }}">{{ n }} ATK</option>
           {% endfor %}
         </select>
       </div>
 
-      <div class="breakpoint-calc-select-weather-condition-wrapper">
-        <label for="breakpoint-calc-select-weather-condition" class="screen-reader">Weather condition</label>
-        <select id="breakpoint-calc-select-weather-condition">
+      <div class="select-weather-condition-wrapper">
+        <label for="select-weather-condition" class="screen-reader">Weather condition</label>
+        <select id="select-weather-condition">
           {% for weather_condition in weather_condition_data %}
             <option value="{{ weather_condition.pk }}">{{ weather_condition.name }}</option>
           {% endfor %}
         </select>
       </div>
 
-      <div class="breakpoint-calc-select-friendship-boost-wrapper">
-        <label for="breakpoint-calc-select-friendship-boost" class="screen-reader">Friendship boost</label>
-        <select id="breakpoint-calc-select-friendship-boost">
+      <div class="select-friendship-boost-wrapper">
+        <label for="select-friendship-boost" class="screen-reader">Friendship boost</label>
+        <select id="select-friendship-boost">
           {% for friend in friendship %}
             <option value="{{ friend.damage_boost }}">{{ friend.level }}</option>
           {% endfor %}
         </select>
       </div>
     </div>
-    <div class="breakpoint-calc-row">
-      <div class="breakpoint-calc-select-defender-wrapper">
-        <label for="breakpoint-calc-select-defender" class="screen-reader">Select defender</label>
-        <select id="breakpoint-calc-select-defender" data-trigger name="choices-single-default">
+    <div class="row">
+      <div class="select-defender-wrapper">
+        <label for="select-defender" class="screen-reader">Select defender</label>
+        <select id="select-defender" data-trigger name="choices-single-default">
           <option value="-1" placeholder disabled selected>Select defender</option>
         </select>
       </div>
 
-      <div class="breakpoint-calc-select-defender-tier-wrapper">
-        <label for="breakpoint-calc-select-defender-tier" class="screen-reader">Defender tier / level</label>
-        <select id="breakpoint-calc-select-defender-tier">
+      <div class="select-defender-tier-wrapper">
+        <label for="select-defender-tier" class="screen-reader">Defender tier / level</label>
+        <select id="select-defender-tier">
           {% for data in defender_cpm_data %}
             {% if forloop.last %}
               <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
@@ -92,22 +92,22 @@
     </div>
   </div>
 
-  <div class="breakpoint-calc-output-wrapper">
-    <p id="breakpoint-calc-atk-iv-assessment">
+  <div class="output-wrapper">
+    <p id="atk-iv-assessment">
       The Pokemon GO breakpoint calculator was created to help you find your pokemon's breakpoints and plan power-ups accordingly.
     </p>
-    <p id="breakpoint-calc-move-effectiveness">
+    <p id="move-effectiveness">
       Selecting an attacker and a defender will auto submit the form. Changing any value will refresh it.
     </p>
   </div>
 </div>
 
-<div id="breakpoint-calc-breakpoint-details-table" hidden>
-  <div class="breakpoint-calc-tab-wrapper">
-    <input class="breakpoint-calc-tab breakpoint-calc-selected-tab" type="submit" id="breakpoint-calc-breakpoints" value="Breakpoints">
-    <input class="breakpoint-calc-tab" type="submit" id="breakpoint-calc-top-counters" value="Top counters">
+<div id="breakpoint-details-table" hidden>
+  <div class="tab-wrapper">
+    <input class="tab selected-tab" type="submit" id="breakpoints" value="Breakpoints">
+    <input class="tab" type="submit" id="top-counters" value="Top counters">
   </div>
-  <table id="breakpoint-calc-breakpoints-table">
+  <table id="breakpoints-table">
     <thead>
       <tr>
         <th>LVL</th>
@@ -117,26 +117,26 @@
         </th>
         <th>QM</th>
         <th>
-          <span id="breakpoint-calc-toggle-cinematic-breakpoints">CM</span>
+          <span id="toggle-cinematic-breakpoints">CM</span>
         </th>
         <th>DPS</th>
         <th>T#</th>
       </tr>
     </thead>
-    <tbody id="breakpoint-calc-breakpoint-details-table-body"></tbody>
+    <tbody id="breakpoint-details-table-body"></tbody>
   </table>
-  <div id="breakpoint-calc-top-counters-table" hidden>
-    <div class="breakpoint-calc-counters-moveset">
-      <div class="breakpoint-calc-vs-label">VS</div>
-      <div class="breakpoint-calc-select-defender-move-wrapper">
-        <label for="breakpoint-calc-select-defender-quick-move" class="screen-reader">Quick move</label>
-        <select id="breakpoint-calc-select-defender-quick-move" disabled>
+  <div id="top-counters-table" hidden>
+    <div class="counters-moveset">
+      <div class="vs-label">VS</div>
+      <div class="select-defender-move-wrapper">
+        <label for="select-defender-quick-move" class="screen-reader">Quick move</label>
+        <select id="select-defender-quick-move" disabled>
           <option value="-1" disabled selected>Quick move</option>
         </select>
       </div>
-      <div class="breakpoint-calc-select-defender-move-wrapper">
-        <label for="breakpoint-calc-select-defender-cinematic-move" class="screen-reader">Cinematic move</label>
-        <select id="breakpoint-calc-select-defender-cinematic-move" disabled>
+      <div class="select-defender-move-wrapper">
+        <label for="select-defender-cinematic-move" class="screen-reader">Cinematic move</label>
+        <select id="select-defender-cinematic-move" disabled>
           <option value="-1" disabled selected>Cinematic move</option>
         </select>
       </div>
@@ -152,7 +152,7 @@
           </th>
         </tr>
       </thead>
-      <tbody id="breakpoint-calc-top-counters-table-body"></tbody>
+      <tbody id="top-counters-table-body"></tbody>
     </table>
   </div>
   <div id="faq-legend-link">FAQ / legend</div>

@@ -1,0 +1,250 @@
+@import './variables.sass'
+
+
+@media (min-width: 50.81rem)
+  body
+    max-width: 50rem
+    margin: 0 auto
+    padding: 0 3rem
+
+  .nav
+    margin: 1.5rem 0
+
+    input
+      padding: 0
+      margin: 0
+
+    #menu
+      display: flex
+      list-style: none
+      margin: 0 !important
+      opacity: 1 !important
+      padding: 0
+
+      li
+        padding: 0 1rem 0 0
+
+@media (max-width: 50.8rem)
+  body
+    margin: 0 .7rem
+
+  .nav
+    margin: 1rem 0
+
+    #menuToggle
+      flex-direction: column
+      position: relative
+      z-index: 1
+      -webkit-user-select: none
+      user-select: none
+
+      span
+        width: 2.2rem
+        height: .18rem
+        margin-bottom: .45rem
+        border-radius: $borderRadius
+        background: $fontColor
+        z-index: 1
+        transform-origin: .5rem .1rem
+
+        &:first-child
+          transform-origin: 0% 0%
+
+        &:nth-last-child(2)
+          transform-origin: 0% 100%
+          margin-bottom: 0
+
+      input
+        position: absolute
+        cursor: pointer
+        z-index: 2
+        width: 3.7rem
+        height: 3rem
+        top: -.95rem
+        left: -.85rem
+
+        &:checked ~ span
+          opacity: 1
+          transform: rotate(45deg) translate(.31rem, .1rem)
+
+        &:checked ~ span:nth-last-child(3)
+          opacity: 0
+          transform: rotate(0deg) scale(0.2, 0.2)
+
+        &:checked ~ span:nth-last-child(2)
+          transform: rotate(-45deg) translate(.1rem, .4rem)
+
+        &:checked ~ ul
+          transform: none
+          opacity: 1 !important
+
+    #menu
+      position: absolute
+      z-index: 2
+      margin: 2.4rem 0 0 0
+      padding: 0 .5rem .7rem .5rem
+      border-radius: $borderRadius
+      background-color: $backgroundColor
+      list-style: none
+      transform-origin: 0% 0%
+      transform: translate(-150%, 0)
+      box-shadow: $discreetShadow
+
+      a
+        margin: .7rem 0 0
+        padding: .3rem
+
+.nav
+  display: flex
+  justify-content: space-between
+
+  a
+    display: block
+    text-decoration: none
+    color: $fontColor
+    white-space: nowrap
+
+  input:checked
+    width: 100%
+    height: 100%
+
+  #menuToggle
+    display: flex
+
+  .active
+    border-bottom: .2rem solid $highlightColor
+    width: fit-content
+
+html,
+body
+  height: 100%
+
+body
+  font-family: Helvetica, sans-serif
+  color: $fontColor
+  display: flex
+  flex-direction: column
+  min-height: 27rem
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+  -webkit-tap-highlight-color: transparent
+
+footer
+  flex-shrink: 0
+  font-size: $fontSize
+  margin-bottom: .5rem
+
+hr
+  opacity: .3
+  margin: .7rem 0
+
+table
+  width: 100%
+  border-top: .05rem solid $borderColor
+  border-spacing: 0
+  margin-bottom: .7rem
+  font-size: $fontSize
+  text-align: left
+  border-collapse: collapse
+
+  tr
+    border: 0
+
+  th,
+  td
+    padding: .6rem .2rem
+    border-bottom: .1rem solid $borderColor
+
+    &:last-child
+      text-align: right
+
+input,
+select
+  height: 1.8rem
+  padding: 0 0 0 .4rem
+  border: 0
+  border-radius: $borderRadius
+  color: $fontColor
+  font-size: $fontSize
+  background-color: $backgroundColor
+  box-shadow: $discreetShadow
+  -webkit-appearance: none !important
+  -moz-appearance: none !important
+  -ms-appearance: none !important
+
+  &:disabled
+    color: $fontColor
+    background-color: $disabledBGColor
+
+button
+  color: $fontColor
+  box-shadow: .1rem .1rem 0 0 $highlightColor
+
+a
+  color: $linkColor
+  text-decoration: none
+
+p
+  font-size: $fontSize
+  text-align: justify
+  line-height: 1.4
+  margin: 0
+  padding: .3rem .1rem
+
+content
+  flex: 1 0 auto
+
+  ul
+    margin: 0
+
+    li
+      padding: 0 0 .2rem 0
+
+:focus
+  outline: 0
+  box-shadow: 0 0 0 .1rem $highlightColor
+
+%input-wrapper
+  flex: 1 1
+  position: relative
+
+%input-arrow:after
+  content: ""
+  height: 0
+  width: 0
+  border-style: solid
+  border-color: $fontColor transparent transparent
+  border-width: .3rem
+  position: absolute
+  top: .8rem
+  pointer-events: none
+
+.svg-icon
+  margin-bottom: -.15rem
+
+.changelog-toggle
+  font-weight: $fontBold
+  padding-right: 1.5rem
+  text-transform: uppercase
+  cursor: pointer
+  position: relative
+
+  &:after
+    @extend %input-arrow
+    top: .4rem
+    left: 7rem
+
+.changelog-info-wrapper
+  font-size: $fontSize
+  line-height: 1.4
+  margin-bottom: 1.5rem
+
+  ul
+    margin: 0 0 .5rem
+
+.screen-reader
+  position: absolute
+  top: auto
+  left: -100rem
+  width: .1rem
+  height: .1rem
+  overflow: hidden

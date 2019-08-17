@@ -1,0 +1,167 @@
+@import './choicesjsOverrides.sass'
+@import './general.sass'
+
+
+.wrapper
+  display: block
+  margin-bottom: .3rem
+
+.row
+  display: flex
+
+.input-wrapper,
+.output-wrapper
+  flex: 1 1
+
+.select-attacker-wrapper,
+.select-defender-wrapper
+  flex: 3 3
+  margin: 0 .5rem .5rem 0
+
+#input-attacker-level
+  width: calc(100% - .4rem)
+
+.input-attacker-level-wrapper
+  @extend %input-wrapper
+
+.select-attacker-atk-iv-wrapper,
+.select-cinematic-move-wrapper,
+.select-defender-move-wrapper,
+.select-defender-tier-wrapper,
+.select-friendship-boost-wrapper,
+.select-quick-move-wrapper,
+.select-weather-condition-wrapper
+  @extend %input-wrapper
+  &:after
+    @extend %input-arrow
+    right: .5rem
+
+.select-weather-condition-wrapper
+  margin: 0 .25rem .4rem .25rem
+
+.select-quick-move-wrapper,
+.select-attacker-atk-iv-wrapper
+  margin: 0 .25rem .5rem 0
+
+.select-cinematic-move-wrapper,
+.select-friendship-boost-wrapper
+  margin: 0 0 .4rem .25rem
+
+#select-attacker-atk-iv,
+#select-cinematic-move,
+#select-defender-cinematic-move,
+#select-defender-quick-move,
+#select-defender-tier,
+#select-friendship-boost,
+#select-quick-move,
+#select-weather-condition
+  width: 100%
+
+#toggle-cinematic-breakpoints,
+#top-counter-sort-toggle
+  color: $linkColor
+
+#move-effectiveness
+  font-size: $fontSize
+
+#top-counters-table
+  border-top: .05rem solid $borderColor
+  margin-top: -.06rem
+
+  .counters-moveset
+    display: flex
+    padding: .5rem 0
+
+    .vs-label
+      display: flex
+      align-items: center
+      font-weight: $fontBold
+      margin-left: .3rem
+
+    .select-defender-move-wrapper
+      padding-left: .6rem
+
+#atk-iv-assessment
+  padding-top: .5rem
+  padding-bottom: 0
+
+#breakpoints-table
+  margin-top: -.06rem
+
+  th:first-child
+    width: 12%
+
+  tbody
+    tr:nth-child(odd)
+      background-color: $backgroundColor
+
+    tr:nth-child(even)
+      background-color: #fff
+
+#faq-legend-link
+  margin: .8rem .2rem 0 0
+  font-weight: $fontBold
+  text-transform: uppercase
+  cursor: pointer
+  position: relative
+  width: 9rem
+
+  &:after
+    @extend %input-arrow
+    top: .4rem
+    left: 7.5rem
+
+#faq-legend-content
+  ul
+    list-style: none
+    padding: 0
+
+.tab-wrapper
+  .tab
+    padding: .3rem .7rem
+    margin: 0
+    box-shadow: none
+    border: .05rem solid $borderColor
+    border-bottom-right-radius: 0
+    border-bottom-left-radius: 0
+
+    &:focus
+      box-shadow: 0 0 0 .1rem $highlightColor
+
+  .selected-tab
+    background-color: #fff
+    border-bottom-color: #fff
+
+    &:focus
+      box-shadow: 0 -.05rem 0 .05rem $highlightColor
+
+.top-counter-chevron
+  cursor: pointer
+  padding: 0 1.2rem 0 0
+  position: relative
+
+  &:after
+    @extend %input-arrow
+    top: .4rem
+    left: .4rem
+
+.top-counter-subrow
+  background-color: $backgroundColor
+
+.top-counter-subrow
+  text-align: right
+  padding: 0 1.4rem 0 0
+
+.disclaimer
+  font-size: $fontSize
+  margin-bottom: 2rem
+
+
+@media (min-width: 50.81rem)
+  #atk-iv-assessment,
+  #move-effectiveness
+    padding: 0 0 .5rem 2rem
+
+  .wrapper
+    display: flex
+    margin-bottom: 1.2rem

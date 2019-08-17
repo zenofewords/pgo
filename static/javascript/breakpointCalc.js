@@ -1,6 +1,6 @@
-import '../../node_modules/choices.js/public/assets/styles/choices.min.css'
-import '../sass/pgo.sass'
+import '../sass/breakpointCalc.sass'
 import Choices from 'choices.js'
+
 
 const ready = (runBreakpointCalc) => {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
@@ -24,42 +24,42 @@ ready(() => {
 
   // inputs
   const selectAttacker = new Choices(
-    '#breakpoint-calc-select-attacker',
+    '#select-attacker',
     {
       searchPlaceholderValue: 'Type in the attacker\'s name',
       searchResultLimit: 5,
       itemSelectText: '',
     }
   )
-  const inputAttackerLevel = document.getElementById('breakpoint-calc-input-attacker-level')
-  const selectAttackerQuickMove = document.getElementById('breakpoint-calc-select-quick-move')
-  const selectAttackerCinematicMove = document.getElementById('breakpoint-calc-select-cinematic-move')
-  const selectAttackerAtkIv = document.getElementById('breakpoint-calc-select-attacker-atk-iv')
+  const inputAttackerLevel = document.getElementById('input-attacker-level')
+  const selectAttackerQuickMove = document.getElementById('select-quick-move')
+  const selectAttackerCinematicMove = document.getElementById('select-cinematic-move')
+  const selectAttackerAtkIv = document.getElementById('select-attacker-atk-iv')
   const selectDefender = new Choices(
-    '#breakpoint-calc-select-defender',
+    '#select-defender',
     {
       searchPlaceholderValue: 'Type in the defender\'s name',
       searchResultLimit: 5,
       itemSelectText: '',
     }
   )
-  const selectDefenderQuickMove = document.getElementById('breakpoint-calc-select-defender-quick-move')
-  const selectDefenderCinematicMove = document.getElementById('breakpoint-calc-select-defender-cinematic-move')
+  const selectDefenderQuickMove = document.getElementById('select-defender-quick-move')
+  const selectDefenderCinematicMove = document.getElementById('select-defender-cinematic-move')
 
-  const selectWeatherCondition = document.getElementById('breakpoint-calc-select-weather-condition')
-  const selectFriendShipBoost = document.getElementById('breakpoint-calc-select-friendship-boost')
-  const selectDefenderCPM = document.getElementById('breakpoint-calc-select-defender-tier')
+  const selectWeatherCondition = document.getElementById('select-weather-condition')
+  const selectFriendShipBoost = document.getElementById('select-friendship-boost')
+  const selectDefenderCPM = document.getElementById('select-defender-tier')
 
-  const moveEffectiveness = document.getElementById('breakpoint-calc-move-effectiveness')
-  const detailsTable = document.getElementById('breakpoint-calc-breakpoint-details-table')
-  const inputToggleCinematicBreakpoints = document.getElementById('breakpoint-calc-toggle-cinematic-breakpoints')
+  const moveEffectiveness = document.getElementById('move-effectiveness')
+  const detailsTable = document.getElementById('breakpoint-details-table')
+  const inputToggleCinematicBreakpoints = document.getElementById('toggle-cinematic-breakpoints')
   const inputToggleTopCounterSort = document.getElementById('top-counter-sort-toggle')
 
-  const tabBreakpoints = document.getElementById('breakpoint-calc-breakpoints')
-  const tabTopCounters = document.getElementById('breakpoint-calc-top-counters')
-  const breakpointsTable = document.getElementById('breakpoint-calc-breakpoints-table')
-  const topCountersTable = document.getElementById('breakpoint-calc-top-counters-table')
-  const ivAssessment = document.getElementById('breakpoint-calc-atk-iv-assessment')
+  const tabBreakpoints = document.getElementById('breakpoints')
+  const tabTopCounters = document.getElementById('top-counters')
+  const breakpointsTable = document.getElementById('breakpoints-table')
+  const topCountersTable = document.getElementById('top-counters-table')
+  const ivAssessment = document.getElementById('atk-iv-assessment')
   const faqLegend = document.getElementById('faq-legend-content')
 
   let breakpointCalcForm = {
@@ -84,7 +84,7 @@ ready(() => {
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('attacker')
     selectPokemonMoves(event.currentTarget.value, 'attacker')
-    clearChoicesFieldError('breakpoint-calc-select-attacker')
+    clearChoicesFieldError('select-attacker')
 
     breakpointCalcForm.attacker = event.currentTarget.value
     breakpointCalcForm.staleTab = true
@@ -130,7 +130,7 @@ ready(() => {
   selectDefender.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('defender')
     selectPokemonMoves(event.currentTarget.value, 'defender')
-    clearChoicesFieldError('breakpoint-calc-select-defender')
+    clearChoicesFieldError('select-defender')
 
     breakpointCalcForm.defender = event.currentTarget.value
     breakpointCalcForm.staleTab = true
@@ -162,6 +162,7 @@ ready(() => {
   })
   inputToggleTopCounterSort.addEventListener('click', event => {
     breakpointCalcForm.staleTab = true
+
     if (!inputToggleTopCounterSort.disabled) {
       toggleTopCounterOrder(breakpointCalcForm.top_counter_order)
       submitBreakpointCalcForm()
@@ -254,16 +255,16 @@ ready(() => {
       breakpointsTable.hidden = false
       topCountersTable.hidden = true
 
-      tabBreakpoints.classList.add('breakpoint-calc-selected-tab')
-      tabTopCounters.classList.remove('breakpoint-calc-selected-tab')
+      tabBreakpoints.classList.add('selected-tab')
+      tabTopCounters.classList.remove('selected-tab')
 
       updateBrowserHistory(formatParams(breakpointCalcForm))
     } else if (currentTab === TAB.COUNTERS) {
       breakpointsTable.hidden = true
       topCountersTable.hidden = false
 
-      tabTopCounters.classList.add('breakpoint-calc-selected-tab')
-      tabBreakpoints.classList.remove('breakpoint-calc-selected-tab')
+      tabTopCounters.classList.add('selected-tab')
+      tabBreakpoints.classList.remove('selected-tab')
 
       updateBrowserHistory(formatParams(breakpointCalcForm))
     }
@@ -500,7 +501,7 @@ ready(() => {
   }
 
   const generateBreakpointTable = (data) => {
-    const dataTable = document.getElementById('breakpoint-calc-breakpoint-details-table-body')
+    const dataTable = document.getElementById('breakpoint-details-table-body')
     dataTable.innerHTML = ''
 
     for (let i = 0; i < data.length; i++) {
@@ -519,7 +520,7 @@ ready(() => {
   const generateTopCountersTable = (dataset) => {
     const attackerStats = document.getElementById('top-counters-table-attacker-stats')
     attackerStats.innerHTML = `L${breakpointCalcForm.attacker_level} ${breakpointCalcForm.attacker_atk_iv}ATK`
-    const dataTable = document.getElementById('breakpoint-calc-top-counters-table-body')
+    const dataTable = document.getElementById('top-counters-table-body')
     let dataRow
     let dataCell
     let href
@@ -545,13 +546,13 @@ ready(() => {
 
         let className = key.toLowerCase()
         if (i > 0) {
-          className = 'toggle_' + className + ' breakpoint-calc-top-counter-subrow'
+          className = 'toggle_' + className + ' top-counter-subrow'
           dataRow.hidden = true
           dataCell.classList.add('top-counter-subrow')
         } else {
           const chevron = document.createElement('span')
           chevron.setAttribute(
-            'class', 'chevron-down breakpoint-calc-top-counter-chevron')
+            'class', 'chevron-down top-counter-chevron')
 
           href = document.createElement('a')
           href.onclick = () => {
@@ -597,7 +598,7 @@ ready(() => {
     if (errorObject) {
       for (let field in errorObject) {
         if (field !== 'attacker_level') {
-          const invalidInput = document.querySelector('.breakpoint-calc-select-' + field)
+          const invalidInput = document.querySelector('.select-' + field)
           if (invalidInput) {
             invalidInput.parentElement.parentElement.classList.add('error')
           }

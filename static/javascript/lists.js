@@ -1,6 +1,6 @@
-import '../../node_modules/choices.js/public/assets/styles/choices.min.css'
-import '../sass/pgo.sass'
+import '../sass/lists.sass'
 import Choices from 'choices.js'
+
 
 const ready = (runGeneric) => {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {

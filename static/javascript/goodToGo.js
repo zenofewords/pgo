@@ -2,120 +2,104 @@ import '../sass/goodToGo.sass'
 import Choices from 'choices.js'
 
 
-const ready = (runGoodToGo) => {
+const ready = (run) => {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
-    runGoodToGo()
+    run()
   } else {
-    document.addEventListener('DOMContentLoaded', runGoodToGo)
+    document.addEventListener('DOMContentLoaded', run)
   }
 }
 
 ready(() => {
+  // constants
   const FORM_STATE = {
     SUBMITTING: 'submitting',
     READY: 'ready',
     ERROR: 'error',
   }
 
+  // inputs
   const selectAttacker = new Choices(
-    '.good-to-go-select-attacker',
+    '.select-attacker',
     {
       searchPlaceholderValue: 'Type in the attacker\'s name',
       searchResultLimit: 5,
       itemSelectText: '',
     }
   )
-  const selectAttackerQuickMove = document.getElementById('good-to-go-select-quick-move')
-  const selectAttackerCinematicMove = document.getElementById('good-to-go-select-cinematic-move')
-  const selectAttackerAtkIv = document.getElementById('good-to-go-select-atk-iv')
-  const selectWeatherCondition = document.getElementById('good-to-go-select-weather-condition')
-  const selectFriendshipBoost = document.getElementById('good-to-go-select-friendship-boost')
+  const selectAttackerQuickMove = document.getElementById('select-quick-move')
+  const selectAttackerCinematicMove = document.getElementById('select-cinematic-move')
+  const selectAttackerAtkIv = document.getElementById('select-atk-iv')
+  const selectWeatherCondition = document.getElementById('select-weather-condition')
+  const selectFriendshipBoost = document.getElementById('select-friendship-boost')
 
-  const tier36BossesButton = document.getElementById('toggle-tier-3-6-raid-bosses')
-  const tier36BossesCheckbox = document.getElementById('tier-3-6-raid-bosses')
-  const tier12BossesButton = document.getElementById('toggle-tier-1-2-raid-bosses')
-  const tier12BossesCheckbox = document.getElementById('tier-1-2-raid-bosses')
-  const relevantDefendersButton = document.getElementById('toggle-relevant-defenders')
-  const relevantDefendersCheckbox = document.getElementById('relevant-defenders')
+  const tier36BossesToggle = document.querySelector('.toggle-tier-3-6-raid-bosses')
+  const tier12BossesToggle = document.querySelector('.toggle-tier-1-2-raid-bosses')
 
-  const goodToGoSummary = document.getElementById('good-to-go-summary-text')
-  const goodToGoResults = document.querySelector('.good-to-go-results')
+  const summary = document.querySelector('.output-wrapper')
+  const results = document.querySelector('.results')
 
-  let goodToGoForm = {
+  let form = {
     attacker: selectAttacker.value,
     attack_iv: selectAttackerAtkIv.value,
     quick_move: selectAttackerQuickMove.value,
     cinematic_move: selectAttackerCinematicMove.value,
     weather_condition: selectWeatherCondition.value,
     friendship_boost: selectFriendshipBoost.value,
-    tier_3_6_raid_bosses: tier36BossesCheckbox.checked,
-    tier_1_2_raid_bosses: tier12BossesCheckbox.checked,
-    relevant_defenders: relevantDefendersCheckbox.checked,
+    tier_3_6_raid_bosses: true,
+    tier_1_2_raid_bosses: false,
     status: FORM_STATE.READY,
   }
 
+  // events
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs()
     selectPokemonMoves(event.currentTarget.value)
 
-    goodToGoForm.attacker = event.currentTarget.value
-    submitGoodToGoForm()
+    form.attacker = event.currentTarget.value
+    submitForm()
   })
   selectAttackerAtkIv.addEventListener('change', (event) => {
-    goodToGoForm.attack_iv = event.currentTarget.value
+    form.attack_iv = event.currentTarget.value
 
-    submitGoodToGoForm().then(() => selectAttackerAtkIv.focus())
+    submitForm().then(() => selectAttackerAtkIv.focus())
   })
   selectAttackerQuickMove.addEventListener('change', (event) => {
-    goodToGoForm.quick_move = event.currentTarget.value
+    form.quick_move = event.currentTarget.value
 
-    submitGoodToGoForm().then(() => selectAttackerQuickMove.focus())
+    submitForm().then(() => selectAttackerQuickMove.focus())
   })
   selectAttackerCinematicMove.addEventListener('change', (event) => {
-    goodToGoForm.cinematic_move = event.currentTarget.value
+    form.cinematic_move = event.currentTarget.value
 
-    submitGoodToGoForm().then(() => selectAttackerCinematicMove.focus())
+    submitForm().then(() => selectAttackerCinematicMove.focus())
   })
   selectWeatherCondition.addEventListener('change', (event) => {
-    goodToGoForm.weather_condition = event.currentTarget.value
+    form.weather_condition = event.currentTarget.value
 
-    submitGoodToGoForm().then(() => selectWeatherCondition.focus())
+    submitForm().then(() => selectWeatherCondition.focus())
   })
   selectFriendshipBoost.addEventListener('change', (event) => {
-    goodToGoForm.friendship_boost = event.currentTarget.value
+    form.friendship_boost = event.currentTarget.value
 
-    submitGoodToGoForm().then(() => selectFriendshipBoost.focus())
+    submitForm().then(() => selectFriendshipBoost.focus())
   })
-  tier36BossesButton.addEventListener('click', (event) => {
-    event.preventDefault()
-
-    toggleButtonCheckbox(tier36BossesButton, tier36BossesCheckbox)
-    goodToGoForm.tier_3_6_raid_bosses = tier36BossesCheckbox.checked
-
-    submitGoodToGoForm().then(() => tier36BossesButton.focus())
+  tier36BossesToggle.addEventListener('click', (event) => {
+    togglePressed(tier36BossesToggle)
+    form.tier_3_6_raid_bosses = !form.tier_3_6_raid_bosses
+    submitForm().then(() => tier36BossesToggle.focus())
   })
-  tier12BossesButton.addEventListener('click', (event) => {
-    event.preventDefault()
-
-    toggleButtonCheckbox(tier12BossesButton, tier12BossesCheckbox)
-    goodToGoForm.tier_1_2_raid_bosses = tier12BossesCheckbox.checked
-
-    submitGoodToGoForm().then(() => tier12BossesButton.focus())
-  })
-  relevantDefendersButton.addEventListener('click', (event) => {
-    // event.preventDefault()
-
-    // toggleButtonCheckbox(relevantDefendersButton, relevantDefendersCheckbox)
-    // goodToGoForm.relevant_defenders = relevantDefendersCheckbox.checked
-
-    // submitGoodToGoForm().then(() => relevantDefendersButton.focus())()
+  tier12BossesToggle.addEventListener('click', (event) => {
+    togglePressed(tier12BossesToggle)
+    form.tier_1_2_raid_bosses = !form.tier_1_2_raid_bosses
+    submitForm().then(() => tier12BossesToggle.focus())
   })
 
   // functions
   const initialFetch = () => {
     return new Promise((resolve) => {
-      if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
-        goodToGoForm.status = FORM_STATE.SUBMITTING
+      if (form.status !== FORM_STATE.SUBMITTING) {
+        form.status = FORM_STATE.SUBMITTING
         toggleLoading()
 
         selectAttacker.ajax((callback) => {
@@ -123,12 +107,12 @@ ready(() => {
             response.json().then((data) => {
               callback(data, 'value', 'label')
             }).then(() => {
-              goodToGoForm.status = FORM_STATE.READY
+              form.status = FORM_STATE.READY
               toggleLoading()
               resolve()
             })
           }).catch(() => {
-            goodToGoForm.status = FORM_STATE.ERROR
+            form.status = FORM_STATE.ERROR
             showErrors()
             resolve()
           })
@@ -138,7 +122,7 @@ ready(() => {
   }
 
   const clearMoveInputs = () => {
-    if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
+    if (form.status !== FORM_STATE.SUBMITTING) {
       const quickMoveSelect = selectAttackerQuickMove
       const cinematicMoveSelect = selectAttackerCinematicMove
 
@@ -150,8 +134,8 @@ ready(() => {
       cinematicMoveSelect.append(
         '<option value="-1" disabled selected>Select cinematic move</option>'
       )
-      goodToGoForm['quick_move'] = -1
-      goodToGoForm['cinematic_move'] = -1
+      form['quick_move'] = -1
+      form['cinematic_move'] = -1
     }
   }
 
@@ -172,7 +156,7 @@ ready(() => {
         }
       }
       request.onerror = () => {
-        goodToGoForm.status = FORM_STATE.ERROR
+        form.status = FORM_STATE.ERROR
       }
       request.send()
     } else {
@@ -190,14 +174,14 @@ ready(() => {
     const quickMoveKey = 'quick_move'
     const cinematicMoveKey = 'cinematic_move'
 
-    const quickMoveId = parseInt(goodToGoForm[quickMoveKey])
-    const cinematicMoveId = parseInt(goodToGoForm[cinematicMoveKey])
+    const quickMoveId = parseInt(form[quickMoveKey])
+    const cinematicMoveId = parseInt(form[cinematicMoveKey])
 
     data.forEach((moveData, i) => {
       const move = moveData.move
 
       if (move.category === 'QK') {
-        if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
+        if (form.status !== FORM_STATE.SUBMITTING) {
           quickMoveSelect.disabled = false
         }
         quickMoveSelect.options.add(createMoveOption(move, quickMoveId, quickMoveKey))
@@ -206,10 +190,10 @@ ready(() => {
         cinematicMoveSelect.options.add(createMoveOption(move, cinematicMoveId, cinematicMoveKey))
       }
     })
-    goodToGoForm[quickMoveKey] = quickMoveSelect.value
-    goodToGoForm[cinematicMoveKey] = cinematicMoveSelect.value
+    form[quickMoveKey] = quickMoveSelect.value
+    form[cinematicMoveKey] = cinematicMoveSelect.value
 
-    submitGoodToGoForm()
+    submitForm()
   }
 
   const createMoveOption = (move, moveId, moveKey) => {
@@ -223,28 +207,24 @@ ready(() => {
 
   const determineSelectedMove = (moveId, move, type) => {
     if (moveId > 0 && moveId === move.id) {
-      goodToGoForm[type] = move.id
+      form[type] = move.id
       return true
     }
     return false
   }
 
-  const toggleButtonCheckbox = (button, checkbox) => {
-    checkbox.checked = !checkbox.checked
-
-    if (checkbox.checked) {
-      button.classList.add('btn-info')
-      button.classList.remove('btn-default')
+  const togglePressed = (button) => {
+    if (button.classList.contains('pressed')) {
+      button.classList.remove('pressed')
     } else {
-      button.classList.add('btn-default')
-      button.classList.remove('btn-info')
+      button.classList.add('pressed')
     }
   }
 
-  const submitGoodToGoForm = () => {
-    if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
-      for (const key in goodToGoForm) {
-        const value = String(goodToGoForm[key])
+  const submitForm = () => {
+    if (form.status !== FORM_STATE.SUBMITTING) {
+      for (const key in form) {
+        const value = String(form[key])
 
         if (value === 'undefined' || value === '-1') {
           return new Promise(() => {
@@ -254,12 +234,12 @@ ready(() => {
       }
 
       return new Promise((resolve) => {
-        if (goodToGoForm.status !== FORM_STATE.SUBMITTING) {
-          goodToGoForm.status = FORM_STATE.SUBMITTING
+        if (form.status !== FORM_STATE.SUBMITTING) {
+          form.status = FORM_STATE.SUBMITTING
           toggleLoading()
 
           const request = new XMLHttpRequest()
-          const getParams = formatParams(goodToGoForm)
+          const getParams = formatParams(form)
           const url = window.pgoAPIURLs['good-to-go'] + getParams
           request.open('GET', url, true)
 
@@ -274,7 +254,7 @@ ready(() => {
               } else {
                 showErrors()
               }
-              goodToGoForm.status = FORM_STATE.READY
+              form.status = FORM_STATE.READY
 
               toggleLoading()
               renderResults(json)
@@ -282,7 +262,7 @@ ready(() => {
             }
           }
           request.onerror = () => {
-            goodToGoForm.status = FORM_STATE.ERROR
+            form.status = FORM_STATE.ERROR
             showErrors()
             resolve()
           }
@@ -293,38 +273,33 @@ ready(() => {
   }
 
   const toggleLoading = () => {
-    const submitting = goodToGoForm.status === FORM_STATE.SUBMITTING
+    const submitting = form.status === FORM_STATE.SUBMITTING
     submitting ? selectAttacker.disable() : selectAttacker.enable()
 
     selectAttackerQuickMove.disabled = submitting || selectAttackerQuickMove.value < 0
     selectAttackerAtkIv.disabled = submitting
     selectWeatherCondition.disabled = submitting
     selectFriendshipBoost.disabled = submitting
-    tier36BossesButton.disabled = submitting
-    tier36BossesCheckbox.disabled = submitting
-    tier12BossesButton.disabled = submitting
-    tier12BossesCheckbox.disabled = submitting
+    tier36BossesToggle.disabled = submitting
+    tier12BossesToggle.disabled = submitting
   }
 
   const renderResults = (data) => {
-    goodToGoSummary.innerHTML = data.summary
-    goodToGoResults.innerHTML = ''
-    goodToGoResults.appendChild(document.createElement('hr'))
+    summary.innerHTML = data.summary
+    results.innerHTML = ''
+    results.appendChild(document.createElement('hr'))
 
     if (data.tier_3_6_raid_bosses.length === 0 && data.tier_1_2_raid_bosses.length === 0) {
-      goodToGoResults.innerHTML = 'Please select at least one option (tier 3-6, tier 1-2).'
+      results.innerHTML = 'Please select at least one option (tier 3-6, tier 1-2).'
     }
 
     if (data.tier_3_6_raid_bosses.length > 0) {
-      renderResultSubcategory(goodToGoResults, data.tier_3_6_raid_bosses)
+      renderResultSubcategory(results, data.tier_3_6_raid_bosses)
     }
     if (data.tier_1_2_raid_bosses.length > 0) {
-      renderResultSubcategory(goodToGoResults, data.tier_1_2_raid_bosses)
+      renderResultSubcategory(results, data.tier_1_2_raid_bosses)
     }
-    // if (data.relevant_defenders.length > 0) {
-    //   renderResultSubcategory(goodToGoResults, data.relevant_defenders)
-    // }
-    goodToGoResults.hidden = false
+    results.hidden = false
   }
 
   const renderResultSubcategory = (rootElement, data) => {
@@ -337,15 +312,15 @@ ready(() => {
       chevron.setAttribute('class', 'glyphicon glyphicon-chevron-down')
       chevron.setAttribute('aria-hidden', true)
 
-      resultsWrapper.className = 'good-to-go-results-wrapper'
-      resultsHeader.className = 'good-to-go-results-header'
+      resultsWrapper.className = 'results-wrapper'
+      resultsHeader.className = 'results-header'
       resultsHeader.innerHTML = 'Tier ' + result.tier + ' | ' + result.quick_move +
         ' breakpoints: ' + result.final_breakpoints_reached + ' / ' + result.total_breakpoints
 
       const indicator = document.createElement('span')
       indicator.className = (result.final_breakpoints_reached !== result.total_breakpoints
-        ? 'glyphicon glyphicon-exclamation-sign good-to-go-warning-indicator'
-        : 'glyphicon glyphicon-ok good-to-go-ok-indicator'
+        ? 'glyphicon glyphicon-exclamation-sign warning-indicator'
+        : 'glyphicon glyphicon-ok ok-indicator'
       )
 
       resultsHeader.appendChild(indicator)
@@ -375,13 +350,13 @@ ready(() => {
         const matchup = result.matchups[j]
 
         const resultRow = document.createElement('p')
-        resultRow.className = 'good-to-go-single-result'
+        resultRow.className = 'single-result'
         resultRow.hidden = true
 
         const rowIndicator = document.createElement('span')
         rowIndicator.className = (matchup.final_breakpoint_reached
-          ? 'glyphicon glyphicon-ok good-to-go-ok-indicator'
-          : 'glyphicon glyphicon-exclamation-sign good-to-go-warning-indicator'
+          ? 'glyphicon glyphicon-ok ok-indicator'
+          : 'glyphicon glyphicon-exclamation-sign warning-indicator'
         )
         resultRow.innerHTML = matchup.damage_per_hit + ' / ' + matchup.max_damage_per_hit +
           ' damage per hit vs ' + matchup.defender
@@ -408,30 +383,18 @@ ready(() => {
     }).join('&')
   }
 
-  const restoreCheckboxButtons = (data) => {
-    tier36BossesCheckbox.checked = data.tier_3_6_raid_bosses
-    toggleButtonClass(tier36BossesButton, data.tier_3_6_raid_bosses)
-
-    tier12BossesCheckbox.checked = data.tier_1_2_raid_bosses
-    toggleButtonClass(tier12BossesButton, data.tier_1_2_raid_bosses)
-
-    // relevantDefendersCheckbox.checked = data.relevant_defenders
-    // toggleButtonClass(relevantDefendersButton, data.relevant_defenders)
+  const restoreTierSelection = (data) => {
+    data.tier_3_6_raid_bosses
+      ? tier36BossesToggle.classList.add('pressed')
+      : tier36BossesToggle.classList.remove('pressed')
+    data.tier_1_2_raid_bosses
+      ? tier12BossesToggle.classList.add('pressed')
+      : tier12BossesToggle.classList.remove('pressed')
   }
 
-  const toggleButtonClass = (button, checked) => {
-    if (checked) {
-      button.classList.remove('btn-default')
-      button.classList.add('btn-info')
-    } else {
-      button.classList.remove('btn-info')
-      button.classList.add('btn-default')
-    }
-  }
-
-  const restoreGoodToGoForm = (data) => {
+  const restoreForm = (data) => {
     initialFetch().then(() => {
-      selectAttacker.setValueByChoice(String(data.attacker))
+      selectAttacker.setChoiceByValue(String(data.attacker))
 
       selectAttackerAtkIv.value = data.attack_iv
       selectWeatherCondition.value = data.weather_condition
@@ -439,28 +402,28 @@ ready(() => {
 
       selectPokemonMoves(data.attacker, 'attacker')
       selectPokemonMoves(data.defender, 'defender')
-      restoreCheckboxButtons(data)
+      restoreTierSelection(data)
 
-      goodToGoForm = data
-      goodToGoForm.status = FORM_STATE.READY
-      submitGoodToGoForm()
+      form = data
+      form.status = FORM_STATE.READY
+      submitForm()
     })
   }
 
   const showErrors = () => {
-    goodToGoResults.hidden = false
-    goodToGoResults.classList.add('error-text')
-    goodToGoResults.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
+    results.hidden = false
+    results.classList.add('error-text')
+    results.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
   }
 
-  if (goodToGoForm.attacker && !(goodToGoForm.attacker_quick_move && goodToGoForm.attacker_cinematic_move)) {
+  if (form.attacker && !(form.attacker_quick_move && form.attacker_cinematic_move)) {
     const queryDict = {}
     location.search.substr(1).split('&').forEach((item) => {
       queryDict[item.split('=')[0]] = item.split('=')[1]
     })
-    restoreGoodToGoForm(queryDict)
+    restoreForm(queryDict)
   } else if (Object.keys(initialData).length > 0) {
-    restoreGoodToGoForm(initialData)
+    restoreForm(initialData)
   }
 
   initialFetch()

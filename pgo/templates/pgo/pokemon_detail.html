@@ -13,13 +13,13 @@
 {% block content %}
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table class="table">
+      <table>
         <tr>
           <td class="search-pokemon-wrapper">
-            <label for="choices-single-default" class="sr-only">
+            <label for="choices-single-default" class="screen-reader">
               Find pokemon
             </label>
-            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+            <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
               <option value="-1" placeholder disabled selected>
                 Find pokemon
               </option>
@@ -47,12 +47,12 @@
           </th>
         </tr>
         <tr>
-          <td id="no-left-padding">
-            <div class="pokemon-item-wrapper">
+          <td>
+            <div>
               <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
                 {{ pokemon.name }}
               </a>
-              <div class="pokemon-type-wrapper">
+              <div>
                 <div class="type-{{ pokemon.primary_type.slug }}">
                   {{ pokemon.primary_type.name }}
                 </div>
@@ -77,9 +77,9 @@
         </tr>
       </table>
 
-      <table class="table">
+      <table>
         <tr>
-          <th id="no-left-padding">
+          <th>
             Move stats
           </th>
           <td colspan="{% if preset == 'pve' %}5{% else %}6{% endif %}">
@@ -95,7 +95,7 @@
           </td>
         </tr>
         <tr>
-          <th width="31%" id="no-left-padding">
+          <th width="31%">
             Move
           </th>
           {% if preset == 'pve' %}
@@ -139,10 +139,10 @@
         {% for pokemon_move in pokemon_moves %}
           {% with pokemon_move.move as move %}
             <tr>
-              <td id="no-left-padding">
-                <div class="pokemon-item-wrapper">
+              <td>
+                <div>
                   <a href="{% url 'pgo:move-detail' move.slug %}">
-                    <div class="move-name">
+                    <div>
                       {% if 'Hidden P.' in move.name %}
                         Hidden Power
                       {% else %}
@@ -178,11 +178,11 @@
       </table>
     </div>
   </div>
-  <div class="table-wrapper">
-    <div class="effectiveness-table-wrapper">
-      <table class="table">
+  <div>
+    <div>
+      <table>
         <tr>
-          <th id="no-left-padding" colspan="2">
+          <th colspan="2">
             Resistances
           </th>
         </tr>
@@ -199,9 +199,9 @@
           </tr>
         {% endfor %}
       </table>
-      <table class="table">
+      <table>
         <tr>
-          <th id="no-left-padding" colspan="2">
+          <th colspan="2">
             Weaknesses
           </th>
         </tr>
@@ -219,24 +219,24 @@
         {% endfor %}
       </table>
     </div>
-    <div class="stats-table-wrapper">
-      <table class="table">
+    <div>
+      <table>
         <tr>
-          <th id="no-left-padding" colspan="5">
+          <th colspan="5">
             Perfect stats
           </th>
         </tr>
         <tr>
-          <th id="no-left-padding">Level</th>
-          <th id="no-left-padding">Attack</th>
-          <th id="no-left-padding">Defense</th>
-          <th id="no-left-padding">Stamina</th>
-          <th id="no-left-padding">CP</th>
+          <th>Level</th>
+          <th>Attack</th>
+          <th>Defense</th>
+          <th>Stamina</th>
+          <th>CP</th>
         </tr>
         {% for stats in pokemon_stats %}
           <tr>
             {% for value in stats %}
-              <td id="no-left-padding">
+              <td>
                 {{ value }}
               </td>
             {% endfor %}

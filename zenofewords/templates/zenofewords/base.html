@@ -26,7 +26,7 @@
 
         {% block pagination %}
           {% if is_paginated %}
-            <ul class="pagination">
+            <ul>
               {% if page_obj.has_previous %}
                 <li>
                   <a href="?page={{ page_obj.previous_page_number }}&amp;ordering={{ ordering }}">

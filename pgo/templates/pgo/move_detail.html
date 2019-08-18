@@ -13,13 +13,13 @@
 {% block content %}
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table class="table">
+      <table>
         <tr>
-          <td colspan="2" class="search-move-wrapper">
-            <label for="choices-single-default" class="sr-only">
+          <td colspan="2">
+            <label for="choices-single-default" class="screen-reader">
               Find move
             </label>
-            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+            <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
               <option value="-1" placeholder disabled selected>
                 Find move
               </option>
@@ -43,7 +43,7 @@
           </td>
         </tr>
         <tr>
-          <th width="30%" id="no-left-padding">
+          <th width="30%">
             Move
           </th>
           {% if preset == 'pve' %}
@@ -84,10 +84,10 @@
           {% endif %}
         </tr>
         <tr>
-          <td id="no-left-padding">
-            <div class="pokemon-item-wrapper">
+          <td>
+            <div>
               <a href="{% url 'pgo:move-detail' move.slug %}">
-                <div class="move-name">
+                <div>
                   {% if 'Hidden P.' in move.name %}
                     Hidden Power
                   {% else %}
@@ -124,11 +124,11 @@
         </tr>
       </table>
 
-      <div class="table-wrapper">
-        <div class="effectiveness-table-wrapper">
-          <table class="table">
+      <div>
+        <div>
+          <table>
             <tr>
-              <th id="no-left-padding" colspan="2">Super effective</th>
+              <th colspan="2">Super effective</th>
             </tr>
             {% for type, value in effectiveness_effective %}
               <tr>
@@ -143,9 +143,9 @@
               </tr>
             {% endfor %}
           </table>
-          <table class="table">
+          <table>
             <tr>
-              <th id="no-left-padding" colspan="2">Not very effective</th>
+              <th colspan="2">Not very effective</th>
             </tr>
             {% for type, value in effectiveness_not_effective %}
               <tr>
@@ -161,15 +161,15 @@
             {% endfor %}
           </table>
         </div>
-        <div class="pokemon-with-move-table-wrapper">
-          <table class="table">
+        <div>
+          <table>
             <tr>
-              <th id="no-left-padding" colspan="8">
+              <th colspan="8">
                 List of pokemon which learn {{ move.name }}
               </th>
             </tr>
             <tr>
-              <th id="no-left-padding">
+              <th>
                 Pokemon
               </th>
               <th>
@@ -193,11 +193,11 @@
               {% with pokemon_move.pokemon as pokemon %}
                 <tr>
                   <td class="type-label-wrapper">
-                    <div class="pokemon-item-wrapper">
+                    <div>
                       <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
                         {{ pokemon.name }}
                       </a>
-                      <div class="pokemon-type-wrapper">
+                      <div>
                         <div class="type-{{ pokemon.primary_type.slug }}">
                           {{ pokemon.primary_type.name }}
                         </div>

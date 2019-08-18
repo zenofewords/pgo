@@ -3,10 +3,10 @@
     <div
       id="menuToggle"
     >
-      <input type="checkbox" style="opacity: 0;"/>
-      <span></span>
-      <span></span>
-      <span></span>
+      <input id="inputMenuToggle" type="checkbox" style="opacity: 0;"/>
+      <span class="menu-line"></span>
+      <span class="menu-line"></span>
+      <span class="menu-line"></span>
       <ul id="menu" style="opacity: 0;">
         {% for menu_item in navigation.navigationitem_set.all %}
           <li>
@@ -64,9 +64,21 @@
 </div>
 
 <script type="text/javascript">
-  const changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');
+  var inputMenuToggle = document.getElementById('inputMenuToggle');
+  var menuLines = document.querySelectorAll('.menu-line');
+  var changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');
 
+  inputMenuToggle.addEventListener('focus', function() {
+    for (var i = 0; i < menuLines.length; i++) {
+      menuLines[i].classList.add('focus');
+    }
+  });
+  inputMenuToggle.addEventListener('blur', function() {
+    for (var i = 0; i < menuLines.length; i++) {
+      menuLines[i].classList.remove('focus');
+    }
+  });
   document.querySelector('.changelog-toggle').addEventListener('click', function() {
     changelogInfoWrapper.hidden = !changelogInfoWrapper.hidden;
-  })
+  });
 </script>

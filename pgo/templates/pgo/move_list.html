@@ -13,13 +13,13 @@
 {% block content %}
   <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table id="contracted-table" class="table">
+      <table>
         <tr>
-          <td colspan="2" class="search-move-wrapper">
-            <label for="choices-single-default" class="sr-only">
+          <td colspan="2">
+            <label for="choices-single-default" class="screen-reader">
               Find move
             </label>
-            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+            <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
               <option value="-1" placeholder disabled selected>
                 Find move
               </option>
@@ -31,10 +31,10 @@
             </select>
           </td>
           <td colspan="3">
-            <label for="choices-single-default" class="sr-only">
+            <label for="choices-single-default" class="screen-reader">
               Filter move type
             </label>
-            <select id="move-type-filter" class="form-control input-height input-table">
+            <select id="move-type-filter">
               <option selected value="all">Every type</option>
               {% for move_type in move_types %}
                 <option value="{{ move_type.slug }}" {% if move_type.slug == selected_move_type %}selected{% endif %}>
@@ -56,7 +56,7 @@
           </td>
         </tr>
         <tr>
-          <th width="30%" id="no-left-padding">
+          <th width="30%">
             <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == 'name' %}-{% endif %}name">
               Move
             </a>
@@ -123,10 +123,10 @@
 
         {% for move in move_list %}
           <tr>
-            <td id="no-left-padding">
-              <div class="pokemon-item-wrapper">
+            <td>
+              <div>
                 <a href="{% url 'pgo:move-detail' move.slug %}">
-                  <div class="move-name">
+                  <div>
                     {% if 'Hidden P.' in move.name %}
                       Hidden Power
                     {% else %}

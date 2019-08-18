@@ -2,17 +2,6 @@
 @import './general.sass'
 
 
-.wrapper
-  display: block
-  margin-bottom: .3rem
-
-.row
-  display: flex
-
-.input-wrapper,
-.output-wrapper
-  flex: 1 1
-
 .select-attacker-wrapper,
 .select-defender-wrapper
   flex: 3 3
@@ -46,16 +35,6 @@
 .select-cinematic-move-wrapper,
 .select-friendship-boost-wrapper
   margin: 0 0 .4rem .25rem
-
-#select-attacker-atk-iv,
-#select-cinematic-move,
-#select-defender-cinematic-move,
-#select-defender-quick-move,
-#select-defender-tier,
-#select-friendship-boost,
-#select-quick-move,
-#select-weather-condition
-  width: 100%
 
 #toggle-cinematic-breakpoints,
 #top-counter-sort-toggle
@@ -98,8 +77,8 @@
     tr:nth-child(even)
       background-color: #fff
 
-#faq-legend-link
-  margin: .8rem .2rem 0 0
+#faq-legend
+  margin: .8rem .2rem 0 .1rem
   font-weight: $fontBold
   text-transform: uppercase
   cursor: pointer
@@ -117,6 +96,9 @@
     padding: 0
 
 .tab-wrapper
+  input
+    width: auto
+
   .tab
     padding: .3rem .7rem
     margin: 0
@@ -147,9 +129,6 @@
 
 .top-counter-subrow
   background-color: $backgroundColor
-
-.top-counter-subrow
-  text-align: right
   padding: 0 1.4rem 0 0
 
 .disclaimer
@@ -161,7 +140,3 @@
   #atk-iv-assessment,
   #move-effectiveness
     padding: 0 0 .5rem 2rem
-
-  .wrapper
-    display: flex
-    margin-bottom: 1.2rem

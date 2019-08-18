@@ -1,2 +1,36 @@
 @import './choicesjsOverrides.sass'
 @import './general.sass'
+
+
+.select-attacker-wrapper
+  flex: 3 3
+  margin: 0 0.5rem 0.5rem 0
+
+.input-attacker-atk-iv-wrapper,
+.select-attacker-quick-move-wrapper,
+.select-attacker-cinematic-move-wrapper,
+.select-friendship-boost-wrapper,
+.select-weather-condition-wrapper,
+.toggle-tier-3-6-raid-bosses,
+.toggle-tier-1-2-raid-bosses
+  @extend %input-wrapper
+
+.select-attacker-quick-move-wrapper,
+.select-friendship-boost-wrapper,
+.toggle-tier-3-6-raid-bosses
+  margin: 0 0.25rem 0.5rem 0
+
+.select-attacker-cinematic-move-wrapper,
+.select-weather-condition-wrapper,
+.toggle-tier-1-2-raid-bosses
+  margin: 0 0 0.4rem 0.25rem
+
+.toggle-tier-3-6-raid-bosses,
+.toggle-tier-1-2-raid-bosses
+  text-align: left
+  font-size: $fontSize
+  background-color: $backgroundColor
+  border-radius: $borderRadius
+
+.pressed
+  background-color: $highlightColor

@@ -13,61 +13,14 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="pokemon-list-filter-wrapper" hidden>
-      <form class="pokemon-filter-form">
-        <label for="choices-single-default" class="sr-only">
-          Pokemon type filter
-        </label>
-        <select class="form-control type-filter" name="type-filter" multiple="multiple">
-          {% for type in types %}
-            {% option_matches_value type.slug filters.pokemon_types as selected %}
-            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-              {{ type.name }}
-            </option>
-          {% endfor %}
-        </select>
-        <label for="choices-single-default" class="sr-only">
-          Pokemon resistance filter
-        </label>
-        <select class="form-control resistance-filter" name="resistance-filter" multiple="multiple">
-          {% for type in types %}
-            {% option_matches_value type.slug filters.resistance_types as selected %}
-            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-              {{ type.name }}
-            </option>
-          {% endfor %}
-        </select>
-        <label for="choices-single-default" class="sr-only">
-          Pokemon super effective filter
-        </label>
-        <select class="form-control super-effectiveness-filter" name="super-effectiveness-filter" multiple="multiple">
-          {% for type in types %}
-            {% option_matches_value type.slug filters.super_effectiveness_types as selected %}
-            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-              {{ type.name }}
-            </option>
-          {% endfor %}
-        </select>
-        <div class="pokemon-filter-control-wrapper">
-          <a href="{% url 'pgo:pokemon-list' %}" id="filter-reset" class="btn btn-xs btn-danger" style="width: 30%">
-            Reset
-          </a>
-          <button id="filter-submit" type="submit" class="btn btn-xs btn-primary" style="width: 30%">
-            Apply
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table id="contracted-table" class="table">
+    <div>
+      <table>
         <tr>
-          <td width="35%" class="search-pokemon-wrapper" hidden>
-            <label for="choices-single-default" class="sr-only">
+          <td width="35%" class="search-pokemon-wrapper">
+            <label for="choices-single-default" class="screen-reader">
               Find pokemon
             </label>
-            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
+            <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
               <option value="-1" placeholder disabled selected>
                 Find pokemon
               </option>
@@ -106,12 +59,12 @@
         </tr>
         {% for pokemon in pokemon_list %}
           <tr>
-            <td id="no-left-padding">
-              <div class="pokemon-item-wrapper">
+            <td>
+              <div>
                 <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
                   {{ pokemon.name }}
                 </a>
-                <div class="pokemon-type-wrapper">
+                <div>
                   <div class="type-{{ pokemon.primary_type.slug }}">
                     {{ pokemon.primary_type.name }}
                   </div>
@@ -140,7 +93,6 @@
 {% endblock content %}
 
 {% block scripts %}
-  {{ block.super }}
   {% render_bundle 'lists' attrs='async' %}
 
   <script type="text/javascript">

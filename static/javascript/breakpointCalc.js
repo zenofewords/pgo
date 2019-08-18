@@ -2,11 +2,11 @@ import '../sass/breakpointCalc.sass'
 import Choices from 'choices.js'
 
 
-const ready = (runBreakpointCalc) => {
+const ready = (run) => {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
-    runBreakpointCalc()
+    run()
   } else {
-    document.addEventListener('DOMContentLoaded', runBreakpointCalc)
+    document.addEventListener('DOMContentLoaded', run)
   }
 }
 
@@ -62,7 +62,7 @@ ready(() => {
   const ivAssessment = document.getElementById('atk-iv-assessment')
   const faqLegend = document.getElementById('faq-legend-content')
 
-  let breakpointCalcForm = {
+  let form = {
     attacker: selectAttacker.value,
     attacker_level: inputAttackerLevel.value,
     attacker_quick_move: selectAttackerQuickMove.value,
@@ -86,110 +86,104 @@ ready(() => {
     selectPokemonMoves(event.currentTarget.value, 'attacker')
     clearChoicesFieldError('select-attacker')
 
-    breakpointCalcForm.attacker = event.currentTarget.value
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm()
+    form.attacker = event.currentTarget.value
+    form.staleTab = true
+    submitForm()
   })
   inputAttackerLevel.addEventListener('change', (event) => {
     setValidLevel(event.currentTarget, 'attacker_level')
     inputAttackerLevel.classList.remove('error')
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => inputAttackerLevel.focus())
+    form.staleTab = true
+    submitForm().then(() => inputAttackerLevel.focus())
   })
   selectAttackerQuickMove.addEventListener('change', (event) => {
-    breakpointCalcForm.attacker_quick_move = event.currentTarget.value
+    form.attacker_quick_move = event.currentTarget.value
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectAttackerQuickMove.focus())
+    form.staleTab = true
+    submitForm().then(() => selectAttackerQuickMove.focus())
   })
   selectAttackerCinematicMove.addEventListener('change', (event) => {
-    breakpointCalcForm.attacker_cinematic_move = event.currentTarget.value
+    form.attacker_cinematic_move = event.currentTarget.value
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectAttackerCinematicMove.focus())
+    form.staleTab = true
+    submitForm().then(() => selectAttackerCinematicMove.focus())
   })
   selectAttackerAtkIv.addEventListener('change', (event) => {
-    breakpointCalcForm.attacker_atk_iv = event.currentTarget.value
+    form.attacker_atk_iv = event.currentTarget.value
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectAttackerAtkIv.focus())
+    form.staleTab = true
+    submitForm().then(() => selectAttackerAtkIv.focus())
   })
   selectWeatherCondition.addEventListener('change', (event) => {
-    breakpointCalcForm.weather_condition = event.currentTarget.value
+    form.weather_condition = event.currentTarget.value
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectWeatherCondition.focus())
+    form.staleTab = true
+    submitForm().then(() => selectWeatherCondition.focus())
   })
   selectFriendShipBoost.addEventListener('change', (event) => {
-    breakpointCalcForm.friendship_boost = event.currentTarget.value
+    form.friendship_boost = event.currentTarget.value
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectFriendShipBoost.focus())
+    form.staleTab = true
+    submitForm().then(() => selectFriendShipBoost.focus())
   })
   selectDefender.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('defender')
     selectPokemonMoves(event.currentTarget.value, 'defender')
     clearChoicesFieldError('select-defender')
 
-    breakpointCalcForm.defender = event.currentTarget.value
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm()
+    form.defender = event.currentTarget.value
+    form.staleTab = true
+    submitForm()
   })
   selectDefenderQuickMove.addEventListener('change', (event) => {
-    breakpointCalcForm.defender_quick_move = event.currentTarget.value
+    form.defender_quick_move = event.currentTarget.value
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectDefenderQuickMove.focus())
+    form.staleTab = true
+    submitForm().then(() => selectDefenderQuickMove.focus())
   })
   selectDefenderCinematicMove.addEventListener('change', (event) => {
-    breakpointCalcForm.defender_cinematic_move = event.currentTarget.value
+    form.defender_cinematic_move = event.currentTarget.value
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectDefenderCinematicMove.focus())
+    form.staleTab = true
+    submitForm().then(() => selectDefenderCinematicMove.focus())
   })
   selectDefenderCPM.addEventListener('change', (event) => {
-    breakpointCalcForm.defender_cpm = event.currentTarget.value
+    form.defender_cpm = event.currentTarget.value
     clearMoveInputs('defender')
-    selectPokemonMoves(breakpointCalcForm.defender, 'defender')
+    selectPokemonMoves(form.defender, 'defender')
 
-    breakpointCalcForm.staleTab = true
-    submitBreakpointCalcForm().then(() => selectDefenderCPM.focus())
+    form.staleTab = true
+    submitForm().then(() => selectDefenderCPM.focus())
   })
   inputToggleCinematicBreakpoints.addEventListener('click', (event) => {
-    breakpointCalcForm.staleTab = true
+    form.staleTab = true
     toggleCinematicBreakpoints()
   })
   inputToggleTopCounterSort.addEventListener('click', event => {
-    breakpointCalcForm.staleTab = true
+    form.staleTab = true
 
     if (!inputToggleTopCounterSort.disabled) {
-      toggleTopCounterOrder(breakpointCalcForm.top_counter_order)
-      submitBreakpointCalcForm()
+      toggleTopCounterOrder(form.top_counter_order)
+      submitForm()
     }
   })
   tabBreakpoints.addEventListener('click', (event) => {
-    event.preventDefault()
-
-    breakpointCalcForm.tab = TAB.BREAKPOINTS
-    toggleTab(breakpointCalcForm.tab)
+    form.tab = TAB.BREAKPOINTS
+    toggleTab(form.tab)
     toggleElementsByTab(TAB.BREAKPOINTS)
   })
   tabTopCounters.addEventListener('click', (event) => {
-    event.preventDefault()
-
-    breakpointCalcForm.tab = TAB.COUNTERS
-    toggleTab(breakpointCalcForm.tab)
+    form.tab = TAB.COUNTERS
+    toggleTab(form.tab)
     toggleElementsByTab(TAB.COUNTERS)
 
-    if (breakpointCalcForm.staleTab) {
-      breakpointCalcForm.staleTab = false
-      submitBreakpointCalcForm()
+    if (form.staleTab) {
+      form.staleTab = false
+      submitForm()
     }
   })
-  document.getElementById('faq-legend-link').addEventListener('click', (event) => {
-    event.preventDefault()
-
+  document.getElementById('faq-legend').addEventListener('click', (event) => {
     faqLegend.hidden = !faqLegend.hidden
     const faqLegendChevrons = event.currentTarget.getElementsByClassName('faq-legend-chevron')
 
@@ -207,8 +201,8 @@ ready(() => {
   // functions
   const initialFetch = () => {
     return new Promise((resolve) => {
-      if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
-        breakpointCalcForm.status = FORM_STATE.SUBMITTING
+      if (form.status !== FORM_STATE.SUBMITTING) {
+        form.status = FORM_STATE.SUBMITTING
         toggleLoading()
 
         selectAttacker.ajax((callback) => {
@@ -220,12 +214,12 @@ ready(() => {
                 selectAttacker._currentState.choices.slice(1),
                 'value', 'label', false
               )
-              breakpointCalcForm.status = FORM_STATE.READY
+              form.status = FORM_STATE.READY
               toggleLoading()
               resolve()
             })
           }).catch(() => {
-            breakpointCalcForm.status = FORM_STATE.ERROR
+            form.status = FORM_STATE.ERROR
             showErrors()
             resolve()
           })
@@ -258,7 +252,7 @@ ready(() => {
       tabBreakpoints.classList.add('selected-tab')
       tabTopCounters.classList.remove('selected-tab')
 
-      updateBrowserHistory(formatParams(breakpointCalcForm))
+      updateBrowserHistory(formatParams(form))
     } else if (currentTab === TAB.COUNTERS) {
       breakpointsTable.hidden = true
       topCountersTable.hidden = false
@@ -266,7 +260,7 @@ ready(() => {
       tabTopCounters.classList.add('selected-tab')
       tabBreakpoints.classList.remove('selected-tab')
 
-      updateBrowserHistory(formatParams(breakpointCalcForm))
+      updateBrowserHistory(formatParams(form))
     }
   }
 
@@ -305,7 +299,7 @@ ready(() => {
         }
       }
       request.onerror = () => {
-        breakpointCalcForm.status = FORM_STATE.ERROR
+        form.status = FORM_STATE.ERROR
         showErrors()
       }
       request.send()
@@ -321,8 +315,8 @@ ready(() => {
   }
 
   const toggleLoading = () => {
-    const submitting = breakpointCalcForm.status === FORM_STATE.SUBMITTING
-    const breakpointsTab = breakpointCalcForm.tab === 'breakpoints'
+    const submitting = form.status === FORM_STATE.SUBMITTING
+    const breakpointsTab = form.tab === 'breakpoints'
 
     if (submitting) {
       selectAttacker.disable()
@@ -351,10 +345,10 @@ ready(() => {
     selectAttackerCinematicMove.disabled = submitting || selectAttackerCinematicMove.value < 0 || !breakpointsTab
   }
 
-  const submitBreakpointCalcForm = () => {
-    if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
-      for (const key in breakpointCalcForm) {
-        if (breakpointCalcForm[key] === undefined || breakpointCalcForm[key].toString() === '-1') {
+  const submitForm = () => {
+    if (form.status !== FORM_STATE.SUBMITTING) {
+      for (const key in form) {
+        if (form[key] === undefined || form[key].toString() === '-1') {
           return new Promise(() => {
             return false
           })
@@ -362,12 +356,12 @@ ready(() => {
       }
 
       return new Promise((resolve) => {
-        if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
-          breakpointCalcForm.status = FORM_STATE.SUBMITTING
+        if (form.status !== FORM_STATE.SUBMITTING) {
+          form.status = FORM_STATE.SUBMITTING
           toggleLoading()
 
           const request = new XMLHttpRequest()
-          const getParams = formatParams(breakpointCalcForm)
+          const getParams = formatParams(form)
           const url = window.pgoAPIURLs['breakpoint-calc'] + getParams
           request.open('GET', url, true)
 
@@ -381,16 +375,16 @@ ready(() => {
                 moveEffectiveness.innerHTML = ''
                 ivAssessment.innerHTML = json.attack_iv_assessment
 
-                displayBreakpointCalcDetails(json)
+                displayDetails(json)
                 generateTopCountersTable(json.top_counters)
                 updateBrowserHistory(getParams)
               } else {
                 showErrors(json)
               }
-              breakpointCalcForm.status = FORM_STATE.READY
+              form.status = FORM_STATE.READY
 
-              if (breakpointCalcForm.tab === TAB.COUNTERS) {
-                breakpointCalcForm.staleTab = false
+              if (form.tab === TAB.COUNTERS) {
+                form.staleTab = false
                 toggleElementsByTab(TAB.COUNTERS)
               }
               toggleLoading()
@@ -398,7 +392,7 @@ ready(() => {
             }
           }
           request.onerror = () => {
-            breakpointCalcForm.status = FORM_STATE.ERROR
+            form.status = FORM_STATE.ERROR
             showErrors()
             resolve()
           }
@@ -408,7 +402,7 @@ ready(() => {
     }
   }
 
-  const restoreBreakpointCalcForm = (data) => {
+  const restoreForm = (data) => {
     initialFetch().then(() => {
       toggleTab(data.tab)
 
@@ -424,24 +418,24 @@ ready(() => {
       selectPokemonMoves(data.attacker, 'attacker')
       selectPokemonMoves(data.defender, 'defender')
 
-      breakpointCalcForm = data
-      breakpointCalcForm.staleTab = true
-      breakpointCalcForm.status = FORM_STATE.READY
-      breakpointCalcForm.top_counter_order = data.top_counter_order
+      form = data
+      form.staleTab = true
+      form.status = FORM_STATE.READY
+      form.top_counter_order = data.top_counter_order
 
       toggleTopCounterOrder(data.top_counter_order === 'dps' ? 'rnk' : 'dps')
-      submitBreakpointCalcForm()
+      submitForm()
     })
   }
 
-  if (breakpointCalcForm.attacker && !(breakpointCalcForm.attacker_quick_move && breakpointCalcForm.attacker_cinematic_move)) {
+  if (form.attacker && !(form.attacker_quick_move && form.attacker_cinematic_move)) {
     const queryDict = {}
     location.search.substr(1).split('&').forEach((item) => {
       queryDict[item.split('=')[0]] = item.split('=')[1]
     })
-    restoreBreakpointCalcForm(queryDict)
+    restoreForm(queryDict)
   } else if (Object.keys(initialData).length > 0) {
-    restoreBreakpointCalcForm(initialData)
+    restoreForm(initialData)
   }
 
   const selectMoves = (data, pokemon) => {
@@ -451,8 +445,8 @@ ready(() => {
     const quickMoveKey = pokemon + '_quick_move'
     const cinematicMoveKey = pokemon + '_cinematic_move'
 
-    const quickMoveId = parseInt(breakpointCalcForm[quickMoveKey])
-    const cinematicMoveId = parseInt(breakpointCalcForm[cinematicMoveKey])
+    const quickMoveId = parseInt(form[quickMoveKey])
+    const cinematicMoveId = parseInt(form[cinematicMoveKey])
 
     data.forEach((moveData, i) => {
       if (moveData.move.category === 'QK') {
@@ -463,10 +457,10 @@ ready(() => {
         cinematicMoveSelect.options.add(createMoveOption(moveData, cinematicMoveId, cinematicMoveKey, pokemon))
       }
     })
-    breakpointCalcForm[quickMoveKey] = quickMoveSelect.value
-    breakpointCalcForm[cinematicMoveKey] = cinematicMoveSelect.value
+    form[quickMoveKey] = quickMoveSelect.value
+    form[cinematicMoveKey] = cinematicMoveSelect.value
 
-    submitBreakpointCalcForm()
+    submitForm()
   }
 
   const createMoveOption = (moveData, moveId, moveKey, pokemon) => {
@@ -482,13 +476,13 @@ ready(() => {
 
   const determineSelectedMove = (moveId, move, type) => {
     if (moveId > 0 && moveId === move.id) {
-      breakpointCalcForm[type] = move.id
+      form[type] = move.id
       return true
     }
     return false
   }
 
-  const displayBreakpointCalcDetails = (json) => {
+  const displayDetails = (json) => {
     detailsTable.hidden = false
 
     if (json.breakpoint_details.length < 2) {
@@ -519,7 +513,7 @@ ready(() => {
 
   const generateTopCountersTable = (dataset) => {
     const attackerStats = document.getElementById('top-counters-table-attacker-stats')
-    attackerStats.innerHTML = `L${breakpointCalcForm.attacker_level} ${breakpointCalcForm.attacker_atk_iv}ATK`
+    attackerStats.innerHTML = `L${form.attacker_level} ${form.attacker_atk_iv}ATK`
     const dataTable = document.getElementById('top-counters-table-body')
     let dataRow
     let dataCell
@@ -581,17 +575,17 @@ ready(() => {
   }
 
   const toggleCinematicBreakpoints = () => {
-    if (breakpointCalcForm.show_cinematic_breakpoints) {
-      delete breakpointCalcForm.show_cinematic_breakpoints
+    if (form.show_cinematic_breakpoints) {
+      delete form.show_cinematic_breakpoints
     } else {
-      breakpointCalcForm.show_cinematic_breakpoints = true
+      form.show_cinematic_breakpoints = true
     }
-    submitBreakpointCalcForm()
+    submitForm()
   }
 
   const toggleTopCounterOrder = (value) => {
-    breakpointCalcForm.top_counter_order = value === 'rnk' ? 'dps' : 'rnk'
-    inputToggleTopCounterSort.innerHTML = breakpointCalcForm.top_counter_order.toUpperCase()
+    form.top_counter_order = value === 'rnk' ? 'dps' : 'rnk'
+    inputToggleTopCounterSort.innerHTML = form.top_counter_order.toUpperCase()
   }
 
   const showErrors = (errorObject = null) => {
@@ -619,7 +613,7 @@ ready(() => {
   }
 
   const clearMoveInputs = (pokemon) => {
-    if (breakpointCalcForm.status !== FORM_STATE.SUBMITTING) {
+    if (form.status !== FORM_STATE.SUBMITTING) {
       const quickMoveSelect = pokemon === 'attacker' ? selectAttackerQuickMove : selectDefenderQuickMove
       const cinematicMoveSelect = pokemon === 'attacker' ? selectAttackerCinematicMove : selectDefenderCinematicMove
 
@@ -634,8 +628,8 @@ ready(() => {
       cinematicMoveSelect.append(
         '<option value="-1" disabled selected>Select cinematic move</option>'
       )
-      breakpointCalcForm[quickMoveKey] = -1
-      breakpointCalcForm[cinematicMoveKey] = -1
+      form[quickMoveKey] = -1
+      form[cinematicMoveKey] = -1
     }
   }
 
@@ -644,9 +638,9 @@ ready(() => {
 
     if (!isNaN(choice)) {
       input.value = choice
-      breakpointCalcForm[inputName] = input.value
+      form[inputName] = input.value
     } else {
-      breakpointCalcForm[inputName] = '-1'
+      form[inputName] = '-1'
     }
   }
 

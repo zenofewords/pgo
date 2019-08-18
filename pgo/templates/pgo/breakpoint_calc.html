@@ -11,226 +11,226 @@
 {% endblock %}
 
 {% block content %}
-<div class="wrapper">
-  <div class="input-wrapper">
-    <div class="row">
-      <div class="select-attacker-wrapper">
-        <label for="select-attacker" class="screen-reader">Select attacker</label>
-        <select id="select-attacker" data-trigger name="choices-single-default">
-          <option value="-1" placeholder disabled selected>Select attacker</option>
-        </select>
-      </div>
+  <div class="wrapper">
+    <div class="input-wrapper">
+      <div class="row">
+        <div class="select-attacker-wrapper">
+          <label for="select-attacker" class="screen-reader">Select attacker</label>
+          <select id="select-attacker" data-trigger name="choices-single-default">
+            <option value="-1" placeholder disabled selected>Select attacker</option>
+          </select>
+        </div>
 
-      <div class="input-attacker-level-wrapper">
-        <label for="input-attacker-level" class="screen-reader">Attacker level</label>
-        <input id="input-attacker-level" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
+        <div class="input-attacker-level-wrapper">
+          <label for="input-attacker-level" class="screen-reader">Attacker level</label>
+          <input id="input-attacker-level" type="number" name="attacker_lvl" placeholder="Attacker lvl" min="1" max="40" step="0.5" value="20">
+        </div>
+      </div>
+      <div class="row">
+        <div class="select-quick-move-wrapper">
+          <label for="select-quick-move" class="screen-reader">Quick move</label>
+          <select id="select-quick-move" disabled>
+            <option value="-1" disabled selected>Quick move</option>
+          </select>
+        </div>
+
+        <div class="select-cinematic-move-wrapper">
+          <label for="select-cinematic-move" class="screen-reader">Cinematic move</label>
+          <select id="select-cinematic-move" disabled>
+            <option value="-1" disabled selected>Cinematic move</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="select-attacker-atk-iv-wrapper">
+          <label for="select-attacker-atk-iv" class="screen-reader">Attacker ATK IV</label>
+          <select id="select-attacker-atk-iv">
+            {% for n in attack_iv_range %}
+              <option value="{{ n }}">{{ n }} ATK</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="select-weather-condition-wrapper">
+          <label for="select-weather-condition" class="screen-reader">Weather condition</label>
+          <select id="select-weather-condition">
+            {% for weather_condition in weather_condition_data %}
+              <option value="{{ weather_condition.pk }}">{{ weather_condition.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="select-friendship-boost-wrapper">
+          <label for="select-friendship-boost" class="screen-reader">Friendship boost</label>
+          <select id="select-friendship-boost">
+            {% for friend in friendship %}
+              <option value="{{ friend.damage_boost }}">{{ friend.level }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="select-defender-wrapper">
+          <label for="select-defender" class="screen-reader">Select defender</label>
+          <select id="select-defender" data-trigger name="choices-single-default">
+            <option value="-1" placeholder disabled selected>Select defender</option>
+          </select>
+        </div>
+
+        <div class="select-defender-tier-wrapper">
+          <label for="select-defender-tier" class="screen-reader">Defender tier / level</label>
+          <select id="select-defender-tier">
+            {% for data in defender_cpm_data %}
+              {% if forloop.last %}
+                <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
+              {% else %}
+                <option value="{{ data.1 }}{{ data.0 }}" {% if data.0 == 5 %}selected{% endif %}>T{{ data.0 }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="select-quick-move-wrapper">
-        <label for="select-quick-move" class="screen-reader">Quick move</label>
-        <select id="select-quick-move" disabled>
-          <option value="-1" disabled selected>Quick move</option>
-        </select>
-      </div>
 
-      <div class="select-cinematic-move-wrapper">
-        <label for="select-cinematic-move" class="screen-reader">Cinematic move</label>
-        <select id="select-cinematic-move" disabled>
-          <option value="-1" disabled selected>Cinematic move</option>
-        </select>
-      </div>
-    </div>
-    <div class="row">
-      <div class="select-attacker-atk-iv-wrapper">
-        <label for="select-attacker-atk-iv" class="screen-reader">Attacker ATK IV</label>
-        <select id="select-attacker-atk-iv">
-          {% for n in attack_iv_range %}
-            <option value="{{ n }}">{{ n }} ATK</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="select-weather-condition-wrapper">
-        <label for="select-weather-condition" class="screen-reader">Weather condition</label>
-        <select id="select-weather-condition">
-          {% for weather_condition in weather_condition_data %}
-            <option value="{{ weather_condition.pk }}">{{ weather_condition.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="select-friendship-boost-wrapper">
-        <label for="select-friendship-boost" class="screen-reader">Friendship boost</label>
-        <select id="select-friendship-boost">
-          {% for friend in friendship %}
-            <option value="{{ friend.damage_boost }}">{{ friend.level }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-    <div class="row">
-      <div class="select-defender-wrapper">
-        <label for="select-defender" class="screen-reader">Select defender</label>
-        <select id="select-defender" data-trigger name="choices-single-default">
-          <option value="-1" placeholder disabled selected>Select defender</option>
-        </select>
-      </div>
-
-      <div class="select-defender-tier-wrapper">
-        <label for="select-defender-tier" class="screen-reader">Defender tier / level</label>
-        <select id="select-defender-tier">
-          {% for data in defender_cpm_data %}
-            {% if forloop.last %}
-              <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
-            {% else %}
-              <option value="{{ data.1 }}{{ data.0 }}" {% if data.0 == 5 %}selected{% endif %}>T{{ data.0 }}</option>
-            {% endif %}
-          {% endfor %}
-        </select>
-      </div>
+    <div class="output-wrapper">
+      <p id="atk-iv-assessment">
+        The Pokemon GO breakpoint calculator was created to help you find your pokemon's breakpoints and plan power-ups accordingly.
+      </p>
+      <p id="move-effectiveness">
+        Selecting an attacker and a defender will auto submit the form. Changing any value will refresh it.
+      </p>
     </div>
   </div>
 
-  <div class="output-wrapper">
-    <p id="atk-iv-assessment">
-      The Pokemon GO breakpoint calculator was created to help you find your pokemon's breakpoints and plan power-ups accordingly.
-    </p>
-    <p id="move-effectiveness">
-      Selecting an attacker and a defender will auto submit the form. Changing any value will refresh it.
-    </p>
-  </div>
-</div>
-
-<div id="breakpoint-details-table" hidden>
-  <div class="tab-wrapper">
-    <input class="tab selected-tab" type="submit" id="breakpoints" value="Breakpoints">
-    <input class="tab" type="submit" id="top-counters" value="Top counters">
-  </div>
-  <table id="breakpoints-table">
-    <thead>
-      <tr>
-        <th>LVL</th>
-        <th>
-          {% include 'pgo/includes/stardust_icon.html' %}|
-          {% include 'pgo/includes/candy_icon.html' %}
-        </th>
-        <th>QM</th>
-        <th>
-          <span id="toggle-cinematic-breakpoints">CM</span>
-        </th>
-        <th>DPS</th>
-        <th>T#</th>
-      </tr>
-    </thead>
-    <tbody id="breakpoint-details-table-body"></tbody>
-  </table>
-  <div id="top-counters-table" hidden>
-    <div class="counters-moveset">
-      <div class="vs-label">VS</div>
-      <div class="select-defender-move-wrapper">
-        <label for="select-defender-quick-move" class="screen-reader">Quick move</label>
-        <select id="select-defender-quick-move" disabled>
-          <option value="-1" disabled selected>Quick move</option>
-        </select>
-      </div>
-      <div class="select-defender-move-wrapper">
-        <label for="select-defender-cinematic-move" class="screen-reader">Cinematic move</label>
-        <select id="select-defender-cinematic-move" disabled>
-          <option value="-1" disabled selected>Cinematic move</option>
-        </select>
-      </div>
+  <div id="breakpoint-details-table" hidden>
+    <div class="tab-wrapper">
+      <input class="tab selected-tab" type="submit" id="breakpoints" value="Breakpoints">
+      <input class="tab" type="submit" id="top-counters" value="Top counters">
     </div>
-    <table id="top-counters-table">
+    <table id="breakpoints-table">
       <thead>
         <tr>
-          <th width="27%" id="top-counters-table-attacker-stats"></th>
-          <th width="27%">QM</th>
-          <th width="27%">CM</th>
-          <th width="9%">
-            <span id="top-counter-sort-toggle">RNK</span>
+          <th>LVL</th>
+          <th>
+            {% include 'pgo/includes/stardust_icon.html' %}|
+            {% include 'pgo/includes/candy_icon.html' %}
           </th>
+          <th>QM</th>
+          <th>
+            <span id="toggle-cinematic-breakpoints">CM</span>
+          </th>
+          <th>DPS</th>
+          <th>T#</th>
         </tr>
       </thead>
-      <tbody id="top-counters-table-body"></tbody>
+      <tbody id="breakpoint-details-table-body"></tbody>
     </table>
-  </div>
-  <div id="faq-legend-link">FAQ / legend</div>
-  <hr>
-  <div id="faq-legend-content" hidden>
-    <p>
-      <strong>Breakpoints</strong> - due to rounding in the damage formula, damage dealt in PGo isn't linear
-    </p>
-    <p>
-      Instead, there are certain points for combinations of attacker and defender level, IVs, and moves, where the damage per hit of the move is, sometimes significantly, increased.
-    </p>
-    <ul>
-      <li>
-        <p>
-          <strong>LVL</strong> - your pokemon's current level and levels at which breakpoints occur
-        </p>
-      </li>
-      <li>
-        <p>
-          {% include 'pgo/includes/stardust_icon.html' %} - stardust required to level up from current level to breakpoint (<em>k</em> stands for thousand)
-        </p>
-      </li>
-      <li>
-        <p>
-          {% include 'pgo/includes/candy_icon.html' %} - candy required to level up from current level to breakpoint
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>QM</strong> - quick move's damage per hit
-        </p>
-        <p>
-           Unlike charge move breakpoints, quick move breakpoints are usually highly impactful.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>CM</strong> - charge move's damage per hit
-        </p>
-        <p>
-          You can toggle the button to display all charge move breakpoints.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>DPS</strong> - stands for damage per second
-        </p>
-        <p>
-          The percentages in brackets are relative to a perfect, maxed specimen of the selected pokemon.
-        </p>
-        <p>
-          DPS is calculated using the damage formula, factoring in the charge up, and use, of charge moves translated into "cycles" which are then divided by the duration of the moves required to perform a single cycle.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>T#</strong> - the aproximated number of trainers required to win the raid
-        </p>
-        <p>
-          Assumes that every trainer is using the exact, selected pokemon. This metric should not be relied upon when attempting to shortman raids, it's here to help figure out by how much the pokemon is improved when reaching a breakpoint.
-        </p>
-      </li>
-    </ul>
+    <div id="top-counters-table" hidden>
+      <div class="counters-moveset">
+        <div class="vs-label">VS</div>
+        <div class="select-defender-move-wrapper">
+          <label for="select-defender-quick-move" class="screen-reader">Quick move</label>
+          <select id="select-defender-quick-move" disabled>
+            <option value="-1" disabled selected>Quick move</option>
+          </select>
+        </div>
+        <div class="select-defender-move-wrapper">
+          <label for="select-defender-cinematic-move" class="screen-reader">Cinematic move</label>
+          <select id="select-defender-cinematic-move" disabled>
+            <option value="-1" disabled selected>Cinematic move</option>
+          </select>
+        </div>
+      </div>
+      <table id="top-counters-table">
+        <thead>
+          <tr>
+            <th width="27%" id="top-counters-table-attacker-stats"></th>
+            <th width="27%">QM</th>
+            <th width="27%">CM</th>
+            <th width="9%">
+              <span id="top-counter-sort-toggle">RNK</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="top-counters-table-body"></tbody>
+      </table>
+    </div>
+    <div id="faq-legend">FAQ / legend</div>
+    <hr>
+    <div id="faq-legend-content" hidden>
+      <p>
+        <strong>Breakpoints</strong> - due to rounding in the damage formula, damage dealt in PGo isn't linear
+      </p>
+      <p>
+        Instead, there are certain points for combinations of attacker and defender level, IVs, and moves, where the damage per hit of the move is, sometimes significantly, increased.
+      </p>
+      <ul>
+        <li>
+          <p>
+            <strong>LVL</strong> - your pokemon's current level and levels at which breakpoints occur
+          </p>
+        </li>
+        <li>
+          <p>
+            {% include 'pgo/includes/stardust_icon.html' %} - stardust required to level up from current level to breakpoint (<em>k</em> stands for thousand)
+          </p>
+        </li>
+        <li>
+          <p>
+            {% include 'pgo/includes/candy_icon.html' %} - candy required to level up from current level to breakpoint
+          </p>
+        </li>
+        <li>
+          <p>
+            <strong>QM</strong> - quick move's damage per hit
+          </p>
+          <p>
+             Unlike charge move breakpoints, quick move breakpoints are usually highly impactful.
+          </p>
+        </li>
+        <li>
+          <p>
+            <strong>CM</strong> - charge move's damage per hit
+          </p>
+          <p>
+            You can toggle the button to display all charge move breakpoints.
+          </p>
+        </li>
+        <li>
+          <p>
+            <strong>DPS</strong> - stands for damage per second
+          </p>
+          <p>
+            The percentages in brackets are relative to a perfect, maxed specimen of the selected pokemon.
+          </p>
+          <p>
+            DPS is calculated using the damage formula, factoring in the charge up, and use, of charge moves translated into "cycles" which are then divided by the duration of the moves required to perform a single cycle.
+          </p>
+        </li>
+        <li>
+          <p>
+            <strong>T#</strong> - the aproximated number of trainers required to win the raid
+          </p>
+          <p>
+            Assumes that every trainer is using the exact, selected pokemon. This metric should not be relied upon when attempting to shortman raids, it's here to help figure out by how much the pokemon is improved when reaching a breakpoint.
+          </p>
+        </li>
+      </ul>
 
-    <hr>
-    <p>
-      <strong>Top Counters</strong> - a quick reference list of pokemon which counter the selected defender
+      <hr>
+      <p>
+        <strong>Top Counters</strong> - a quick reference list of pokemon which counter the selected defender
+      </p>
+      <p>
+        It features counters ranked by their damage output. However, the defender's moves, resistances, and the selected weather are also accounted for. Feel free to adjust the IV and level of the attackers in the list. The counters are pitted against level 40 pokemon, unless the defender can be a raid boss, where you are given the option of selecting a tier for more accurate results.
+      </p>
+      <hr>
+    </div>
+    <p class="disclaimer">
+      All calculations are purely math based. DPS and the required number of trainers are approximated. For high quality battle simulations, visit
+      <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
     </p>
-    <p>
-      It features counters ranked by their damage output. However, the defender's moves, resistances, and the selected weather are also accounted for. Feel free to adjust the IV and level of the attackers in the list. The counters are pitted against level 40 pokemon, unless the defender can be a raid boss, where you are given the option of selecting a tier for more accurate results.
-    </p>
-    <hr>
   </div>
-  <p class="disclaimer">
-    All calculations are purely math based. DPS and the required number of trainers are approximated. For high quality battle simulations, visit
-    <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
-  </p>
-</div>
 {% endblock content %}
 
 {% block scripts %}

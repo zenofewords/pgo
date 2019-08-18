@@ -11,18 +11,19 @@
 {% endblock %}
 
 {% block content %}
-  <div class="row">
-    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 form-wrapper">
+  <div class="wrapper">
+    <div class="input-wrapper">
       <div class="row">
-        <div class="col-xs-8 input-padding-right">
-          <label for="choices-single-default" class="sr-only">Select attacker</label>
-          <select class="form-control good-to-go-select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
+        <div class="select-attacker-wrapper">
+          <label for="choices-single-default" class="screen-reader">Select attacker</label>
+          <select class="select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
             <option value="-1" placeholder disabled selected>Select attacker</option>
           </select>
         </div>
-        <div class="col-xs-4 input-padding-left">
-          <label for="good-to-go-select-atk-iv" class="sr-only">Attacker ATK IV</label>
-          <select id="good-to-go-select-atk-iv" class="form-control input-height">
+
+        <div class="input-attacker-atk-iv-wrapper">
+          <label for="select-atk-iv" class="screen-reader">Attacker ATK IV</label>
+          <select id="select-atk-iv">
             <option value="-1" selected disabled>? ATK</option>
             {% for n in attack_iv_range %}
               <option value="{{ n }}">{{ n }} ATK</option>
@@ -32,32 +33,34 @@
       </div>
 
       <div class="row">
-        <div class="col-xs-6 input-padding-right">
-          <label for="good-to-go-select-quick-move" class="sr-only">Quick move</label>
-          <select id="good-to-go-select-quick-move" class="form-control input-height" disabled>
+        <div class="select-attacker-quick-move-wrapper">
+          <label for="select-quick-move" class="screen-reader">Quick move</label>
+          <select id="select-quick-move" disabled>
             <option value="-1" disabled selected>Quick move</option>
           </select>
         </div>
-        <div class="col-xs-6 input-padding-left">
-          <label for="good-to-go-select-cinematic-move" class="sr-only">Cinematic move</label>
-          <select id="good-to-go-select-cinematic-move" class="form-control input-height" disabled>
+
+        <div class="select-attacker-cinematic-move-wrapper">
+          <label for="select-cinematic-move" class="screen-reader">Cinematic move</label>
+          <select id="select-cinematic-move" disabled>
             <option value="-1" disabled selected>Cinematic move</option>
           </select>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-xs-6 input-padding-right">
-          <label for="good-to-go-select-friendship-boost" class="sr-only">Friendship boost</label>
-          <select id="good-to-go-select-friendship-boost" class="form-control input-height">
+        <div class="select-friendship-boost-wrapper">
+          <label for="select-friendship-boost" class="screen-reader">Friendship boost</label>
+          <select id="select-friendship-boost">
             {% for friend in friendship %}
               <option value="{{ friend.damage_boost }}">{{ friend.level }}</option>
             {% endfor %}
           </select>
         </div>
-        <div class="col-xs-6 input-padding-left">
-          <label for="good-to-go-select-weather-condition" class="sr-only">Weather condition</label>
-          <select id="good-to-go-select-weather-condition" class="form-control input-height">
+
+        <div class="select-weather-condition-wrapper">
+          <label for="select-weather-condition" class="screen-reader">Weather condition</label>
+          <select id="select-weather-condition">
             {% for weather_condition in weather_condition_data %}
               <option value="{{ weather_condition.pk }}">{{ weather_condition.name }}</option>
             {% endfor %}
@@ -66,27 +69,11 @@
       </div>
 
       <div class="row">
-        <div class="col-xs-4 input-padding-right">
-          <input type="checkbox" id="tier-3-6-raid-bosses" checked hidden>
-          <button id="toggle-tier-3-6-raid-bosses" type="button" class="btn btn-info form-control input-height">
-            T3-6 bosses
-          </button>
-        </div>
-        <div class="col-xs-4 input-padding-right input-padding-left">
-          <input type="checkbox" id="tier-1-2-raid-bosses" hidden>
-          <button id="toggle-tier-1-2-raid-bosses" type="button" class="btn btn-default form-control input-height">
-            T1-2 bosses
-          </button>
-        </div>
-        <div class="col-xs-4 input-padding-left">
-          <input type="checkbox" id="relevant-defenders" hidden>
-          <button id="toggle-relevant-defenders" type="button" class="btn btn-default form-control input-height" disabled>
-            Gyms
-          </button>
-        </div>
+        <input type="submit" class="toggle-tier-3-6-raid-bosses pressed" value="T3-6 bosses">
+        <input type="submit" class="toggle-tier-1-2-raid-bosses" value="T1-2 bosses">
       </div>
     </div>
-    <div id="good-to-go-summary-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <div class="output-wrapper">
       <p>
         Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the final quick move breakpoint for all selected matchups.
       </p>
@@ -95,15 +82,10 @@
       </p>
     </div>
   </div>
-  <div class="row">
-    <div class="col-xs-12">
-      <div id="good-to-go-results" class="good-to-go-results" hidden></div>
-    </div>
-  </div>
+  <div class="results" hidden></div>
 {% endblock content %}
 
 {% block scripts %}
-  {{ block.super }}
   {% render_bundle 'goodToGo' attrs='async' %}
 
   <script type="text/javascript">

@@ -93,10 +93,10 @@
     </div>
 
     <div class="output-wrapper">
-      <p id="atk-iv-assessment">
+      <p>
         The Pokemon GO breakpoint calculator was created to help you find your pokemon's breakpoints and plan power-ups accordingly.
       </p>
-      <p id="move-effectiveness">
+      <p>
         Selecting an attacker and a defender will auto submit the form. Changing any value will refresh it.
       </p>
     </div>
@@ -110,17 +110,21 @@
     <table id="breakpoints-table">
       <thead>
         <tr>
-          <th>LVL</th>
-          <th>
+          <th width="10%">LVL</th>
+          <th width="25%">
             {% include 'pgo/includes/stardust_icon.html' %}|
             {% include 'pgo/includes/candy_icon.html' %}
           </th>
-          <th>QM</th>
-          <th>
-            <span id="toggle-cinematic-breakpoints">CM</span>
+          <th width="10%">
+            <span class="quick-move-icon"></span>
           </th>
-          <th>DPS</th>
-          <th>T#</th>
+          <th width="10%">
+            <span id="toggle-cinematic-breakpoints" class="cinematic-move-icon-link"></span>
+          </th>
+          <th width="30%">DPS</th>
+          <th width="15%">
+            <span class="trainer-count-icon">#</span>
+          </th>
         </tr>
       </thead>
       <tbody id="breakpoint-details-table-body"></tbody>
@@ -145,8 +149,12 @@
         <thead>
           <tr>
             <th width="27%" id="top-counters-table-attacker-stats"></th>
-            <th width="27%">QM</th>
-            <th width="27%">CM</th>
+            <th width="27%">
+              <span class="quick-move-icon"></span>
+            </th>
+            <th width="27%">
+              <span class="cinematic-move-icon"></span>
+            </th>
             <th width="9%">
               <span id="top-counter-sort-toggle">RNK</span>
             </th>
@@ -182,7 +190,7 @@
         </li>
         <li>
           <p>
-            <strong>QM</strong> - quick move's damage per hit
+            <span class="quick-move-icon-faq"></span> - quick move's damage per hit
           </p>
           <p>
              Unlike charge move breakpoints, quick move breakpoints are usually highly impactful.
@@ -190,7 +198,7 @@
         </li>
         <li>
           <p>
-            <strong>CM</strong> - charge move's damage per hit
+            <span class="cinematic-move-icon-faq"></span> - charge move's damage per hit
           </p>
           <p>
             You can toggle the button to display all charge move breakpoints.
@@ -209,7 +217,7 @@
         </li>
         <li>
           <p>
-            <strong>T#</strong> - the aproximated number of trainers required to win the raid
+            <span class="trainer-count-icon-faq">#</span> - the aproximated number of trainers required to win the raid
           </p>
           <p>
             Assumes that every trainer is using the exact, selected pokemon. This metric should not be relied upon when attempting to shortman raids, it's here to help figure out by how much the pokemon is improved when reaching a breakpoint.

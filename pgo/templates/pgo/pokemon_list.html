@@ -8,87 +8,79 @@
 {% endblock title %}
 
 {% block meta_description %}
-  <meta name="description" content="A list of all pokemon with their PGo stats.">
+  <meta name="description" content="A list of all pokemon with and their Pokemon GO stats.">
 {% endblock %}
 
 {% block content %}
   <div class="row">
-    <div>
-      <table>
-        <tr>
-          <td width="35%" class="search-pokemon-wrapper">
-            <label for="choices-single-default" class="screen-reader">
-              Find pokemon
-            </label>
-            <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
-              <option value="-1" placeholder disabled selected>
-                Find pokemon
+    <table>
+      <tr>
+        <td width="35%" class="list-search-wrapper">
+          <label for="choices-single-default" class="screen-reader">
+            Find
+          </label>
+          <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
+            <option value="-1" placeholder disabled selected>
+              Find
+            </option>
+            {% for row in unfiltered_data %}
+              <option value="{{ row.0 }}">
+                {{ row.1 }}
               </option>
-              {% for row in unfiltered_data %}
-                <option value="{{ row.0 }}">
-                  {{ row.1 }}
-                </option>
-              {% endfor %}
-            </select>
-          </td>
-          <th>
-            <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack{{ query_param_url }}">
-              Atk
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense{{ query_param_url }}">
-              Def
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina{{ query_param_url }}">
-              Sta
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-stat_product' %}{% else %}-{% endif %}stat_product{{ query_param_url }}">
-              Product
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp{{ query_param_url }}">
-              CP
-            </a>
-          </th>
-        </tr>
-        {% for pokemon in pokemon_list %}
-          <tr>
-            <td>
-              <div>
-                <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
-                  {{ pokemon.name }}
-                </a>
-                <div>
-                  <div class="type-{{ pokemon.primary_type.slug }}">
-                    {{ pokemon.primary_type.name }}
-                  </div>
-                  <div class="type-{{ pokemon.secondary_type.slug }}">
-                    {{ pokemon.secondary_type.name|default:"" }}
-                  </div>
+            {% endfor %}
+          </select>
+        </td>
+        <th>
+          <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack{{ query_param_url }}">
+            ATK
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense{{ query_param_url }}">
+            DEF
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina{{ query_param_url }}">
+            STA
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-stat_product' %}{% else %}-{% endif %}stat_product{{ query_param_url }}">
+            PROD
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp{{ query_param_url }}">
+            CP
+          </a>
+        </th>
+      </tr>
+      {% for pokemon in pokemon_list %}
+        <tr>
+          <td>
+            <div class="pokemon-wrapper">
+              <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
+                {{ pokemon.name }}
+              </a>
+              <div class="type-wrapper">
+                <div class="type-{{ pokemon.primary_type.slug }}">
+                  {{ pokemon.primary_type.name }}
+                </div>
+                <div class="type-{{ pokemon.secondary_type.slug|default:"none" }}">
+                  {{ pokemon.secondary_type.name|default:"" }}
                 </div>
               </div>
-            </td>
-            <td>{{ pokemon.pgo_attack }}</td>
-            <td>{{ pokemon.pgo_defense }}</td>
-            <td>{{ pokemon.pgo_stamina }}</td>
-            <td>{{ pokemon.stat_product|format_stat_product }}</td>
-            <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="8">
-              No pokemon found, try selecting different filtering criteria.
-            </td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
+            </div>
+          </td>
+          <td>{{ pokemon.pgo_attack }}</td>
+          <td>{{ pokemon.pgo_defense }}</td>
+          <td>{{ pokemon.pgo_stamina }}</td>
+          <td>{{ pokemon.stat_product|format_stat_product }}</td>
+          <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
+        </tr>
+      {% endfor %}
+    </table>
   </div>
 {% endblock content %}
 

@@ -1,18 +1,17 @@
 @import './choicesjsOverrides.sass'
 @import './general.sass'
 
-
 .type-label-wrapper
-  padding: .4rem .6rem .4rem 0
+  padding: .2rem
 
 %type-label
   color: $fontColor
-  padding: .4rem .5rem .3rem
-  border-radius: .5rem
-  font-size: 1.2rem
-  width: 5.5rem
+  font-size: $fontSizeSmall
+  border-radius: .3rem
+  padding: .2rem .2rem .25rem
+  width: 2.8rem
   text-align: center
-  margin: 0 .1rem
+  margin-right: .2rem
 
 .type-bug
   @extend %type-label
@@ -85,3 +84,62 @@
 .type-water
   @extend %type-label
   background-color: rgba(85, 155, 217, .7)
+
+.type-none
+  @extend %type-label
+
+.pokemon-wrapper,
+.move-wrapper
+  display: flex
+  flex-wrap: wrap
+  justify-content: space-between
+
+  a
+    padding-top: .3rem
+
+.type-wrapper
+  display: flex
+  width: 100%
+  margin-top: .2rem
+
+.select-move-type-wrapper
+  @extend .input-wrapper
+  &:after
+    @extend %input-arrow
+    right: .5rem
+
+.list-link
+  font-size: $fontSize
+  display: block
+  width: 10rem
+  margin: .1rem 0 .9rem .2rem
+
+.pokemon-stats-table
+  display: flex
+  flex-wrap: wrap
+
+.pokemon-resistance-weakness,
+.pokemon-stats-table
+  flex-grow: 1
+
+.move-stats-table
+  margin-bottom: 2.5rem
+
+.pokemon-resistance-weakness
+  table
+    margin-bottom: 2.5rem
+
+@media (min-width: $mediaBreakpoint)
+  .pokemon-wrapper
+    padding-right: .7rem
+
+  .list-search-wrapper
+    padding-right: 1rem
+
+  .pokemon-resistance-weakness
+    table
+      margin-bottom: 0
+
+  .type-wrapper
+    width: auto
+    margin-top: 0rem

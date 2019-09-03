@@ -100,5 +100,5 @@ webpack-stats.json
 webpack-stats-prod.json
 server.js
 
-*.eslintrc
+*.eslintrc.json
 *.flake8

@@ -1,7 +1,6 @@
 import '../sass/breakpointCalc.sass'
 import Choices from 'choices.js'
 
-
 const ready = (run) => {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
     run()
@@ -50,7 +49,6 @@ ready(() => {
   const selectFriendShipBoost = document.getElementById('select-friendship-boost')
   const selectDefenderCPM = document.getElementById('select-defender-tier')
 
-  const moveEffectiveness = document.getElementById('move-effectiveness')
   const detailsTable = document.getElementById('breakpoint-details-table')
   const inputToggleCinematicBreakpoints = document.getElementById('toggle-cinematic-breakpoints')
   const inputToggleTopCounterSort = document.getElementById('top-counter-sort-toggle')
@@ -59,7 +57,7 @@ ready(() => {
   const tabTopCounters = document.getElementById('top-counters')
   const breakpointsTable = document.getElementById('breakpoints-table')
   const topCountersTable = document.getElementById('top-counters-table')
-  const ivAssessment = document.getElementById('atk-iv-assessment')
+  const summary = document.querySelector('.output-wrapper')
   const faqLegend = document.getElementById('faq-legend-content')
 
   let form = {
@@ -185,17 +183,6 @@ ready(() => {
   })
   document.getElementById('faq-legend').addEventListener('click', (event) => {
     faqLegend.hidden = !faqLegend.hidden
-    const faqLegendChevrons = event.currentTarget.getElementsByClassName('faq-legend-chevron')
-
-    for (var i = 0; i < faqLegendChevrons.length; i++) {
-      if (faqLegendChevrons[i].classList.contains('chevron-down')) {
-        faqLegendChevrons[i].classList.remove('chevron-down')
-        faqLegendChevrons[i].classList.add('chevron-up')
-      } else {
-        faqLegendChevrons[i].classList.remove('chevron-up')
-        faqLegendChevrons[i].classList.add('chevron-down')
-      }
-    }
   })
 
   // functions
@@ -270,13 +257,13 @@ ready(() => {
       selectAttackerQuickMove.disabled = true
       selectAttackerCinematicMove.disabled = true
 
-      ivAssessment.hidden = true
+      summary.hidden = true
     } else {
       selectAttacker.enable()
       selectAttackerQuickMove.disabled = false
       selectAttackerCinematicMove.disabled = false
 
-      ivAssessment.hidden = false
+      summary.hidden = false
     }
   }
 
@@ -372,8 +359,7 @@ ready(() => {
               const json = JSON.parse(request.responseText)
 
               if (request.status >= 200 && request.status < 400) {
-                moveEffectiveness.innerHTML = ''
-                ivAssessment.innerHTML = json.attack_iv_assessment
+                summary.innerHTML = json.attack_iv_assessment
 
                 displayDetails(json)
                 generateTopCountersTable(json.top_counters)
@@ -434,8 +420,8 @@ ready(() => {
       queryDict[item.split('=')[0]] = item.split('=')[1]
     })
     restoreForm(queryDict)
-  } else if (Object.keys(initialData).length > 0) {
-    restoreForm(initialData)
+  } else if (Object.keys(window.initialData).length > 0) {
+    restoreForm(window.initialData)
   }
 
   const selectMoves = (data, pokemon) => {
@@ -542,30 +528,20 @@ ready(() => {
         if (i > 0) {
           className = 'toggle_' + className + ' top-counter-subrow'
           dataRow.hidden = true
-          dataCell.classList.add('top-counter-subrow')
+          dataCell.classList.add('top-counter-subrow-td')
         } else {
-          const chevron = document.createElement('span')
-          chevron.setAttribute(
-            'class', 'chevron-down top-counter-chevron')
+          const arrow = document.createElement('span')
+          arrow.setAttribute('class', 'top-counter-arrow')
 
           href = document.createElement('a')
           href.onclick = () => {
-            if (chevron.classList.contains('chevron-down')) {
-              chevron.classList.remove('chevron-down')
-              chevron.classList.add('chevron-up')
-            } else {
-              chevron.classList.remove('chevron-up')
-              chevron.classList.add('chevron-down')
-            }
-
             const elements = document.getElementsByClassName('toggle_' + className)
             for (var i = 0; i < elements.length; i++) {
               elements[i].hidden = !elements[i].hidden
             }
           }
-          href.appendChild(chevron)
+          href.appendChild(arrow)
           dataCell.appendChild(href)
-          dataCell.classList.add('align-right')
         }
         dataRow.appendChild(dataCell)
         dataRow.setAttribute('class', className)
@@ -590,7 +566,7 @@ ready(() => {
 
   const showErrors = (errorObject = null) => {
     if (errorObject) {
-      for (let field in errorObject) {
+      for (const field in errorObject) {
         if (field !== 'attacker_level') {
           const invalidInput = document.querySelector('.select-' + field)
           if (invalidInput) {

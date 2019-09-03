@@ -1,17 +1,16 @@
 @import './choicesjsOverrides.sass'
 @import './general.sass'
 
-
 .select-attacker-wrapper,
 .select-defender-wrapper
-  flex: 3 3
+  flex: 9 9 0rem
   margin: 0 .5rem .5rem 0
 
 #input-attacker-level
   width: calc(100% - .4rem)
 
 .input-attacker-level-wrapper
-  @extend %input-wrapper
+  @extend .input-wrapper
 
 .select-attacker-atk-iv-wrapper,
 .select-cinematic-move-wrapper,
@@ -20,10 +19,10 @@
 .select-friendship-boost-wrapper,
 .select-quick-move-wrapper,
 .select-weather-condition-wrapper
-  @extend %input-wrapper
+  @extend .input-wrapper
   &:after
     @extend %input-arrow
-    right: .5rem
+    right: .4rem
 
 .select-weather-condition-wrapper
   margin: 0 .25rem .4rem .25rem
@@ -39,6 +38,7 @@
 #toggle-cinematic-breakpoints,
 #top-counter-sort-toggle
   color: $linkColor
+  cursor: pointer
 
 #move-effectiveness
   font-size: $fontSize
@@ -46,6 +46,11 @@
 #top-counters-table
   border-top: .05rem solid $borderColor
   margin-top: -.06rem
+
+  th,
+  td
+    &:last-child
+      text-align: right
 
   .counters-moveset
     display: flex
@@ -60,9 +65,11 @@
     .select-defender-move-wrapper
       padding-left: .6rem
 
-#atk-iv-assessment
-  padding-top: .5rem
-  padding-bottom: 0
+  .top-counter-subrow
+    background-color: $backgroundColor
+
+  .top-counter-subrow-td
+    padding-right: 1.3rem
 
 #breakpoints-table
   margin-top: -.06rem
@@ -117,9 +124,9 @@
     &:focus
       box-shadow: 0 -.05rem 0 .05rem $highlightColor
 
-.top-counter-chevron
+.top-counter-arrow
   cursor: pointer
-  padding: 0 1.2rem 0 0
+  padding: 0 1.15rem 0 0
   position: relative
 
   &:after
@@ -127,16 +134,5 @@
     top: .4rem
     left: .4rem
 
-.top-counter-subrow
-  background-color: $backgroundColor
-  padding: 0 1.4rem 0 0
-
 .disclaimer
   font-size: $fontSize
-  margin-bottom: 2rem
-
-
-@media (min-width: 50.81rem)
-  #atk-iv-assessment,
-  #move-effectiveness
-    padding: 0 0 .5rem 2rem

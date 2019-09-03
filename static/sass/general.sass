@@ -1,9 +1,8 @@
 @import './variables.sass'
 
-
-@media (min-width: 50.81rem)
+@media (min-width: $mediaBreakpoint)
   body
-    max-width: 50rem
+    max-width: $maxWidth
     margin: 0 auto
     padding: 0 3rem
 
@@ -31,7 +30,10 @@
     display: flex
     margin-bottom: 1.2rem
 
-@media (max-width: 50.8rem)
+  .output-wrapper p
+    padding: 0 0 .5rem 2rem
+
+@media (max-width: $mediaMobileBreakpoint)
   body
     margin: 0 .7rem
 
@@ -96,7 +98,7 @@
       position: absolute
       z-index: 2
       margin: 2.4rem 0 0 0
-      padding: 0 .5rem .7rem .5rem
+      padding: .5rem .5rem .7rem
       border-radius: $borderRadius
       background-color: $backgroundColor
       list-style: none
@@ -113,7 +115,7 @@
 
   .wrapper
     display: block
-    margin-bottom: .3rem
+    margin-bottom: .8rem
 
 .nav
   display: flex
@@ -152,7 +154,8 @@ body
 footer
   flex-shrink: 0
   font-size: $fontSize
-  margin-bottom: .5rem
+  padding: 0 .1rem
+  margin: 5rem 0 .7rem
 
 hr
   opacity: .3
@@ -174,9 +177,6 @@ table
   td
     padding: .6rem .2rem
     border-bottom: .1rem solid $borderColor
-
-    &:last-child
-      text-align: right
 
 input,
 select
@@ -226,10 +226,6 @@ content
   border-radius: $borderRadius
   box-shadow: 0 0 0 .1rem $highlightColor
 
-%input-wrapper
-  flex: 1 1
-  position: relative
-
 %input-arrow:after
   content: ""
   height: 0
@@ -238,18 +234,14 @@ content
   border-color: $fontColor transparent transparent
   border-width: .3rem
   position: absolute
-  top: .8rem
+  top: .75rem
   pointer-events: none
 
 .row
   display: flex
 
-.input-wrapper,
-.output-wrapper
-  flex: 1 1
-
 .svg-icon
-  margin-bottom: -.15rem
+  margin-bottom: -.1rem
 
 .changelog-toggle
   font-weight: $fontBold
@@ -284,3 +276,206 @@ content
 
 .error-text
   color: #f00
+
+.input-wrapper
+  flex: 3 2 0rem
+  position: relative
+
+.output-wrapper
+  flex: 2 1 0rem
+
+  p
+    padding: .3rem 0 0 0
+
+.pagination
+  display: flex
+  justify-content: start
+  list-style: none
+  margin: 1.2rem 0 0
+  padding: 0
+
+  a,
+  span
+    padding: .3rem .6rem .2rem
+    border-radius: .2rem
+    background-color: $backgroundColor
+    box-shadow: $discreetShadow
+    color: $fontColor
+
+  span.active
+    background-color: $highlightColor
+    box-shadow: 0 .1rem .1rem 0 $highlightColor
+
+  span.disabled
+    background-color: $disabledBGColor
+
+  li
+    padding-right: .3rem
+
+    &:last-child
+      padding-right: 0
+
+.warning-icon
+  position: absolute
+  width: 17px
+  height: 17px
+  border-radius: 50%
+  background-color: #f00
+  top: 5px
+  right: 25px
+  box-shadow: 0 0 .05rem 0 red
+
+  &:before
+    content: ''
+    position: absolute
+    width: 3px
+    height: 7px
+    background: #fff
+    top: 3px
+    right: 7px
+    border-radius: 1px
+
+  &:after
+    content: ''
+    position: absolute
+    width: 3px
+    height: 3px
+    background: #fff
+    top: 12px
+    right: 7px
+    border-radius: 50%
+
+.quick-move-icon
+  position: relative
+
+  &:before
+    content: ''
+    position: absolute
+    top: 11px
+    left: 4px
+    border-top: 4px solid transparent
+    border-right: 2px solid #000
+    border-bottom: 4px solid #000
+    border-left: 2px solid transparent
+    box-shadow: 1px 0 0 0 #000
+    transform: skewX(-17deg)
+
+  &:after
+    content: ''
+    position: absolute
+    top: 17px
+    left: 8px
+    border-top: 4px solid #000
+    border-right: 2px solid transparent
+    border-bottom: 4px solid transparent
+    border-left: 2px solid #000
+    box-shadow: -1px 0 0 0 #000
+    transform: skewX(-17deg)
+
+.cinematic-move-icon
+  position: relative
+
+  &:before
+    content: ''
+    position: absolute
+    width: 1px
+    top: 11px
+    left: 3px
+    border-top: 7px solid #000
+    border-right: 5px solid transparent
+    border-bottom: 7px solid #000
+    border-left: 6px solid transparent
+    border-radius: 5%
+
+  &:after
+    content: ''
+    position: absolute
+    top: 13px
+    left: 6px
+    border-top: 5px solid #fff
+    border-right: 3px solid transparent
+    border-bottom: 5px solid #fff
+    border-left: 3px solid transparent
+
+.cinematic-move-icon-link
+  @extend .cinematic-move-icon
+
+  &:before
+    border-top: 7px solid $linkColor
+    border-bottom: 7px solid $linkColor
+
+.trainer-count-icon
+  position: relative
+  margin-left: 1.2rem
+
+  &:before
+    content: ''
+    position: absolute
+    background-color: #000
+    top: 1px
+    left: -15px
+    width: 5px
+    height: 8px
+    border-right: 1px solid #000
+    border-left: 1px solid #000
+    border-radius: 47%
+    border-bottom-right-radius: 20%
+    border-bottom-left-radius: 20%
+    box-shadow: 0 4px 0 -1px #000
+
+  &:after
+    content: ''
+    position: absolute
+    top: 7px
+    left: -19px
+    width: 3px
+    border-top: 3px solid transparent
+    border-right: 6px solid transparent
+    border-bottom: 3px solid #000
+    border-left: 6px solid transparent
+    box-shadow: 0 2px 0 0 #000
+
+.quick-move-icon-faq
+  @extend .quick-move-icon
+  margin-right: 1rem
+
+  &:before
+    top: 2px
+    left: 1px
+
+  &:after
+    top: 8px
+    left: 5px
+
+.cinematic-move-icon-faq
+  @extend .cinematic-move-icon
+  margin-right: 1rem
+
+  &:before
+    top: 1px
+    left: 0px
+
+  &:after
+    top: 3px
+    left: 3px
+
+.trainer-count-icon-faq
+  @extend .trainer-count-icon
+
+@media (min-width: $mediaBreakpoint)
+  .input-wrapper
+    max-width: 60%
+
+  .output-wrapper p
+    padding: 0 0 .5rem 2rem
+
+/* iPhone 5/SE */
+@media (max-width: $mediaMinBreakpoint)
+  select,
+  input,
+  p
+    font-size: $fontSizeSmall
+
+  table
+    tr
+      font-size: $fontSizeSmall

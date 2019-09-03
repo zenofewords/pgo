@@ -1,7 +1,6 @@
 import '../sass/lists.sass'
 import Choices from 'choices.js'
 
-
 const ready = (runGeneric) => {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
     runGeneric()

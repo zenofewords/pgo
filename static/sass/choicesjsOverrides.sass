@@ -1,7 +1,6 @@
 @import '../../node_modules/choices.js/public/assets/styles/choices.min.css'
 @import './variables.sass'
 
-
 .choices__input
   font-size: $fontSize
   background-color: $backgroundColor !important
@@ -39,7 +38,7 @@
   background-color: $highlightColor !important
 
 .choices[data-type*=select-one]:after
-  right: .5rem
+  right: .4rem
 
 .choices[data-type*=select-one] .choices__inner
   padding-top: .45rem
@@ -51,3 +50,15 @@
 
 .choices.is-disabled .choices__inner
   background-color: $disabledBGColor
+
+/* iPhone 5/SE */
+@media (max-width: $mediaMinBreakpoint)
+  .choices__input,
+  .choices__inner,
+  .choices__item,
+  .choices__list--dropdown .choices__item
+    font-size: $fontSizeSmall
+
+  .choices[data-type*=select-one] .choices__inner
+    padding-top: .45rem
+    padding-bottom: .4rem

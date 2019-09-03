@@ -1,7 +1,6 @@
 import '../sass/goodToGo.sass'
 import Choices from 'choices.js'
 
-
 const ready = (run) => {
   if (document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading') {
     run()
@@ -28,7 +27,6 @@ ready(() => {
     }
   )
   const selectAttackerQuickMove = document.getElementById('select-quick-move')
-  const selectAttackerCinematicMove = document.getElementById('select-cinematic-move')
   const selectAttackerAtkIv = document.getElementById('select-atk-iv')
   const selectWeatherCondition = document.getElementById('select-weather-condition')
   const selectFriendshipBoost = document.getElementById('select-friendship-boost')
@@ -43,7 +41,7 @@ ready(() => {
     attacker: selectAttacker.value,
     attack_iv: selectAttackerAtkIv.value,
     quick_move: selectAttackerQuickMove.value,
-    cinematic_move: selectAttackerCinematicMove.value,
+    cinematic_move: 1,
     weather_condition: selectWeatherCondition.value,
     friendship_boost: selectFriendshipBoost.value,
     tier_3_6_raid_bosses: true,
@@ -68,11 +66,6 @@ ready(() => {
     form.quick_move = event.currentTarget.value
 
     submitForm().then(() => selectAttackerQuickMove.focus())
-  })
-  selectAttackerCinematicMove.addEventListener('change', (event) => {
-    form.cinematic_move = event.currentTarget.value
-
-    submitForm().then(() => selectAttackerCinematicMove.focus())
   })
   selectWeatherCondition.addEventListener('change', (event) => {
     form.weather_condition = event.currentTarget.value
@@ -124,18 +117,12 @@ ready(() => {
   const clearMoveInputs = () => {
     if (form.status !== FORM_STATE.SUBMITTING) {
       const quickMoveSelect = selectAttackerQuickMove
-      const cinematicMoveSelect = selectAttackerCinematicMove
 
       quickMoveSelect.innerHTML = ''
       quickMoveSelect.append(
         '<option value="-1" disabled selected>Select quick move</option>'
       )
-      cinematicMoveSelect.innerHTML = ''
-      cinematicMoveSelect.append(
-        '<option value="-1" disabled selected>Select cinematic move</option>'
-      )
       form['quick_move'] = -1
-      form['cinematic_move'] = -1
     }
   }
 
@@ -161,7 +148,6 @@ ready(() => {
       request.send()
     } else {
       selectAttackerQuickMove.disabled = true
-      selectAttackerCinematicMove.disabled = true
 
       clearMoveInputs()
     }
@@ -169,13 +155,8 @@ ready(() => {
 
   const selectMoves = (data) => {
     const quickMoveSelect = selectAttackerQuickMove
-    const cinematicMoveSelect = selectAttackerCinematicMove
-
     const quickMoveKey = 'quick_move'
-    const cinematicMoveKey = 'cinematic_move'
-
     const quickMoveId = parseInt(form[quickMoveKey])
-    const cinematicMoveId = parseInt(form[cinematicMoveKey])
 
     data.forEach((moveData, i) => {
       const move = moveData.move
@@ -185,13 +166,9 @@ ready(() => {
           quickMoveSelect.disabled = false
         }
         quickMoveSelect.options.add(createMoveOption(move, quickMoveId, quickMoveKey))
-      } else {
-        cinematicMoveSelect.disabled = true
-        cinematicMoveSelect.options.add(createMoveOption(move, cinematicMoveId, cinematicMoveKey))
       }
     })
     form[quickMoveKey] = quickMoveSelect.value
-    form[cinematicMoveKey] = cinematicMoveSelect.value
 
     submitForm()
   }
@@ -308,23 +285,15 @@ ready(() => {
       const resultsWrapper = document.createElement('div')
       const resultsHeader = document.createElement('p')
 
-      const chevron = document.createElement('span')
-      chevron.setAttribute('class', 'glyphicon glyphicon-chevron-down')
-      chevron.setAttribute('aria-hidden', true)
-
       resultsWrapper.className = 'results-wrapper'
       resultsHeader.className = 'results-header'
       resultsHeader.innerHTML = 'Tier ' + result.tier + ' | ' + result.quick_move +
         ' breakpoints: ' + result.final_breakpoints_reached + ' / ' + result.total_breakpoints
 
       const indicator = document.createElement('span')
-      indicator.className = (result.final_breakpoints_reached !== result.total_breakpoints
-        ? 'glyphicon glyphicon-exclamation-sign warning-indicator'
-        : 'glyphicon glyphicon-ok ok-indicator'
-      )
+      indicator.className = (result.final_breakpoints_reached !== result.total_breakpoints && 'warning-icon')
 
       resultsHeader.appendChild(indicator)
-      resultsHeader.appendChild(chevron)
       resultsWrapper.appendChild(resultsHeader)
       resultsWrapper.addEventListener('click', (event) => {
         const target = event.currentTarget
@@ -332,16 +301,6 @@ ready(() => {
         target.childNodes.forEach((node, i) => {
           if (i > 0) {
             node.hidden = !node.hidden
-          } else {
-            const chev = node.childNodes[2]
-
-            if (chev.classList.contains('glyphicon-chevron-down')) {
-              chev.classList.remove('glyphicon-chevron-down')
-              chev.classList.add('glyphicon-chevron-up')
-            } else {
-              chev.classList.remove('glyphicon-chevron-up')
-              chev.classList.add('glyphicon-chevron-down')
-            }
           }
         })
       })
@@ -354,10 +313,7 @@ ready(() => {
         resultRow.hidden = true
 
         const rowIndicator = document.createElement('span')
-        rowIndicator.className = (matchup.final_breakpoint_reached
-          ? 'glyphicon glyphicon-ok ok-indicator'
-          : 'glyphicon glyphicon-exclamation-sign warning-indicator'
-        )
+        rowIndicator.className = (!matchup.final_breakpoint_reached && 'warning-icon')
         resultRow.innerHTML = matchup.damage_per_hit + ' / ' + matchup.max_damage_per_hit +
           ' damage per hit vs ' + matchup.defender
         resultRow.prepend(rowIndicator)
@@ -416,14 +372,14 @@ ready(() => {
     results.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
   }
 
-  if (form.attacker && !(form.attacker_quick_move && form.attacker_cinematic_move)) {
+  if (form.attacker && !(form.attacker_quick_move)) {
     const queryDict = {}
     location.search.substr(1).split('&').forEach((item) => {
       queryDict[item.split('=')[0]] = item.split('=')[1]
     })
     restoreForm(queryDict)
-  } else if (Object.keys(initialData).length > 0) {
-    restoreForm(initialData)
+  } else if (Object.keys(window.initialData).length > 0) {
+    restoreForm(window.initialData)
   }
 
   initialFetch()

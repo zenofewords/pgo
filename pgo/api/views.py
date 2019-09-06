@@ -239,8 +239,8 @@ class BreakpointCalcAPIView(GenericAPIView):
                 self.raid_tier.tier) if self.raid_tier else 'level 40, 15 defense IV',
             self.defender.name,
         )
-        return 'Your {}\'s <b>attack IV is {}</b> for it to reach the final {} breakpoint ({})\
-                against a <b>{} {}</b>.'.format(*params)
+        return '<p>Your {}\'s <b>attack IV is {}</b> for it to reach the final {} breakpoint ({})\
+                against a <b>{} {}</b>.</p>'.format(*params)
 
     def _set_move_stats(self, attacker_cpm=None, attack_iv=None):
         self._calculate_attack_multiplier(attacker_cpm, attack_iv)

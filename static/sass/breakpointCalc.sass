@@ -1,0 +1,138 @@
+@import './choicesjsOverrides.sass'
+@import './general.sass'
+
+.select-attacker-wrapper,
+.select-defender-wrapper
+  flex: 9 9 0rem
+  margin: 0 .5rem .5rem 0
+
+#input-attacker-level
+  width: calc(100% - .4rem)
+
+.input-attacker-level-wrapper
+  @extend .input-wrapper
+
+.select-attacker-atk-iv-wrapper,
+.select-cinematic-move-wrapper,
+.select-defender-move-wrapper,
+.select-defender-tier-wrapper,
+.select-friendship-boost-wrapper,
+.select-quick-move-wrapper,
+.select-weather-condition-wrapper
+  @extend .input-wrapper
+  &:after
+    @extend %input-arrow
+    right: .4rem
+
+.select-weather-condition-wrapper
+  margin: 0 .25rem .4rem .25rem
+
+.select-quick-move-wrapper,
+.select-attacker-atk-iv-wrapper
+  margin: 0 .25rem .5rem 0
+
+.select-cinematic-move-wrapper,
+.select-friendship-boost-wrapper
+  margin: 0 0 .4rem .25rem
+
+#toggle-cinematic-breakpoints,
+#top-counter-sort-toggle
+  color: $linkColor
+  cursor: pointer
+
+#move-effectiveness
+  font-size: $fontSize
+
+#top-counters-detail-table
+  border-top: .05rem solid $borderColor
+  margin-top: -.06rem
+
+  th,
+  td
+    &:last-child
+      text-align: right
+
+  .counters-moveset
+    display: flex
+    padding: .5rem 0
+
+    .vs-label
+      display: flex
+      align-items: center
+      font-weight: $fontBold
+      margin-left: .3rem
+
+    .select-defender-move-wrapper
+      padding-left: .6rem
+
+  .top-counter-subrow
+    background-color: $backgroundColor
+
+  .top-counter-subrow-td
+    padding-right: 1.3rem
+
+#breakpoints-table
+  margin-top: -.06rem
+
+  th:first-child
+    width: 12%
+
+  tbody
+    tr:nth-child(odd)
+      background-color: $backgroundColor
+
+    tr:nth-child(even)
+      background-color: #fff
+
+#faq-legend
+  margin: .8rem .2rem 0 .1rem
+  font-weight: $fontBold
+  text-transform: uppercase
+  cursor: pointer
+  position: relative
+  width: 9rem
+
+  &:after
+    @extend %input-arrow
+    top: .4rem
+    left: 7.5rem
+
+#faq-legend-content
+  ul
+    list-style: none
+    padding: 0
+
+.tab-wrapper
+  input
+    width: auto
+
+  .tab
+    padding: .3rem .7rem
+    margin: 0
+    box-shadow: none
+    border: .05rem solid $borderColor
+    border-bottom-right-radius: 0
+    border-bottom-left-radius: 0
+
+    &:focus
+      box-shadow: 0 0 0 .1rem $highlightColor
+
+  .selected-tab
+    background-color: #fff
+    border-bottom-color: #fff
+
+    &:focus
+      box-shadow: 0 -.05rem 0 .05rem $highlightColor
+
+.top-counter-arrow
+  cursor: pointer
+  padding: 0 1.15rem 0 0
+  position: relative
+
+  &:after
+    @extend %input-arrow
+    top: .4rem
+    left: .4rem
+
+.disclaimer
+  font-size: $fontSize

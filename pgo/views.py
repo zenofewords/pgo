@@ -58,7 +58,7 @@ class CalculatorInitialDataMixin(TemplateView):
             'friendship': Friendship.objects.order_by('order'),
             'defender_cpm_data': defender_cpm_data,
             'initial_data': self.initial_data,
-            'site_notifications': SiteNotification.objects.all(),
+            'site_notifications': SiteNotification.active_notifications.all(),
         }
         context.update(data)
         return context
@@ -117,111 +117,18 @@ class GoodToGoView(CalculatorInitialDataMixin):
         }
 
 
-class PvPView(TemplateView):
-    template_name = 'pgo/pvp.html'
-
-
 class PokemonListView(ListViewOrderingMixin):
     template_name = 'pgo/pokemon_list.html'
     queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
-    default_ordering = ('number', 'name',)
     ordering_fields = (
-        'number', 'slug', 'primary_type', 'secondary_type',
-        'pgo_attack', 'pgo_defense', 'pgo_stamina', 'stat_product', 'maximum_cp'
+        'number', 'pgo_attack', 'pgo_defense', 'pgo_stamina', 'stat_product', 'maximum_cp',
     )
     values_list_args = ('slug', 'name',)
-
-    def get(self, request, *args, **kwargs):
-        self._process_filters(self.request.GET)
-        self._get_query_param_url(self.request.GET)
-        return super().get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        return self._apply_filters(queryset)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'filters': self.filters,
-            'query_param_url': self.query_param_url,
-        })
-        return context
-
-    def _process_filters(self, data):
-        self.filters = {}
-        if 'type-filter' in data:
-            self.filters.update({
-                'pokemon_types': [slugify(x) for x in data.getlist('type-filter')],
-            })
-        if 'resistance-filter' in data:
-            self.filters.update({
-                'resistance_types': [slugify(x) for x in data.getlist('resistance-filter')],
-            })
-        if 'super-effectiveness-filter' in data:
-            self.filters.update({
-                'super_effectiveness_types': [slugify(x) for x in data.getlist('super-effectiveness-filter')],
-            })
-
-    def _get_query_param_url(self, data):
-        self.query_param_url = '{}{}{}'.format(
-            '&type-filter='.join([''] + data.getlist('type-filter')),
-            '&resistance-filter='.join([''] + data.getlist('resistance-filter')),
-            '&super-effectiveness-filter='.join([''] + data.getlist('super-effectiveness-filter'))
-        )
-
-    def _apply_filters(self, queryset):
-        pokemon_types = self.filters.get('pokemon_types')
-        if pokemon_types:
-            queryset = queryset.filter(
-                Q(primary_type__slug__in=pokemon_types)
-                | Q(secondary_type__slug__in=pokemon_types)
-            )
-
-        resistance_types = self.filters.get('resistance_types')
-        if resistance_types:
-            for resistance_type in resistance_types:
-                queryset = queryset.filter(compound_resistance__icontains=resistance_type)
-
-        super_effectiveness_types = self.filters.get('super_effectiveness_types')
-        if super_effectiveness_types:
-            effective_types_qs = Type.objects.filter(
-                slug__in=super_effectiveness_types
-            )
-            resisted_types = Type.objects.filter(
-                slug__in=[x.slug for x in effective_types_qs]
-            ).values('resistant', 'immune')
-
-            effective_types = effective_types_qs.values('weak')
-            effective_type_set = set()
-            for effective_type_data in effective_types:
-                for effective_type in effective_type_data['weak']:
-                    effective_type_set.add(effective_type[0].lower())
-
-            for resisted_type_data in resisted_types:
-                for resisted_type in resisted_type_data['resistant']:
-                    resisted_value = resisted_type[0].lower()
-
-                    if resisted_value in list(effective_type_set):
-                        effective_type_set.remove(resisted_value)
-                for resisted_type in resisted_type_data['immune']:
-                    resisted_value = resisted_type[0].lower()
-
-                    if resisted_value in list(effective_type_set):
-                        effective_type_set.remove(resisted_value)
-
-            queryset = queryset.filter(
-                Q(quick_moves__move_type__in=list(effective_type_set))
-                | Q(cinematic_moves__move_type__in=list(effective_type_set))
-            ).distinct()
-        return queryset
 
 
 class MoveListView(ListViewOrderingMixin):
     template_name = 'pgo/move_list.html'
     queryset = Move.objects.select_related('move_type')
-    default_ordering = ('-category', 'name',)
     ordering_fields = (
         'name', 'slug', 'category', 'move_type', 'power', 'energy_delta', 'duration',
         'damage_window_start', 'damage_window_end', 'dps', 'eps',

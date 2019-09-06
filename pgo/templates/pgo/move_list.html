@@ -1,4 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
+{% load render_bundle from webpack_loader %}
 
 
 {% block title %}
@@ -6,165 +7,171 @@
 {% endblock title %}
 
 {% block meta_description %}
-  <meta name="description" content="A list of all moves in PGo with stats.">
+  <meta name="description" content="A detailed list of all moves in Pokemon GO.">
 {% endblock %}
+
+{% block scripts %}
+  {% render_bundle 'lists' 'css' %}
+{% endblock scripts %}
 
 {% block content %}
   <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table id="contracted-table" class="table">
-        <tr>
-          <td colspan="2" class="search-move-wrapper">
-            <label for="choices-single-default" class="sr-only">
-              Find move
-            </label>
-            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
-              <option value="-1" placeholder disabled selected>
-                Find move
+    <table>
+      <tr>
+        <td class="list-search-wrapper" colspan="2">
+          <label for="choices-single-default" class="screen-reader">
+            Find move
+          </label>
+          <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
+            <option value="-1" disabled selected>
+              Find
+            </option>
+            {% for row in unfiltered_data %}
+              <option value="{{ row.0 }}">
+                {{ row.1 }}
               </option>
-              {% for row in unfiltered_data %}
-                <option value="{{ row.0 }}">
-                  {{ row.1 }}
-                </option>
-              {% endfor %}
-            </select>
-          </td>
-          <td colspan="3">
-            <label for="choices-single-default" class="sr-only">
+            {% endfor %}
+          </select>
+        </td>
+        <td colspan="{% if preset == 'pve' %}2{% else %}3{% endif %}">
+          <div class="select-move-type-wrapper">
+            <label for="move-type-filter" class="screen-reader">
               Filter move type
             </label>
-            <select id="move-type-filter" class="form-control input-height input-table">
-              <option selected value="all">Every type</option>
+            <select id="move-type-filter">
+              <option value="all">All types</option>
               {% for move_type in move_types %}
                 <option value="{{ move_type.slug }}" {% if move_type.slug == selected_move_type %}selected{% endif %}>
                   {{ move_type.name }}
                 </option>
               {% endfor %}
             </select>
-          </td>
-          <td colspan="{% if preset == 'pve' %}2{% else %}3{% endif %}">
-            <a href="?preset={% if preset == 'pve' %}pvp{% else %}pve{% endif %}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={{ ordering }}">
-              <span class="{% if preset == 'pvp' %}underline{% endif %}">
-                PvP
-              </span>
-              /
-              <span class="{% if preset == 'pve' %}underline{% endif %}">
-                PvE
-              </span>
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <th width="30%" id="no-left-padding">
-            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == 'name' %}-{% endif %}name">
-              Move
+          </div>
+        </td>
+        <td colspan="2">
+          <a href="?preset={% if preset == 'pve' %}pvp{% else %}pve{% endif %}&amp;selected-move-type={{ selected_move_type }}{% if ordering %}&amp;ordering={{ ordering }}{% endif %}">
+            <span class="{% if preset == 'pvp' %}underline{% endif %}">
+              PvP
+            </span>
+            /
+            <span class="{% if preset == 'pve' %}underline{% endif %}">
+              PvE
+            </span>
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <th class="cell-width-25">
+          <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == 'name' %}-{% endif %}name">
+            Move
+          </a>
+        </th>
+        {% if preset == 'pve' %}
+          <th class="cell-width-15">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-power' %}{% else %}-{% endif %}power">
+              <span>PWR</span>
             </a>
           </th>
-          {% if preset == 'pve' %}
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-power' %}{% else %}-{% endif %}power">
-                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-energy_delta' %}{% else %}-{% endif %}energy_delta">
-                <span class="glyphicon glyphicon-leaf" aria-hidden="true"></span>
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == 'duration' %}-{% endif %}duration">
-                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-dps' %}{% else %}-{% endif %}dps">
-                DPS
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-eps' %}{% else %}-{% endif %}eps">
-                EPS
-              </a>
-            </th>
-          {% else %}
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-pvp_power' %}{% else %}-{% endif %}pvp_power">
-                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-pvp_energy_delta' %}{% else %}-{% endif %}pvp_energy_delta">
-                <span class="glyphicon glyphicon-leaf" aria-hidden="true"></span>
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-pvp_duration' %}{% else %}-{% endif %}pvp_duration">
-                <span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span>
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-dpt' %}{% else %}-{% endif %}dpt">
-                DPT
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-ept' %}{% else %}-{% endif %}ept">
-                EPT
-              </a>
-            </th>
-            <th>
-              <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-dpe' %}{% else %}-{% endif %}dpe">
-                DPE
-              </a>
-            </th>
-          {% endif %}
-        </tr>
+          <th class="cell-width-15">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-energy_delta' %}{% else %}-{% endif %}energy_delta">
+              <span>ENE</span>
+            </a>
+          </th>
+          <th class="cell-width-15">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == 'duration' %}-{% endif %}duration">
+              <span class="cinematic-move-icon-link">T</span>
+            </a>
+          </th>
+          <th class="cell-width-15">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-dps' %}{% else %}-{% endif %}dps">
+              DPS
+            </a>
+          </th>
+          <th class="cell-width-15">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-eps' %}{% else %}-{% endif %}eps">
+              EPS
+            </a>
+          </th>
+        {% else %}
+          <th class="cell-width-125">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-pvp_power' %}{% else %}-{% endif %}pvp_power">
+              PWR
+            </a>
+          </th>
+          <th class="cell-width-125">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-pvp_energy_delta' %}{% else %}-{% endif %}pvp_energy_delta">
+              ENE
+            </a>
+          </th>
+          <th class="cell-width-125">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-pvp_duration' %}{% else %}-{% endif %}pvp_duration">
+              <span class="cinematic-move-icon-link">T</span>
+            </a>
+          </th>
+          <th class="cell-width-125">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-dpt' %}{% else %}-{% endif %}dpt">
+              DPT
+            </a>
+          </th>
+          <th class="cell-width-125">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-ept' %}{% else %}-{% endif %}ept">
+              EPT
+            </a>
+          </th>
+          <th class="cell-width-125">
+            <a href="?preset={{ preset }}&amp;selected-move-type={{ selected_move_type }}&amp;ordering={% if ordering == '-dpe' %}{% else %}-{% endif %}dpe">
+              DPE
+            </a>
+          </th>
+        {% endif %}
+      </tr>
 
-        {% for move in move_list %}
-          <tr>
-            <td id="no-left-padding">
-              <div class="pokemon-item-wrapper">
-                <a href="{% url 'pgo:move-detail' move.slug %}">
-                  <div class="move-name">
-                    {% if 'Hidden P.' in move.name %}
-                      Hidden Power
-                    {% else %}
-                      {{ move.name }}
-                    {% endif %}
-                  </div>
-                </a>
-                <div class="type-label type-{{ move.move_type.slug }}">
+      {% for move in move_list %}
+        <tr>
+          <td>
+            <div class="move-wrapper">
+              <a href="{% url 'pgo:move-detail' move.slug %}">
+                <div>
+                  {% if 'Hidden P.' in move.name %}
+                    Hidden Power
+                  {% else %}
+                    {{ move.name }}
+                  {% endif %}
+                </div>
+              </a>
+              <div class="type-wrapper">
+                <div class="type-{{ move.move_type.slug }}">
                   {{ move.move_type.name }}
                 </div>
               </div>
-            </td>
-            {% if preset == 'pve' %}
-              <td>{{ move.power }}</td>
-              <td>{{ move.energy_delta }}</td>
-              <td>{{ move.duration }}</td>
-              <td>{{ move.dps }}</td>
-              <td>{{ move.eps }}</td>
-            {% else %}
-              <td>{{ move.pvp_power }}</td>
-              <td>{{ move.pvp_energy_delta }}</td>
-              <td>{{ move.pvp_duration }}</td>
-              <td>{{ move.dpt|default:"0" }}</td>
-              <td>{{ move.ept|default:"0" }}</td>
-              <td>{{ move.dpe|floatformat:"2"|default:"0" }}</td>
-            {% endif %}
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
+            </div>
+          </td>
+          {% if preset == 'pve' %}
+            <td>{{ move.power }}</td>
+            <td>{{ move.energy_delta }}</td>
+            <td>{{ move.duration }}</td>
+            <td>{{ move.dps }}</td>
+            <td>{{ move.eps }}</td>
+          {% else %}
+            <td>{{ move.pvp_power }}</td>
+            <td>{{ move.pvp_energy_delta }}</td>
+            <td>{{ move.pvp_duration }}</td>
+            <td>{{ move.dpt|default:"0" }}</td>
+            <td>{{ move.ept|default:"0" }}</td>
+            <td>{{ move.dpe|floatformat:"2"|default:"0" }}</td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </table>
   </div>
 {% endblock content %}
 
-{% block scripts %}
-  {{ block.super }}
+{% block body_scripts %}
+  {% render_bundle 'lists' 'js' attrs='async' %}
 
-  <script type="text/javascript">
+  <script>
     window.pgoURLs = {
       'list-url': "{% url 'pgo:move-list' %}",
     };
   </script>
-{% endblock scripts %}
+{% endblock body_scripts %}

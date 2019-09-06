@@ -8,12 +8,11 @@ class ListViewOrderingMixin(ListView):
     paginate_by = 100
 
     def get_ordering(self):
-        default = self.default_ordering
         ordering = self.request.GET.get('ordering', None)
 
         if ordering and ordering.replace('-', '') in self.ordering_fields:
             return ordering
-        return default
+        return None
 
     def get_queryset(self):
         queryset = super().get_queryset()

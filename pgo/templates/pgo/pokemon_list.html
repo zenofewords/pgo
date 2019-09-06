@@ -1,4 +1,5 @@
 {% extends 'pgo/pgo_base.html' %}
+{% load render_bundle from webpack_loader %}
 {% load zenofewords_tags %}
 
 
@@ -7,143 +8,92 @@
 {% endblock title %}
 
 {% block meta_description %}
-  <meta name="description" content="A list of all pokemon with their PGo stats.">
+  <meta name="description" content="A list of all pokemon with and their Pokemon GO stats.">
 {% endblock %}
+
+{% block scripts %}
+  {% render_bundle 'lists' 'css' %}
+{% endblock scripts %}
 
 {% block content %}
   <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="pokemon-list-filter-wrapper" hidden>
-      <form class="pokemon-filter-form">
-        <label for="choices-single-default" class="sr-only">
-          Pokemon type filter
-        </label>
-        <select class="form-control type-filter" name="type-filter" multiple="multiple">
-          {% for type in types %}
-            {% option_matches_value type.slug filters.pokemon_types as selected %}
-            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-              {{ type.name }}
+    <table>
+      <tr>
+        <td class="list-search-wrapper">
+          <label for="choices-single-default" class="screen-reader">
+            Find
+          </label>
+          <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
+            <option value="-1" disabled selected>
+              Find
             </option>
-          {% endfor %}
-        </select>
-        <label for="choices-single-default" class="sr-only">
-          Pokemon resistance filter
-        </label>
-        <select class="form-control resistance-filter" name="resistance-filter" multiple="multiple">
-          {% for type in types %}
-            {% option_matches_value type.slug filters.resistance_types as selected %}
-            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-              {{ type.name }}
-            </option>
-          {% endfor %}
-        </select>
-        <label for="choices-single-default" class="sr-only">
-          Pokemon super effective filter
-        </label>
-        <select class="form-control super-effectiveness-filter" name="super-effectiveness-filter" multiple="multiple">
-          {% for type in types %}
-            {% option_matches_value type.slug filters.super_effectiveness_types as selected %}
-            <option value="{{ type.slug }}" {% if selected %}selected{% endif %}>
-              {{ type.name }}
-            </option>
-          {% endfor %}
-        </select>
-        <div class="pokemon-filter-control-wrapper">
-          <a href="{% url 'pgo:pokemon-list' %}" id="filter-reset" class="btn btn-xs btn-danger" style="width: 30%">
-            Reset
-          </a>
-          <button id="filter-submit" type="submit" class="btn btn-xs btn-primary" style="width: 30%">
-            Apply
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-      <table id="contracted-table" class="table">
-        <tr>
-          <td width="35%" class="search-pokemon-wrapper" hidden>
-            <label for="choices-single-default" class="sr-only">
-              Find pokemon
-            </label>
-            <select class="form-control list-search" data-trigger name="choices-single-default" id="choices-single-default">
-              <option value="-1" placeholder disabled selected>
-                Find pokemon
+            {% for row in unfiltered_data %}
+              <option value="{{ row.0 }}">
+                {{ row.1 }}
               </option>
-              {% for row in unfiltered_data %}
-                <option value="{{ row.0 }}">
-                  {{ row.1 }}
-                </option>
-              {% endfor %}
-            </select>
-          </td>
-          <th>
-            <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack{{ query_param_url }}">
-              Atk
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense{{ query_param_url }}">
-              Def
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina{{ query_param_url }}">
-              Sta
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-stat_product' %}{% else %}-{% endif %}stat_product{{ query_param_url }}">
-              Product
-            </a>
-          </th>
-          <th>
-            <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp{{ query_param_url }}">
-              CP
-            </a>
-          </th>
-        </tr>
-        {% for pokemon in pokemon_list %}
-          <tr>
-            <td id="no-left-padding">
-              <div class="pokemon-item-wrapper">
-                <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
-                  {{ pokemon.name }}
-                </a>
-                <div class="pokemon-type-wrapper">
-                  <div class="type-label type-{{ pokemon.primary_type.slug }}">
-                    {{ pokemon.primary_type.name }}
-                  </div>
-                  <div class="type-label type-{{ pokemon.secondary_type.slug }}">
-                    {{ pokemon.secondary_type.name|default:"" }}
-                  </div>
+            {% endfor %}
+          </select>
+        </td>
+        <th>
+          <a href="?ordering={% if ordering == '-pgo_attack' %}{% else %}-{% endif %}pgo_attack{{ query_param_url }}">
+            ATK
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-pgo_defense' %}{% else %}-{% endif %}pgo_defense{{ query_param_url }}">
+            DEF
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-pgo_stamina' %}{% else %}-{% endif %}pgo_stamina{{ query_param_url }}">
+            STA
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-stat_product' %}{% else %}-{% endif %}stat_product{{ query_param_url }}">
+            PROD
+          </a>
+        </th>
+        <th>
+          <a href="?ordering={% if ordering == '-maximum_cp' %}{% else %}-{% endif %}maximum_cp{{ query_param_url }}">
+            CP
+          </a>
+        </th>
+      </tr>
+      {% for pokemon in pokemon_list %}
+        <tr>
+          <td>
+            <div class="pokemon-wrapper">
+              <a href="{% url 'pgo:pokemon-detail' pokemon.slug %}">
+                {{ pokemon.name }}
+              </a>
+              <div class="type-wrapper">
+                <div class="type-{{ pokemon.primary_type.slug }}">
+                  {{ pokemon.primary_type.name }}
+                </div>
+                <div class="type-{{ pokemon.secondary_type.slug|default:"none" }}">
+                  {{ pokemon.secondary_type.name|default:"" }}
                 </div>
               </div>
-            </td>
-            <td>{{ pokemon.pgo_attack }}</td>
-            <td>{{ pokemon.pgo_defense }}</td>
-            <td>{{ pokemon.pgo_stamina }}</td>
-            <td>{{ pokemon.stat_product|format_stat_product }}</td>
-            <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="8">
-              No pokemon found, try selecting different filtering criteria.
-            </td>
-          </tr>
-        {% endfor %}
-      </table>
-    </div>
+            </div>
+          </td>
+          <td>{{ pokemon.pgo_attack }}</td>
+          <td>{{ pokemon.pgo_defense }}</td>
+          <td>{{ pokemon.pgo_stamina }}</td>
+          <td>{{ pokemon.stat_product|format_stat_product }}</td>
+          <td>{{ pokemon.maximum_cp|floatformat:"0" }}</td>
+        </tr>
+      {% endfor %}
+    </table>
   </div>
 {% endblock content %}
 
-{% block scripts %}
-  {{ block.super }}
+{% block body_scripts %}
+  {% render_bundle 'lists' 'js' attrs='async' %}
 
-  <script type="text/javascript">
+  <script>
     window.pgoURLs = {
       'list-url': "{% url 'pgo:pokemon-list' %}",
     };
   </script>
-{% endblock scripts %}
+{% endblock body_scripts %}

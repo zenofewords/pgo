@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.urls import path
 
 from pgo.views import (
@@ -10,15 +8,13 @@ from pgo.views import (
     MoveListView,
     PokemonDetailView,
     PokemonListView,
-    PvPView,
 )
 
 app_name = 'pgo'
 urlpatterns = (
-    path('pgo', BreakpointCalcRedirectView.as_view(), name='breakpoint-calc-redirect'),
+    path('pgo', BreakpointCalcRedirectView.as_view(), name='redirect'),
     path('breakpoint-calc/', BreakpointCalculatorView.as_view(), name='breakpoint-calc'),
     path('good-to-go/', GoodToGoView.as_view(), name='good-to-go'),
-    path('pv3p/', PvPView.as_view(), name='pvp'),
 
     path('pokemon/<slug:slug>', PokemonDetailView.as_view(), name='pokemon-detail'),
     path('pokemon/', PokemonListView.as_view(), name='pokemon-list'),

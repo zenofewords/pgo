@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from math import floor
 
 from django.db.models import Avg, Max

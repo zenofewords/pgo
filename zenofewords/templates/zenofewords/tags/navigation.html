@@ -1,34 +1,39 @@
-<nav class="row navbar-default">
-  <input type="checkbox" id="navbar-toggle-cbox" hidden>
-  <div class="col-xs-12">
-    <label for="navbar-toggle-cbox" class="navbar-toggle collapsed pull-left" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </label>
-    <div class="changelog-toggle-wrapper">
-      <h5>
-        Changelog
-        <span class="glyphicon glyphicon-chevron-down changelog-chevron" aria-hidden="true"></span>
-      </h5>
+<nav>
+  <div class="nav">
+    <div
+      id="menuToggle"
+    >
+      <label for="inputMenuToggle" class="screen-reader">Menu toggle</label>
+      <input id="inputMenuToggle" type="checkbox" style="opacity: 0;"/>
+      <span class="menu-line"></span>
+      <span class="menu-line"></span>
+      <span class="menu-line"></span>
+      <ul id="menu" style="opacity: 0;">
+        {% for menu_item in navigation.navigationitem_set.all %}
+          <li>
+            <a href="/{{ menu_item.slug }}/">
+              <div class="{% if current_url == '' and forloop.first %}active{% endif %}{% if menu_item.slug in current_url %}active{% endif %}">
+                {{ menu_item|upper }}
+              </div>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="changelog-toggle">
+      Changelog
+      <span class="changelog-date">updated 9/2019</span>
     </div>
   </div>
-  <div id="navbar" class="col-xs-12 navbar-collapse collapse">
-    <ul class="nav navbar-nav">
-      {% for menu_item in navigation.navigationitem_set.all %}
-        {% if menu_item.active %}
-        <li class="{% if menu_item.slug in current_url %}active{% endif %}{% if menu_item.slug == 'breakpoint-calc' and current_url == '' %}active{% endif %}">
-          <a href="/{{ menu_item.slug }}/">{{ menu_item }}
-          </a>
-        </li>
-        {% endif %}
-      {% endfor %}
-    </ul>
-  </div>
 </nav>
+
 <div class="changelog-info-wrapper" hidden>
-  <h5>Changelog</h5>
+  <p>Hello and thanks for stopping by! I'd like to inform you that I've stopped playing Pokemon GO in March 2019, but still maintain the calculator. Feel free to message me at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a> if you notice something missing, as I'm a bit out of the loop as far as game updates go.</p>
+  9/2019
+  <ul>
+    <li>removed bootstrap (technical debt/performance improvement)</li>
+    <li>updated UI after removing bootstrap</li>
+  </ul>
   7/2019
   <ul>
     <li>added temporary friendship bonuses</li>
@@ -40,60 +45,43 @@
   </ul>
   2/2019
   <ul>
-    <li>made pokemon and move pages mobile friendly, added filtering</li>
-    <li>added indicators for legacy moves and excluded them from raid boss' movesets</li>
-    <li>completely reworked top counters to be more accurate and flexible, added rank/DPS toggle</li>
+    <li>made pokemon and move pages mobile friendly, added filters</li>
+    <li>added indicators for legacy moves and excluded them from raid boss movesets</li>
+    <li>reworked top counters to be more accurate and flexible, added rank/DPS toggle</li>
     <li>slightly improved performance and load times</li>
   </ul>
   1/2019
   <ul>
     <li>brought pokemon and move pages back</li>
     <li>updated moves with PvP data</li>
-    <li>implemented hidden power properly</li>
+    <li>implemented hidden power</li>
+  </ul>
+  3/2018
+  <ul>
+    <li>updated the breakpoint calculator for raids</li>
+  </ul>
+  5/2017
+  <ul>
+    <li>launched breakpoint calculator beta</li>
   </ul>
 </div>
 
-<style type="text/css">
-  #navbar-toggle-cbox:checked ~ .collapse {
-    display: block;
-  }
-  #navbar-toggle-cbox {
-    display: none;
-  }
-  #navbar {
-    padding-bottom: 2rem;
-  }
-  .navbar-default {
-    background: none;
-    padding-bottom: 1rem;
-  }
-  .changelog-toggle-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: .7rem 1.4rem 0 0;
-    color: #337ab7;
-    cursor: pointer;
-  }
-  .changelog-info-wrapper {
-    margin: 0 0 30px 0;
-  }
-</style>
+<script>
+  var inputMenuToggle = document.getElementById('inputMenuToggle');
+  var menuLines = document.querySelectorAll('.menu-line');
+  var changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');
 
-<script type="text/javascript">
-  const changelogToggleWrapper = document.querySelector('.changelog-toggle-wrapper');
-  const changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');
-  const changelogChevron = document.querySelector('.changelog-chevron');
-
-  changelogToggleWrapper.addEventListener('click', function() {
-    changelogInfoWrapper.hidden = !changelogInfoWrapper.hidden;
-
-    if (changelogChevron.classList.contains('glyphicon-chevron-down')) {
-      changelogChevron.classList.remove('glyphicon-chevron-down');
-      changelogChevron.classList.add('glyphicon-chevron-up');
-    } else {
-      changelogChevron.classList.remove('glyphicon-chevron-up');
-      changelogChevron.classList.add('glyphicon-chevron-down');
+  inputMenuToggle.addEventListener('focus', function() {
+    for (var i = 0; i < menuLines.length; i++) {
+      menuLines[i].classList.add('focus');
     }
-  })
+  });
+  inputMenuToggle.addEventListener('blur', function() {
+    for (var i = 0; i < menuLines.length; i++) {
+      menuLines[i].classList.remove('focus');
+    }
+  });
+  document.querySelector('.changelog-toggle').addEventListener('click', function() {
+    changelogInfoWrapper.hidden = !changelogInfoWrapper.hidden;
+  });
 </script>

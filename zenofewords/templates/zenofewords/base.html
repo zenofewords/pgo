@@ -1,5 +1,4 @@
 {% load static %}
-{% load render_bundle from webpack_loader %}
 
 
 <!DOCTYPE html>
@@ -11,84 +10,78 @@
           Zen's Repository
         {% endblock title %}
       </title>
-      <link rel="shortcut icon" href="{% static 'static/favicon.ico' %}">
-      <!-- <link rel="stylesheet" href="{% static 'static/css/bootstrap.min.css' %}"> -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+      <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta charset="utf-8">
 
-      <meta name="viewport" content="width=device-width, initial-scale=1">
+      {% block scripts %}
+      {% endblock scripts %}
     {% endblock head %}
   </head>
 
-  {% block body %}
-    <body>
-      <div class="container content">
+  <body>
+    <main>
+      <header>
         {% block header %}
         {% endblock header %}
+      </header>
 
-        {% block content %}
-        {% endblock content %}
+      {% block content %}
+      {% endblock content %}
 
-        {% block pagination %}
-          {% if is_paginated %}
-            <ul class="pagination">
-              {% if page_obj.has_previous %}
-                <li>
-                  <a href="?page={{ page_obj.previous_page_number }}&amp;ordering={{ ordering }}">
-                    <span class="glyphicon glyphicon-chevron-left faq-legend-chevron" aria-hidden="true"></span>
-                  </a>
-                </li>
-              {% else %}
-                <li class="disabled">
-                  <span class="glyphicon glyphicon-chevron-left faq-legend-chevron" aria-hidden="true"></span>
-                </li>
-              {% endif %}
-
-              {% for page_number in paginator.page_range %}
-                {% if page_obj.number == page_number %}
-                  <li class="active">
-                    <span>{{ page_number }}</span>
-                  </li>
-                {% else %}
-                  <li>
-                    <a href="?page={{ page_number }}&amp;ordering={{ ordering }}">{{ page_number }}</a>
-                  </li>
-                {% endif %}
-              {% endfor %}
-
-              {% if page_obj.has_next %}
-                <li>
-                  <a href="?page={{ page_obj.next_page_number }}&amp;ordering={{ ordering }}">
-                    <span class="glyphicon glyphicon-chevron-right faq-legend-chevron" aria-hidden="true"></span>
-                  </a>
-                </li>
-              {% else %}
-                <li class="disabled">
-                  <span class="glyphicon glyphicon-chevron-right faq-legend-chevron" aria-hidden="true"></span>
-                </li>
-              {% endif %}
+      {% block pagination %}
+        {% if is_paginated %}
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
               <li>
-                <a href="{{ request.get_full_path }}" class="back-to-top">
-                  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                <a href="?page={{ page_obj.previous_page_number }}{% if ordering %}&amp;ordering={{ ordering }}{% endif %}">
+                  Prev
                 </a>
               </li>
-            </ul>
-          {% endif %}
-        {% endblock pagination %}
-      </div>
-      <div class="container foosnote">
-        <div class="footer">
-          {% block footer %}
-            <span>
-              &copy; {% now 'Y' %} Dominik Zen
-            </span>
-          {% endblock footer %}
-        </div>
-      </div>
-      {% block scripts %}
-        {% block generic %}
-          {% render_bundle 'default' attrs='async' %}
-        {% endblock generic %}
-      {% endblock scripts %}
-    </body>
-  {% endblock body %}
+            {% else %}
+              <li>
+                <span class="disabled">
+                  Prev
+                </span>
+              </li>
+            {% endif %}
+
+            {% for page_number in paginator.page_range %}
+              {% if page_obj.number == page_number %}
+                <li>
+                  <span class="active">{{ page_number }}</span>
+                </li>
+              {% else %}
+                <li>
+                  <a href="?page={{ page_number }}{% if ordering %}&amp;ordering={{ ordering }}{% endif %}">{{ page_number }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li>
+                <a href="?page={{ page_obj.next_page_number }}{% if ordering %}&amp;ordering={{ ordering }}{% endif %}">
+                  Next
+                </a>
+              </li>
+            {% else %}
+              <li>
+                <span class="disabled">
+                  Next
+                </span>
+              </li>
+            {% endif %}
+          </ul>
+        {% endif %}
+      {% endblock pagination %}
+    </main>
+
+    <footer>
+      {% block footer %}
+      {% endblock footer %}
+    </footer>
+
+    {% block body_scripts %}
+    {% endblock body_scripts %}
+  </body>
 </html>

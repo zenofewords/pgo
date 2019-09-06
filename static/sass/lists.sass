@@ -1,0 +1,151 @@
+@import './choicesjsOverrides.sass'
+@import './general.sass'
+
+.type-label-wrapper
+  padding: .2rem
+
+%type-label
+  color: $fontColor
+  font-size: $fontSizeSmall
+  border-radius: .3rem
+  padding: .2rem .2rem .25rem
+  width: 2.8rem
+  text-align: center
+  margin-right: .2rem
+
+.type-bug
+  @extend %type-label
+  background-color: rgba(148, 194, 46, .7)
+
+.type-dark
+  @extend %type-label
+  background-color: rgba(114, 110, 127, .7)
+
+.type-dragon
+  @extend %type-label
+  background-color: rgba(29, 128, 213, .7)
+
+.type-electric
+  @extend %type-label
+  background-color: rgba(245, 212, 73, .7)
+
+.type-fairy
+  @extend %type-label
+  background-color: rgba(238, 146, 229, .7)
+
+.type-fighting
+  @extend %type-label
+  background-color: rgba(219, 75, 111, .7)
+
+.type-fire
+  @extend %type-label
+  background-color: rgba(254, 161, 83, .7)
+
+.type-flying
+  @extend %type-label
+  background-color: rgba(143, 169, 222, .7)
+
+.type-ghost
+  @extend %type-label
+  background-color: rgba(92, 108, 183, .7)
+
+.type-grass
+  @extend %type-label
+  background-color: rgba(96, 188, 91, .7)
+
+.type-ground
+  @extend %type-label
+  background-color: rgba(217, 121, 71, .7)
+
+.type-ice
+  @extend %type-label
+  background-color: rgba(121, 209, 197, .7)
+
+.type-normal
+  @extend %type-label
+  background-color: rgba(165, 174, 181, .7)
+
+.type-poison
+  @extend %type-label
+  background-color: rgba(169, 101, 200, .7)
+
+.type-psychic
+  @extend %type-label
+  background-color: rgba(250, 126, 126, .7)
+
+.type-rock
+  @extend %type-label
+  background-color: rgba(201, 187, 140, .7)
+
+.type-steel
+  @extend %type-label
+  background-color: rgba(85, 146, 164, .7)
+
+.type-water
+  @extend %type-label
+  background-color: rgba(85, 155, 217, .7)
+
+.type-none
+  @extend %type-label
+
+.pokemon-wrapper,
+.move-wrapper
+  display: flex
+  flex-wrap: wrap
+  justify-content: space-between
+
+  a
+    padding-top: .3rem
+
+.type-wrapper
+  display: flex
+  width: 100%
+  margin-top: .2rem
+
+.select-move-type-wrapper
+  @extend .input-wrapper
+  &:after
+    @extend %input-arrow
+    right: .5rem
+
+.list-link
+  font-size: $fontSize
+  display: block
+  width: 10rem
+  margin: .1rem 0 .9rem .2rem
+
+.pokemon-stats-table
+  display: flex
+  flex-wrap: wrap
+
+.pokemon-resistance-weakness,
+.pokemon-stats-table
+  display: flex
+  flex: 1 0 0rem
+
+.move-stats-table
+  margin-bottom: 2.5rem
+
+.pokemon-resistance-weakness
+  table
+    width: 50%
+    margin-bottom: 2.5rem
+
+table
+  th
+    padding-right: .6rem
+
+@media (min-width: $mediaBreakpoint)
+  .pokemon-wrapper
+    padding-right: .7rem
+
+  .list-search-wrapper
+    padding-right: 1rem
+
+  .pokemon-resistance-weakness
+    table
+      margin-bottom: 0
+
+  .type-wrapper
+    width: auto
+    margin-top: 0rem

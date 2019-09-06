@@ -1,0 +1,64 @@
+@import '../../node_modules/choices.js/public/assets/styles/choices.min.css'
+@import './variables.sass'
+
+.choices__input
+  font-size: $fontSize
+  background-color: $backgroundColor !important
+
+.choices__inner
+  min-height: 0
+  padding-right: 0
+  padding-left: 0
+  border: 0
+  font-size: $fontSize
+  background-color: $backgroundColor
+  box-shadow: $discreetShadow
+
+.choices__item
+  font-size: $fontSize
+  padding-left: .45rem
+
+.choices__list
+  max-height: 15rem
+  border: 0
+
+.choices__list--dropdown
+  background-color: $backgroundColor
+  border: 0
+  box-shadow: $discreetShadow
+
+.choices__list--single
+  padding: 0
+
+.choices__list--dropdown .choices__item
+  font-size: $fontSize
+  padding: .5rem
+
+.is-highlighted
+  background-color: $highlightColor !important
+
+.choices[data-type*=select-one]:after
+  right: .4rem
+
+.choices[data-type*=select-one] .choices__inner
+  padding-top: .45rem
+  padding-bottom: .35rem
+
+.choices[data-type*=select-one] .choices__input
+  padding-top: .1rem
+  padding-bottom: .1rem
+
+.choices.is-disabled .choices__inner
+  background-color: $disabledBGColor
+
+/* iPhone 5/SE */
+@media (max-width: $mediaMinBreakpoint)
+  .choices__input,
+  .choices__inner,
+  .choices__item,
+  .choices__list--dropdown .choices__item
+    font-size: $fontSizeSmall
+
+  .choices[data-type*=select-one] .choices__inner
+    padding-top: .45rem
+    padding-bottom: .4rem

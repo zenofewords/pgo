@@ -28,6 +28,7 @@ ready(() => {
       searchPlaceholderValue: 'Type in the attacker\'s name',
       searchResultLimit: 5,
       itemSelectText: '',
+      loadingText: '',
     }
   )
   const inputAttackerLevel = document.getElementById('input-attacker-level')
@@ -40,6 +41,7 @@ ready(() => {
       searchPlaceholderValue: 'Type in the defender\'s name',
       searchResultLimit: 5,
       itemSelectText: '',
+      loadingText: '',
     }
   )
   const selectDefenderQuickMove = document.getElementById('select-defender-quick-move')
@@ -49,14 +51,14 @@ ready(() => {
   const selectFriendShipBoost = document.getElementById('select-friendship-boost')
   const selectDefenderCPM = document.getElementById('select-defender-tier')
 
-  const detailsTable = document.getElementById('breakpoint-details-table')
+  const outputTable = document.getElementById('output-table')
   const inputToggleCinematicBreakpoints = document.getElementById('toggle-cinematic-breakpoints')
   const inputToggleTopCounterSort = document.getElementById('top-counter-sort-toggle')
 
   const tabBreakpoints = document.getElementById('breakpoints')
   const tabTopCounters = document.getElementById('top-counters')
   const breakpointsTable = document.getElementById('breakpoints-table')
-  const topCountersTable = document.getElementById('top-counters-table')
+  const topCountersTable = document.getElementById('top-counters-detail-table')
   const summary = document.querySelector('.output-wrapper')
   const faqLegend = document.getElementById('faq-legend-content')
 
@@ -469,7 +471,7 @@ ready(() => {
   }
 
   const displayDetails = (json) => {
-    detailsTable.hidden = false
+    outputTable.hidden = false
 
     if (json.breakpoint_details.length < 2) {
       inputToggleCinematicBreakpoints.enabled = false
@@ -577,9 +579,9 @@ ready(() => {
         }
       }
     } else {
-      detailsTable.hidden = false
-      detailsTable.classList.add('error-text')
-      detailsTable.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
+      outputTable.hidden = false
+      outputTable.classList.add('error-text')
+      outputTable.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
     }
   }
 

@@ -17,6 +17,7 @@ ready(() => {
       searchPlaceholderValue: 'Type name',
       searchResultLimit: 5,
       itemSelectText: '',
+      loadingText: '',
     }
   ) : undefined
 

@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
-DEBUG_TOOLBAR = False # bool(os.getenv('DEBUG_TOOLBAR', False) and DEBUG)
+DEBUG_TOOLBAR = bool(os.getenv('DEBUG_TOOLBAR', False) and DEBUG)
 CACHE = not DEBUG
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -33,8 +33,7 @@ CSRF_COOKIE_SECURE = not DEBUG
 X_FRAME_OPTIONS = 'DENY'
 
 FORCE_SSL = bool(os.getenv('FORCE_SSL', False))
-if not DEBUG and FORCE_SSL:
-    SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = not DEBUG and FORCE_SSL
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS').split(',')]
 INTERNAL_IPS = ['127.0.0.1', ]

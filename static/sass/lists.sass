@@ -19,11 +19,11 @@
 
 .type-dark
   @extend %type-label
-  background-color: rgba(94, 90, 107, .7)
+  background-color: rgba(114, 110, 127, .7)
 
 .type-dragon
   @extend %type-label
-  background-color: rgba(9, 108, 193, .7)
+  background-color: rgba(29, 128, 213, .7)
 
 .type-electric
   @extend %type-label
@@ -35,7 +35,7 @@
 
 .type-fighting
   @extend %type-label
-  background-color: rgba(209, 65, 101, .7)
+  background-color: rgba(219, 75, 111, .7)
 
 .type-fire
   @extend %type-label
@@ -63,7 +63,7 @@
 
 .type-normal
   @extend %type-label
-  background-color: rgba(145, 154, 161, .7)
+  background-color: rgba(165, 174, 181, .7)
 
 .type-poison
   @extend %type-label
@@ -120,14 +120,20 @@
 
 .pokemon-resistance-weakness,
 .pokemon-stats-table
-  flex-grow: 1
+  display: flex
+  flex: 1 0 0rem
 
 .move-stats-table
   margin-bottom: 2.5rem
 
 .pokemon-resistance-weakness
   table
+    width: 50%
     margin-bottom: 2.5rem
+
+table
+  th
+    padding-right: .6rem
 
 @media (min-width: $mediaBreakpoint)
   .pokemon-wrapper

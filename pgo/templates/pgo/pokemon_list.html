@@ -11,16 +11,20 @@
   <meta name="description" content="A list of all pokemon with and their Pokemon GO stats.">
 {% endblock %}
 
+{% block scripts %}
+  {% render_bundle 'lists' 'css' %}
+{% endblock scripts %}
+
 {% block content %}
   <div class="row">
     <table>
       <tr>
-        <td width="35%" class="list-search-wrapper">
+        <td class="list-search-wrapper">
           <label for="choices-single-default" class="screen-reader">
             Find
           </label>
           <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
-            <option value="-1" placeholder disabled selected>
+            <option value="-1" disabled selected>
               Find
             </option>
             {% for row in unfiltered_data %}
@@ -84,12 +88,12 @@
   </div>
 {% endblock content %}
 
-{% block scripts %}
-  {% render_bundle 'lists' attrs='async' %}
+{% block body_scripts %}
+  {% render_bundle 'lists' 'js' attrs='async' %}
 
-  <script type="text/javascript">
+  <script>
     window.pgoURLs = {
       'list-url': "{% url 'pgo:pokemon-list' %}",
     };
   </script>
-{% endblock scripts %}
+{% endblock body_scripts %}

@@ -14,12 +14,12 @@
   <div class="row">
     <table>
       <tr>
-        <td colspan="2" class="list-search-wrapper">
+        <td colspan="2" class="list-search-wrapper cell-width-30">
           <label for="choices-single-default" class="screen-reader">
             Find move
           </label>
           <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
-            <option value="-1" placeholder disabled selected>
+            <option value="-1" disabled selected>
               Find move
             </option>
             {% for row in data %}
@@ -29,7 +29,7 @@
             {% endfor %}
           </select>
         </td>
-        <td colspan="{% if preset == 'pve' %}5{% else %}6{% endif %}">
+        <td colspan="{% if preset == 'pve' %}6{% else %}5{% endif %}">
           <a href="?preset={% if preset == 'pve' %}pvp{% else %}pve{% endif %}">
             <span class="{% if preset == 'pvp' %}underline{% endif %}">
               PvP
@@ -42,7 +42,7 @@
         </td>
       </tr>
       <tr>
-        <th width="30%">
+        <th>
           Move
         </th>
         <th>
@@ -52,7 +52,7 @@
           ENE
         </th>
         <th>
-          <span class="cinematic-move-icon"></span>
+          <span class="cinematic-move-icon">&nbsp;</span>
         </th>
         {% if preset == 'pve' %}
           <th>
@@ -153,7 +153,7 @@
       <table>
         <tr>
           <th>
-            Pokemon which learn {{ move.name }}
+            Who can learn {{ move.name }}?
           </th>
           <th>
             Atk
@@ -165,7 +165,7 @@
             Sta
           </th>
           <th>
-            Product
+            Prod
           </th>
           <th>
             CP

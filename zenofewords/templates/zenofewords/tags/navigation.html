@@ -1,8 +1,9 @@
-<nav role="navigation">
+<nav>
   <div class="nav">
     <div
       id="menuToggle"
     >
+      <label for="inputMenuToggle" class="screen-reader">Menu toggle</label>
       <input id="inputMenuToggle" type="checkbox" style="opacity: 0;"/>
       <span class="menu-line"></span>
       <span class="menu-line"></span>
@@ -21,11 +22,13 @@
     </div>
     <div class="changelog-toggle">
       Changelog
+      <span class="changelog-date">updated 9/2019</span>
     </div>
   </div>
 </nav>
 
 <div class="changelog-info-wrapper" hidden>
+  <p>Hello and thanks for stopping by! I'd like to inform you that I've stopped playing Pokemon GO in March 2019, but still maintain the calculator. Feel free to message me at <a href="https://www.reddit.com/user/zenofewords" target="_blank" rel="noopener">reddit</a> if you notice something missing, as I'm a bit out of the loop as far as game updates go.</p>
   9/2019
   <ul>
     <li>removed bootstrap (technical debt/performance improvement)</li>
@@ -44,14 +47,14 @@
   <ul>
     <li>made pokemon and move pages mobile friendly, added filters</li>
     <li>added indicators for legacy moves and excluded them from raid boss movesets</li>
-    <li>completely reworked top counters to be more accurate and flexible, added rank/DPS toggle</li>
+    <li>reworked top counters to be more accurate and flexible, added rank/DPS toggle</li>
     <li>slightly improved performance and load times</li>
   </ul>
   1/2019
   <ul>
     <li>brought pokemon and move pages back</li>
     <li>updated moves with PvP data</li>
-    <li>properly implemented hidden power</li>
+    <li>implemented hidden power</li>
   </ul>
   3/2018
   <ul>
@@ -63,7 +66,7 @@
   </ul>
 </div>
 
-<script type="text/javascript">
+<script>
   var inputMenuToggle = document.getElementById('inputMenuToggle');
   var menuLines = document.querySelectorAll('.menu-line');
   var changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');

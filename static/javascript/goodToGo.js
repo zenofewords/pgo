@@ -24,6 +24,7 @@ ready(() => {
       searchPlaceholderValue: 'Type in the attacker\'s name',
       searchResultLimit: 5,
       itemSelectText: '',
+      loadingText: '',
     }
   )
   const selectAttackerQuickMove = document.getElementById('select-quick-move')

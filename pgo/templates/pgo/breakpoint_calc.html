@@ -10,6 +10,10 @@
   <meta name="description" content="The Pokemon GO breakpoint calculator was built to help you find your pokemon's offensive breakpoints and plan your power-ups accordingly.">
 {% endblock %}
 
+{% block scripts %}
+  {% render_bundle 'breakpointCalc' 'css' %}
+{% endblock scripts %}
+
 {% block content %}
   <div class="wrapper">
     <div class="input-wrapper">
@@ -17,7 +21,7 @@
         <div class="select-attacker-wrapper">
           <label for="select-attacker" class="screen-reader">Select attacker</label>
           <select id="select-attacker" data-trigger name="choices-single-default">
-            <option value="-1" placeholder disabled selected>Select attacker</option>
+            <option value="-1" disabled selected>Select attacker</option>
           </select>
         </div>
 
@@ -73,7 +77,7 @@
         <div class="select-defender-wrapper">
           <label for="select-defender" class="screen-reader">Select defender</label>
           <select id="select-defender" data-trigger name="choices-single-default">
-            <option value="-1" placeholder disabled selected>Select defender</option>
+            <option value="-1" disabled selected>Select defender</option>
           </select>
         </div>
 
@@ -102,7 +106,7 @@
     </div>
   </div>
 
-  <div id="breakpoint-details-table" hidden>
+  <div id="output-table" hidden>
     <div class="tab-wrapper">
       <input class="tab selected-tab" type="submit" id="breakpoints" value="Breakpoints">
       <input class="tab" type="submit" id="top-counters" value="Top counters">
@@ -110,26 +114,26 @@
     <table id="breakpoints-table">
       <thead>
         <tr>
-          <th width="10%">LVL</th>
-          <th width="25%">
+          <th class="cell-width-10">LVL</th>
+          <th class="cell-width-25">
             {% include 'pgo/includes/stardust_icon.html' %}|
             {% include 'pgo/includes/candy_icon.html' %}
           </th>
-          <th width="10%">
-            <span class="quick-move-icon"></span>
+          <th class="cell-width-10">
+            <span class="quick-move-icon">&nbsp;</span>
           </th>
-          <th width="10%">
-            <span id="toggle-cinematic-breakpoints" class="cinematic-move-icon-link"></span>
+          <th class="cell-width-10">
+            <span id="toggle-cinematic-breakpoints" class="cinematic-move-icon-link">&nbsp;</span>
           </th>
-          <th width="30%">DPS</th>
-          <th width="15%">
+          <th class="cell-width-30">DPS</th>
+          <th class="cell-width-15">
             <span class="trainer-count-icon">#</span>
           </th>
         </tr>
       </thead>
       <tbody id="breakpoint-details-table-body"></tbody>
     </table>
-    <div id="top-counters-table" hidden>
+    <div id="top-counters-detail-table" hidden>
       <div class="counters-moveset">
         <div class="vs-label">VS</div>
         <div class="select-defender-move-wrapper">
@@ -145,17 +149,17 @@
           </select>
         </div>
       </div>
-      <table id="top-counters-table">
+      <table>
         <thead>
           <tr>
-            <th width="27%" id="top-counters-table-attacker-stats"></th>
-            <th width="27%">
-              <span class="quick-move-icon"></span>
+            <th class="cell-width-25" id="top-counters-table-attacker-stats"></th>
+            <th class="cell-width-25">
+              <span class="quick-move-icon">&nbsp;</span>
             </th>
-            <th width="27%">
-              <span class="cinematic-move-icon"></span>
+            <th class="cell-width-30">
+              <span class="cinematic-move-icon">&nbsp;</span>
             </th>
-            <th width="9%">
+            <th class="cell-width-20">
               <span id="top-counter-sort-toggle">RNK</span>
             </th>
           </tr>
@@ -163,88 +167,91 @@
         <tbody id="top-counters-table-body"></tbody>
       </table>
     </div>
-    <div id="faq-legend">FAQ / legend</div>
-    <hr>
-    <div id="faq-legend-content" hidden>
-      <p>
-        <strong>Breakpoints</strong> - due to rounding in the damage formula, damage dealt in PGo isn't linear
-      </p>
-      <p>
-        Instead, there are certain points for combinations of attacker and defender level, IVs, and moves, where the damage per hit of the move is, sometimes significantly, increased.
-      </p>
-      <ul>
-        <li>
-          <p>
-            <strong>LVL</strong> - your pokemon's current level and levels at which breakpoints occur
-          </p>
-        </li>
-        <li>
-          <p>
-            {% include 'pgo/includes/stardust_icon.html' %} - stardust required to level up from current level to breakpoint (<em>k</em> stands for thousand)
-          </p>
-        </li>
-        <li>
-          <p>
-            {% include 'pgo/includes/candy_icon.html' %} - candy required to level up from current level to breakpoint
-          </p>
-        </li>
-        <li>
-          <p>
-            <span class="quick-move-icon-faq"></span> - quick move's damage per hit
-          </p>
-          <p>
-             Unlike charge move breakpoints, quick move breakpoints are usually highly impactful.
-          </p>
-        </li>
-        <li>
-          <p>
-            <span class="cinematic-move-icon-faq"></span> - charge move's damage per hit
-          </p>
-          <p>
-            You can toggle the button to display all charge move breakpoints.
-          </p>
-        </li>
-        <li>
-          <p>
-            <strong>DPS</strong> - stands for damage per second
-          </p>
-          <p>
-            The percentages in brackets are relative to a perfect, maxed specimen of the selected pokemon.
-          </p>
-          <p>
-            DPS is calculated using the damage formula, factoring in the charge up, and use, of charge moves translated into "cycles" which are then divided by the duration of the moves required to perform a single cycle.
-          </p>
-        </li>
-        <li>
-          <p>
-            <span class="trainer-count-icon-faq">#</span> - the aproximated number of trainers required to win the raid
-          </p>
-          <p>
-            Assumes that every trainer is using the exact, selected pokemon. This metric should not be relied upon when attempting to shortman raids, it's here to help figure out by how much the pokemon is improved when reaching a breakpoint.
-          </p>
-        </li>
-      </ul>
 
+    <aside>
+      <div id="faq-legend">FAQ / legend</div>
       <hr>
-      <p>
-        <strong>Top Counters</strong> - a quick reference list of pokemon which counter the selected defender
+      <div id="faq-legend-content" hidden>
+        <p>
+          <strong>Breakpoints</strong> - due to rounding in the damage formula, damage dealt in PGo isn't linear
+        </p>
+        <p>
+          Instead, there are certain points for combinations of attacker and defender level, IVs, and moves, where the damage per hit of the move is, sometimes significantly, increased.
+        </p>
+        <ul>
+          <li>
+            <p>
+              <strong>LVL</strong> - your pokemon's current level and levels at which breakpoints occur
+            </p>
+          </li>
+          <li>
+            <p>
+              {% include 'pgo/includes/stardust_icon.html' %} - stardust required to level up from current level to breakpoint (<em>k</em> stands for thousand)
+            </p>
+          </li>
+          <li>
+            <p>
+              {% include 'pgo/includes/candy_icon.html' %} - candy required to level up from current level to breakpoint
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="quick-move-icon-faq">&nbsp;</span> - quick move's damage per hit
+            </p>
+            <p>
+               Unlike charge move breakpoints, quick move breakpoints are usually highly impactful.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="cinematic-move-icon-faq">&nbsp;</span> - charge move's damage per hit
+            </p>
+            <p>
+              You can toggle the button to display all charge move breakpoints.
+            </p>
+          </li>
+          <li>
+            <p>
+              <strong>DPS</strong> - stands for damage per second
+            </p>
+            <p>
+              The percentages in brackets are relative to a perfect, maxed specimen of the selected pokemon.
+            </p>
+            <p>
+              DPS is calculated using the damage formula, factoring in the charge up, and use, of charge moves translated into "cycles" which are then divided by the duration of the moves required to perform a single cycle.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="trainer-count-icon-faq">#</span> - the aproximated number of trainers required to win the raid
+            </p>
+            <p>
+              Assumes that every trainer is using the exact, selected pokemon. This metric should not be relied upon when attempting to shortman raids, it's here to help figure out by how much the pokemon is improved when reaching a breakpoint.
+            </p>
+          </li>
+        </ul>
+
+        <hr>
+        <p>
+          <strong>Top Counters</strong> - a quick reference list of pokemon which counter the selected defender
+        </p>
+        <p>
+          It features counters ranked by their damage output. However, the defender's moves, resistances, and the selected weather are also accounted for. Feel free to adjust the IV and level of the attackers in the list. The counters are pitted against level 40 pokemon, unless the defender can be a raid boss, where you are given the option of selecting a tier for more accurate results.
+        </p>
+        <hr>
+      </div>
+      <p class="disclaimer">
+        All calculations are purely math based. DPS and the required number of trainers are approximated. For high quality battle simulations, visit
+        <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
       </p>
-      <p>
-        It features counters ranked by their damage output. However, the defender's moves, resistances, and the selected weather are also accounted for. Feel free to adjust the IV and level of the attackers in the list. The counters are pitted against level 40 pokemon, unless the defender can be a raid boss, where you are given the option of selecting a tier for more accurate results.
-      </p>
-      <hr>
-    </div>
-    <p class="disclaimer">
-      All calculations are purely math based. DPS and the required number of trainers are approximated. For high quality battle simulations, visit
-      <a href="https://www.pokebattler.com/" target="_blank" rel="noopener">Pokebattler</a>.
-    </p>
+    </aside>
   </div>
 {% endblock content %}
 
-{% block scripts %}
-  {% render_bundle 'breakpointCalc' attrs='async' %}
+{% block body_scripts %}
+  {% render_bundle 'breakpointCalc' 'js' attrs='async' %}
 
-  <script type="text/javascript">
+  <script>
     var initialData = {{ initial_data|safe }}
     window.pgoAPIURLs = {
       'simple-pokemon-list': "{% url 'api-pgo:simple-pokemon-list' %}",
@@ -253,4 +260,4 @@
       'breakpoint-calc': "{% url 'api-pgo:breakpoint-calc' %}",
     };
   </script>
-{% endblock scripts %}
+{% endblock body_scripts %}

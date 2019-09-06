@@ -10,6 +10,10 @@
   <meta name="description" content="Good to Go is a comprehensive breakpoint calculator used to quickly figure out if your pokemon can hit the final quick move breakpoint for all selected matchups.">
 {% endblock %}
 
+{% block scripts %}
+  {% render_bundle 'goodToGo' 'css' %}
+{% endblock scripts %}
+
 {% block content %}
   <div class="wrapper">
     <div class="input-wrapper">
@@ -17,7 +21,7 @@
         <div class="select-attacker-wrapper">
           <label for="choices-single-default" class="screen-reader">Select attacker</label>
           <select class="select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
-            <option value="-1" placeholder disabled selected>Select attacker</option>
+            <option value="-1" disabled selected>Select attacker</option>
           </select>
         </div>
 
@@ -75,10 +79,10 @@
   <div class="results" hidden></div>
 {% endblock content %}
 
-{% block scripts %}
-  {% render_bundle 'goodToGo' attrs='async' %}
+{% block body_scripts %}
+  {% render_bundle 'goodToGo' 'js' attrs='async' %}
 
-  <script type="text/javascript">
+  <script>
     var initialData = {{ initial_data|safe }};
     window.pgoAPIURLs = {
       'simple-pokemon-list': "{% url 'api-pgo:simple-pokemon-list' %}",
@@ -86,4 +90,4 @@
       'good-to-go': "{% url 'api-pgo:good-to-go' %}",
     };
   </script>
-{% endblock scripts %}
+{% endblock body_scripts %}

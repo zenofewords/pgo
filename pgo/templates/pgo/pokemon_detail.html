@@ -19,7 +19,7 @@
             Find pokemon
           </label>
           <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
-            <option value="-1" placeholder disabled selected>
+            <option value="-1" disabled selected>
               Find pokemon
             </option>
             {% for row in data %}
@@ -91,7 +91,7 @@
         </td>
       </tr>
       <tr>
-        <th width="31%">
+        <th class="cell-width-30">
           Move
         </th>
         <th>
@@ -101,7 +101,7 @@
           ENE
         </th>
         <th>
-          <span class="cinematic-move-icon"></span>
+          <span class="cinematic-move-icon">&nbsp;</span>
         </th>
         {% if preset == 'pve' %}
           <th>

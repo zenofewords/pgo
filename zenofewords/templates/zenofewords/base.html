@@ -12,72 +12,76 @@
       </title>
       <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% endblock head %}
-  </head>
-
-  {% block body %}
-    <body>
-      <content>
-        {% block header %}
-        {% endblock header %}
-
-        {% block content %}
-        {% endblock content %}
-
-        {% block pagination %}
-          {% if is_paginated %}
-            <ul class="pagination">
-              {% if page_obj.has_previous %}
-                <li>
-                  <a href="?page={{ page_obj.previous_page_number }}&amp;ordering={{ ordering }}">
-                    Prev
-                  </a>
-                </li>
-              {% else %}
-                <li>
-                  <span class="disabled">
-                    Prev
-                  </span>
-                </li>
-              {% endif %}
-
-              {% for page_number in paginator.page_range %}
-                {% if page_obj.number == page_number %}
-                  <li>
-                    <span class="active">{{ page_number }}</span>
-                  </li>
-                {% else %}
-                  <li>
-                    <a href="?page={{ page_number }}&amp;ordering={{ ordering }}">{{ page_number }}</a>
-                  </li>
-                {% endif %}
-              {% endfor %}
-
-              {% if page_obj.has_next %}
-                <li>
-                  <a href="?page={{ page_obj.next_page_number }}&amp;ordering={{ ordering }}">
-                    Next
-                  </a>
-                </li>
-              {% else %}
-                <li>
-                  <span class="disabled">
-                    Next
-                  </span>
-                </li>
-              {% endif %}
-            </ul>
-          {% endif %}
-        {% endblock pagination %}
-      </content>
-
-      <footer>
-        {% block footer %}
-        {% endblock footer %}
-      </footer>
+      <meta charset="utf-8">
 
       {% block scripts %}
       {% endblock scripts %}
-    </body>
-  {% endblock body %}
+    {% endblock head %}
+  </head>
+
+  <body>
+    <main>
+      <header>
+        {% block header %}
+        {% endblock header %}
+      </header>
+
+      {% block content %}
+      {% endblock content %}
+
+      {% block pagination %}
+        {% if is_paginated %}
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              <li>
+                <a href="?page={{ page_obj.previous_page_number }}{% if ordering %}&amp;ordering={{ ordering }}{% endif %}">
+                  Prev
+                </a>
+              </li>
+            {% else %}
+              <li>
+                <span class="disabled">
+                  Prev
+                </span>
+              </li>
+            {% endif %}
+
+            {% for page_number in paginator.page_range %}
+              {% if page_obj.number == page_number %}
+                <li>
+                  <span class="active">{{ page_number }}</span>
+                </li>
+              {% else %}
+                <li>
+                  <a href="?page={{ page_number }}{% if ordering %}&amp;ordering={{ ordering }}{% endif %}">{{ page_number }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li>
+                <a href="?page={{ page_obj.next_page_number }}{% if ordering %}&amp;ordering={{ ordering }}{% endif %}">
+                  Next
+                </a>
+              </li>
+            {% else %}
+              <li>
+                <span class="disabled">
+                  Next
+                </span>
+              </li>
+            {% endif %}
+          </ul>
+        {% endif %}
+      {% endblock pagination %}
+    </main>
+
+    <footer>
+      {% block footer %}
+      {% endblock footer %}
+    </footer>
+
+    {% block body_scripts %}
+    {% endblock body_scripts %}
+  </body>
 </html>

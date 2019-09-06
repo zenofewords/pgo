@@ -210,6 +210,9 @@ class Move(NameMixin):
     dpe = models.DecimalField(
         verbose_name='Damage per energy', max_digits=5, decimal_places=3, blank=True, null=True)
 
+    class Meta:
+        ordering = ('-category', 'name',)
+
     def __str__(self):
         return self.name
 

@@ -6,7 +6,7 @@ config.mode = 'production'
 config.output.publicPath = ''
 config.plugins = config.plugins.concat([
   new MinifyPlugin(),
-  new WebpackBundleTracker({filename: 'static/webpack-stats-prod.json'}),
+  new WebpackBundleTracker({filename: './webpack-stats-prod.json'}),
 ])
 
 module.exports = config

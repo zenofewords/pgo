@@ -10,8 +10,8 @@ module.exports = {
   },
   output: {
     filename: '[name]_[hash].js',
-    path: path.resolve(__dirname, 'bundles'),
-    publicPath: 'http://localhost:3000/static/bundles/',
+    path: path.resolve(__dirname, 'static/bundles'),
+    publicPath: 'http://localhost:3000/static/bundles',
   },
   module: {
     rules: [
@@ -57,7 +57,7 @@ module.exports = {
       filename: '[name]_[hash].css',
     }),
     new WebpackBundleTracker({
-      filename: 'static/webpack-stats.json'
+      filename: './webpack-stats.json'
     }),
   ],
   mode: 'development',

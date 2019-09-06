@@ -2,10 +2,10 @@
   "name": "zenofewords",
   "version": "1.0.0",
   "description": "",
-  "main": "static/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node static/server.js",
-    "build": "webpack --config static/webpack.prod.config.js"
+    "start": "node server.js",
+    "build": "webpack --config webpack.prod.config.js"
   },
   "repository": {
     "type": "git",

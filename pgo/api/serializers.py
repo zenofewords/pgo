@@ -55,7 +55,7 @@ class PokemonSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class PokemonSimpleSerializer(serializers.Serializer):
+class SimplePokemonSerializer(serializers.Serializer):
     value = serializers.SerializerMethodField()
     label = serializers.SerializerMethodField()
 
@@ -66,8 +66,7 @@ class PokemonSimpleSerializer(serializers.Serializer):
         )
 
     def get_value(self, obj):
-        # choices.js bug causes crashes when working with integer values
-        return str(obj.pk)
+        return obj.pk
 
     def get_label(self, obj):
         label = '{} | {}'.format(obj.name, obj.primary_type.name)

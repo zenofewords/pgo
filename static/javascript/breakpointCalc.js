@@ -394,8 +394,8 @@ ready(() => {
     initialFetch().then(() => {
       toggleTab(data.tab)
 
-      selectAttacker.setChoiceByValue(String(data.attacker))
-      selectDefender.setChoiceByValue(String(data.defender))
+      selectAttacker.setChoiceByValue(data.attacker)
+      selectDefender.setChoiceByValue(data.defender)
 
       inputAttackerLevel.value = data.attacker_level
       selectAttackerAtkIv.value = data.attacker_atk_iv

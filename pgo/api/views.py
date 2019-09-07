@@ -18,7 +18,7 @@ from django.utils.text import slugify
 
 from pgo.api.serializers import (
     BreakpointCalcSerializer, PokemonMoveSerializer, MoveSerializer,
-    PokemonSimpleSerializer, PokemonSerializer, TypeSerializer, GoodToGoSerializer,
+    SimplePokemonSerializer, PokemonSerializer, TypeSerializer, GoodToGoSerializer,
 )
 from pgo.models import (
     CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, RaidTier, WeatherCondition, RaidBossStatus,
@@ -94,7 +94,7 @@ class TypeViewSet(viewsets.ModelViewSet):
 class PokemonSimpleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
-    serializer_class = PokemonSimpleSerializer
+    serializer_class = SimplePokemonSerializer
 
 
 class BreakpointCalcAPIView(GenericAPIView):

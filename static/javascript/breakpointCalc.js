@@ -188,34 +188,43 @@ ready(() => {
   })
 
   // functions
-  const initialFetch = () => {
-    return new Promise((resolve) => {
-      if (form.status !== FORM_STATE.SUBMITTING) {
-        form.status = FORM_STATE.SUBMITTING
-        toggleLoading()
+  // const initialFetch = () => {
+  //   if (form.status !== FORM_STATE.SUBMITTING) {
+  //     form.status = FORM_STATE.SUBMITTING
+  //     toggleLoading()
 
-        selectAttacker.ajax((callback) => {
-          fetch(window.pgoAPIURLs['simple-pokemon-list']).then((response) => {
-            response.json().then((data) => {
-              callback(data, 'value', 'label')
-            }).then(() => {
-              selectDefender.setChoices(
-                selectAttacker._currentState.choices.slice(1),
-                'value', 'label', false
-              )
-              form.status = FORM_STATE.READY
-              toggleLoading()
-              resolve()
-            })
-          }).catch(() => {
-            form.status = FORM_STATE.ERROR
-            showErrors()
-            resolve()
-          })
-        })
-      }
-    })
-  }
+  //     return new Promise(resolve => {
+  //       selectAttacker.ajax(callback => {
+  //         fetch(window.pgoAPIURLs['simple-pokemon-list'])
+  //           .then(response => {
+  //             response.json()
+  //               .then(data => {
+  //                 callback(data, 'value', 'label')
+  //                 resolve()
+  //               })
+  //               .then(() => {
+  //                 selectDefender.setChoices(
+  //                   selectAttacker._currentState.choices.slice(1),
+  //                   'value', 'label', false
+  //                 )
+  //               })
+  //               .then(() => {
+  //                 form.status = FORM_STATE.READY
+  //                 toggleLoading()
+  //               })
+  //               .catch(() => {
+  //                 form.status = FORM_STATE.ERROR
+  //                 showErrors()
+  //               })
+  //           })
+  //           .catch(() => {
+  //             form.status = FORM_STATE.ERROR
+  //             showErrors()
+  //           })
+  //       })
+  //     })
+  //   }
+  // }
 
   const updateBrowserHistory = (getParams) => {
     window.history.pushState(
@@ -390,42 +399,6 @@ ready(() => {
     }
   }
 
-  const restoreForm = (data) => {
-    initialFetch().then(() => {
-      toggleTab(data.tab)
-
-      selectAttacker.setChoiceByValue(data.attacker)
-      selectDefender.setChoiceByValue(data.defender)
-
-      inputAttackerLevel.value = data.attacker_level
-      selectAttackerAtkIv.value = data.attacker_atk_iv
-      selectWeatherCondition.value = data.weather_condition
-      selectFriendShipBoost.value = data.friendship_boost
-      selectDefenderCPM.value = data.defender_cpm
-
-      selectPokemonMoves(data.attacker, 'attacker')
-      selectPokemonMoves(data.defender, 'defender')
-
-      form = data
-      form.staleTab = true
-      form.status = FORM_STATE.READY
-      form.top_counter_order = data.top_counter_order
-
-      toggleTopCounterOrder(data.top_counter_order === 'dps' ? 'rnk' : 'dps')
-      submitForm()
-    })
-  }
-
-  if (form.attacker && !(form.attacker_quick_move && form.attacker_cinematic_move)) {
-    const queryDict = {}
-    location.search.substr(1).split('&').forEach((item) => {
-      queryDict[item.split('=')[0]] = item.split('=')[1]
-    })
-    restoreForm(queryDict)
-  } else if (Object.keys(window.initialData).length > 0) {
-    restoreForm(window.initialData)
-  }
-
   const selectMoves = (data, pokemon) => {
     const quickMoveSelect = pokemon === 'attacker' ? selectAttackerQuickMove : selectDefenderQuickMove
     const cinematicMoveSelect = pokemon === 'attacker' ? selectAttackerCinematicMove : selectDefenderCinematicMove
@@ -449,6 +422,47 @@ ready(() => {
     form[cinematicMoveKey] = cinematicMoveSelect.value
 
     submitForm()
+  }
+
+  const toggleTopCounterOrder = (value) => {
+    form.top_counter_order = value === 'rnk' ? 'dps' : 'rnk'
+    inputToggleTopCounterSort.innerHTML = form.top_counter_order.toUpperCase()
+  }
+
+  const restoreForm = (data) => {
+    // initialFetch().then(() => {
+    toggleTab(data.tab)
+
+    selectAttacker.setChoiceByValue(data.attacker)
+    selectDefender.setChoiceByValue(data.defender)
+
+    inputAttackerLevel.value = data.attacker_level
+    selectAttackerAtkIv.value = data.attacker_atk_iv
+    selectWeatherCondition.value = data.weather_condition
+    selectFriendShipBoost.value = data.friendship_boost
+    selectDefenderCPM.value = data.defender_cpm
+
+    selectPokemonMoves(data.attacker, 'attacker')
+    selectPokemonMoves(data.defender, 'defender')
+
+    form = data
+    form.staleTab = true
+    form.status = FORM_STATE.READY
+    form.top_counter_order = data.top_counter_order
+
+    toggleTopCounterOrder(data.top_counter_order === 'dps' ? 'rnk' : 'dps')
+    submitForm()
+    // })
+  }
+
+  if (form.attacker && !(form.attacker_quick_move && form.attacker_cinematic_move)) {
+    const queryDict = {}
+    location.search.substr(1).split('&').forEach((item) => {
+      queryDict[item.split('=')[0]] = item.split('=')[1]
+    })
+    restoreForm(queryDict)
+  } else if (Object.keys(window.initialData).length > 0) {
+    restoreForm(window.initialData)
   }
 
   const createMoveOption = (moveData, moveId, moveKey, pokemon) => {
@@ -561,11 +575,6 @@ ready(() => {
     submitForm()
   }
 
-  const toggleTopCounterOrder = (value) => {
-    form.top_counter_order = value === 'rnk' ? 'dps' : 'rnk'
-    inputToggleTopCounterSort.innerHTML = form.top_counter_order.toUpperCase()
-  }
-
   const showErrors = (errorObject = null) => {
     if (errorObject) {
       for (const field in errorObject) {
@@ -641,5 +650,5 @@ ready(() => {
     return level
   }
 
-  initialFetch()
+  // initialFetch()
 })

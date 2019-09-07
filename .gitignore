@@ -95,7 +95,7 @@ init.json
 
 # NPM / webpack
 node_modules/
-/bundles/
+static/bundles/
 webpack-stats.json
 webpack-stats-prod.json
 server.js

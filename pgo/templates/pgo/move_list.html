@@ -1,7 +1,6 @@
 {% extends 'pgo/pgo_base.html' %}
 {% load render_bundle from webpack_loader %}
 
-
 {% block title %}
   {{ block.super }} - Moves
 {% endblock title %}
@@ -132,11 +131,7 @@
             <div class="move-wrapper">
               <a href="{% url 'pgo:move-detail' move.slug %}">
                 <div>
-                  {% if 'Hidden P.' in move.name %}
-                    Hidden Power
-                  {% else %}
-                    {{ move.name }}
-                  {% endif %}
+                  {{ move.name }}
                 </div>
               </a>
               <div class="type-wrapper">

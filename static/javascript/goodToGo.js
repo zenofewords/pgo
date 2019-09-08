@@ -1,4 +1,5 @@
 import '../sass/goodToGo.sass'
+import './navigation.js'
 import Choices from 'choices.js'
 
 const ready = (run) => {

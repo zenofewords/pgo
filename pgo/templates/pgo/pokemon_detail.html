@@ -1,7 +1,6 @@
 {% extends 'pgo/pokemon_list.html' %}
 {% load zenofewords_tags %}
 
-
 {% block title %}
   {{ block.super }} - {{ pokemon.name }}
 {% endblock title %}
@@ -130,11 +129,7 @@
               <div class="pokemon-wrapper">
                 <a href="{% url 'pgo:move-detail' move.slug %}">
                   <div>
-                    {% if 'Hidden P.' in move.name %}
-                      Hidden Power
-                    {% else %}
-                      {{ move.name }}
-                    {% endif %}
+                    {{ move.name }}
                     {% if pokemon_move.legacy %}
                       *
                     {% endif %}

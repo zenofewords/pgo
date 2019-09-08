@@ -65,23 +65,3 @@
     <li>launched breakpoint calculator beta</li>
   </ul>
 </div>
-
-<script>
-  var inputMenuToggle = document.getElementById('inputMenuToggle');
-  var menuLines = document.querySelectorAll('.menu-line');
-  var changelogInfoWrapper = document.querySelector('.changelog-info-wrapper');
-
-  inputMenuToggle.addEventListener('focus', function() {
-    for (var i = 0; i < menuLines.length; i++) {
-      menuLines[i].classList.add('focus');
-    }
-  });
-  inputMenuToggle.addEventListener('blur', function() {
-    for (var i = 0; i < menuLines.length; i++) {
-      menuLines[i].classList.remove('focus');
-    }
-  });
-  document.querySelector('.changelog-toggle').addEventListener('click', function() {
-    changelogInfoWrapper.hidden = !changelogInfoWrapper.hidden;
-  });
-</script>

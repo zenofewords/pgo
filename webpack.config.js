@@ -11,13 +11,13 @@ module.exports = {
   output: {
     filename: '[name]_[hash].js',
     path: path.resolve(__dirname, 'staticfiles/bundles'),
-    publicPath: 'http://localhost:3000/static/bundles',
+    publicPath: 'http://localhost:3000/static/bundles/',
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        exclude: /(node_modules)/,
+        exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
           options: {

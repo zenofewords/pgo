@@ -48,12 +48,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'webpack_loader',
-    'django_extensions',
     'rest_framework',
 
     'zenofewords',
     'pgo',
 ]
+
+if DEBUG:
+    INSTALLED_APPS.insert(7, 'django_extensions')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -7,6 +7,7 @@ from decimal import Decimal
 from operator import itemgetter
 
 from rest_framework import response, status, viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.generics import GenericAPIView
 
@@ -37,9 +38,19 @@ from pgo.utils import (
 logger = logging.getLogger(__name__)
 
 
-class MoveViewSet(viewsets.ModelViewSet):
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = 'page_size'
+    max_page_size = 2000
+
+
+class LargeResultModelViewSet(viewsets.ModelViewSet):
+    pagination_class = LargeResultsSetPagination
+
+
+class MoveViewSet(LargeResultModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    queryset = Move.objects.all()
+    queryset = Move.objects.select_related('move_type')
     serializer_class = MoveSerializer
 
     def get_queryset(self):
@@ -85,13 +96,13 @@ class PokemonViewSet(viewsets.ModelViewSet):
         return super(PokemonViewSet, self).get_queryset()
 
 
-class TypeViewSet(viewsets.ModelViewSet):
+class TypeViewSet(LargeResultModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Type.objects.all()
     serializer_class = TypeSerializer
 
 
-class PokemonSimpleViewSet(viewsets.ModelViewSet):
+class PokemonSimpleViewSet(LargeResultModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
     serializer_class = SimplePokemonSerializer

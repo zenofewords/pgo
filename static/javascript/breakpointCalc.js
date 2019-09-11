@@ -410,7 +410,7 @@ ready(() => {
     const quickMoveId = parseInt(form[quickMoveKey])
     const cinematicMoveId = parseInt(form[cinematicMoveKey])
 
-    data.forEach((moveData, i) => {
+    data.results.forEach((moveData, i) => {
       if (moveData.move.category === 'QK') {
         quickMoveSelect.disabled = false
         quickMoveSelect.options.add(createMoveOption(moveData, quickMoveId, quickMoveKey, pokemon))

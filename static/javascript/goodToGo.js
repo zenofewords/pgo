@@ -100,7 +100,7 @@ ready(() => {
         selectAttacker.ajax((callback) => {
           fetch(window.pgoAPIURLs['simple-pokemon-list']).then((response) => {
             response.json().then((data) => {
-              callback(data, 'value', 'label')
+              callback(data.results, 'value', 'label')
             }).then(() => {
               form.status = FORM_STATE.READY
               toggleLoading()
@@ -160,7 +160,7 @@ ready(() => {
     const quickMoveKey = 'quick_move'
     const quickMoveId = parseInt(form[quickMoveKey])
 
-    data.forEach((moveData, i) => {
+    data.results.forEach((moveData, i) => {
       const move = moveData.move
 
       if (move.category === 'QK') {

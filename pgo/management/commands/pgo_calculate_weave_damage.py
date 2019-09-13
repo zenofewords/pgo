@@ -1,6 +1,5 @@
 from math import floor
 
-from django.db.models import Avg, Max
 from django.core.management.base import BaseCommand
 
 from pgo.models import (

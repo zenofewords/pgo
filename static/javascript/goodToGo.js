@@ -90,32 +90,6 @@ ready(() => {
     submitForm().then(() => tier12BossesToggle.focus())
   })
 
-  // functions
-  const initialFetch = () => {
-    return new Promise((resolve) => {
-      if (form.status !== FORM_STATE.SUBMITTING) {
-        form.status = FORM_STATE.SUBMITTING
-        toggleLoading()
-
-        selectAttacker.ajax((callback) => {
-          fetch(window.pgoAPIURLs['simple-pokemon-list']).then((response) => {
-            response.json().then((data) => {
-              callback(data.results, 'value', 'label')
-            }).then(() => {
-              form.status = FORM_STATE.READY
-              toggleLoading()
-              resolve()
-            })
-          }).catch(() => {
-            form.status = FORM_STATE.ERROR
-            showErrors()
-            resolve()
-          })
-        })
-      }
-    })
-  }
-
   const clearMoveInputs = () => {
     if (form.status !== FORM_STATE.SUBMITTING) {
       const quickMoveSelect = selectAttackerQuickMove
@@ -351,21 +325,19 @@ ready(() => {
   }
 
   const restoreForm = (data) => {
-    initialFetch().then(() => {
-      selectAttacker.setChoiceByValue(String(data.attacker))
+    selectAttacker.setChoiceByValue(String(data.attacker))
 
-      selectAttackerAtkIv.value = data.attack_iv
-      selectWeatherCondition.value = data.weather_condition
-      selectFriendshipBoost.value = data.friendship_boost
+    selectAttackerAtkIv.value = data.attack_iv
+    selectWeatherCondition.value = data.weather_condition
+    selectFriendshipBoost.value = data.friendship_boost
 
-      selectPokemonMoves(data.attacker, 'attacker')
-      selectPokemonMoves(data.defender, 'defender')
-      restoreTierSelection(data)
+    selectPokemonMoves(data.attacker, 'attacker')
+    selectPokemonMoves(data.defender, 'defender')
+    restoreTierSelection(data)
 
-      form = data
-      form.status = FORM_STATE.READY
-      submitForm()
-    })
+    form = data
+    form.status = FORM_STATE.READY
+    submitForm()
   }
 
   const showErrors = () => {
@@ -383,6 +355,4 @@ ready(() => {
   } else if (Object.keys(window.initialData).length > 0) {
     restoreForm(window.initialData)
   }
-
-  initialFetch()
 })

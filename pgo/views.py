@@ -4,7 +4,6 @@ from decimal import Decimal, InvalidOperation, getcontext
 from math import pow, sqrt, floor
 
 from django.apps import apps
-from django.db.models import Q
 from django.utils.text import slugify
 from django.views.generic import (
     DetailView,
@@ -20,7 +19,6 @@ from pgo.models import (
     CPM,
     Friendship,
     Move,
-    Moveset,
     Pokemon,
     PokemonMove,
     RaidTier,
@@ -48,14 +46,14 @@ class CalculatorInitialDataMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CalculatorInitialDataMixin, self).get_context_data(**kwargs)
         defender_cpm_data = (
-            list(RaidTier.objects.order_by('order').values_list('tier', 'raid_cpm__value')) +
-            list(CPM.objects.filter(level=40, raid_cpm=False).values_list('level', 'value'))
+            list(RaidTier.objects.order_by('order').values_list('tier', 'raid_cpm__value'))
+            + list(CPM.objects.filter(level=40, raid_cpm=False).values_list('level', 'value'))
         )
 
         data = {
             'pokemon_qs': Pokemon.objects.only(
-                    'pk', 'name', 'primary_type', 'secondary_type'
-                ).select_related('primary_type', 'secondary_type'),
+                'pk', 'name', 'primary_type', 'secondary_type'
+            ).select_related('primary_type', 'secondary_type'),
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.all(),
             'friendship': Friendship.objects.order_by('order'),
@@ -169,9 +167,6 @@ class PokemonDetailView(PresetMixin, DetailView):
             raid_cpm=False,
             level__in=[1, 15, 20, 25, 30, 35, 40]
         )
-        moveset_qs = Moveset.objects.filter(
-            pokemon_id=self.object.pk
-        )
         context.update({
             'data': Pokemon.objects.values_list('slug', 'name'),
             'pokemon_stats': [(
@@ -198,6 +193,7 @@ class PokemonDetailView(PresetMixin, DetailView):
             * sqrt(self.object.pgo_stamina + 15)
             * pow(value, 2) / 10.0
         )
+
 
 class MoveDetailView(PresetMixin, DetailView):
     model = Move

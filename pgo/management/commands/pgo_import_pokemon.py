@@ -22,7 +22,7 @@ class Command(BaseCommand):
         cinematic_move = Move.objects.get(slug='struggle')
 
         # drop gen IV
-        Pokemon.objects.filter(generation=Generation.IV).delete()
+        Pokemon.objects.filter(generation=Generation.FOURTH).delete()
 
         with open(file_path) as csvfile:
             reader = csv.reader(csvfile)
@@ -52,5 +52,5 @@ class Command(BaseCommand):
                     pokemon=p, move=cinematic_move)
                 p.cinematic_moves.add(pokemon_cinematic_move)
 
-                p.generation = Generation.IV
+                p.generation = Generation.FOURTH
                 p.save()

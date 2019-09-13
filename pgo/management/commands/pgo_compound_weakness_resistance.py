@@ -41,7 +41,7 @@ class Command(BaseCommand):
             weakness_placeholder, compound_weakness)
         pokemon.save()
 
-    def _compound_type_effectiveness(self, type_effectiveness, compound_effectiveness = {}):
+    def _compound_type_effectiveness(self, type_effectiveness, compound_effectiveness={}):
         compound_effectiveness = compound_effectiveness if compound_effectiveness else {}
 
         for values in type_effectiveness['primary_type']:

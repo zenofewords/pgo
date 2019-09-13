@@ -49,7 +49,7 @@ class Command(BaseCommand):
             pokemon=pokemon,
             move=move,
             defaults={
-               'stab': move.move_type in [pokemon.primary_type, pokemon.secondary_type],
+                'stab': move.move_type in [pokemon.primary_type, pokemon.secondary_type],
             }
         )
         return obj
@@ -105,7 +105,8 @@ class Command(BaseCommand):
                         cinematic_move = self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'CC'
                         )[0]
-                        pokemon_cinematic_move = self.get_or_create_pokemon_move(pokemon, cinematic_move)
+                        pokemon_cinematic_move = self.get_or_create_pokemon_move(
+                            pokemon, cinematic_move)
                         pokemon.cinematic_moves.add(pokemon_cinematic_move)
                         cinematic_moves.append(pokemon_cinematic_move)
 
@@ -175,15 +176,15 @@ class Command(BaseCommand):
 
             power = int(float(pvp_move[1]))
             duration = int(pvp_move[2])
-            energy_delta = int(pvp_move[3]) if pvp_move[3] else 0
+            delta = int(pvp_move[3]) if pvp_move[3] else 0
 
             pvp_move_data = {
                 'pvp_power': power,
                 'pvp_duration': duration,
-                'pvp_energy_delta': energy_delta,
+                'pvp_energy_delta': delta,
                 'dpt': Decimal(power / duration if duration > 0 else 0),
-                'ept': Decimal(energy_delta / duration if duration > 0 else 0),
-                'dpe': Decimal(power / abs(energy_delta) if abs(energy_delta) > 0 else 0) if energy_delta < 0 else 0,
+                'ept': Decimal(delta / duration if duration > 0 else 0),
+                'dpe': Decimal(power / abs(delta) if abs(delta) > 0 else 0) if delta < 0 else 0,
             }
 
             if slug == 'hidden-power':
@@ -228,7 +229,8 @@ class Command(BaseCommand):
 
                         if 'giratina' == name_string or 'deoxys' == name_string:
                             continue
-                        pokemon_id = slugify(self._next_clean_string(csv_object).replace('_', '-')[9:])
+                        pokemon_id = slugify(
+                            self._next_clean_string(csv_object).replace('_', '-')[9:])
 
                         if name_string != pokemon_id:
                             if len(pokemon_id) > len(name_string):
@@ -291,7 +293,8 @@ class Command(BaseCommand):
                         pokemon_data[name_string] = data
                     else:
                         data = []
-                        move_slug = slugify(self._next_clean_string(csv_object).replace('_', '-')[10:])
+                        move_slug = slugify(
+                            self._next_clean_string(csv_object).replace('_', '-')[10:])
                         category = 'CC'
                         if 'blastoise' in move_slug:
                             continue

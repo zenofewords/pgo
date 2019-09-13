@@ -8,14 +8,11 @@ from operator import itemgetter
 
 from rest_framework import response, status, viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.generics import GenericAPIView
 
 from django.urls import reverse
-from django.db import connection, reset_queries
-from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils.text import slugify
 
 from pgo.api.serializers import (
     BreakpointCalcSerializer, PokemonMoveSerializer, MoveSerializer,
@@ -321,13 +318,13 @@ class BreakpointCalcAPIView(GenericAPIView):
             self._set_move_damage(self.attacker_cinematic_move)
 
             show_all_cc_breakpoints = (
-                self.show_cinematic_breakpoints and
-                current_cc_dph < self.attacker_cinematic_move.damage_per_hit
+                self.show_cinematic_breakpoints
+                and current_cc_dph < self.attacker_cinematic_move.damage_per_hit
             )
             if (
-                [x for x in self.quick_move_proficiency if cpm['value'] == x[2]] or
-                show_all_cc_breakpoints or
-                self.attacker_cinematic_move.damage_per_hit == max_cc_dph
+                [x for x in self.quick_move_proficiency if cpm['value'] == x[2]]
+                or show_all_cc_breakpoints
+                or self.attacker_cinematic_move.damage_per_hit == max_cc_dph
             ):
                 self.cinematic_move_proficiency.append((
                     self.attacker_cinematic_move.damage_per_hit,
@@ -473,19 +470,23 @@ class BreakpointCalcAPIView(GenericAPIView):
         score = dps * 20
         score += pokemon.bulk / 800
 
-        cinematic_move_resisted = pokemon.compound_resistance.get(self.defender.cinematic_move.move_type.name)
+        cinematic_move_resisted = pokemon.compound_resistance.get(
+            self.defender.cinematic_move.move_type.name)
         if cinematic_move_resisted:
             score += 60 if float(cinematic_move_resisted) < 0.4 else 20
 
-        quick_move_resisted = pokemon.compound_resistance.get(self.defender.quick_move.move_type.name)
+        quick_move_resisted = pokemon.compound_resistance.get(
+            self.defender.quick_move.move_type.name)
         if quick_move_resisted:
             score += 30 if float(quick_move_resisted) < 0.4 else 20
 
-        cinematic_move_amplified = pokemon.compound_weakness.get(self.defender.cinematic_move.move_type.name)
+        cinematic_move_amplified = pokemon.compound_weakness.get(
+            self.defender.cinematic_move.move_type.name)
         if cinematic_move_amplified:
             score -= 60 if float(cinematic_move_amplified) > 2.5 else 20
 
-        quick_move_amplified = pokemon.compound_weakness.get(self.defender.quick_move.move_type.name)
+        quick_move_amplified = pokemon.compound_weakness.get(
+            self.defender.quick_move.move_type.name)
         if quick_move_amplified:
             score -= 30 if float(quick_move_amplified) > 2.5 else 20
 
@@ -504,9 +505,9 @@ class BreakpointCalcAPIView(GenericAPIView):
             elif health - (cinematic_move_dph + quick_move_threshold * quick_move_dph) < 0:
                 score += cm_energy_delta * 1.5
         else:
-            if (health - (cinematic_move_dph * 2 + quick_move_threshold * quick_move_dph) < 0
-                or health - quick_move_dph * 5 < 0):
-                    score -= 70
+            treshold = cinematic_move_dph * 2 + quick_move_threshold * quick_move_dph
+            if health - treshold < 0 or health - quick_move_dph * 5 < 0:
+                score -= 70
         return score
 
     def _get_top_counter_url(self, pokemon, moveset_data):

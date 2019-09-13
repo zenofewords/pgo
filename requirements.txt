@@ -1,5 +1,5 @@
 blessings==1.7
-certifi==2019.6.16
+certifi==2019.9.11
 chardet==3.0.4
 curtsies==0.3.0
 Django==2.2.5
@@ -9,7 +9,7 @@ greenlet==0.4.15
 idna==2.8
 psycopg2-binary==2.8.3
 Pygments==2.4.2
-python-dotenv=0.10.3
+python-dotenv==0.10.3
 python-memcached==1.59
 pytz==2019.2
 requests==2.22.0

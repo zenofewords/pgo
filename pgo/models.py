@@ -29,24 +29,24 @@ class RaidBossStatus:
 
 
 class Generation:
-    I = 'I'
-    II = 'II'
-    III = 'III'
-    IV = 'IV'
-    V = 'V'
-    VI = 'VI'
-    VII = 'VII'
-    VIII = 'VIII'
+    FIRST = 'I'
+    SECOND = 'II'
+    THIRD = 'III'
+    FOURTH = 'IV'
+    FIFTH = 'V'
+    SIXTH = 'VI'
+    SEVENTH = 'VII'
+    EIGHTH = 'VIII'
 
     CHOICES = (
-        (I, 'I'),
-        (II, 'II'),
-        (III, 'III'),
-        (IV, 'IV'),
-        (V, 'V'),
-        (VI, 'VI'),
-        (VII, 'VII'),
-        (VIII, 'VIII'),
+        (FIRST, 'I'),
+        (SECOND, 'II'),
+        (THIRD, 'III'),
+        (FOURTH, 'IV'),
+        (FIFTH, 'V'),
+        (SIXTH, 'VI'),
+        (SEVENTH, 'VII'),
+        (EIGHTH, 'VIII'),
     )
 
 
@@ -115,9 +115,11 @@ class PokemonManager(models.Manager):
 
 class Pokemon(NameMixin):
     number = models.CharField(max_length=5)
-    primary_type = models.ForeignKey('pgo.Type', related_name='primary_types',
+    primary_type = models.ForeignKey(
+        'pgo.Type', related_name='primary_types',
         blank=True, null=True, on_delete=models.deletion.CASCADE)
-    secondary_type = models.ForeignKey('pgo.Type', related_name='secondary_types',
+    secondary_type = models.ForeignKey(
+        'pgo.Type', related_name='secondary_types',
         blank=True, null=True, on_delete=models.deletion.CASCADE)
     quick_moves = models.ManyToManyField(
         'pgo.PokemonMove', blank=True, related_name='quick_moves_pokemon')
@@ -185,7 +187,8 @@ class EffectivenessScalar(NameMixin):
 
 class Move(NameMixin):
     category = models.CharField(max_length=2, choices=MoveCategory.CHOICES)
-    move_type = models.ForeignKey('pgo.Type', blank=True, null=True, on_delete=models.deletion.CASCADE)
+    move_type = models.ForeignKey(
+        'pgo.Type', blank=True, null=True, on_delete=models.deletion.CASCADE)
 
     power = models.IntegerField(blank=True, default=0)
     energy_delta = models.IntegerField(blank=True, default=0)
@@ -258,11 +261,14 @@ class MoveAvailability(models.Model):
 
 
 class Moveset(models.Model):
-    pokemon = models.ForeignKey('pgo.Pokemon', blank=True, null=True, on_delete=models.deletion.CASCADE)
+    pokemon = models.ForeignKey(
+        'pgo.Pokemon', blank=True, null=True, on_delete=models.deletion.CASCADE)
     quick_move = models.ForeignKey(
-        'pgo.PokemonMove', blank=True, null=True, related_name='quick_moves', on_delete=models.deletion.CASCADE)
+        'pgo.PokemonMove', blank=True, null=True,
+        related_name='quick_moves', on_delete=models.deletion.CASCADE)
     cinematic_move = models.ForeignKey(
-        'pgo.PokemonMove', blank=True, null=True, related_name='cinematic_moves', on_delete=models.deletion.CASCADE)
+        'pgo.PokemonMove', blank=True, null=True,
+        related_name='cinematic_moves', on_delete=models.deletion.CASCADE)
     key = models.CharField(max_length=50, blank=True)
 
     weave_damage = JSONField(blank=True, null=True)
@@ -309,7 +315,8 @@ class CPM(models.Model):
 
 
 class RaidTier(OrderMixin):
-    raid_cpm = models.ForeignKey('pgo.CPM', verbose_name='Raid CPM', on_delete=models.deletion.CASCADE)
+    raid_cpm = models.ForeignKey(
+        'pgo.CPM', verbose_name='Raid CPM', on_delete=models.deletion.CASCADE)
     tier = models.PositiveIntegerField(verbose_name='Tier Level')
     tier_stamina = models.PositiveIntegerField(verbose_name='Tier Stamina')
     battle_duration = models.PositiveIntegerField(default=180)
@@ -324,8 +331,10 @@ class RaidTier(OrderMixin):
 
 
 class RaidBoss(models.Model):
-    pokemon = models.ForeignKey('pgo.Pokemon', verbose_name='Pokemon', on_delete=models.deletion.CASCADE)
-    raid_tier = models.ForeignKey('pgo.RaidTier', verbose_name='Raid Tier', on_delete=models.deletion.CASCADE)
+    pokemon = models.ForeignKey(
+        'pgo.Pokemon', verbose_name='Pokemon', on_delete=models.deletion.CASCADE)
+    raid_tier = models.ForeignKey(
+        'pgo.RaidTier', verbose_name='Raid Tier', on_delete=models.deletion.CASCADE)
     status = models.CharField(max_length=20, choices=RaidBossStatus.CHOICES, blank=True)
 
     class Meta:

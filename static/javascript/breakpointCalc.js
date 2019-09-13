@@ -188,45 +188,6 @@ ready(() => {
     faqLegend.hidden = !faqLegend.hidden
   })
 
-  // functions
-  // const initialFetch = () => {
-  //   if (form.status !== FORM_STATE.SUBMITTING) {
-  //     form.status = FORM_STATE.SUBMITTING
-  //     toggleLoading()
-
-  //     return new Promise(resolve => {
-  //       selectAttacker.ajax(callback => {
-  //         fetch(window.pgoAPIURLs['simple-pokemon-list'])
-  //           .then(response => {
-  //             response.json()
-  //               .then(data => {
-  //                 callback(data, 'value', 'label')
-  //                 resolve()
-  //               })
-  //               .then(() => {
-  //                 selectDefender.setChoices(
-  //                   selectAttacker._currentState.choices.slice(1),
-  //                   'value', 'label', false
-  //                 )
-  //               })
-  //               .then(() => {
-  //                 form.status = FORM_STATE.READY
-  //                 toggleLoading()
-  //               })
-  //               .catch(() => {
-  //                 form.status = FORM_STATE.ERROR
-  //                 showErrors()
-  //               })
-  //           })
-  //           .catch(() => {
-  //             form.status = FORM_STATE.ERROR
-  //             showErrors()
-  //           })
-  //       })
-  //     })
-  //   }
-  // }
-
   const updateBrowserHistory = (getParams) => {
     window.history.pushState(
       {}, null, '/breakpoint-calc/' + getParams
@@ -431,7 +392,6 @@ ready(() => {
   }
 
   const restoreForm = (data) => {
-    // initialFetch().then(() => {
     toggleTab(data.tab)
 
     selectAttacker.setChoiceByValue(`${data.attacker}`)
@@ -453,7 +413,6 @@ ready(() => {
 
     toggleTopCounterOrder(data.top_counter_order === 'dps' ? 'rnk' : 'dps')
     submitForm()
-    // })
   }
 
   if (form.attacker && !(form.attacker_quick_move && form.attacker_cinematic_move)) {
@@ -650,6 +609,4 @@ ready(() => {
     }
     return level
   }
-
-  // initialFetch()
 })

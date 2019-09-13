@@ -16,20 +16,20 @@ def assign_generations(apps, schema_editor):
     pokemon_qs = Pokemon.objects.exclude(name__icontains='(A)')
 
     genI = pokemon_qs.all()[:151]
-    assign_generation(genI, Generation.I)
+    assign_generation(genI, Generation.FIRST)
 
     genII = pokemon_qs.all()[151:251]
-    assign_generation(genII, Generation.II)
+    assign_generation(genII, Generation.SECOND)
 
     genIII = pokemon_qs.all()[251:386]
-    assign_generation(genIII, Generation.III)
+    assign_generation(genIII, Generation.THIRD)
 
     genIV = pokemon_qs.all()[386:]
-    assign_generation(genIV, Generation.IV)
+    assign_generation(genIV, Generation.FOURTH)
 
     alola_qs = Pokemon.objects.filter(name__icontains='(A)')
     for pokemon in alola_qs:
-        pokemon.generation = Generation.VII
+        pokemon.generation = Generation.SEVENTH
         pokemon.number = pokemon.number.replace('a', '')
         pokemon.slug = pokemon.slug.replace('-a', '-alolan')
         pokemon.name = pokemon.name.replace('(A)', '(Alolan)')

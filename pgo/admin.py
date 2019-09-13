@@ -15,6 +15,7 @@ from pgo.models import (
     WeatherCondition,
 )
 
+
 class FriendshipAdmin(admin.ModelAdmin):
     list_display = (
         'level', 'damage_boost', 'order',
@@ -23,6 +24,7 @@ class FriendshipAdmin(admin.ModelAdmin):
         'order',
     )
     ordering = ('order',)
+
 
 class MoveAdmin(admin.ModelAdmin):
     search_fields = (

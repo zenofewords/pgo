@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import path
 
 from tcg.views import DeckListView
 
 
 urlpatterns = (
-    url(r'^$', DeckListView.as_view(), name='deck-list'),
+    path('', DeckListView.as_view(), name='deck-list'),
 )

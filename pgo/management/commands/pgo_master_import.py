@@ -1,4 +1,4 @@
-import csv
+import json
 import re
 
 from decimal import Decimal
@@ -18,9 +18,7 @@ from pgo.models import (
 
 
 class Command(BaseCommand):
-    help = '''
-        Build the CPM, Pokemon, Move and Type models, parsed from the .csv source file.
-    '''
+    help = '''Add Pokemon data from Game Master json.'''
 
     def get_or_create_type(self, slug):
         if slug != '':
@@ -32,6 +30,9 @@ class Command(BaseCommand):
 
     def get_or_create_pokemon(self, number, slug):
         obj, created = Pokemon.objects.get_or_create(number=number, slug=slug)
+
+        if created:
+            print('created', obj.slug)
         return obj, created
 
     def get_or_create_move(self, slug, category):
@@ -42,6 +43,8 @@ class Command(BaseCommand):
                 'category': category
             }
         )
+        if created:
+            print('created', obj.slug)
         return obj, created
 
     def get_or_create_pokemon_move(self, pokemon, move):
@@ -52,6 +55,8 @@ class Command(BaseCommand):
                 'stab': move.move_type in [pokemon.primary_type, pokemon.secondary_type],
             }
         )
+        if created:
+            print('created', obj)
         return obj
 
     def _process_pokemon(self, pokemon_data):
@@ -192,18 +197,6 @@ class Command(BaseCommand):
             else:
                 Move.objects.filter(slug=slug).update(**pvp_move_data)
 
-    def _next(self, csv_object, slice_start=None, slice_end=None):
-        return next(csv_object)[0][slice_start:slice_end].strip()
-
-    def _next_clean_string(self, csv_object):
-        return re.sub(r'[^A-Za-z_,]+', '', str(next(csv_object)).lower())
-
-    def _next_clean_numeric(self, csv_object):
-        return re.sub(r'[^0-9.-]+', '', str(next(csv_object)))
-
-    def _clean_numeric(self, line):
-        return re.sub(r'[^0-9.-]+', '', str(line))
-
     def add_arguments(self, parser):
         parser.add_argument('path', nargs='?', type=str)
 
@@ -215,156 +208,89 @@ class Command(BaseCommand):
         move_data = {}
         pvp_move_data = []
 
-        with open(file_path) as csvfile:
-            csv_object = csv.reader(csvfile)
+        with open(file_path, 'r') as file:
+            json_data = json.load(file)
 
-            for row in csv_object:
-                if 'templateId": "V' in row[0]:
-                    template_id = '#{0}'.format(row[0][23:26])
+        pokemon_pattern = re.compile('^V\\d+_POKEMON_[A-Z_*-*]+$', re.IGNORECASE)
+        move_pattern = re.compile('^V\\d+_MOVE_[A-Z_*-*]+$', re.IGNORECASE)
+        pvp_move_pattern = re.compile('^COMBAT_V\\d+_MOVE_[A-Z_*-*]+$', re.IGNORECASE)
+        exclude = ('NORMAL', 'SHADOW', 'PURIFIED', )
 
-                    if 'pokemonSettings' in self._next(csv_object):
-                        # name
-                        data = []
-                        name_string = row[0][35:-1].lower().replace('_', '-')
+        for data_line in json_data['itemTemplates']:
+            data = []
+            template_id = data_line['templateId']
 
-                        if 'giratina' == name_string or 'deoxys' == name_string:
-                            continue
-                        pokemon_id = slugify(
-                            self._next_clean_string(csv_object).replace('_', '-')[9:])
+            if pokemon_pattern.match(template_id) and all([x not in template_id for x in exclude]):
+                pokemon_id = data_line['templateId'][2:5]
+                pokemon_settings = data_line['pokemonSettings']
+                pokemon_name = pokemon_settings['pokemonId']
+                stats = pokemon_settings['stats']
+                quick_moves = pokemon_settings.get('quickMoves')
+                cinematic_moves = pokemon_settings.get('cinematicMoves')
 
-                        if name_string != pokemon_id:
-                            if len(pokemon_id) > len(name_string):
-                                name_string = pokemon_id
+                form = pokemon_settings.get('form')
+                pokemon_name = form if form else pokemon_name
 
-                        if 'deoxys' not in name_string:
-                            name_string = name_string.replace('-normal', '')
+                data.append({'number': '#{}'.format(pokemon_id)})
+                data.append({'slug': slugify(pokemon_name.replace('_', '-'))})
 
-                        data.append({'number': template_id})
-                        data.append({'slug': slugify(name_string)})
-                        self._next(csv_object)
-                        # types
-                        data.append({
-                            'pokemon_types': (
-                                self._next(csv_object, 30).replace('"', '').lower(),
-                                self._next(csv_object, 31).replace('"', '').lower()
-                            )
-                        })
+                if 'type2' in pokemon_settings:
+                    data.append({'pokemon_types': (
+                        pokemon_settings['type'][13:],
+                        pokemon_settings['type2'][13:],
+                    )})
+                else:
+                    data.append({'pokemon_types': (
+                        pokemon_settings['type'][13:],
+                    )})
+                data.append({
+                    'stats': (
+                        {'stamina': stats['baseStamina']},
+                        {'attack': stats['baseAttack']},
+                        {'defense': stats['baseDefense']}
+                    )
+                })
+                data.append({'moves': {
+                    'quick': [m.replace('_FAST', '') for m in quick_moves] if quick_moves else [],
+                    'cinematic': [m for m in cinematic_moves] if cinematic_moves else [],
+                }})
+                pokemon_data[pokemon_name] = data
 
-                        while 'stats' not in self._next(csv_object):
-                            pass
-                        # stats
-                        data.append({
-                            'stats': (
-                                {'stamina': self._next_clean_numeric(csv_object)},
-                                {'attack': self._next_clean_numeric(csv_object)},
-                                {'defense': self._next_clean_numeric(csv_object)}
-                            )
-                        })
-                        self._next(csv_object)
+            if move_pattern.match(template_id):
+                move_settings = data_line['moveSettings']
+                move_name = slugify(move_settings['movementId']).replace('_', '-')
 
-                        # moves
-                        quick = []
-                        cinematic = []
-                        next_line = self._next_clean_string(csv_object)
+                category = 'CM'
+                if 'blastoise' in move_name:
+                    continue
 
-                        while 'quickmoves' in next_line:
-                            move = self._next_clean_string(csv_object)
-                            if 'fast' in move:
-                                quick.append(move.replace('_fast', '').replace(',', ''))
-                            else:
-                                next_line = self._next_clean_string(csv_object)
+                if 'fast' in move_name:
+                    category = 'QK'
+                    move_slug = move_name.replace('-fast', '')
+                else:
+                    move_slug = move_name
 
-                        while 'cinematicmoves' in next_line:
-                            move = self._next_clean_string(csv_object).replace(',', '')
-                            if move:
-                                cinematic.append(move)
-                            else:
-                                next_line = self._next_clean_string(csv_object)
+                data.append({'category': category})
+                data.append({'move_type': slugify(move_settings['pokemonType'][13:])})
+                data.append({'power': move_settings.get('power', 0)})
+                data.append({'duration': move_settings.get('durationMs', 0)})
+                data.append({'damage_window_start': move_settings.get('damageWindowStartMs', 0)})
+                data.append({'damage_window_end': move_settings.get('damageWindowEndMs', 0)})
+                data.append({'energy_delta': move_settings.get('energyDelta', 0)})
+                move_data[move_slug] = data
 
-                        moves = {
-                            'quick': quick,
-                            'cinematic': cinematic
-                        }
-                        data.append({'moves': moves})
+            if pvp_move_pattern.match(template_id):
+                move_settings = data_line['combatMove']
+                move_name = slugify(move_settings['uniqueId']).replace('_', '-')
 
-                        while 'animation_time' in self._next(csv_object):
-                            pass
+                data.append(move_name.replace('-fast', ''))
+                data.append(move_settings.get('power', 0))
+                data.append(move_settings.get('energyDelta', 0))
+                data.append(move_settings.get('durationTurns', 0))
+                data.append(move_settings.get('energyDelta', 0))
+                data.append(slugify(move_settings.get('type')[13:]))
 
-                        pokemon_data[name_string] = data
-                    else:
-                        data = []
-                        move_slug = slugify(
-                            self._next_clean_string(csv_object).replace('_', '-')[10:])
-                        category = 'CC'
-                        if 'blastoise' in move_slug:
-                            continue
-
-                        if 'fast' in move_slug:
-                            category = 'QK'
-                            move_slug = move_slug[:-5]
-                        self._next(csv_object)
-
-                        # name & category
-                        data.append({'category': category})
-                        # move type
-                        data.append(
-                            {'move_type': slugify(self._next_clean_string(csv_object)[24:])})
-                        # power
-                        if move_slug not in ['transform', 'splash', 'yawn']:
-                            data.append({'power': self._next_clean_numeric(csv_object)})
-
-                        while 'vfxName' not in self._next(csv_object):
-                            pass
-
-                        # durations & delta
-                        data.append({
-                            'duration': self._next_clean_numeric(csv_object)})
-                        data.append({
-                            'damage_window_start': self._next_clean_numeric(csv_object)})
-                        data.append({
-                            'damage_window_end': self._next_clean_numeric(csv_object)})
-
-                        if move_slug not in ['transform', 'struggle']:
-                            data.append({
-                                'energy_delta': self._next_clean_numeric(csv_object)})
-                        move_data[move_slug] = data
-
-                pvp_move = []
-                if '"templateId": "COMBAT_V' in row[0]:
-                    next(csv_object)
-                    next_line = self._next_clean_string(csv_object)
-                    move_slug = next_line[8:].replace('_', '-').replace(',', '')
-                    next(csv_object)
-
-                    pvp_move.append(move_slug.replace('-fast', ''))
-                    next_line = next(csv_object)
-
-                    if 'power' in str(next_line):
-                        power = self._clean_numeric(next_line)
-                        pvp_move.append(power)
-
-                        # skip vfx
-                        next(csv_object)
-                    else:
-                        pvp_move.append(0)
-
-                    next_line = next(csv_object)
-                    if 'fast' in move_slug and 'energyDelta' in str(next_line):
-                        pvp_move.append(1)
-
-                        energy_delta = self._clean_numeric(next_line)
-                        pvp_move.append(energy_delta)
-                    else:
-                        value = self._clean_numeric(next_line)
-                        if int(value) < 0:
-                            pvp_move.append(0)
-                            pvp_move.append(value)
-                        else:
-                            duration_turns = self._clean_numeric(next_line)
-                            pvp_move.append(int(duration_turns) + 1)
-                            energy_delta = self._next_clean_numeric(csv_object)
-                            pvp_move.append(energy_delta)
-                    pvp_move_data.append(pvp_move)
+                pvp_move_data.append(data)
 
         self._process_moves(move_data)
         print('moves processed')

@@ -303,3 +303,15 @@ class Command(BaseCommand):
         print('move scores processed')
         call_command('pgo_assign_goodtogo_bosses')
         print('good to go bosses processed')
+
+        Pokemon.objects.filter(slug__in=(
+            'shellos-west-sea',
+            'shellos-east-sea',
+            'gastrodon-east-sea',
+            'gastrodon-west-sea',
+            'giratina',
+            'shaymin',
+        )).delete()
+        Pokemon.objects.filter(slug='mewtwo-a').update(name='Mewtwo-armored')
+        Pokemon.objects.filter(slug='deoxys').update(name='Deoxys-normal')
+        print('clean up redundant entries')

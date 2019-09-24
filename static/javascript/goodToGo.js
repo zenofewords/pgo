@@ -33,7 +33,7 @@ ready(() => {
   const selectWeatherCondition = document.getElementById('select-weather-condition')
   const selectFriendshipBoost = document.getElementById('select-friendship-boost')
 
-  const tier36BossesToggle = document.querySelector('.toggle-tier-3-6-raid-bosses')
+  const tier36BossesToggle = document.querySelector('.toggle-tier-3-5-raid-bosses')
   const tier12BossesToggle = document.querySelector('.toggle-tier-1-2-raid-bosses')
 
   const summary = document.querySelector('.output-wrapper')
@@ -243,7 +243,7 @@ ready(() => {
     results.appendChild(document.createElement('hr'))
 
     if (data.tier_3_6_raid_bosses.length === 0 && data.tier_1_2_raid_bosses.length === 0) {
-      results.innerHTML = 'Please select at least one option (tier 3-6 bosses or tier 1-2 bosses).'
+      results.innerHTML = 'Please select at least one option (tier 3-5 bosses or tier 1-2 bosses).'
     }
 
     if (data.tier_3_6_raid_bosses.length > 0) {

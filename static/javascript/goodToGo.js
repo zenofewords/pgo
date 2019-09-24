@@ -243,7 +243,7 @@ ready(() => {
     results.appendChild(document.createElement('hr'))
 
     if (data.tier_3_6_raid_bosses.length === 0 && data.tier_1_2_raid_bosses.length === 0) {
-      results.innerHTML = 'Please select at least one option (tier 3-6, tier 1-2).'
+      results.innerHTML = 'Please select at least one option (tier 3-6 bosses or tier 1-2 bosses).'
     }
 
     if (data.tier_3_6_raid_bosses.length > 0) {

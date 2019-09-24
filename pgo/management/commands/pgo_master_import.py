@@ -9,10 +9,12 @@ from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
 from pgo.models import (
+    Move,
+    MoveCategory,
+    Moveset,
+    MoveType,
     Pokemon,
     PokemonMove,
-    Move,
-    Moveset,
     Type,
 )
 
@@ -53,18 +55,21 @@ class Command(BaseCommand):
             move=move,
             defaults={
                 'stab': move.move_type in [pokemon.primary_type, pokemon.secondary_type],
+                'cinematic': move.category == MoveCategory.CC,
+                'move_type': move.move_type.slug,
             }
         )
         if created:
             print('created', obj)
         return obj
 
+    def _append_move(self, move, pokemon):
+        pokemon.quick_moves.add(self.get_or_create_pokemon_move(pokemon, move))
+
     def _process_pokemon(self, pokemon_data):
         new_movesets = []
 
         for pokemon_number, data in pokemon_data.items():
-            quick_moves = []
-            cinematic_moves = []
             pokemon, created = self.get_or_create_pokemon(data[0]['number'], data[1]['slug'])
 
             pokemon_types = []
@@ -102,9 +107,15 @@ class Command(BaseCommand):
                         quick_move = self.get_or_create_move(
                             slugify(move_name.replace('_', '-')), 'QK'
                         )[0]
-                        pokemon_quick_move = self.get_or_create_pokemon_move(pokemon, quick_move)
-                        pokemon.quick_moves.add(pokemon_quick_move)
-                        quick_moves.append(pokemon_quick_move)
+                        if quick_move.slug == 'hidden-power':
+                            PokemonMove.objects.filter(move=quick_move, pokemon=pokemon).delete()
+
+                            for move_type in MoveType.CHOICES:
+                                if move_type[0] != 'fairy' and move_type[0] != 'normal':
+                                    self._append_move(self.get_or_create_move(
+                                        'hidden-power-{}'.format(move_type[0]), 'QK')[0], pokemon)
+                        else:
+                            self._append_move(quick_move, pokemon)
 
                     for move_name in detail['moves']['cinematic']:
                         cinematic_move = self.get_or_create_move(
@@ -113,14 +124,11 @@ class Command(BaseCommand):
                         pokemon_cinematic_move = self.get_or_create_pokemon_move(
                             pokemon, cinematic_move)
                         pokemon.cinematic_moves.add(pokemon_cinematic_move)
-                        cinematic_moves.append(pokemon_cinematic_move)
 
-                if 'legendary' in detail:
-                    pokemon.legendary = True
+            pokemon.legendary = data[5].get('legendary')
 
-            self._legacy_check_existing_moves(pokemon, quick_moves, cinematic_moves)
-            for quick_move in quick_moves:
-                for cinematic_move in cinematic_moves:
+            for quick_move in pokemon.quick_moves.all():
+                for cinematic_move in pokemon.cinematic_moves.all():
                     new_movesets.append(Moveset.objects.get_or_create(
                         pokemon=pokemon,
                         key='{} - {}'.format(quick_move.move, cinematic_move.move),
@@ -130,23 +138,6 @@ class Command(BaseCommand):
                         }
                     ))
             pokemon.save()
-
-    def _legacy_check_existing_moves(self, pokemon, quick_moves, cinematic_moves):
-        hidden_powers = []
-        for quick_move in quick_moves:
-            if quick_move.move.slug == 'hidden-power':
-                quick_moves.remove(quick_move)
-
-                hidden_powers = PokemonMove.objects.filter(
-                    pokemon=pokemon, move__slug__startswith=quick_move.move.slug)
-
-        for hidden_power in hidden_powers:
-            quick_moves.append(hidden_power)
-
-        legacy_moves = PokemonMove.objects.filter(
-            pokemon=pokemon).exclude(id__in=[x.pk for x in quick_moves + cinematic_moves])
-        if legacy_moves:
-            legacy_moves.update(legacy=True)
 
     def _process_moves(self, move_data):
         for move_slug, data in move_data.items():
@@ -201,7 +192,7 @@ class Command(BaseCommand):
         parser.add_argument('path', nargs='?', type=str)
 
     def handle(self, *args, **options):
-        path = '{0}{1}'.format(settings.BASE_DIR, '/pgo/game_master_genIV')
+        path = '{0}{1}'.format(settings.BASE_DIR, '')
         file_path = options.get('path') if options.get('path') else path
 
         pokemon_data = {}
@@ -254,6 +245,7 @@ class Command(BaseCommand):
                     'quick': [m.replace('_FAST', '') for m in quick_moves] if quick_moves else [],
                     'cinematic': [m for m in cinematic_moves] if cinematic_moves else [],
                 }})
+                data.append({'legendary': bool(pokemon_settings.get('rarity', False))})
                 pokemon_data[pokemon_name] = data
 
             if move_pattern.match(template_id):
@@ -299,7 +291,7 @@ class Command(BaseCommand):
         self._process_pokemon(pokemon_data)
         print('pokemon processed')
 
-        call_command('pgo_calculate_cp')
+        call_command('pgo_calculate_stats')
         print('cp processed')
         call_command('pgo_compound_weakness_resistance')
         print('weakness and resistance processed')
@@ -309,3 +301,5 @@ class Command(BaseCommand):
         print('moveset weave processed')
         call_command('pgo_populate_pokemon_moves')
         print('move scores processed')
+        call_command('pgo_assign_goodtogo_bosses')
+        print('good to go bosses processed')

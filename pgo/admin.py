@@ -77,10 +77,10 @@ class PokemonMoveAdmin(admin.ModelAdmin):
 
 class RaidBossAdmin(admin.ModelAdmin):
     list_display = (
-        'pokemon', 'raid_tier', 'status',
+        'pokemon', 'raid_tier',
     )
     list_editable = (
-        'status',
+        'raid_tier',
     )
     search_fields = (
         'pokemon__slug',

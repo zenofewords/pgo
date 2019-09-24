@@ -114,7 +114,6 @@ class GoodToGoView(CalculatorInitialDataMixin):
             'friendship_boost': str(params.get('friendship_boost')),
             'tier_3_6_raid_bosses': bool(params.get('tier_3_6_raid_bosses') == 'true'),
             'tier_1_2_raid_bosses': bool(params.get('tier_1_2_raid_bosses') == 'true'),
-            'relevant_defenders': bool(params.get('relevant_defenders') == 'true'),
         }
 
 

@@ -99,4 +99,3 @@ class GoodToGoSerializer(serializers.Serializer):
     friendship_boost = serializers.DecimalField(required=False, max_digits=3, decimal_places=2)
     tier_3_6_raid_bosses = serializers.BooleanField(required=False)
     tier_1_2_raid_bosses = serializers.BooleanField(required=False)
-    relevant_defenders = serializers.BooleanField(required=False)

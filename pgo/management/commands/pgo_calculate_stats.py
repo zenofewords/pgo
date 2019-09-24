@@ -19,9 +19,10 @@ class Command(BaseCommand):
         defense = pokemon.pgo_defense + IVs
         stamina = pokemon.pgo_stamina + IVs
 
-        pokemon.maximum_cp = (
-            attack * sqrt(defense) * sqrt(stamina) * pow(cpm, 2) / 10.0
-        )
+        pokemon.maximum_cp = attack * sqrt(defense) * sqrt(stamina) * pow(cpm, 2) / 10.0
+        pokemon.stat_sum = pokemon.pgo_attack + pokemon.pgo_defense + pokemon.pgo_stamina
+        pokemon.stat_product = pokemon.pgo_attack * pokemon.pgo_defense * pokemon.pgo_stamina
+        pokemon.bulk = pokemon.pgo_defense * pokemon.pgo_stamina
         pokemon.save()
 
     def handle(self, *args, **options):

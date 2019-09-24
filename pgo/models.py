@@ -18,16 +18,6 @@ class MoveCategory:
     )
 
 
-class RaidBossStatus:
-    OFFICIAL = 'official'
-    SIMULATED = 'simulated'
-
-    CHOICES = (
-        (OFFICIAL, 'Official'),
-        (SIMULATED, 'Simulated'),
-    )
-
-
 class Generation:
     FIRST = 'I'
     SECOND = 'II'
@@ -335,7 +325,6 @@ class RaidBoss(models.Model):
         'pgo.Pokemon', verbose_name='Pokemon', on_delete=models.deletion.CASCADE)
     raid_tier = models.ForeignKey(
         'pgo.RaidTier', verbose_name='Raid Tier', on_delete=models.deletion.CASCADE)
-    status = models.CharField(max_length=20, choices=RaidBossStatus.CHOICES, blank=True)
 
     class Meta:
         verbose_name = 'Raid Boss'

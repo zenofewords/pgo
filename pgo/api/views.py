@@ -19,7 +19,7 @@ from pgo.api.serializers import (
     SimplePokemonSerializer, PokemonSerializer, TypeSerializer, GoodToGoSerializer,
 )
 from pgo.models import (
-    CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, RaidTier, WeatherCondition, RaidBossStatus,
+    CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, RaidTier, WeatherCondition,
 )
 from pgo.utils import (
     calculate_dph,
@@ -554,16 +554,12 @@ class GoodToGoAPIView(GenericAPIView):
         self.friendship_boost = data.get('friendship_boost', 1.00)
 
         self.tier_3_6_raid_bosses = RaidBoss.objects.filter(
-            status=RaidBossStatus.OFFICIAL, raid_tier__tier__in=[3, 4, 5, 6]
+            raid_tier__tier__in=[3, 4, 5, 6]
         ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_3_6_raid_bosses') else []
 
         self.tier_1_2_raid_bosses = RaidBoss.objects.filter(
-            status=RaidBossStatus.OFFICIAL, raid_tier__tier__in=[1, 2]
+            raid_tier__tier__in=[1, 2]
         ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_1_2_raid_bosses') else []
-
-        # todo devise a better metric for relevant defenders
-        self.relevant_defenders = Pokemon.objects.filter(
-            maximum_cp__gte=2000) if data.get('relevant_defenders') else []
 
         self.max_cpm_value = CPM.gyms.last().value
 
@@ -613,8 +609,6 @@ class GoodToGoAPIView(GenericAPIView):
             total_breakpoints += len(value)
             total_breakpoints_reached += breakpoints_reached
 
-        # for defender in self.relevant_defenders:
-        #     self._get_breakpoint_data(defender)
         return {
             'tier_3_6_raid_bosses': tier_3_6,
             'tier_1_2_raid_bosses': tier_1_2,

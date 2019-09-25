@@ -1,14 +1,93 @@
-from math import floor
+from decimal import Decimal
+from math import floor, pow, sqrt
 
 from django.db.models import Q
 from django.http import Http404
+from django.template.defaultfilters import slugify
 
-from pgo.models import Move, Pokemon, RaidBoss, Type
+from pgo.models import (
+    CPM,
+    Move,
+    Moveset,
+    Pokemon,
+    PokemonMove,
+    RaidBoss,
+    Type,
+)
 
 NEUTRAL_SCALAR = 1.0
 STAB_SCALAR = 1.2
 WEATHER_BOOST_SCALAR = 1.2
 MAX_IV = 15
+LEVELS = (20.0, 25.0, 30.0, 35.0, 40.0)
+cpm = CPM.gyms.get(level=Decimal('40.0')).value
+
+
+def get_stab(stab):
+    return STAB_SCALAR if stab else NEUTRAL_SCALAR
+
+
+def is_stab(pokemon, move_type):
+    return move_type in (pokemon.primary_type, pokemon.secondary_type)
+
+
+def calculate_move_stats(move):
+    move.dps = move.power / (move.duration / 1000.0)
+    move.eps = move.energy_delta / (move.duration / 1000.0)
+    move.save()
+
+
+def calculate_pokemon_stats(pokemon):
+    attack = pokemon.pgo_attack + MAX_IV
+    defense = pokemon.pgo_defense + MAX_IV
+    stamina = pokemon.pgo_stamina + MAX_IV
+
+    pokemon.maximum_cp = attack * sqrt(defense) * sqrt(stamina) * pow(cpm, 2) / 10.0
+    pokemon.stat_sum = pokemon.pgo_attack + pokemon.pgo_defense + pokemon.pgo_stamina
+    pokemon.stat_product = pokemon.pgo_attack * pokemon.pgo_defense * pokemon.pgo_stamina
+    pokemon.bulk = pokemon.pgo_defense * pokemon.pgo_stamina
+    return pokemon
+
+
+def calculate_weave_damage(pokemon):
+    def get_moveset(pokemon, quick_move, cinematic_move):
+        return Moveset.objects.filter(
+            pokemon=pokemon,
+            key='{} - {}'.format(quick_move.name, cinematic_move.name)
+        ).first()
+
+    def get_base_attack(attack, level):
+        return float((attack + MAX_IV) * CPM.gyms.get(level=level).value)
+
+    def calculate_dph(power, attack, stab):
+        return floor(0.5 * power * attack * stab) + 1
+
+    def calculate_weave(attack, qk_move, cc_move, stab):
+        weave_damage = {}
+
+        for level in LEVELS:
+            base_attack = get_base_attack(attack, level)
+            qk_move.damage_per_hit = calculate_dph(qk_move.power, base_attack, get_stab(stab[0]))
+            cc_move.damage_per_hit = calculate_dph(cc_move.power, base_attack, get_stab(stab[1]))
+
+            cycle_dps = calculate_cycle_dps(qk_move, cc_move)
+
+            weave_damage[level] = cycle_dps
+        return weave_damage
+
+    for quick_move in pokemon.quick_moves.all():
+        stab = [False, False]
+        stab[0] = is_stab(pokemon, quick_move.move.move_type)
+
+        for cinematic_move in pokemon.cinematic_moves.all():
+            stab[1] = is_stab(pokemon, cinematic_move.move.move_type)
+            moveset = get_moveset(pokemon, quick_move.move, cinematic_move.move)
+
+            if moveset:
+                moveset.weave_damage = sorted(calculate_weave(
+                    pokemon.pgo_attack, quick_move.move, cinematic_move.move, stab).items()
+                )
+                moveset.save()
 
 
 def calculate_cycle_dps(quick_move, cinematic_move):
@@ -30,16 +109,37 @@ def calculate_cycle_dps(quick_move, cinematic_move):
 def calculate_dph(
         power, attack_multiplier, stab, weather_boost, effectiveness=1.0, friendship_boost=1.0):
 
-    def _get_stab(stab):
-        return STAB_SCALAR if stab else NEUTRAL_SCALAR
-
     def _get_weather_boost(weather_boost):
         return WEATHER_BOOST_SCALAR if weather_boost else NEUTRAL_SCALAR
 
     return int(floor(
-        0.5 * power * float(attack_multiplier) * _get_stab(stab) * float(effectiveness)
+        0.5 * power * float(attack_multiplier) * get_stab(stab) * float(effectiveness)
         * _get_weather_boost(weather_boost) * float(friendship_boost))
     ) + 1
+
+
+def calculate_pokemon_move_score(moveset):
+    def update_or_create_pokemon_move(moveset, move):
+        pokemon = moveset.pokemon
+        new_score = Decimal(moveset.weave_damage[4][1] / 100)
+
+        obj, created = PokemonMove.objects.get_or_create(
+            pokemon=pokemon,
+            move=move,
+            defaults={
+                'stab': is_stab(pokemon, move.move_type),
+                'score': new_score,
+            }
+        )
+        if not created and obj.pokemon == pokemon:
+            obj.stab = is_stab(pokemon, move.move_type)
+            obj.score = new_score if new_score > obj.score else obj.score
+            obj.save()
+        return obj
+
+    moves = moveset.key.split(' - ', 1)
+    update_or_create_pokemon_move(moveset, Move.objects.get(slug=slugify(moves[0])))
+    update_or_create_pokemon_move(moveset, Move.objects.get(slug=slugify(moves[1])))
 
 
 def calculate_health(total_stamina, cpm):

@@ -219,7 +219,7 @@ class PokemonMove(models.Model):
     stab = models.BooleanField(default=False)
 
     move_type = models.CharField(choices=MoveType.CHOICES, max_length=10, default=MoveType.NORMAL)
-    score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, default=0)
 
     class Meta:
         ordering = ('pokemon', '-score', '-stab',)

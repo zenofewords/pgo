@@ -67,8 +67,6 @@ class Command(BaseCommand):
         pokemon.quick_moves.add(self.get_or_create_pokemon_move(pokemon, move))
 
     def _process_pokemon(self, pokemon_data):
-        new_movesets = []
-
         for pokemon_number, data in pokemon_data.items():
             pokemon, created = self.get_or_create_pokemon(data[0]['number'], data[1]['slug'])
 
@@ -129,14 +127,14 @@ class Command(BaseCommand):
 
             for quick_move in pokemon.quick_moves.all():
                 for cinematic_move in pokemon.cinematic_moves.all():
-                    new_movesets.append(Moveset.objects.get_or_create(
+                    Moveset.objects.get_or_create(
                         pokemon=pokemon,
                         key='{} - {}'.format(quick_move.move, cinematic_move.move),
                         defaults={
                             'quick_move': quick_move,
                             'cinematic_move': cinematic_move,
                         }
-                    ))
+                    )
             pokemon.save()
 
     def _process_moves(self, move_data):
@@ -291,7 +289,7 @@ class Command(BaseCommand):
         self._process_pokemon(pokemon_data)
         print('pokemon processed')
 
-        call_command('pgo_calculate_stats')
+        call_command('pgo_calculate_pokemon_stats')
         print('cp processed')
         call_command('pgo_compound_weakness_resistance')
         print('weakness and resistance processed')
@@ -299,7 +297,7 @@ class Command(BaseCommand):
         print('move stats processed')
         call_command('pgo_calculate_weave_damage')
         print('moveset weave processed')
-        call_command('pgo_populate_pokemon_moves')
+        call_command('pgo_calculate_pokemon_move_score')
         print('move scores processed')
         call_command('pgo_assign_goodtogo_bosses')
         print('good to go bosses processed')

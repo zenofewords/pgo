@@ -14,6 +14,10 @@ from pgo.models import (
     Type,
     WeatherCondition,
 )
+from pgo.utils import (
+    calculate_weave_damage,
+    calculate_pokemon_move_score,
+)
 
 
 class FriendshipAdmin(admin.ModelAdmin):
@@ -73,6 +77,38 @@ class PokemonMoveAdmin(admin.ModelAdmin):
         'pokemon',
         'move',
     )
+
+    def save_model(self, request, obj, form, change):
+        legacy = obj.legacy
+        obj.legacy = False
+        obj.move_type = obj.move.move_type.slug
+
+        super().save_model(request, obj, form, change)
+        pokemon = obj.pokemon
+
+        if obj.cinematic:
+            if obj not in pokemon.cinematic_moves.all():
+                pokemon.cinematic_moves.add(obj)
+        else:
+            if obj not in pokemon.quick_moves.all():
+                pokemon.quick_moves.add(obj)
+
+        for quick_move in pokemon.quick_moves.filter(legacy=False):
+            for cinematic_move in pokemon.cinematic_moves.filter(legacy=False):
+                Moveset.objects.get_or_create(
+                    pokemon=pokemon,
+                    key='{} - {}'.format(quick_move.move, cinematic_move.move),
+                    defaults={
+                        'quick_move': quick_move,
+                        'cinematic_move': cinematic_move,
+                    }
+                )
+        obj.legacy = legacy
+        obj.save()
+        calculate_weave_damage(obj.pokemon)
+
+        for moveset in obj.pokemon.moveset_set.all():
+            calculate_pokemon_move_score(moveset)
 
 
 class RaidBossAdmin(admin.ModelAdmin):

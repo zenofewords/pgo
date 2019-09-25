@@ -1,12 +1,13 @@
 from django.core.management.base import BaseCommand
 
 from pgo.models import Pokemon
-from pgo.utils import calculate_weave_damage
+from pgo.utils import calculate_pokemon_stats
 
 
 class Command(BaseCommand):
-    help = 'Calculate and store DPS details for all currently listed pokemon.'
+    help = 'Calculate stats for all currently listed pokemon.'
 
     def handle(self, *args, **options):
         for pokemon in Pokemon.objects.all():
-            calculate_weave_damage(pokemon)
+            pokemon = calculate_pokemon_stats(pokemon)
+            pokemon.save()

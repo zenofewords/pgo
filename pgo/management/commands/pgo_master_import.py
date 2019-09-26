@@ -163,16 +163,22 @@ class Command(BaseCommand):
 
     def _process_pvp_moves(self, pvp_move_data):
         for pvp_move in pvp_move_data:
-            slug = pvp_move[0]
+            category = pvp_move[0]
+            slug = pvp_move[1]
 
             if slug in ['scald-blastoise', 'hydro-pump-blastoise', 'water-gun-blastoise']:
                 continue
 
-            power = int(float(pvp_move[1]))
-            duration = int(pvp_move[2])
-            delta = int(pvp_move[3]) if pvp_move[3] else 0
+            power = int(float(pvp_move[2]))
+            duration = int(pvp_move[3])
+
+            if category == MoveCategory.QK:
+                duration += 1
+
+            delta = int(pvp_move[4]) if pvp_move[4] else 0
 
             pvp_move_data = {
+                'category': category,
                 'pvp_power': power,
                 'pvp_duration': duration,
                 'pvp_energy_delta': delta,
@@ -273,12 +279,11 @@ class Command(BaseCommand):
                 move_settings = data_line['combatMove']
                 move_name = slugify(move_settings['uniqueId']).replace('_', '-')
 
+                data.append('QK' if 'fast' in move_name else 'CC')
                 data.append(move_name.replace('-fast', ''))
                 data.append(move_settings.get('power', 0))
-                data.append(move_settings.get('energyDelta', 0))
                 data.append(move_settings.get('durationTurns', 0))
                 data.append(move_settings.get('energyDelta', 0))
-                data.append(slugify(move_settings.get('type')[13:]))
 
                 pvp_move_data.append(data)
 

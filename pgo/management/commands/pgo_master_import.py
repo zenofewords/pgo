@@ -37,13 +37,10 @@ class Command(BaseCommand):
             print('created', obj.slug)
         return obj, created
 
-    def get_or_create_move(self, slug, category):
+    def get_or_create_move(self, slug):
         obj, created = Move.objects.get_or_create(
             slug=slug,
-            defaults={
-                'name': slug.replace('-', ' ').title(),
-                'category': category
-            }
+            defaults={'name': slug.replace('-', ' ').title()}
         )
         if created:
             print('created', obj.slug)
@@ -103,22 +100,21 @@ class Command(BaseCommand):
                 if 'moves' in detail:
                     for move_name in detail['moves']['quick']:
                         quick_move = self.get_or_create_move(
-                            slugify(move_name.replace('_', '-')), 'QK'
-                        )[0]
+                            slugify(move_name.replace('_', '-')))[0]
+
                         if quick_move.slug == 'hidden-power':
                             PokemonMove.objects.filter(move=quick_move, pokemon=pokemon).delete()
 
                             for move_type in MoveType.CHOICES:
                                 if move_type[0] != 'fairy' and move_type[0] != 'normal':
                                     self._append_move(self.get_or_create_move(
-                                        'hidden-power-{}'.format(move_type[0]), 'QK')[0], pokemon)
+                                        'hidden-power-{}'.format(move_type[0]))[0], pokemon)
                         else:
                             self._append_move(quick_move, pokemon)
 
                     for move_name in detail['moves']['cinematic']:
                         cinematic_move = self.get_or_create_move(
-                            slugify(move_name.replace('_', '-')), 'CC'
-                        )[0]
+                            slugify(move_name.replace('_', '-')))[0]
                         pokemon_cinematic_move = self.get_or_create_pokemon_move(
                             pokemon, cinematic_move)
                         pokemon.cinematic_moves.add(pokemon_cinematic_move)
@@ -142,8 +138,8 @@ class Command(BaseCommand):
             move = None
             for detail in data:
                 if 'category' in detail:
-                    move, _ = self.get_or_create_move(
-                        move_slug, detail['category'])
+                    move, _ = self.get_or_create_move(move_slug)
+                    move.category = detail['category']
                 if 'move_type' in detail:
                     move.move_type_id = \
                         self.get_or_create_type(detail['move_type']).id
@@ -158,7 +154,7 @@ class Command(BaseCommand):
                 if 'energy_delta' in detail:
                     move.energy_delta = int(detail['energy_delta'])
 
-            if move.move_type_id and move.power:
+            if move.move_type_id:
                 move.save()
 
     def _process_pvp_moves(self, pvp_move_data):
@@ -210,6 +206,14 @@ class Command(BaseCommand):
         move_pattern = re.compile('^V\\d+_MOVE_[A-Z_*-*]+$', re.IGNORECASE)
         pvp_move_pattern = re.compile('^COMBAT_V\\d+_MOVE_[A-Z_*-*]+$', re.IGNORECASE)
         exclude = ('NORMAL', 'SHADOW', 'PURIFIED', )
+        ignored = (
+            'shellos-west-sea',
+            'shellos-east-sea',
+            'gastrodon-east-sea',
+            'gastrodon-west-sea',
+            'giratina',
+            'shaymin',
+        )
 
         for data_line in json_data['itemTemplates']:
             data = []
@@ -219,15 +223,19 @@ class Command(BaseCommand):
                 pokemon_id = data_line['templateId'][2:5]
                 pokemon_settings = data_line['pokemonSettings']
                 pokemon_name = pokemon_settings['pokemonId']
+
                 stats = pokemon_settings['stats']
                 quick_moves = pokemon_settings.get('quickMoves')
                 cinematic_moves = pokemon_settings.get('cinematicMoves')
 
                 form = pokemon_settings.get('form')
                 pokemon_name = form if form else pokemon_name
+                pokemon_name = slugify(pokemon_name.replace('_', '-'))
 
+                if pokemon_name.lower() in ignored:
+                    continue
                 data.append({'number': '#{}'.format(pokemon_id)})
-                data.append({'slug': slugify(pokemon_name.replace('_', '-'))})
+                data.append({'slug': pokemon_name})
 
                 if 'type2' in pokemon_settings:
                     data.append({'pokemon_types': (
@@ -254,6 +262,11 @@ class Command(BaseCommand):
 
             if move_pattern.match(template_id):
                 move_settings = data_line['moveSettings']
+
+                # placeholder move
+                if type(move_settings['movementId']) != str:
+                    continue
+
                 move_name = slugify(move_settings['movementId']).replace('_', '-')
 
                 category = 'CM'
@@ -307,14 +320,6 @@ class Command(BaseCommand):
         call_command('pgo_assign_goodtogo_bosses')
         print('good to go bosses processed')
 
-        Pokemon.objects.filter(slug__in=(
-            'shellos-west-sea',
-            'shellos-east-sea',
-            'gastrodon-east-sea',
-            'gastrodon-west-sea',
-            'giratina',
-            'shaymin',
-        )).delete()
         Pokemon.objects.filter(slug='mewtwo-a').update(name='Mewtwo-armored')
         Pokemon.objects.filter(slug='deoxys').update(name='Deoxys-normal')
-        print('clean up redundant entries')
+        print('update names')

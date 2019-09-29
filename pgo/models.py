@@ -192,16 +192,16 @@ class Move(NameMixin):
     pvp_duration = models.IntegerField(blank=True, default=0)
 
     dps = models.DecimalField(
-        verbose_name='Damage per second', max_digits=3, decimal_places=1, blank=True, null=True)
+        verbose_name='Damage per second', max_digits=6, decimal_places=1, blank=True, null=True)
     eps = models.DecimalField(
-        verbose_name='Energy per second', max_digits=3, decimal_places=1, blank=True, null=True)
+        verbose_name='Energy per second', max_digits=6, decimal_places=1, blank=True, null=True)
 
     dpt = models.DecimalField(
-        verbose_name='Damage per turn', max_digits=3, decimal_places=1, blank=True, null=True)
+        verbose_name='Damage per turn', max_digits=6, decimal_places=1, blank=True, null=True)
     ept = models.DecimalField(
-        verbose_name='Energy per turn', max_digits=3, decimal_places=1, blank=True, null=True)
+        verbose_name='Energy per turn', max_digits=6, decimal_places=1, blank=True, null=True)
     dpe = models.DecimalField(
-        verbose_name='Damage per energy', max_digits=5, decimal_places=3, blank=True, null=True)
+        verbose_name='Damage per energy', max_digits=6, decimal_places=3, blank=True, null=True)
 
     class Meta:
         ordering = ('-category', 'name',)

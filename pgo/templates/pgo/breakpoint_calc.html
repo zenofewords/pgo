@@ -93,11 +93,11 @@
         <div class="select-defender-tier-wrapper">
           <label for="select-defender-tier" class="screen-reader">Defender tier / level</label>
           <select id="select-defender-tier">
-            {% for data in defender_cpm_data %}
+            {% for key, value in defender_cpm.items %}
               {% if forloop.last %}
-                <option value="{{ data.1 }}0">L{{ data.0.normalize }}</option>
+                <option value="{{ value }}0">L{{ key }}</option>
               {% else %}
-                <option value="{{ data.1 }}{{ data.0 }}" {% if data.0 == 5 %}selected{% endif %}>T{{ data.0 }}</option>
+                <option value="{{ value }}{{ key }}" {% if key == 5 %}selected{% endif %}>T{{ key }}</option>
               {% endif %}
             {% endfor %}
           </select>

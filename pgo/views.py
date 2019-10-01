@@ -21,12 +21,10 @@ from pgo.models import (
     Move,
     Pokemon,
     PokemonMove,
-    RaidTier,
     Type,
     WeatherCondition,
 )
-
-from zenofewords.models import SiteNotification
+from pgo.utils import TIER_CPM_MAP
 
 
 class BreakpointCalcRedirectView(RedirectView):
@@ -45,23 +43,16 @@ class CalculatorInitialDataMixin(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(CalculatorInitialDataMixin, self).get_context_data(**kwargs)
-        defender_cpm_data = (
-            list(RaidTier.objects.order_by('order').values_list('tier', 'raid_cpm__value'))
-            + list(CPM.objects.filter(level=40, raid_cpm=False).values_list('level', 'value'))
-        )
-
-        data = {
+        context.update({
             'pokemon_qs': Pokemon.objects.only(
                 'pk', 'name', 'primary_type', 'secondary_type'
             ).select_related('primary_type', 'secondary_type'),
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.all(),
             'friendship': Friendship.objects.order_by('order'),
-            'defender_cpm_data': defender_cpm_data,
+            'defender_cpm': TIER_CPM_MAP,
             'initial_data': self.initial_data,
-            'site_notifications': SiteNotification.active_notifications.all(),
-        }
-        context.update(data)
+        })
         return context
 
     def _get_object_id(self, model_name, value):

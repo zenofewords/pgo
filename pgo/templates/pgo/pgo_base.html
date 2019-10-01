@@ -16,13 +16,7 @@
 
 {% block header %}
   {{ block.super }}
-  {% navigation_tag 'pgo' True %}
-
-  {% for notification in site_notifications %}
-    <p>
-      {{ notification.message|safe }}
-    </p>
-  {% endfor %}
+  {% navigation_tag %}
 {% endblock header %}
 
 {% block footer %}

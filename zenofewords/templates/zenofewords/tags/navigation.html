@@ -1,3 +1,5 @@
+{% load zenofewords_tags %}
+
 <nav>
   <div class="nav">
     <div
@@ -9,11 +11,11 @@
       <span class="menu-line"></span>
       <span class="menu-line"></span>
       <ul id="menu" style="opacity: 0;">
-        {% for menu_item in navigation.navigationitem_set.all %}
+        {% for key, value in navigation.items %}
           <li>
-            <a href="/{{ menu_item.slug }}/">
-              <div class="{% if current_url == '' and forloop.first %}active{% endif %}{% if menu_item.slug in current_url %}active{% endif %}">
-                {{ menu_item|upper }}
+            <a href="{{ key }}">
+              <div {% is_active current_url key forloop.first %}>
+                {{ value|upper }}
               </div>
             </a>
           </li>

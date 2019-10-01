@@ -44,9 +44,7 @@ class CalculatorInitialDataMixin(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CalculatorInitialDataMixin, self).get_context_data(**kwargs)
         context.update({
-            'pokemon_qs': Pokemon.objects.only(
-                'pk', 'name', 'primary_type', 'secondary_type'
-            ).select_related('primary_type', 'secondary_type'),
+            'pokemon_qs': {},
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.all(),
             'friendship': Friendship.objects.order_by('order'),

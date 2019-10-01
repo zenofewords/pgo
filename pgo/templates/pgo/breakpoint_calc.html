@@ -21,11 +21,6 @@
           <label for="select-attacker" class="screen-reader">Select attacker</label>
           <select id="select-attacker" data-trigger name="choices-single-default">
             <option value="-1" disabled selected>Select attacker</option>
-            {% for pokemon in pokemon_qs %}
-              <option value="{{ pokemon.pk }}">
-                {{ pokemon.name }} | {{ pokemon.primary_type.name }} {% if pokemon.secondary_type %} / {{ pokemon.secondary_type.name }}{% endif %}
-              </option>
-            {% endfor %}
           </select>
         </div>
 
@@ -82,11 +77,6 @@
           <label for="select-defender" class="screen-reader">Select defender</label>
           <select id="select-defender" data-trigger name="choices-single-default">
             <option value="-1" disabled selected>Select defender</option>
-            {% for pokemon in pokemon_qs %}
-              <option value="{{ pokemon.pk }}">
-                {{ pokemon.name }} | {{ pokemon.primary_type.name }} {% if pokemon.secondary_type %} / {{ pokemon.secondary_type.name }}{% endif %}
-              </option>
-            {% endfor %}
           </select>
         </div>
 

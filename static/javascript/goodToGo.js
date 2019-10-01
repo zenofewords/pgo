@@ -22,8 +22,9 @@ ready(() => {
   const selectAttacker = new Choices(
     '.select-attacker',
     {
-      searchPlaceholderValue: 'Type in the attacker\'s name',
-      searchResultLimit: 5,
+      searchPlaceholderValue: 'Type in at least 3 characters',
+      searchFloor: 3,
+      searchResultLimit: 10,
       itemSelectText: '',
       loadingText: '',
     }
@@ -52,6 +53,13 @@ ready(() => {
   }
 
   // events
+  selectAttacker.input.element.addEventListener('input', (event) => {
+    const value = event.target.value
+
+    if (value.length > 2) {
+      fetchPokemon(selectAttacker, value)
+    }
+  })
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs()
     selectPokemonMoves(event.currentTarget.value)
@@ -100,6 +108,30 @@ ready(() => {
       )
       form['quick_move'] = -1
     }
+  }
+
+  const fetchPokemon = (select, value) => {
+    select.ajax(callback => {
+      fetch(`${window.pgoAPIURLs['simple-pokemon-list']}?pokemon-slug=${value}`)
+        .then(response => {
+          response.json()
+            .then(data => {
+              select.clearChoices()
+              callback(data.results, 'value', 'label')
+            })
+            .then(() => {
+              select.input.element.focus()
+            })
+            .catch(() => {
+              form.status = FORM_STATE.ERROR
+              showErrors()
+            })
+        })
+        .catch(() => {
+          form.status = FORM_STATE.ERROR
+          showErrors()
+        })
+    })
   }
 
   const selectPokemonMoves = (value) => {
@@ -325,7 +357,18 @@ ready(() => {
   }
 
   const restoreForm = (data) => {
-    selectAttacker.setChoiceByValue(String(data.attacker))
+    selectAttacker.ajax(callback => {
+      fetch(`${window.pgoAPIURLs['simple-pokemon-list']}${data.attacker}/`)
+        .then(response => {
+          response.json()
+            .then(data => {
+              callback(data, 'value', 'label')
+            })
+            .then(() => {
+              selectAttacker.setChoiceByValue(data.attacker)
+            })
+        })
+    })
 
     selectAttackerAtkIv.value = data.attack_iv
     selectWeatherCondition.value = data.weather_condition

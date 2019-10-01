@@ -15,12 +15,11 @@
   box-shadow: $discreetShadow
 
 .choices__item
-  font-size: $fontSize
   padding-left: .45rem
 
 .choices__list
-  max-height: 15rem
   border: 0
+  font-size: $fontSize
 
 .choices__list--dropdown
   background-color: $backgroundColor
@@ -45,8 +44,10 @@
   padding-bottom: .4rem
 
 .choices[data-type*=select-one] .choices__input
-  padding-top: .1rem
-  padding-bottom: .1rem
+  padding-left: .5rem
+  padding-top: 0
+  padding-bottom: 0
+  border-radius: 0
 
 .choices.is-disabled .choices__inner
   background-color: $disabledBGColor

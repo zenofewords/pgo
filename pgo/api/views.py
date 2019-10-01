@@ -11,8 +11,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.generics import GenericAPIView
 
+from django.contrib.postgres.search import TrigramSimilarity
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 
 from pgo.api.serializers import (
     BreakpointCalcSerializer, PokemonMoveSerializer, MoveSerializer,
@@ -67,7 +69,7 @@ class MoveViewSet(LargeResultModelViewSet):
             else:
                 return []
         else:
-            return super(MoveViewSet, self).get_queryset()
+            return super().get_queryset()
 
 
 class PokemonViewSet(viewsets.ModelViewSet):
@@ -90,7 +92,7 @@ class PokemonViewSet(viewsets.ModelViewSet):
             except ValueError:
                 pass
 
-        return super(PokemonViewSet, self).get_queryset()
+        return super().get_queryset()
 
 
 class TypeViewSet(LargeResultModelViewSet):
@@ -103,6 +105,17 @@ class PokemonSimpleViewSet(LargeResultModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
     serializer_class = SimplePokemonSerializer
+
+    def get_queryset(self):
+        pokemon_slug = slugify(self.request.GET.get('pokemon-slug', ''))
+
+        if pokemon_slug:
+            return self.queryset.annotate(
+                similarity=TrigramSimilarity('slug', pokemon_slug)
+            ).filter(
+                similarity__gte=0.1
+            )[:10]
+        return super().get_queryset()
 
 
 class BreakpointCalcAPIView(GenericAPIView):

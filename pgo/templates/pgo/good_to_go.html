@@ -21,11 +21,6 @@
           <label for="choices-single-default" class="screen-reader">Select attacker</label>
           <select class="select-attacker" data-trigger name="choices-single-default" id="choices-single-default">
             <option value="-1" disabled selected>Select attacker</option>
-            {% for pokemon in pokemon_qs %}
-              <option value="{{ pokemon.pk }}">
-                {{ pokemon.name }} | {{ pokemon.primary_type.name }} {% if pokemon.secondary_type %} / {{ pokemon.secondary_type.name }}{% endif %}
-              </option>
-            {% endfor %}
           </select>
         </div>
 

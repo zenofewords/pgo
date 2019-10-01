@@ -26,11 +26,12 @@ ready(() => {
   const selectAttacker = new Choices(
     '#select-attacker',
     {
-      searchPlaceholderValue: 'Type in the attacker\'s name',
-      searchResultLimit: 5,
+      searchPlaceholderValue: 'Type in at least 3 characters',
+      searchFloor: 3,
+      searchResultLimit: 10,
       itemSelectText: '',
       loadingText: '',
-    }
+    },
   )
   const inputAttackerLevel = document.getElementById('input-attacker-level')
   const selectAttackerQuickMove = document.getElementById('select-quick-move')
@@ -39,8 +40,9 @@ ready(() => {
   const selectDefender = new Choices(
     '#select-defender',
     {
-      searchPlaceholderValue: 'Type in the defender\'s name',
-      searchResultLimit: 5,
+      searchPlaceholderValue: 'Type in at least 3 characters',
+      searchFloor: 3,
+      searchResultLimit: 10,
       itemSelectText: '',
       loadingText: '',
     }
@@ -82,6 +84,20 @@ ready(() => {
   }
 
   // events
+  selectAttacker.input.element.addEventListener('input', (event) => {
+    const value = event.target.value
+
+    if (value.length > 2) {
+      fetchPokemon(selectAttacker, value)
+    }
+  })
+  selectDefender.input.element.addEventListener('input', (event) => {
+    const value = event.target.value
+
+    if (value.length > 2) {
+      fetchPokemon(selectDefender, value)
+    }
+  })
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('attacker')
     selectPokemonMoves(event.currentTarget.value, 'attacker')
@@ -240,6 +256,30 @@ ready(() => {
     }
   }
 
+  const fetchPokemon = (select, value) => {
+    select.ajax(callback => {
+      fetch(`${window.pgoAPIURLs['simple-pokemon-list']}?pokemon-slug=${value}`)
+        .then(response => {
+          response.json()
+            .then(data => {
+              select.clearChoices()
+              callback(data.results, 'value', 'label')
+            })
+            .then(() => {
+              select.input.element.focus()
+            })
+            .catch(() => {
+              form.status = FORM_STATE.ERROR
+              showErrors()
+            })
+        })
+        .catch(() => {
+          form.status = FORM_STATE.ERROR
+          showErrors()
+        })
+    })
+  }
+
   const selectPokemonMoves = (value, pokemon) => {
     if (parseInt(value) > 0) {
       const request = new XMLHttpRequest()
@@ -394,8 +434,30 @@ ready(() => {
   const restoreForm = (data) => {
     toggleTab(data.tab)
 
-    selectAttacker.setChoiceByValue(`${data.attacker}`)
-    selectDefender.setChoiceByValue(`${data.defender}`)
+    selectAttacker.ajax(callback => {
+      fetch(`${window.pgoAPIURLs['simple-pokemon-list']}${data.attacker}/`)
+        .then(response => {
+          response.json()
+            .then(data => {
+              callback(data, 'value', 'label')
+            })
+            .then(() => {
+              selectAttacker.setChoiceByValue(data.attacker)
+            })
+        })
+    })
+    selectDefender.ajax(callback => {
+      fetch(`${window.pgoAPIURLs['simple-pokemon-list']}${data.defender}/`)
+        .then(response => {
+          response.json()
+            .then(data => {
+              callback(data, 'value', 'label')
+            })
+            .then(() => {
+              selectDefender.setChoiceByValue(data.defender)
+            })
+        })
+    })
 
     inputAttackerLevel.value = data.attacker_level
     selectAttackerAtkIv.value = data.attacker_atk_iv

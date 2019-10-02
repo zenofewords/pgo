@@ -26,7 +26,8 @@ ready(() => {
       searchFloor: 3,
       searchResultLimit: 10,
       itemSelectText: '',
-      loadingText: '',
+      loadingText: 'loading',
+      shouldSort: false,
     }
   )
   const selectAttackerQuickMove = document.getElementById('select-quick-move')

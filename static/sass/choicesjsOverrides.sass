@@ -52,12 +52,23 @@
 .choices.is-disabled .choices__inner
   background-color: $disabledBGColor
 
+.choices__placeholder
+  position: absolute
+  top: 2.1rem
+  z-index: 2
+  font-size: $fontSize
+  padding-left: .5rem
+  text-align: right
+  width: 100%
+  margin-left: -1rem
+
 /* iPhone 5/SE */
 @media (max-width: $mediaMinBreakpoint)
   .choices__input,
   .choices__inner,
   .choices__item,
-  .choices__list--dropdown .choices__item
+  .choices__list--dropdown .choices__item,
+  .choices__placeholder
     font-size: $fontSizeSmall
 
   .choices[data-type*=select-one] .choices__inner

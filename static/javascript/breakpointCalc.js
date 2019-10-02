@@ -30,7 +30,7 @@ ready(() => {
       searchFloor: 3,
       searchResultLimit: 10,
       itemSelectText: '',
-      loadingText: '',
+      loadingText: 'loading',
       shouldSort: false,
     },
   )
@@ -45,7 +45,7 @@ ready(() => {
       searchFloor: 3,
       searchResultLimit: 10,
       itemSelectText: '',
-      loadingText: '',
+      loadingText: 'loading',
       shouldSort: false,
     }
   )
@@ -103,8 +103,8 @@ ready(() => {
     }
   }, 500)
 
-  selectAttacker.input.element.addEventListener('keydown', processInput.bind(null, selectAttacker))
-  selectDefender.input.element.addEventListener('keydown', processInput.bind(null, selectDefender))
+  selectAttacker.input.element.addEventListener('input', processInput.bind(null, selectAttacker))
+  selectDefender.input.element.addEventListener('input', processInput.bind(null, selectDefender))
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('attacker')
     selectPokemonMoves(event.currentTarget.value, 'attacker')

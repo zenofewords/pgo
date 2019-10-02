@@ -53,13 +53,24 @@ ready(() => {
   }
 
   // events
-  selectAttacker.input.element.addEventListener('input', (event) => {
+  const debounceEvent = (callbackFn, time, interval) =>
+    (...args) => {
+      clearTimeout(interval)
+      interval = setTimeout(() => {
+        interval = null
+        callbackFn(...args)
+      }, time)
+    }
+
+  const processInput = debounceEvent((select, event) => {
     const value = event.target.value
 
     if (value.length > 2) {
-      fetchPokemon(selectAttacker, value)
+      fetchPokemon(select, value)
     }
-  })
+  }, 500)
+
+  selectAttacker.input.element.addEventListener('keydown', processInput.bind(null, selectAttacker))
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs()
     selectPokemonMoves(event.currentTarget.value)

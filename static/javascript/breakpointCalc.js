@@ -31,6 +31,7 @@ ready(() => {
       searchResultLimit: 10,
       itemSelectText: '',
       loadingText: '',
+      shouldSort: false,
     },
   )
   const inputAttackerLevel = document.getElementById('input-attacker-level')
@@ -45,6 +46,7 @@ ready(() => {
       searchResultLimit: 10,
       itemSelectText: '',
       loadingText: '',
+      shouldSort: false,
     }
   )
   const selectDefenderQuickMove = document.getElementById('select-defender-quick-move')
@@ -84,20 +86,25 @@ ready(() => {
   }
 
   // events
-  selectAttacker.input.element.addEventListener('input', (event) => {
+  const debounceEvent = (callbackFn, time, interval) =>
+    (...args) => {
+      clearTimeout(interval)
+      interval = setTimeout(() => {
+        interval = null
+        callbackFn(...args)
+      }, time)
+    }
+
+  const processInput = debounceEvent((select, event) => {
     const value = event.target.value
 
     if (value.length > 2) {
-      fetchPokemon(selectAttacker, value)
+      fetchPokemon(select, value)
     }
-  })
-  selectDefender.input.element.addEventListener('input', (event) => {
-    const value = event.target.value
+  }, 500)
 
-    if (value.length > 2) {
-      fetchPokemon(selectDefender, value)
-    }
-  })
+  selectAttacker.input.element.addEventListener('keydown', processInput.bind(null, selectAttacker))
+  selectDefender.input.element.addEventListener('keydown', processInput.bind(null, selectDefender))
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('attacker')
     selectPokemonMoves(event.currentTarget.value, 'attacker')

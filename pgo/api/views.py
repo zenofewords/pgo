@@ -114,7 +114,7 @@ class PokemonSimpleViewSet(LargeResultModelViewSet):
                 similarity=TrigramSimilarity('slug', pokemon_slug)
             ).filter(
                 similarity__gte=0.1
-            )[:10]
+            ).order_by('-similarity')[:10]
         return super().get_queryset()
 
 

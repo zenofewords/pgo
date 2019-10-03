@@ -169,9 +169,9 @@ def calculate_defense(total_defense, cpm):
     return int(floor(total_defense * cpm))
 
 
-def get_pokemon_data(id):
+def get_pokemon_data(slug):
     try:
-        return Pokemon.objects.get(pk=id)
+        return Pokemon.objects.get(slug=slug)
     except Pokemon.DoesNotExist:
         raise Http404
 

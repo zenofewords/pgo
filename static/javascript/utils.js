@@ -1,3 +1,5 @@
+export const breakpointCalcURL = '/breakpoint-calc/'
+
 export const choicesOptions = {
   searchPlaceholderValue: 'Type in at least 3 characters',
   searchFloor: 3,
@@ -69,16 +71,16 @@ export const updateBrowserHistory = (getParams, url) => {
   )
 }
 
-export const fetchPokemonChoice = (select, pokemonId) => {
+export const fetchPokemonChoice = (select, pokemonSlug) => {
   select.ajax(callback => {
-    fetch(`${window.pgoAPIURLs['simple-pokemon-list']}${pokemonId}/`)
+    fetch(`${window.pgoAPIURLs['simple-pokemon-list']}${pokemonSlug}/`)
       .then(response => {
         response.json()
           .then(data => {
             callback(data, 'value', 'label')
           })
           .then(() => {
-            select.setChoiceByValue(pokemonId)
+            select.setChoiceByValue(pokemonSlug)
           })
       })
   })

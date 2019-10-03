@@ -61,12 +61,11 @@ class SimplePokemonSerializer(serializers.Serializer):
 
     class Meta:
         model = Pokemon
-        fields = (
-            'value', 'label',
-        )
+        fields = ('value', 'label', )
+        lookup_field = 'slug'
 
     def get_value(self, obj):
-        return obj.pk
+        return obj.slug
 
     def get_label(self, obj):
         label = '{} | {}'.format(obj.name, obj.primary_type.name)
@@ -77,21 +76,21 @@ class SimplePokemonSerializer(serializers.Serializer):
 
 
 class BreakpointCalcSerializer(serializers.Serializer):
-    attacker = serializers.IntegerField()
+    attacker = serializers.SlugField()
     attacker_level = serializers.FloatField(min_value=1, max_value=40)
     attacker_quick_move = serializers.IntegerField()
     attacker_cinematic_move = serializers.IntegerField()
     attacker_atk_iv = serializers.IntegerField(min_value=0, max_value=15)
     weather_condition = serializers.IntegerField(required=False)
     friendship_boost = serializers.DecimalField(required=False, max_digits=3, decimal_places=2)
-    defender = serializers.IntegerField()
+    defender = serializers.SlugField()
     defender_quick_move = serializers.IntegerField()
     defender_cinematic_move = serializers.IntegerField()
     defender_cpm = serializers.DecimalField(max_digits=11, decimal_places=10)
 
 
 class GoodToGoSerializer(serializers.Serializer):
-    attacker = serializers.IntegerField()
+    attacker = serializers.SlugField()
     quick_move = serializers.IntegerField()
     cinematic_move = serializers.IntegerField()
     attack_iv = serializers.IntegerField(min_value=0, max_value=15)

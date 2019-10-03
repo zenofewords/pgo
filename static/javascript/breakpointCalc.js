@@ -1,6 +1,7 @@
 import '../sass/breakpointCalc.sass'
 import './navigation.js'
 import {
+  breakpointCalcURL,
   choicesOptions,
   createMoveOption,
   fetchPokemonChoice,
@@ -46,7 +47,7 @@ ready(() => {
   const selectFriendShipBoost = document.getElementById('select-friendship-boost')
   const selectDefenderCPM = document.getElementById('select-defender-tier')
 
-  const results = document.getElementById('results')
+  const results = document.querySelector('.results')
   const inputToggleCinematicBreakpoints = document.getElementById('toggle-cinematic-breakpoints')
   const inputToggleTopCounterSort = document.getElementById('top-counter-sort-toggle')
 
@@ -190,7 +191,7 @@ ready(() => {
       tabBreakpoints.classList.add('selected-tab')
       tabTopCounters.classList.remove('selected-tab')
 
-      updateBrowserHistory(formatParams(form), '/breakpoint-calc/')
+      updateBrowserHistory(formatParams(form), breakpointCalcURL)
     } else if (currentTab === TAB.COUNTERS) {
       breakpointsTable.hidden = true
       topCountersTable.hidden = false
@@ -198,7 +199,7 @@ ready(() => {
       tabTopCounters.classList.add('selected-tab')
       tabBreakpoints.classList.remove('selected-tab')
 
-      updateBrowserHistory(formatParams(form), '/breakpoint-calc/')
+      updateBrowserHistory(formatParams(form), breakpointCalcURL)
     }
   }
 
@@ -219,12 +220,12 @@ ready(() => {
   }
 
   const selectPokemonMoves = (value, pokemon) => {
-    if (parseInt(value) > 0) {
+    if (value.length > 0) {
       const request = new XMLHttpRequest()
       const excludeLegacy = pokemon === 'defender' && selectDefenderCPM.value.slice(-1) !== '0'
       request.open(
         'GET',
-        `${window.pgoAPIURLs['move-list']}?pokemon-id=${value}&exclude-legacy=${excludeLegacy}`,
+        `${window.pgoAPIURLs['move-list']}?pokemon-slug=${value}&exclude-legacy=${excludeLegacy}`,
         true
       )
 
@@ -241,6 +242,8 @@ ready(() => {
       }
       request.send()
     } else {
+      showErrors()
+
       selectAttackerQuickMove.disabled = true
       selectAttackerCinematicMove.disabled = true
       selectDefenderQuickMove.disabled = true
@@ -313,7 +316,7 @@ ready(() => {
 
                 displayDetails(json)
                 generateTopCountersTable(json.top_counters)
-                updateBrowserHistory(getParams, '/breakpoint-calc/')
+                updateBrowserHistory(getParams, breakpointCalcURL)
               } else {
                 showErrors()
               }

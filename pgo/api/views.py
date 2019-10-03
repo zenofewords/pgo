@@ -53,21 +53,15 @@ class MoveViewSet(LargeResultModelViewSet):
     serializer_class = MoveSerializer
 
     def get_queryset(self):
-        if 'pokemon-id' in self.request.GET:
-            try:
-                query = int(self.request.GET.get('pokemon-id', 0))
-            except ValueError:
-                query = 0
+        if 'pokemon-slug' in self.request.GET:
+            self.serializer_class = PokemonMoveSerializer
+            qs = PokemonMove.objects.filter(
+                pokemon__slug=slugify(self.request.GET.get('pokemon-slug'))
+            )
 
-            if query != 0:
-                self.serializer_class = PokemonMoveSerializer
-                qs = PokemonMove.objects.filter(pokemon_id=query)
-
-                if self.request.GET.get('exclude-legacy') == 'true':
-                    qs = qs.exclude(legacy=True)
-                return qs
-            else:
-                return []
+            if self.request.GET.get('exclude-legacy') == 'true':
+                qs = qs.exclude(legacy=True)
+            return qs
         else:
             return super().get_queryset()
 
@@ -105,6 +99,7 @@ class PokemonSimpleViewSet(LargeResultModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
     serializer_class = SimplePokemonSerializer
+    lookup_field = 'slug'
 
     def get_queryset(self):
         pokemon_slug = slugify(self.request.GET.get('pokemon-slug', ''))
@@ -146,10 +141,10 @@ class BreakpointCalcAPIView(GenericAPIView):
         cpm_qs = CPM.gyms.all()
         self.max_cpm_value = cpm_qs.last().value
 
-        attacker_id = data.get('attacker')
-        defender_id = data.get('defender')
-        if attacker_id == defender_id:
-            pokemon = get_pokemon_data(attacker_id)
+        attacker_slug = data.get('attacker')
+        defender_slug = data.get('defender')
+        if attacker_slug == defender_slug:
+            pokemon = get_pokemon_data(attacker_slug)
             self.attacker = pokemon
             self.defender = copy.deepcopy(pokemon)
         else:
@@ -558,7 +553,7 @@ class GoodToGoAPIView(GenericAPIView):
         return response.Response(self._process_data(), status=status.HTTP_200_OK)
 
     def _fetch_data(self, data):
-        self.attacker = get_object_or_404(Pokemon, pk=data.get('attacker'))
+        self.attacker = get_object_or_404(Pokemon, slug=data.get('attacker'))
         self.quick_move = get_object_or_404(Move, pk=data.get('quick_move'))
         self.cinematic_move = get_object_or_404(Move, pk=data.get('cinematic_move'))
         self.boosted_types = list(get_object_or_404(WeatherCondition, pk=data.get(

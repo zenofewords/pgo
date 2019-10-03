@@ -53,15 +53,6 @@ ready(() => {
   }
 
   // events
-  const debounceEvent = (callbackFn, time, interval) =>
-    (...args) => {
-      clearTimeout(interval)
-      interval = setTimeout(() => {
-        interval = null
-        callbackFn(...args)
-      }, time)
-    }
-
   selectAttacker.input.element.addEventListener('keydown', processInput.bind(null, selectAttacker))
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs()
@@ -113,32 +104,10 @@ ready(() => {
     }
   }
 
-  const fetchPokemon = (select, value) => {
-    select.ajax(callback => {
-      fetch(`${window.pgoAPIURLs['simple-pokemon-list']}?pokemon-slug=${value}`)
-        .then(response => {
-          response.json()
-            .then(data => {
-              select.clearChoices()
-              callback(data.results, 'value', 'label')
-            })
-            .then(() => {
-              select.input.element.focus()
-            })
-            .catch(() => {
-              showErrors()
-            })
-        })
-        .catch(() => {
-          showErrors()
-        })
-    })
-  }
-
   const selectPokemonMoves = (value) => {
-    if (parseInt(value) > 0) {
+    if (value.length > 0) {
       const request = new XMLHttpRequest()
-      request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
+      request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-slug=' + value, true)
 
       request.onload = () => {
         if (request.status >= 500) {
@@ -156,8 +125,8 @@ ready(() => {
       }
       request.send()
     } else {
+      showErrors()
       selectAttackerQuickMove.disabled = true
-
       clearMoveInputs()
     }
   }
@@ -332,7 +301,6 @@ ready(() => {
     selectFriendshipBoost.value = data.friendship_boost
 
     selectPokemonMoves(data.attacker, 'attacker')
-    selectPokemonMoves(data.defender, 'defender')
     restoreTierSelection(data)
 
     form = data

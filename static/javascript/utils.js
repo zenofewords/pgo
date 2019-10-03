@@ -1,7 +1,7 @@
 export const breakpointCalcURL = '/breakpoint-calc/'
 
 export const choicesOptions = {
-  searchPlaceholderValue: 'Type in at least 3 characters',
+  searchPlaceholderValue: 'Type 3 or more characters',
   searchFloor: 3,
   searchResultLimit: 10,
   itemSelectText: '',
@@ -27,25 +27,24 @@ export const processInput = debounceEvent((select, event) => {
 }, 500)
 
 const fetchPokemon = (select, value) => {
-  select.ajax(callback => {
-    fetch(`${window.pgoAPIURLs['simple-pokemon-list']}?pokemon-slug=${value}`)
-      .then(response => {
-        response.json()
-          .then(data => {
-            select.clearChoices()
-            callback(data.results, 'value', 'label')
-          })
-          .then(() => {
-            select.input.element.focus()
-          })
-          .catch(() => {
-            showErrors()
-          })
-      })
-      .catch(() => {
-        showErrors()
-      })
-  })
+  const request = new XMLHttpRequest()
+  request.open(
+    'GET',
+    `${window.pgoAPIURLs['simple-pokemon-list']}?pokemon-slug=${value}`,
+    true
+  )
+  request.onload = () => {
+    if (request.status >= 200 && request.status < 400) {
+      const json = JSON.parse(request.responseText)
+      select.setChoices(json.results, 'value', 'label', true)
+    } else {
+      showErrors()
+    }
+  }
+  request.onerror = () => {
+    showErrors()
+  }
+  request.send()
 }
 
 export const showErrors = () => {

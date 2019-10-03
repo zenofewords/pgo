@@ -72,18 +72,26 @@ export const updateBrowserHistory = (getParams, url) => {
 }
 
 export const fetchPokemonChoice = (select, pokemonSlug) => {
-  select.ajax(callback => {
-    fetch(`${window.pgoAPIURLs['simple-pokemon-list']}${pokemonSlug}/`)
-      .then(response => {
-        response.json()
-          .then(data => {
-            callback(data, 'value', 'label')
-          })
-          .then(() => {
-            select.setChoiceByValue(pokemonSlug)
-          })
-      })
-  })
+  const request = new XMLHttpRequest()
+  request.open(
+    'GET',
+    `${window.pgoAPIURLs['simple-pokemon-list']}${pokemonSlug}/`,
+    true
+  )
+  request.onload = () => {
+    if (request.status >= 200 && request.status < 400) {
+      const json = JSON.parse(request.responseText)
+      select.setChoices([
+        {value: json.value, label: json.label, selected: true}
+      ], 'value', 'label', true)
+    } else {
+      showErrors()
+    }
+  }
+  request.onerror = () => {
+    showErrors()
+  }
+  request.send()
 }
 
 export const validateLevel = (input) => {

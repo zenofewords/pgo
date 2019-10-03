@@ -1,23 +1,23 @@
 from django import template
 
-from zenofewords.models import Navigation
+from pgo.utils import NAVIGATION_ITEMS
 
 register = template.Library()
 
 
 @register.inclusion_tag('zenofewords/tags/navigation.html', takes_context=True)
-def navigation_tag(context, navigation_slug, subnav=False):
-    path = context['request'].path
+def navigation_tag(context):
     return {
-        'subnav': subnav,
-        'current_url': path.replace('/', '').replace(navigation_slug, ''),
-        'navigation': Navigation.objects.filter(slug=navigation_slug).first()
+        'current_url': context['request'].path,
+        'navigation': NAVIGATION_ITEMS,
     }
 
 
 @register.simple_tag
-def option_matches_value(option, values):
-    return option in values
+def is_active(current_url, key, first_item):
+    if (first_item and current_url == '/') or key in current_url:
+        return 'class=active'
+    return ''
 
 
 @register.filter

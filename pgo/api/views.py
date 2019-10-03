@@ -11,8 +11,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.generics import GenericAPIView
 
+from django.contrib.postgres.search import TrigramSimilarity
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 
 from pgo.api.serializers import (
     BreakpointCalcSerializer, PokemonMoveSerializer, MoveSerializer,
@@ -51,23 +53,17 @@ class MoveViewSet(LargeResultModelViewSet):
     serializer_class = MoveSerializer
 
     def get_queryset(self):
-        if 'pokemon-id' in self.request.GET:
-            try:
-                query = int(self.request.GET.get('pokemon-id', 0))
-            except ValueError:
-                query = 0
+        if 'pokemon-slug' in self.request.GET:
+            self.serializer_class = PokemonMoveSerializer
+            qs = PokemonMove.objects.filter(
+                pokemon__slug=slugify(self.request.GET.get('pokemon-slug'))
+            )
 
-            if query != 0:
-                self.serializer_class = PokemonMoveSerializer
-                qs = PokemonMove.objects.filter(pokemon_id=query)
-
-                if self.request.GET.get('exclude-legacy') == 'true':
-                    qs = qs.exclude(legacy=True)
-                return qs
-            else:
-                return []
+            if self.request.GET.get('exclude-legacy') == 'true':
+                qs = qs.exclude(legacy=True)
+            return qs
         else:
-            return super(MoveViewSet, self).get_queryset()
+            return super().get_queryset()
 
 
 class PokemonViewSet(viewsets.ModelViewSet):
@@ -90,7 +86,7 @@ class PokemonViewSet(viewsets.ModelViewSet):
             except ValueError:
                 pass
 
-        return super(PokemonViewSet, self).get_queryset()
+        return super().get_queryset()
 
 
 class TypeViewSet(LargeResultModelViewSet):
@@ -103,6 +99,18 @@ class PokemonSimpleViewSet(LargeResultModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
     serializer_class = SimplePokemonSerializer
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        pokemon_slug = slugify(self.request.GET.get('pokemon-slug', ''))
+
+        if pokemon_slug:
+            return self.queryset.annotate(
+                similarity=TrigramSimilarity('slug', pokemon_slug)
+            ).filter(
+                similarity__gte=0.1
+            ).order_by('-similarity')[:10]
+        return super().get_queryset()
 
 
 class BreakpointCalcAPIView(GenericAPIView):
@@ -133,10 +141,10 @@ class BreakpointCalcAPIView(GenericAPIView):
         cpm_qs = CPM.gyms.all()
         self.max_cpm_value = cpm_qs.last().value
 
-        attacker_id = data.get('attacker')
-        defender_id = data.get('defender')
-        if attacker_id == defender_id:
-            pokemon = get_pokemon_data(attacker_id)
+        attacker_slug = data.get('attacker')
+        defender_slug = data.get('defender')
+        if attacker_slug == defender_slug:
+            pokemon = get_pokemon_data(attacker_slug)
             self.attacker = pokemon
             self.defender = copy.deepcopy(pokemon)
         else:
@@ -545,7 +553,7 @@ class GoodToGoAPIView(GenericAPIView):
         return response.Response(self._process_data(), status=status.HTTP_200_OK)
 
     def _fetch_data(self, data):
-        self.attacker = get_object_or_404(Pokemon, pk=data.get('attacker'))
+        self.attacker = get_object_or_404(Pokemon, slug=data.get('attacker'))
         self.quick_move = get_object_or_404(Move, pk=data.get('quick_move'))
         self.cinematic_move = get_object_or_404(Move, pk=data.get('cinematic_move'))
         self.boosted_types = list(get_object_or_404(WeatherCondition, pk=data.get(

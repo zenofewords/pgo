@@ -1,5 +1,15 @@
 import '../sass/goodToGo.sass'
 import './navigation.js'
+import {
+  choicesOptions,
+  createMoveOption,
+  fetchPokemonChoice,
+  formatParams,
+  processInput,
+  processParams,
+  showErrors,
+  updateBrowserHistory,
+} from './utils.js'
 import Choices from 'choices.js'
 
 const ready = (run) => {
@@ -15,19 +25,10 @@ ready(() => {
   const FORM_STATE = {
     SUBMITTING: 'submitting',
     READY: 'ready',
-    ERROR: 'error',
   }
 
   // inputs
-  const selectAttacker = new Choices(
-    '.select-attacker',
-    {
-      searchPlaceholderValue: 'Type in the attacker\'s name',
-      searchResultLimit: 5,
-      itemSelectText: '',
-      loadingText: '',
-    }
-  )
+  const selectAttacker = new Choices('.select-attacker', choicesOptions)
   const selectAttackerQuickMove = document.getElementById('select-quick-move')
   const selectAttackerAtkIv = document.getElementById('select-atk-iv')
   const selectWeatherCondition = document.getElementById('select-weather-condition')
@@ -52,6 +53,7 @@ ready(() => {
   }
 
   // events
+  selectAttacker.input.element.addEventListener('keydown', processInput.bind(null, selectAttacker))
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs()
     selectPokemonMoves(event.currentTarget.value)
@@ -103,9 +105,9 @@ ready(() => {
   }
 
   const selectPokemonMoves = (value) => {
-    if (parseInt(value) > 0) {
+    if (value.length > 0) {
       const request = new XMLHttpRequest()
-      request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-id=' + value, true)
+      request.open('GET', window.pgoAPIURLs['move-list'] + '?pokemon-slug=' + value, true)
 
       request.onload = () => {
         if (request.status >= 500) {
@@ -119,12 +121,12 @@ ready(() => {
         }
       }
       request.onerror = () => {
-        form.status = FORM_STATE.ERROR
+        showErrors()
       }
       request.send()
     } else {
+      showErrors()
       selectAttackerQuickMove.disabled = true
-
       clearMoveInputs()
     }
   }
@@ -135,35 +137,18 @@ ready(() => {
     const quickMoveId = parseInt(form[quickMoveKey])
 
     data.results.forEach((moveData, i) => {
-      const move = moveData.move
-
-      if (move.category === 'QK') {
+      if (moveData.move.category === 'QK') {
         if (form.status !== FORM_STATE.SUBMITTING) {
           quickMoveSelect.disabled = false
         }
-        quickMoveSelect.options.add(createMoveOption(move, quickMoveId, quickMoveKey))
+        quickMoveSelect.options.add(createMoveOption(
+          moveData, quickMoveId, quickMoveKey, form
+        ))
       }
     })
     form[quickMoveKey] = quickMoveSelect.value
 
     submitForm()
-  }
-
-  const createMoveOption = (move, moveId, moveKey) => {
-    return new Option(
-      move.name + ' (' + move.power + ')',
-      move.id,
-      false,
-      determineSelectedMove(moveId, move, moveKey)
-    )
-  }
-
-  const determineSelectedMove = (moveId, move, type) => {
-    if (moveId > 0 && moveId === move.id) {
-      form[type] = move.id
-      return true
-    }
-    return false
   }
 
   const togglePressed = (button) => {
@@ -203,7 +188,7 @@ ready(() => {
               const json = JSON.parse(request.responseText)
 
               if (request.status >= 200 && request.status < 400) {
-                updateBrowserHistory(getParams)
+                updateBrowserHistory(getParams, '/good-to-go/')
               } else {
                 showErrors()
               }
@@ -215,7 +200,6 @@ ready(() => {
             }
           }
           request.onerror = () => {
-            form.status = FORM_STATE.ERROR
             showErrors()
             resolve()
           }
@@ -300,21 +284,6 @@ ready(() => {
     }
   }
 
-  const updateBrowserHistory = (getParams) => {
-    window.history.pushState(
-      {}, null, '/good-to-go/' + getParams
-    )
-  }
-
-  const formatParams = (params) => {
-    const paramsCopy = Object.assign({}, params)
-    delete paramsCopy.status
-
-    return '?' + Object.keys(paramsCopy).map((key) => {
-      return key + '=' + encodeURIComponent(paramsCopy[key])
-    }).join('&')
-  }
-
   const restoreTierSelection = (data) => {
     data.tier_3_6_raid_bosses
       ? tier36BossesToggle.classList.add('pressed')
@@ -325,14 +294,13 @@ ready(() => {
   }
 
   const restoreForm = (data) => {
-    selectAttacker.setChoiceByValue(String(data.attacker))
+    fetchPokemonChoice(selectAttacker, data.attacker)
 
     selectAttackerAtkIv.value = data.attack_iv
     selectWeatherCondition.value = data.weather_condition
     selectFriendshipBoost.value = data.friendship_boost
 
     selectPokemonMoves(data.attacker, 'attacker')
-    selectPokemonMoves(data.defender, 'defender')
     restoreTierSelection(data)
 
     form = data
@@ -340,18 +308,8 @@ ready(() => {
     submitForm()
   }
 
-  const showErrors = () => {
-    results.hidden = false
-    results.classList.add('error-text')
-    results.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
-  }
-
   if (form.attacker && !(form.attacker_quick_move)) {
-    const queryDict = {}
-    location.search.substr(1).split('&').forEach((item) => {
-      queryDict[item.split('=')[0]] = item.split('=')[1]
-    })
-    restoreForm(queryDict)
+    restoreForm(processParams(location.search))
   } else if (Object.keys(window.initialData).length > 0) {
     restoreForm(window.initialData)
   }

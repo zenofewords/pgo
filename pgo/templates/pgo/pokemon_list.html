@@ -7,7 +7,7 @@
 {% endblock title %}
 
 {% block meta_description %}
-  <meta name="description" content="A list of all pokemon with and their Pokemon GO stats.">
+  <meta name="description" content="A list of all pokemon and their Pokemon GO stats.">
 {% endblock %}
 
 {% block scripts %}
@@ -26,11 +26,6 @@
             <option value="-1" disabled selected>
               Find
             </option>
-            {% for row in unfiltered_data %}
-              <option value="{{ row.0 }}">
-                {{ row.1 }}
-              </option>
-            {% endfor %}
           </select>
         </td>
         <th>
@@ -91,6 +86,9 @@
   {% render_bundle 'lists' 'js' attrs='async' %}
 
   <script>
+    window.pgoAPIURLs = {
+      'simple-pokemon-list': "{% url 'api-pgo:simple-pokemon-list' %}",
+    };
     window.pgoURLs = {
       'list-url': "{% url 'pgo:pokemon-list' %}",
     };

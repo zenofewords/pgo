@@ -21,12 +21,10 @@ from pgo.models import (
     Move,
     Pokemon,
     PokemonMove,
-    RaidTier,
     Type,
     WeatherCondition,
 )
-
-from zenofewords.models import SiteNotification
+from pgo.utils import TIER_CPM_MAP
 
 
 class BreakpointCalcRedirectView(RedirectView):
@@ -45,23 +43,14 @@ class CalculatorInitialDataMixin(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(CalculatorInitialDataMixin, self).get_context_data(**kwargs)
-        defender_cpm_data = (
-            list(RaidTier.objects.order_by('order').values_list('tier', 'raid_cpm__value'))
-            + list(CPM.objects.filter(level=40, raid_cpm=False).values_list('level', 'value'))
-        )
-
-        data = {
-            'pokemon_qs': Pokemon.objects.only(
-                'pk', 'name', 'primary_type', 'secondary_type'
-            ).select_related('primary_type', 'secondary_type'),
+        context.update({
+            'pokemon_qs': {},
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.all(),
             'friendship': Friendship.objects.order_by('order'),
-            'defender_cpm_data': defender_cpm_data,
+            'defender_cpm': TIER_CPM_MAP,
             'initial_data': self.initial_data,
-            'site_notifications': SiteNotification.active_notifications.all(),
-        }
-        context.update(data)
+        })
         return context
 
     def _get_object_id(self, model_name, value):
@@ -71,6 +60,10 @@ class CalculatorInitialDataMixin(TemplateView):
             model = apps.get_model('pgo', model_name)
             return model.objects.get(slug=slugify(value)).pk
 
+    def _get_object_slug(self, model_name, value):
+        model = apps.get_model('pgo', model_name)
+        return model.objects.get(slug=slugify(value)).slug
+
 
 class BreakpointCalculatorView(CalculatorInitialDataMixin):
     template_name = 'pgo/breakpoint_calc.html'
@@ -79,7 +72,7 @@ class BreakpointCalculatorView(CalculatorInitialDataMixin):
         getcontext().prec = 11
 
         return {
-            'attacker': self._get_object_id('Pokemon', params.get('attacker')),
+            'attacker': self._get_object_slug('Pokemon', params.get('attacker')),
             'attacker_level': float(params.get('attacker_level')),
             'attacker_quick_move': self._get_object_id(
                 'Move', params.get('attacker_quick_move')),
@@ -89,7 +82,7 @@ class BreakpointCalculatorView(CalculatorInitialDataMixin):
             'weather_condition': self._get_object_id(
                 'WeatherCondition', params.get('weather_condition')),
             'friendship_boost': str(params.get('friendship_boost')),
-            'defender': self._get_object_id('Pokemon', params.get('defender')),
+            'defender': self._get_object_slug('Pokemon', params.get('defender')),
             'defender_quick_move': self._get_object_id(
                 'Move', params.get('defender_quick_move')),
             'defender_cinematic_move': self._get_object_id(
@@ -105,7 +98,7 @@ class GoodToGoView(CalculatorInitialDataMixin):
 
     def _process_get_params(self, params):
         return {
-            'attacker': self._get_object_id('Pokemon', params.get('attacker')),
+            'attacker': self._get_object_slug('Pokemon', params.get('attacker')),
             'attack_iv': int(params.get('attack_iv')),
             'quick_move': self._get_object_id('Move', params.get('quick_move')),
             'cinematic_move': self._get_object_id('Move', params.get('cinematic_move')),

@@ -1,5 +1,9 @@
 import '../sass/lists.sass'
 import './navigation.js'
+import {
+  choicesOptions,
+  processInput,
+} from './utils.js'
 import Choices from 'choices.js'
 
 const ready = (runGeneric) => {
@@ -12,18 +16,10 @@ const ready = (runGeneric) => {
 
 ready(() => {
   const listSearchInput = document.querySelector('.list-search')
-  const searchInput = listSearchInput ? new Choices(
-    '.list-search',
-    {
-      searchPlaceholderValue: 'Type name',
-      searchResultLimit: 5,
-      itemSelectText: '',
-      loadingText: '',
-    }
-  ) : undefined
-
+  const searchInput = listSearchInput ? new Choices('.list-search', choicesOptions) : undefined
   const moveTypeFilter = document.getElementById('move-type-filter')
 
+  searchInput.input.element.addEventListener('input', processInput.bind(null, searchInput))
   moveTypeFilter && moveTypeFilter.addEventListener('change', event => {
     const searchParams = window.location.search.split(/[?&]+/).slice(1)
     const index = searchParams.findIndex(element => element.includes('selected-move-type'))

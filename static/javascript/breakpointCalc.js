@@ -1,5 +1,17 @@
 import '../sass/breakpointCalc.sass'
 import './navigation.js'
+import {
+  breakpointCalcURL,
+  choicesOptions,
+  createMoveOption,
+  fetchPokemonChoice,
+  formatParams,
+  processInput,
+  processParams,
+  showErrors,
+  updateBrowserHistory,
+  validateLevel,
+} from './utils.js'
 import Choices from 'choices.js'
 
 const ready = (run) => {
@@ -15,7 +27,6 @@ ready(() => {
   const FORM_STATE = {
     SUBMITTING: 'submitting',
     READY: 'ready',
-    ERROR: 'error',
   }
   const TAB = {
     BREAKPOINTS: 'breakpoints',
@@ -23,28 +34,12 @@ ready(() => {
   }
 
   // inputs
-  const selectAttacker = new Choices(
-    '#select-attacker',
-    {
-      searchPlaceholderValue: 'Type in the attacker\'s name',
-      searchResultLimit: 5,
-      itemSelectText: '',
-      loadingText: '',
-    }
-  )
+  const selectAttacker = new Choices('#select-attacker', choicesOptions)
   const inputAttackerLevel = document.getElementById('input-attacker-level')
   const selectAttackerQuickMove = document.getElementById('select-quick-move')
   const selectAttackerCinematicMove = document.getElementById('select-cinematic-move')
   const selectAttackerAtkIv = document.getElementById('select-attacker-atk-iv')
-  const selectDefender = new Choices(
-    '#select-defender',
-    {
-      searchPlaceholderValue: 'Type in the defender\'s name',
-      searchResultLimit: 5,
-      itemSelectText: '',
-      loadingText: '',
-    }
-  )
+  const selectDefender = new Choices('#select-defender', choicesOptions)
   const selectDefenderQuickMove = document.getElementById('select-defender-quick-move')
   const selectDefenderCinematicMove = document.getElementById('select-defender-cinematic-move')
 
@@ -52,7 +47,7 @@ ready(() => {
   const selectFriendShipBoost = document.getElementById('select-friendship-boost')
   const selectDefenderCPM = document.getElementById('select-defender-tier')
 
-  const outputTable = document.getElementById('output-table')
+  const results = document.querySelector('.results')
   const inputToggleCinematicBreakpoints = document.getElementById('toggle-cinematic-breakpoints')
   const inputToggleTopCounterSort = document.getElementById('top-counter-sort-toggle')
 
@@ -61,7 +56,8 @@ ready(() => {
   const breakpointsTable = document.getElementById('breakpoints-table')
   const topCountersTable = document.getElementById('top-counters-detail-table')
   const summary = document.querySelector('.output-wrapper')
-  const faqLegend = document.getElementById('faq-legend-content')
+  const faqLegendContent = document.getElementById('faq-legend-content')
+  const faqLegend = document.getElementById('faq-legend')
 
   let form = {
     attacker: selectAttacker.value,
@@ -82,10 +78,11 @@ ready(() => {
   }
 
   // events
+  selectAttacker.input.element.addEventListener('input', processInput.bind(null, selectAttacker))
+  selectDefender.input.element.addEventListener('input', processInput.bind(null, selectDefender))
   selectAttacker.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('attacker')
     selectPokemonMoves(event.currentTarget.value, 'attacker')
-    clearChoicesFieldError('select-attacker')
 
     form.attacker = event.currentTarget.value
     form.staleTab = true
@@ -93,7 +90,6 @@ ready(() => {
   })
   inputAttackerLevel.addEventListener('change', (event) => {
     setValidLevel(event.currentTarget, 'attacker_level')
-    inputAttackerLevel.classList.remove('error')
 
     form.staleTab = true
     submitForm().then(() => inputAttackerLevel.focus())
@@ -131,7 +127,6 @@ ready(() => {
   selectDefender.passedElement.element.addEventListener('change', (event) => {
     clearMoveInputs('defender')
     selectPokemonMoves(event.currentTarget.value, 'defender')
-    clearChoicesFieldError('select-defender')
 
     form.defender = event.currentTarget.value
     form.staleTab = true
@@ -184,25 +179,9 @@ ready(() => {
       submitForm()
     }
   })
-  document.getElementById('faq-legend').addEventListener('click', (event) => {
-    faqLegend.hidden = !faqLegend.hidden
+  faqLegend.addEventListener('click', (event) => {
+    faqLegendContent.hidden = !faqLegendContent.hidden
   })
-
-  const updateBrowserHistory = (getParams) => {
-    window.history.pushState(
-      {}, null, '/breakpoint-calc/' + getParams
-    )
-  }
-
-  const formatParams = (params) => {
-    const paramsCopy = Object.assign({}, params)
-    delete paramsCopy.status
-    delete paramsCopy.staleTab
-
-    return '?' + Object.keys(paramsCopy).map((key) => {
-      return key + '=' + encodeURIComponent(paramsCopy[key])
-    }).join('&')
-  }
 
   const toggleTab = (currentTab) => {
     if (currentTab === TAB.BREAKPOINTS) {
@@ -212,7 +191,7 @@ ready(() => {
       tabBreakpoints.classList.add('selected-tab')
       tabTopCounters.classList.remove('selected-tab')
 
-      updateBrowserHistory(formatParams(form))
+      updateBrowserHistory(formatParams(form), breakpointCalcURL)
     } else if (currentTab === TAB.COUNTERS) {
       breakpointsTable.hidden = true
       topCountersTable.hidden = false
@@ -220,7 +199,7 @@ ready(() => {
       tabTopCounters.classList.add('selected-tab')
       tabBreakpoints.classList.remove('selected-tab')
 
-      updateBrowserHistory(formatParams(form))
+      updateBrowserHistory(formatParams(form), breakpointCalcURL)
     }
   }
 
@@ -241,12 +220,12 @@ ready(() => {
   }
 
   const selectPokemonMoves = (value, pokemon) => {
-    if (parseInt(value) > 0) {
+    if (value.length > 0) {
       const request = new XMLHttpRequest()
       const excludeLegacy = pokemon === 'defender' && selectDefenderCPM.value.slice(-1) !== '0'
       request.open(
         'GET',
-        `${window.pgoAPIURLs['move-list']}?pokemon-id=${value}&exclude-legacy=${excludeLegacy}`,
+        `${window.pgoAPIURLs['move-list']}?pokemon-slug=${value}&exclude-legacy=${excludeLegacy}`,
         true
       )
 
@@ -259,11 +238,12 @@ ready(() => {
         }
       }
       request.onerror = () => {
-        form.status = FORM_STATE.ERROR
         showErrors()
       }
       request.send()
     } else {
+      showErrors()
+
       selectAttackerQuickMove.disabled = true
       selectAttackerCinematicMove.disabled = true
       selectDefenderQuickMove.disabled = true
@@ -336,9 +316,9 @@ ready(() => {
 
                 displayDetails(json)
                 generateTopCountersTable(json.top_counters)
-                updateBrowserHistory(getParams)
+                updateBrowserHistory(getParams, breakpointCalcURL)
               } else {
-                showErrors(json)
+                showErrors()
               }
               form.status = FORM_STATE.READY
 
@@ -351,7 +331,6 @@ ready(() => {
             }
           }
           request.onerror = () => {
-            form.status = FORM_STATE.ERROR
             showErrors()
             resolve()
           }
@@ -374,10 +353,14 @@ ready(() => {
     data.results.forEach((moveData, i) => {
       if (moveData.move.category === 'QK') {
         quickMoveSelect.disabled = false
-        quickMoveSelect.options.add(createMoveOption(moveData, quickMoveId, quickMoveKey, pokemon))
+        quickMoveSelect.options.add(createMoveOption(
+          moveData, quickMoveId, quickMoveKey, form, pokemon
+        ))
       } else {
         cinematicMoveSelect.disabled = false
-        cinematicMoveSelect.options.add(createMoveOption(moveData, cinematicMoveId, cinematicMoveKey, pokemon))
+        cinematicMoveSelect.options.add(createMoveOption(
+          moveData, cinematicMoveId, cinematicMoveKey, form, pokemon
+        ))
       }
     })
     form[quickMoveKey] = quickMoveSelect.value
@@ -394,8 +377,8 @@ ready(() => {
   const restoreForm = (data) => {
     toggleTab(data.tab)
 
-    selectAttacker.setChoiceByValue(`${data.attacker}`)
-    selectDefender.setChoiceByValue(`${data.defender}`)
+    fetchPokemonChoice(selectAttacker, data.attacker)
+    fetchPokemonChoice(selectDefender, data.defender)
 
     inputAttackerLevel.value = data.attacker_level
     selectAttackerAtkIv.value = data.attacker_atk_iv
@@ -416,36 +399,13 @@ ready(() => {
   }
 
   if (form.attacker && !(form.attacker_quick_move && form.attacker_cinematic_move)) {
-    const queryDict = {}
-    location.search.substr(1).split('&').forEach((item) => {
-      queryDict[item.split('=')[0]] = item.split('=')[1]
-    })
-    restoreForm(queryDict)
+    restoreForm(processParams(location.search))
   } else if (Object.keys(window.initialData).length > 0) {
     restoreForm(window.initialData)
   }
 
-  const createMoveOption = (moveData, moveId, moveKey, pokemon) => {
-    const move = moveData.move
-
-    return new Option(
-      pokemon === 'attacker' ? `${move.name} ${moveData.legacy ? '*' : ''} (${move.power})` : move.name,
-      move.id,
-      false,
-      determineSelectedMove(moveId, move, moveKey)
-    )
-  }
-
-  const determineSelectedMove = (moveId, move, type) => {
-    if (moveId > 0 && moveId === move.id) {
-      form[type] = move.id
-      return true
-    }
-    return false
-  }
-
   const displayDetails = (json) => {
-    outputTable.hidden = false
+    results.hidden = false
 
     if (json.breakpoint_details.length < 2) {
       inputToggleCinematicBreakpoints.enabled = false
@@ -535,30 +495,6 @@ ready(() => {
     submitForm()
   }
 
-  const showErrors = (errorObject = null) => {
-    if (errorObject) {
-      for (const field in errorObject) {
-        if (field !== 'attacker_level') {
-          const invalidInput = document.querySelector('.select-' + field)
-          if (invalidInput) {
-            invalidInput.parentElement.parentElement.classList.add('error')
-          }
-        } else {
-          document.querySelector('.' + field).classList.add('error')
-        }
-      }
-    } else {
-      outputTable.hidden = false
-      outputTable.classList.add('error-text')
-      outputTable.innerHTML = ':( something broke, let me know if refreshing the page does not help.'
-    }
-  }
-
-  const clearChoicesFieldError = (elementName) => {
-    const input = document.getElementById(elementName)[0]
-    input.parentElement.parentElement.classList.remove('error')
-  }
-
   const clearMoveInputs = (pokemon) => {
     if (form.status !== FORM_STATE.SUBMITTING) {
       const quickMoveSelect = pokemon === 'attacker' ? selectAttackerQuickMove : selectDefenderQuickMove
@@ -589,24 +525,5 @@ ready(() => {
     } else {
       form[inputName] = '-1'
     }
-  }
-
-  const validateLevel = (input) => {
-    const val = input.value.replace(',', '.')
-    let level = parseFloat(val)
-
-    if (level < 0) {
-      level *= -1
-    }
-    if (level < 1) {
-      level = 1
-    }
-    if (level > 40) {
-      level = 40
-    }
-    if ((level * 10) % 5 !== 0) {
-      level = parseInt(level)
-    }
-    return level
   }
 })

@@ -19,7 +19,9 @@ ready(() => {
   const searchInput = listSearchInput ? new Choices('.list-search', choicesOptions) : undefined
   const moveTypeFilter = document.getElementById('move-type-filter')
 
-  searchInput.input.element.addEventListener('input', processInput.bind(null, searchInput))
+  if (listSearchInput.id === 'pokemon-search') {
+    searchInput.input.element.addEventListener('input', processInput.bind(null, searchInput))
+  }
   moveTypeFilter && moveTypeFilter.addEventListener('change', event => {
     const searchParams = window.location.search.split(/[?&]+/).slice(1)
     const index = searchParams.findIndex(element => element.includes('selected-move-type'))

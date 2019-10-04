@@ -86,6 +86,7 @@ if CACHE:
         'default': {
             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
             'LOCATION': '127.0.0.1:11211',
+            'TIMEOUT': None,
         }
     }
     LOADERS = [
@@ -96,6 +97,7 @@ if CACHE:
     ]
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     CACHE_MIDDLEWARE_KEY_PREFIX = 'zenofewords_'
+    CACHE_MIDDLEWARE_SECONDS = 2592000
 
 ROOT_URLCONF = 'zenofewords.urls'
 

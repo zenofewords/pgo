@@ -5,7 +5,7 @@ from pgo.utils import NAVIGATION_ITEMS
 register = template.Library()
 
 
-@register.inclusion_tag('zenofewords/tags/navigation.html', takes_context=True)
+@register.inclusion_tag('pokemon/tags/navigation.html', takes_context=True)
 def navigation_tag(context):
     return {
         'current_url': context['request'].path,

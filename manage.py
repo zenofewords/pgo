@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 def main():
     load_dotenv()
 
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zenofewords.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pokemon.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

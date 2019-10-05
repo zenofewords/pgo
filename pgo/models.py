@@ -2,7 +2,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import datetime
 
-from zenofewords.mixins import (
+from pokemon.mixins import (
     NameMixin,
     OrderMixin,
 )

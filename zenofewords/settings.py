@@ -97,7 +97,7 @@ if CACHE:
     ]
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     CACHE_MIDDLEWARE_KEY_PREFIX = 'zenofewords_'
-    CACHE_MIDDLEWARE_SECONDS = 2592000
+    CACHE_MIDDLEWARE_SECONDS = 315360000
 
 ROOT_URLCONF = 'zenofewords.urls'
 

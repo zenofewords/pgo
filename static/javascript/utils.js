@@ -5,7 +5,7 @@ export const choicesOptions = {
   searchFloor: 3,
   searchResultLimit: 10,
   itemSelectText: '',
-  loadingText: 'loading',
+  loadingText: '',
   shouldSort: false,
 }
 

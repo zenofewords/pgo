@@ -14,18 +14,13 @@
     <table>
       <tr>
         <td class="list-search-wrapper">
-          <label for="choices-single-default" class="screen-reader">
+          <label for="pokemon-search" class="screen-reader">
             Find pokemon
           </label>
-          <select class="list-search" data-trigger name="choices-single-default" id="choices-single-default">
+          <select class="list-search" data-trigger name="choices-single-default" id="pokemon-search">
             <option value="-1" disabled selected>
               Find pokemon
             </option>
-            {% for row in data %}
-              <option value="{{ row.0 }}">
-                {{ row.1 }}
-              </option>
-            {% endfor %}
           </select>
         </td>
         <th>

@@ -3,7 +3,6 @@ certifi==2019.9.11
 chardet==3.0.4
 curtsies==0.3.0
 Django==2.2.6
-django-extensions==2.2.1
 django-webpack-loader==0.6.0
 djangorestframework==3.10.3
 greenlet==0.4.15

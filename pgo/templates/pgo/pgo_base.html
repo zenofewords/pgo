@@ -1,5 +1,5 @@
-{% extends 'zenofewords/base.html' %}
-{% load zenofewords_tags %}
+{% extends 'pokestuff/base.html' %}
+{% load pokestuff_tags %}
 
 {% block title %}
   Pokemon GO
@@ -21,6 +21,6 @@
 
 {% block footer %}
   Notice something missing or broken? You can let me know at
-  <a href="https://www.reddit.com/message/compose/?to=zenofewords" target="_blank" rel="noopener">reddit</a>.
+  {% include 'pokestuff/includes/reddit_contact.html' %}
   {{ block.super }}
 {% endblock footer %}

@@ -1,4 +1,4 @@
-{% load zenofewords_tags %}
+{% load pokestuff_tags %}
 
 <nav>
   <div class="nav">
@@ -30,7 +30,7 @@
 </nav>
 
 <div class="changelog-info-wrapper" hidden>
-  <p>Hello and thanks for stopping by! I'd like to inform you that I've stopped playing Pokemon GO in March 2019, but still maintain the calculator. If you notice something is missing, feel free to message me at <a href="https://www.reddit.com/message/compose/?to=zenofewords" target="_blank" rel="noopener">reddit</a>.</p>
+  <p>Hello and thanks for stopping by! I'd like to inform you that I've stopped playing Pokemon GO in March 2019, but still maintain the calculator. If you notice something is missing, feel free to message me at {% include 'pokestuff/includes/reddit_contact.html' %}</p>
   10/2019
   <ul>
     <li>reworked attacker/defender drop down (no longer preloads, the list became too long with gen V)</li>

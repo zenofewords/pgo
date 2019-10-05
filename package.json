@@ -1,5 +1,5 @@
 {
-  "name": "zenofewords",
+  "name": "pokestuff",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zenofewords/zenofewords.git"
+    "url": "git+https://github.com/zenofewords/pokestuff.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zenofewords/zenofewords/issues"
+    "url": "https://github.com/zenofewords/pokestuff/issues"
   },
-  "homepage": "https://github.com/zenofewords/zenofewords#readme",
+  "homepage": "https://github.com/zenofewords/pokestuff#readme",
   "dependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",

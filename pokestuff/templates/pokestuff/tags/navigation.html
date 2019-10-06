@@ -11,11 +11,11 @@
       <span class="menu-line"></span>
       <span class="menu-line"></span>
       <ul id="menu" style="opacity: 0;">
-        {% for key, value in navigation.items %}
+        {% for nav_item in navigation %}
           <li>
-            <a href="{{ key }}">
-              <div {% is_active current_url key forloop.first %}>
-                {{ value|upper }}
+            <a href="{{ nav_item.0 }}">
+              <div {% is_active current_url nav_item.0 forloop.first %}>
+                {{ nav_item.1|upper }}
               </div>
             </a>
           </li>

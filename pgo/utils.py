@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from decimal import Decimal
 from math import floor, pow, sqrt
 
@@ -21,13 +22,13 @@ WEATHER_BOOST_SCALAR = 1.2
 MAX_IV = 15
 LEVELS = (20.0, 25.0, 30.0, 35.0, 40.0)
 cpm = CPM.gyms.get(level=Decimal('40.0')).value
-NAVIGATION_ITEMS = (
-    ('/breakpoint-calc/', 'Breakpoint calculator', ),
-    ('/good-to-go/', 'Good to go', ),
-    ('/pokemon/', 'Pokemon', ),
-    ('/moves/', 'Moves', ),
-)
-TIER_CPM_MAP = {
+NAVIGATION_ITEMS = OrderedDict({
+    '/breakpoint-calc/': 'Breakpoint calculator',
+    '/good-to-go/': 'Good to go',
+    '/pokemon/': 'Pokemon',
+    '/moves/': 'Moves',
+})
+TIER_CPM_MAP = OrderedDict({
     6: '0.790000000',
     5: '0.790000000',
     4: '0.790000000',
@@ -35,7 +36,7 @@ TIER_CPM_MAP = {
     2: '0.670000000',
     1: '0.597400000',
     '40': '0.790300000',
-}
+})
 
 
 def get_stab(stab):

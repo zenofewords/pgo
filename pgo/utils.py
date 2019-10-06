@@ -22,21 +22,35 @@ WEATHER_BOOST_SCALAR = 1.2
 MAX_IV = 15
 LEVELS = (20.0, 25.0, 30.0, 35.0, 40.0)
 cpm = CPM.gyms.get(level=Decimal('40.0')).value
-NAVIGATION_ITEMS = OrderedDict({
-    '/breakpoint-calc/': 'Breakpoint calculator',
-    '/good-to-go/': 'Good to go',
-    '/pokemon/': 'Pokemon',
-    '/moves/': 'Moves',
-})
-TIER_CPM_MAP = OrderedDict({
-    6: '0.790000000',
-    5: '0.790000000',
-    4: '0.790000000',
-    3: '0.730000000',
-    2: '0.670000000',
-    1: '0.597400000',
-    '40': '0.790300000',
-})
+NAVIGATION_ITEM_MAP = (
+    ('/breakpoint-calc/', 'Breakpoint calculator',),
+    ('/good-to-go/', 'Good to go',),
+    ('/pokemon/', 'Pokemon',),
+    ('/moves/', 'Moves',),
+)
+TIER_CPM_MAP = (
+    (6, '0.790000000',),
+    (5, '0.790000000',),
+    (4, '0.790000000',),
+    (3, '0.730000000',),
+    (2, '0.670000000',),
+    (1, '0.597400000',),
+    (40, '0.790300000',),
+)
+
+
+def get_navigation_items():
+    navigation_items = OrderedDict()
+    for nav_item in NAVIGATION_ITEM_MAP:
+        navigation_items[nav_item[0]] = nav_item[1]
+    return navigation_items
+
+
+def get_tier_cpm_map():
+    tier_cpm_map = OrderedDict()
+    for tc in TIER_CPM_MAP:
+        tier_cpm_map[tc[0]] = tc[1]
+    return tier_cpm_map
 
 
 def get_stab(stab):

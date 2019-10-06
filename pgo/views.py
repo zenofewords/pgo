@@ -24,7 +24,7 @@ from pgo.models import (
     Type,
     WeatherCondition,
 )
-from pgo.utils import TIER_CPM_MAP
+from pgo.utils import get_tier_cpm_map
 
 
 class BreakpointCalcRedirectView(RedirectView):
@@ -48,7 +48,7 @@ class CalculatorInitialDataMixin(TemplateView):
             'attack_iv_range': list(range(15, -1, -1)),
             'weather_condition_data': WeatherCondition.objects.all(),
             'friendship': Friendship.objects.order_by('order'),
-            'defender_cpm': TIER_CPM_MAP,
+            'defender_cpm': get_tier_cpm_map(),
             'initial_data': self.initial_data,
         })
         return context

@@ -1,6 +1,6 @@
 from django import template
 
-from pgo.utils import NAVIGATION_ITEMS
+from pgo.utils import get_navigation_items
 
 register = template.Library()
 
@@ -9,7 +9,7 @@ register = template.Library()
 def navigation_tag(context):
     return {
         'current_url': context['request'].path,
-        'navigation': NAVIGATION_ITEMS,
+        'navigation': get_navigation_items(),
     }
 
 

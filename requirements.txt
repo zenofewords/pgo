@@ -6,6 +6,7 @@ Django==2.2.6
 django-webpack-loader==0.6.0
 djangorestframework==3.10.3
 greenlet==0.4.15
+gunicorn==19.9.0
 idna==2.8
 psycopg2-binary==2.8.3
 Pygments==2.4.2

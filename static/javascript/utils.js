@@ -103,8 +103,11 @@ export const validateLevel = (input) => {
   if (level < 1) {
     level = 1
   }
-  if (level > 40) {
-    level = 40
+  if (level > 45) {
+    level = 45
+  }
+  if (level > 40 && level % 2 !== 0) {
+    level = Math.floor(level)
   }
   if ((level * 10) % 5 !== 0) {
     level = parseInt(level)

@@ -139,7 +139,7 @@ class BreakpointCalcAPIView(GenericAPIView):
 
     def _fetch_data(self, data):
         cpm_qs = CPM.gyms.all()
-        self.max_cpm_value = cpm_qs.last().value
+        self.max_cpm_value = cpm_qs.filter(buddy_cpm=False).last().value
 
         attacker_slug = data.get('attacker')
         defender_slug = data.get('defender')
@@ -241,6 +241,13 @@ class BreakpointCalcAPIView(GenericAPIView):
             self.defender.health = calculate_defender_health(stamina + MAX_IV, self.defender.cpm)
 
     def _assess_attack_iv(self):
+        buddy_max_cpm = self.attacker.cpm_list.last()['value']
+        self._set_move_stats(attack_iv=self.attacker.atk_iv, attacker_cpm=buddy_max_cpm)
+        buddy_current_qk_dph = self.attacker_quick_move.damage_per_hit
+        self._set_move_stats(attack_iv=MAX_IV, attacker_cpm=buddy_max_cpm)
+        buddy_max_qk_dph = self.attacker_quick_move.damage_per_hit
+        buddy_dph_match = buddy_current_qk_dph == buddy_max_qk_dph
+
         self._set_move_stats(attack_iv=self.attacker.atk_iv)
         current_qk_dph = self.attacker_quick_move.damage_per_hit
         self._set_move_stats(attack_iv=MAX_IV)
@@ -251,12 +258,16 @@ class BreakpointCalcAPIView(GenericAPIView):
             'high enough' if dph_match else 'too low',
             self.attacker_quick_move.name,
             self.attacker_quick_move.damage_per_hit,
+            'including' if buddy_dph_match else 'but not' if dph_match else 'or',
+            buddy_max_qk_dph,
             'tier {} raid boss'.format(
                 self.raid_tier.tier) if self.raid_tier else 'level 40, 15 defense IV',
             self.defender.name,
         )
-        return '<p>Your {}\'s <b>attack IV is {}</b> for it to reach the final {} breakpoint ({})\
-                against a <b>{} {}</b>.</p>'.format(*params)
+        return '''<p>Your {}\'s <b>attack IV is {}</b> for it to reach the final {} breakpoint ({}),
+                {} the final buddy breakpoint ({}),
+                against a <b>{} {}</b>.</p>
+            '''.format(*params)
 
     def _set_move_stats(self, attacker_cpm=None, attack_iv=None):
         self._calculate_attack_multiplier(attacker_cpm, attack_iv)
@@ -387,6 +398,9 @@ class BreakpointCalcAPIView(GenericAPIView):
                 self._format_dps(cycle_dps), '{:.2f}'.format(trainers_required))
 
     def _format_powerup_cost(self, stardust_cost, candy_cost):
+        if stardust_cost == 0 or candy_cost == 0:
+            return '- | -'
+
         if stardust_cost - self.stardust_cost == 0 and candy_cost - self.candy_cost == 0:
             return '- | -'
 
@@ -569,7 +583,7 @@ class GoodToGoAPIView(GenericAPIView):
             raid_tier__tier__in=[1, 2]
         ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_1_2_raid_bosses') else []
 
-        self.max_cpm_value = CPM.gyms.last().value
+        self.max_cpm_value = CPM.gyms.filter(buddy_cpm=False).last().value
 
     def _process_data(self):
         total_breakpoints = 0

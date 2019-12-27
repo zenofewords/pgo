@@ -283,6 +283,7 @@ class RaidCPMManager(models.Manager):
 class CPM(models.Model):
     level = models.DecimalField(max_digits=3, decimal_places=1)
     value = models.DecimalField(max_digits=10, decimal_places=9)
+    buddy_cpm = models.BooleanField(default=False)
     raid_cpm = models.BooleanField(default=False)
     raid_tier = models.PositiveIntegerField(blank=True, null=True)
     stardust_cost = models.PositiveIntegerField(blank=True, null=True)

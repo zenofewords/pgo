@@ -213,16 +213,21 @@ class Command(BaseCommand):
             'gastrodon-west-sea',
             'giratina',
             'shaymin',
+            'darmanitan',
+            'frillish-female',
+            'jellicent-female',
+            'keldeo',
+            'meloetta',
         )
 
-        for data_line in json_data['itemTemplates']:
+        for data_line in json_data['itemTemplate']:
             data = []
             template_id = data_line['templateId']
 
             if pokemon_pattern.match(template_id) and all([x not in template_id for x in exclude]):
                 pokemon_id = data_line['templateId'][2:5]
-                pokemon_settings = data_line['pokemonSettings']
-                pokemon_name = pokemon_settings['pokemonId']
+                pokemon_settings = data_line['pokemon']
+                pokemon_name = pokemon_settings['uniqueId']
 
                 stats = pokemon_settings['stats']
                 quick_moves = pokemon_settings.get('quickMoves')
@@ -239,12 +244,12 @@ class Command(BaseCommand):
 
                 if 'type2' in pokemon_settings:
                     data.append({'pokemon_types': (
-                        pokemon_settings['type'][13:],
+                        pokemon_settings['type1'][13:],
                         pokemon_settings['type2'][13:],
                     )})
                 else:
                     data.append({'pokemon_types': (
-                        pokemon_settings['type'][13:],
+                        pokemon_settings['type1'][13:],
                     )})
                 data.append({
                     'stats': (
@@ -261,7 +266,7 @@ class Command(BaseCommand):
                 pokemon_data[pokemon_name] = data
 
             if move_pattern.match(template_id):
-                move_settings = data_line['moveSettings']
+                move_settings = data_line['move']
 
                 # placeholder move
                 if type(move_settings['movementId']) != str:

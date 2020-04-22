@@ -1,22 +1,22 @@
 {
-  "name": "pokestuff",
+  "name": "pgo",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "dev": "node server.js",
     "build": "webpack --config webpack.prod.config.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zenofewords/pokestuff.git"
+    "url": "git+https://github.com/zenofewords/pgo.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zenofewords/pokestuff/issues"
+    "url": "https://github.com/zenofewords/pgo/issues"
   },
-  "homepage": "https://github.com/zenofewords/pokestuff#readme",
+  "homepage": "https://github.com/zenofewords/pgo#readme",
   "dependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",

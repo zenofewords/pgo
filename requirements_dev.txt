@@ -1,5 +1,4 @@
 -r requirements.txt
 
-bpython==0.18
 django-debug-toolbar==2.0
 django-extensions==2.2.3

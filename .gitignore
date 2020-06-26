@@ -101,3 +101,6 @@ server.js
 
 *.eslintrc.json
 *.flake8
+
+# vscode
+.vscode

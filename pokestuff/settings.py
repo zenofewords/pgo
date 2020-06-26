@@ -69,12 +69,6 @@ if CACHE:
             'TIMEOUT': None,
         }
     }
-    LOADERS = [
-        ('django.template.loaders.cached.Loader', [
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
-        ]),
-    ]
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     CACHE_MIDDLEWARE_KEY_PREFIX = 'pokestuff_'
     CACHE_MIDDLEWARE_SECONDS = 315360000
@@ -84,7 +78,7 @@ ROOT_URLCONF = 'pokestuff.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -92,7 +86,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'loaders': LOADERS,
         },
     },
 ]

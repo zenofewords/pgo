@@ -102,5 +102,8 @@ server.js
 *.eslintrc.json
 *.flake8
 
+# OSX
+.DS_Store
+
 # vscode
 .vscode

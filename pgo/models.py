@@ -132,6 +132,7 @@ class Pokemon(NameMixin):
     compound_weakness = JSONField(blank=True, null=True)
 
     legendary = models.BooleanField(default=False)
+    shadow = models.BooleanField(default=False)
     generation = models.CharField(max_length=5, choices=Generation.CHOICES, blank=True)
     implemented = models.BooleanField(default=True)
 

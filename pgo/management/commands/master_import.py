@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     def get_or_create_type(self, slug):
         if slug != '':
-            obj, created = Type.objects.get_or_create(
+            obj, _ = Type.objects.get_or_create(
                 slug=slug,
                 defaults={'name': slug.capitalize()}
             )
@@ -64,8 +64,8 @@ class Command(BaseCommand):
         pokemon.quick_moves.add(self.get_or_create_pokemon_move(pokemon, move))
 
     def _process_pokemon(self, pokemon_data):
-        for pokemon_number, data in pokemon_data.items():
-            pokemon, created = self.get_or_create_pokemon(data[0]['number'], data[1]['slug'])
+        for _, data in pokemon_data.items():
+            pokemon, _ = self.get_or_create_pokemon(data[0]['number'], data[1]['slug'])
 
             pokemon_types = []
             for detail in data:
@@ -80,6 +80,9 @@ class Command(BaseCommand):
 
                     pokemon.slug = slug
                     pokemon.name = name
+
+                    if 'shadow' in slug:
+                        pokemon.shadow = True
 
                 if 'pokemon_types' in detail:
                     for pokemon_type in detail['pokemon_types']:
@@ -205,7 +208,7 @@ class Command(BaseCommand):
         pokemon_pattern = re.compile('^V\\d+_POKEMON_[A-Z_*-*]+$', re.IGNORECASE)
         move_pattern = re.compile('^V\\d+_MOVE_[A-Z_*-*]+$', re.IGNORECASE)
         pvp_move_pattern = re.compile('^COMBAT_V\\d+_MOVE_[A-Z_*-*]+$', re.IGNORECASE)
-        exclude = ('NORMAL', 'SHADOW', 'PURIFIED', )
+        exclude = ('NORMAL', 'PURIFIED', )
         ignored = (
             'shellos-west-sea',
             'shellos-east-sea',
@@ -269,7 +272,7 @@ class Command(BaseCommand):
                 move_settings = data_line['move']
 
                 # placeholder move
-                if type(move_settings['movementId']) != str:
+                if not isinstance(move_settings['movementId'], str):
                     continue
 
                 move_name = slugify(move_settings['movementId']).replace('_', '-')
@@ -312,17 +315,17 @@ class Command(BaseCommand):
         self._process_pokemon(pokemon_data)
         print('pokemon processed')
 
-        call_command('pgo_calculate_pokemon_stats')
-        print('cp processed')
-        call_command('pgo_compound_weakness_resistance')
+        call_command('calculate_pokemon_stats')
+        print('stats processed')
+        call_command('compound_weakness_resistance')
         print('weakness and resistance processed')
-        call_command('pgo_calculate_move_stats')
+        call_command('calculate_move_stats')
         print('move stats processed')
-        call_command('pgo_calculate_weave_damage')
+        call_command('calculate_weave_damage')
         print('moveset weave processed')
-        call_command('pgo_calculate_pokemon_move_score')
+        call_command('calculate_pokemon_move_score')
         print('move scores processed')
-        call_command('pgo_assign_goodtogo_bosses')
+        call_command('assign_goodtogo_bosses')
         print('good to go bosses processed')
 
         Pokemon.objects.filter(slug='mewtwo-a').update(name='Mewtwo-armored')

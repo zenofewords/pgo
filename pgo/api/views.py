@@ -24,6 +24,7 @@ from pgo.models import (
     CPM, PokemonMove, Move, Pokemon, Type, RaidBoss, RaidTier, WeatherCondition,
 )
 from pgo.utils import (
+    calculate_damage_multiplier,
     calculate_dph,
     calculate_defender_health,
     calculate_cycle_dps,
@@ -280,9 +281,9 @@ class BreakpointCalcAPIView(GenericAPIView):
         if not attack_iv:
             attack_iv = self.attacker.atk_iv
 
-        self.attack_multiplier = (
-            (self.attacker.pgo_attack + attack_iv) * attacker_cpm) / (
-            (self.defender.pgo_defense + self.defender.defense_iv) * self.defender.cpm)
+        self.attack_multiplier = calculate_damage_multiplier(
+            self.attacker, attack_iv, attacker_cpm, self.defender, self.defender.defense_iv, self.defender.cpm
+        )
 
     def _set_move_damage(self, move):
         move.damage_per_hit = calculate_dph(
@@ -332,7 +333,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         if starting_cc_dph == max_cc_dph:
             return
 
-        for index, cpm in enumerate(self.attacker.cpm_list):
+        for _, cpm in enumerate(self.attacker.cpm_list):
             self._calculate_attack_multiplier(cpm['value'])
             self._set_move_damage(self.attacker_cinematic_move)
 
@@ -420,12 +421,14 @@ class BreakpointCalcAPIView(GenericAPIView):
 
         top_counters = []
         for pokemon in get_top_counter_qs(self.defender):
-            attacker_multiplier = (
-                (pokemon.pgo_attack + self.attacker.atk_iv) * self.attacker.cpm.value) / (
-                (self.defender.pgo_defense + MAX_IV) * self.defender.cpm)
-            defender_multiplier = (
-                (self.defender.pgo_attack + MAX_IV) * self.defender.cpm) / (
-                (pokemon.pgo_defense + MAX_IV) * self.max_cpm_value)
+            attacker_multiplier = calculate_damage_multiplier(
+                pokemon, self.attacker.atk_iv, self.attacker.cpm.value,
+                pokemon, MAX_IV, self.defender.cpm
+            )
+            defender_multiplier = calculate_damage_multiplier(
+                self.defender, MAX_IV, self.defender.cpm,
+                pokemon, MAX_IV, self.max_cpm_value
+            )
 
             moveset_data = []
             for moveset in pokemon.moveset_set.all():
@@ -574,6 +577,7 @@ class GoodToGoAPIView(GenericAPIView):
             'weather_condition')).types_boosted.values_list('pk', flat=True))
         self.attack_iv = data.get('attack_iv')
         self.friendship_boost = data.get('friendship_boost', 1.00)
+        self.buddy_boost = data.get('buddy_boost')
 
         self.tier_3_6_raid_bosses = RaidBoss.objects.filter(
             raid_tier__tier__in=[3, 4, 5, 6]
@@ -583,7 +587,7 @@ class GoodToGoAPIView(GenericAPIView):
             raid_tier__tier__in=[1, 2]
         ).order_by('-raid_tier', '-pokemon__slug') if data.get('tier_1_2_raid_bosses') else []
 
-        self.max_cpm_value = CPM.gyms.filter(buddy_cpm=False).last().value
+        self.max_cpm_value = CPM.gyms.filter(buddy_cpm=self.buddy_boost).last().value
 
     def _process_data(self):
         total_breakpoints = 0
@@ -604,8 +608,8 @@ class GoodToGoAPIView(GenericAPIView):
                 'final_breakpoints_reached': breakpoints_reached,
                 'total_breakpoints': len(value),
                 'matchups': [x for x in sorted(
-                    value, key=itemgetter('final_breakpoint_reached'), reverse=True)
-                ],
+                    value, key=itemgetter('final_breakpoint_reached'), reverse=True
+                )],
             })
             total_breakpoints += len(value)
             total_breakpoints_reached += breakpoints_reached
@@ -625,8 +629,8 @@ class GoodToGoAPIView(GenericAPIView):
                 'final_breakpoints_reached': breakpoints_reached,
                 'total_breakpoints': len(value),
                 'matchups': [x for x in sorted(
-                    value, key=itemgetter('final_breakpoint_reached'), reverse=True)
-                ],
+                    value, key=itemgetter('final_breakpoint_reached'), reverse=True
+                )],
             })
             total_breakpoints += len(value)
             total_breakpoints_reached += breakpoints_reached
@@ -671,10 +675,12 @@ class GoodToGoAPIView(GenericAPIView):
     def _get_summary(self, total_breakpoints_reached, total_breakpoints):
         return '''
             <p>Your {} can reach the final {} breakpoint in <b>{} / {}</b> tested matchups.</p>
-            '''.format(
+        '''.format(
             self.attacker.name, self.quick_move.name, total_breakpoints_reached, total_breakpoints
         )
 
     def _get_attack_multiplier(self, attack_iv, defender):
-        return ((self.attacker.pgo_attack + attack_iv) * self.max_cpm_value) / (
-            (defender.pokemon.pgo_defense + MAX_IV) * defender.raid_tier.raid_cpm.value)
+        return calculate_damage_multiplier(
+            self.attacker, attack_iv, self.max_cpm_value,
+            defender.pokemon, MAX_IV, defender.raid_tier.raid_cpm.value
+        )

@@ -34,6 +34,7 @@ ready(() => {
   const selectWeatherCondition = document.getElementById('select-weather-condition')
   const selectFriendshipBoost = document.getElementById('select-friendship-boost')
 
+  const buddyBoostToggle = document.querySelector('.toggle-buddy-boost')
   const tier36BossesToggle = document.querySelector('.toggle-tier-3-5-raid-bosses')
   const tier12BossesToggle = document.querySelector('.toggle-tier-1-2-raid-bosses')
 
@@ -47,6 +48,7 @@ ready(() => {
     cinematic_move: 1,
     weather_condition: selectWeatherCondition.value,
     friendship_boost: selectFriendshipBoost.value,
+    buddy_boost: false,
     tier_3_6_raid_bosses: true,
     tier_1_2_raid_bosses: false,
     status: FORM_STATE.READY,
@@ -80,6 +82,11 @@ ready(() => {
     form.friendship_boost = event.currentTarget.value
 
     submitForm().then(() => selectFriendshipBoost.focus())
+  })
+  buddyBoostToggle.addEventListener('click', (event) => {
+    togglePressed(buddyBoostToggle)
+    form.buddy_boost = !form.buddy_boost
+    submitForm().then(() => buddyBoostToggle.focus())
   })
   tier36BossesToggle.addEventListener('click', (event) => {
     togglePressed(tier36BossesToggle)
@@ -217,6 +224,7 @@ ready(() => {
     selectAttackerAtkIv.disabled = submitting
     selectWeatherCondition.disabled = submitting
     selectFriendshipBoost.disabled = submitting
+    buddyBoostToggle.disabled = submitting
     tier36BossesToggle.disabled = submitting
     tier12BossesToggle.disabled = submitting
   }
@@ -284,7 +292,10 @@ ready(() => {
     }
   }
 
-  const restoreTierSelection = (data) => {
+  const restoreToggles = (data) => {
+    data.buddy_boost
+      ? buddyBoostToggle.classList.add('pressed')
+      : buddyBoostToggle.classList.remove('pressed')
     data.tier_3_6_raid_bosses
       ? tier36BossesToggle.classList.add('pressed')
       : tier36BossesToggle.classList.remove('pressed')
@@ -301,7 +312,7 @@ ready(() => {
     selectFriendshipBoost.value = data.friendship_boost
 
     selectPokemonMoves(data.attacker, 'attacker')
-    restoreTierSelection(data)
+    restoreToggles(data)
 
     form = data
     form.status = FORM_STATE.READY

@@ -37,6 +37,8 @@ TIER_CPM_MAP = (
     (1, '0.597400000',),
     (40, '0.790300000',),
 )
+SHADOW_ATTACK_BUFF = Decimal('1.2')
+SHADOW_DEFENSE_NERF = Decimal('0.833')
 
 
 def get_navigation_items():
@@ -134,6 +136,19 @@ def calculate_cycle_dps(quick_move, cinematic_move):
         cycle_dps = cycle_dps / 1.06
 
     return cycle_dps
+
+
+def calculate_damage_multiplier(attacker, attack_iv, attacker_cpm, defender, defense_iv, defender_cpm):
+    total_attack = (attacker.pgo_attack + attack_iv) * attacker_cpm
+    total_defense = (defender.pgo_defense + defense_iv) * defender_cpm
+
+    if attacker.shadow:
+        total_attack *= SHADOW_ATTACK_BUFF
+
+    if defender.shadow:
+        total_defense *= SHADOW_DEFENSE_NERF
+
+    return total_attack / total_defense
 
 
 def calculate_dph(

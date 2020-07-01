@@ -105,6 +105,7 @@ class GoodToGoView(CalculatorInitialDataMixin):
             'weather_condition': self._get_object_id(
                 'WeatherCondition', params.get('weather_condition')),
             'friendship_boost': str(params.get('friendship_boost')),
+            'buddy_boost': bool(params.get('buddy_boost') == 'true'),
             'tier_3_6_raid_bosses': bool(params.get('tier_3_6_raid_bosses') == 'true'),
             'tier_1_2_raid_bosses': bool(params.get('tier_1_2_raid_bosses') == 'true'),
         }
@@ -112,7 +113,7 @@ class GoodToGoView(CalculatorInitialDataMixin):
 
 class PokemonListView(ListViewOrderingMixin):
     template_name = 'pgo/pokemon_list.html'
-    queryset = Pokemon.objects.select_related('primary_type', 'secondary_type')
+    queryset = Pokemon.objects.filter(shadow=False).select_related('primary_type', 'secondary_type')
     ordering_fields = (
         'number', 'pgo_attack', 'pgo_defense', 'pgo_stamina', 'stat_product', 'maximum_cp',
     )
@@ -160,7 +161,7 @@ class PokemonDetailView(PresetMixin, DetailView):
             level__in=[1, 15, 20, 25, 30, 35, 40]
         )
         context.update({
-            'data': Pokemon.objects.values_list('slug', 'name'),
+            'data': Pokemon.objects.filter(shadow=False).values_list('slug', 'name'),
             'pokemon_stats': [(
                 int(x.level),
                 floor(x.value * (self.object.pgo_attack + 15)),
@@ -201,7 +202,8 @@ class MoveDetailView(PresetMixin, DetailView):
             'effectiveness_effective': effectiveness_effective,
             'effectiveness_not_effective': effectiveness_not_effective,
             'pokemon_moves': PokemonMove.objects.filter(
-                move_id=self.object.pk
+                move_id=self.object.pk,
+                pokemon__shadow=False
             ).select_related(
                 'pokemon__primary_type',
                 'pokemon__secondary_type',

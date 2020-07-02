@@ -423,7 +423,7 @@ class BreakpointCalcAPIView(GenericAPIView):
         for pokemon in get_top_counter_qs(self.defender):
             attacker_multiplier = calculate_damage_multiplier(
                 pokemon, self.attacker.atk_iv, self.attacker.cpm.value,
-                pokemon, MAX_IV, self.defender.cpm
+                self.defender, MAX_IV, self.defender.cpm
             )
             defender_multiplier = calculate_damage_multiplier(
                 self.defender, MAX_IV, self.defender.cpm,

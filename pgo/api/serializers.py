@@ -77,7 +77,7 @@ class SimplePokemonSerializer(serializers.Serializer):
 
 class BreakpointCalcSerializer(serializers.Serializer):
     attacker = serializers.SlugField()
-    attacker_level = serializers.FloatField(min_value=1, max_value=45)
+    attacker_level = serializers.FloatField(min_value=1, max_value=41)
     attacker_quick_move = serializers.IntegerField()
     attacker_cinematic_move = serializers.IntegerField()
     attacker_atk_iv = serializers.IntegerField(min_value=0, max_value=15)

@@ -21,7 +21,6 @@ STAB_SCALAR = 1.2
 WEATHER_BOOST_SCALAR = 1.2
 MAX_IV = 15
 LEVELS = (20.0, 25.0, 30.0, 35.0, 40.0)
-cpm = CPM.gyms.get(level=Decimal('40.0')).value
 NAVIGATION_ITEM_MAP = (
     ('/breakpoint-calc/', 'Breakpoint calculator',),
     ('/good-to-go/', 'Good to go',),
@@ -74,6 +73,7 @@ def calculate_pokemon_stats(pokemon):
     defense = pokemon.pgo_defense + MAX_IV
     stamina = pokemon.pgo_stamina + MAX_IV
 
+    cpm = CPM.gyms.get(level=Decimal('40.0')).value
     pokemon.maximum_cp = attack * sqrt(defense) * sqrt(stamina) * pow(cpm, 2) / 10.0
     pokemon.stat_sum = pokemon.pgo_attack + pokemon.pgo_defense + pokemon.pgo_stamina
     pokemon.stat_product = pokemon.pgo_attack * pokemon.pgo_defense * pokemon.pgo_stamina

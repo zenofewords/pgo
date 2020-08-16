@@ -1,8 +1,9 @@
-var MiniCssExtractPlugin = require('mini-css-extract-plugin')
-var path = require('path')
-var WebpackBundleTracker = require('webpack-bundle-tracker')
+const path = require('path')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const WebpackBundleTracker = require('webpack-bundle-tracker')
 
 module.exports = {
+  mode: 'development',
   entry: {
     breakpointCalc: './static/javascript/breakpointCalc',
     goodToGo: './static/javascript/goodToGo',
@@ -11,7 +12,15 @@ module.exports = {
   output: {
     filename: '[name]_[hash].js',
     path: path.resolve(__dirname, 'staticfiles/bundles'),
-    publicPath: 'http://localhost:3000/static/bundles/',
+    publicPath: 'http://localhost:8080/static/bundles/',
+  },
+  devtool: 'eval-source-map',
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
+    compress: true,
+    hot: true,
   },
   module: {
     rules: [
@@ -53,12 +62,11 @@ module.exports = {
     ]
   },
   plugins: [
+    new WebpackBundleTracker({
+      filename: './webpack-stats.json',
+    }),
     new MiniCssExtractPlugin({
       filename: '[name]_[hash].css',
     }),
-    new WebpackBundleTracker({
-      filename: './webpack-stats.json'
-    }),
   ],
-  mode: 'development',
 }

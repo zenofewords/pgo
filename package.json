@@ -2,38 +2,27 @@
   "name": "pgo",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "base": "server.js",
   "scripts": {
-    "dev": "node server.js",
-    "build": "webpack --config webpack.prod.config.js"
+    "dev": "webpack-dev-server --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zenofewords/pgo.git"
-  },
-  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/zenofewords/pgo/issues"
-  },
-  "homepage": "https://github.com/zenofewords/pgo#readme",
   "dependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "autoprefixer": "^9.6.1",
+    "@babel/core": "^7.7.5",
+    "@babel/preset-env": "^7.7.6",
     "babel-loader": "^8.0.6",
-    "babel-minify-webpack-plugin": "^0.3.1",
-    "choices.js": "^7.0.0",
-    "css-loader": "^3.2.0",
-    "cssnano": "^4.1.10",
-    "file-loader": "5.1.0",
-    "mini-css-extract-plugin": "0.9.0",
-    "postcss-loader": "^3.0.0",
-    "sass": "^1.22.9",
-    "sass-loader": "8.0.2",
-    "webpack": "^4.39.1",
-    "webpack-bundle-tracker": "^0.4.2-beta",
-    "webpack-cli": "^3.3.8",
-    "webpack-dev-server": "3.2.1"
+    "choices.js": "9.0.1",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^4.2.0",
+    "eslint": "^7.7.0",
+    "mini-css-extract-plugin": "^0.10.0",
+    "sass": "^1.23.7",
+    "sass-lint": "^1.13.1",
+    "sass-loader": "^9.0.3",
+    "webpack": "^4.41.3",
+    "webpack-bundle-tracker": "0.4.3",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.11.0"
   }
 }

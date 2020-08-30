@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('', include('pgo.urls', namespace='pgo')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+admin.site.enable_nav_sidebar = False
 
 if settings.DEBUG_TOOLBAR:
     import debug_toolbar

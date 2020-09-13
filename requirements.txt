@@ -1,4 +1,4 @@
-Django==3.1
+Django==3.1.1
 Pygments==2.6.1
 Unidecode==1.1.1
 asgiref==3.2.10
@@ -13,9 +13,9 @@ Faker==4.1.2
 greenlet==0.4.16
 gunicorn==20.0.4
 idna==2.10
-psycopg2-binary==2.8.5
+psycopg2-binary==2.8.6
 pytest-django==3.9.0
-pytest==6.0.1
+pytest==6.0.2
 python-dotenv==0.14.0
 python-memcached==1.59
 pytz==2020.1

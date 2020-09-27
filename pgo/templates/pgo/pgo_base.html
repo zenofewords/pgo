@@ -17,10 +17,10 @@
 {% block header %}
   {{ block.super }}
   {% navigation_tag %}
+  {% include 'pgo/includes/discontinued_message.html' %}
 {% endblock header %}
 
 {% block footer %}
-  Notice something missing or broken? You can let me know at
-  {% include 'pokestuff/includes/reddit_contact.html' %}
+  {% include 'pgo/includes/discontinued_message.html' %}
   {{ block.super }}
 {% endblock footer %}

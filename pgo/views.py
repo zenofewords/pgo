@@ -212,3 +212,7 @@ class MoveDetailView(PresetMixin, DetailView):
             ),
         })
         return context
+
+
+class FarewellView(TemplateView):
+    template_name = 'pgo/farewell.html'

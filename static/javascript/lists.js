@@ -19,7 +19,7 @@ ready(() => {
   const searchInput = listSearchInput ? new Choices('.list-search', choicesOptions) : undefined
   const moveTypeFilter = document.getElementById('move-type-filter')
 
-  if (listSearchInput.id === 'pokemon-search') {
+  if (listSearchInput && listSearchInput.id === 'pokemon-search') {
     searchInput.input.element.addEventListener('input', processInput.bind(null, searchInput))
   }
   moveTypeFilter && moveTypeFilter.addEventListener('change', event => {

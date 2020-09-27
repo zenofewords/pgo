@@ -8,6 +8,7 @@ from pgo.views import (
     MoveListView,
     PokemonDetailView,
     PokemonListView,
+    FarewellView,
 )
 
 app_name = 'pgo'
@@ -21,5 +22,6 @@ urlpatterns = (
     path('moves/<slug:slug>', MoveDetailView.as_view(), name='move-detail'),
     path('moves/', MoveListView.as_view(), name='move-list'),
 
+    path('farewell/', FarewellView.as_view(), name='farewell'),
     path('', BreakpointCalculatorView.as_view(), name='breakpoint-calc'),
 )

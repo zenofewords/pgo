@@ -7,7 +7,7 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEBUG = bool(os.getenv('DEBUG', False))
 DEBUG_TOOLBAR = bool(os.getenv('DEBUG_TOOLBAR', False) and DEBUG)
-CACHE = not DEBUG
+CACHE = bool(os.getenv('CACHE', False))
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 SECURE_BROWSER_XSS_FILTER = True

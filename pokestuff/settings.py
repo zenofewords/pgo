@@ -103,6 +103,7 @@ DATABASES = {
         'CONN_MAX_AGE': 600,
     }
 }
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

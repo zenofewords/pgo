@@ -20,7 +20,7 @@
     "sass-lint": "^1.13.1",
     "sass-loader": "^11.0.1",
     "webpack": "^5.22.0",
-    "webpack-bundle-tracker": "0.4.3",
+    "webpack-bundle-tracker": "1.0.0",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.0"
   }

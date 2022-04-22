@@ -1,5 +1,5 @@
 asgiref==3.4.1
-Django==3.2.12
+Django==3.2.13
 django-extensions==3.1.5
 django-webpack-loader==1.4.1
 djangorestframework==3.13.1

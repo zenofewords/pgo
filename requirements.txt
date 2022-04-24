@@ -1,10 +1,10 @@
-asgiref==3.4.1
-Django==3.2.12
+asgiref==3.5.0
+Django==3.2.13
 django-extensions==3.1.5
-django-webpack-loader==1.4.1
+django-webpack-loader==1.5.0
 djangorestframework==3.13.1
 psycopg2-binary==2.9.3
-python-dotenv==0.19.2
-pytz==2021.3
+python-dotenv==0.20.0
+pytz==2022.1
 six==1.16.0
 sqlparse==0.4.2

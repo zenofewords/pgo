@@ -7,4 +7,4 @@ psycopg2-binary==2.9.3
 python-dotenv==0.20.0
 pytz==2022.1
 six==1.16.0
-sqlparse==0.4.2
+sqlparse==0.5.4
